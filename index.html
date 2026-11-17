@@ -100,7 +100,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.8.1: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.9: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
@@ -295,7 +295,7 @@ function dunSpawns(){
   const L=[],add=(type,tx,ty,lv,group)=>L.push({type:type,x:tx*T+8,y:ty*T+10,timer:0,mob:null,group:group||null,lv:[lv,lv],noRespawn:true});
   add('crat',5,17,4,'d1');add('crat',7,18,4,'d1');add('crat',9,17,4,'d1b');add('cskel',8,20,4);
   add('cskel',19,19,5,'d2');add('cskel',20,21,5,'d2');add('cskel',23,19,5,'d3');add('cskel',24,21,5,'d3');add('crat',22,22,5);
-  add('cskel',18,9,6,'d4');add('cskel',20,10,6,'d4');add('crat',23,9,5,'d5');add('crat',24,11,5,'d5');add('cskel',22,8,6);
+  add('cskel',20,10,6);
   add('cskel',11,8,6,'d6');add('cskel',12,6,6,'d6');add('boss1',6,4,7);
   return L;
 }
@@ -315,13 +315,13 @@ const ABI={};AB.forEach(a=>ABI[a.id]=a);
 const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl)):0;
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
-  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:26,aggro:40,armor:0},
-  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:12,aggro:30,armor:0.5},
-  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:51,hpl:21,dmg:4.4,dmgl:1.75,spd:9,aggro:48,armor:0},
-  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:104,hpl:29,dmg:4.4,dmgl:1.75,spd:24,aggro:50,armor:0.1,named:1,zone:'Gate Road'},
-  crat:{name:'a crypt rat',img:'crat',lv:[4,5],hp:46,hpl:18,dmg:2.4,dmgl:1.3,spd:28,aggro:44,armor:0},
-  cskel:{name:'a crypt skeleton',img:'skel',lv:[4,6],hp:51,hpl:21,dmg:4.6,dmgl:1.8,spd:15,aggro:52,armor:0.15},
-  boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:220,hpl:40,dmg:6,dmgl:2.2,spd:14,aggro:70,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
+  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:30,aggro:40,armor:0},
+  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:24,aggro:30,armor:0.5},
+  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:51,hpl:21,dmg:4.4,dmgl:1.75,spd:25,aggro:48,armor:0},
+  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:104,hpl:29,dmg:4.4,dmgl:1.75,spd:31,aggro:50,armor:0.1,named:1,zone:'Gate Road'},
+  crat:{name:'a crypt rat',img:'crat',lv:[4,5],hp:50,hpl:20,dmg:2.8,dmgl:1.45,spd:31,aggro:44,armor:0},
+  cskel:{name:'a crypt skeleton',img:'skel',lv:[4,6],hp:56,hpl:23,dmg:5.2,dmgl:2,spd:29,aggro:52,armor:0.15},
+  boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:260,hpl:46,dmg:6.5,dmgl:2.4,spd:27,aggro:70,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 const XP_MULT=1.25; // mobs got tougher, so each kill is worth a bit more
 // XP needed per level, EverQuest-shaped: early levels are quick, later ones slow down a lot.
@@ -469,7 +469,9 @@ function killMob(m){
   if(player.lvl>=10)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
-  if(m.def.boss&&credit){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! Dungeon 1 is cleared.','#ffd27a')}
+  if(zoneId==='dun'){run.kills++;run.xp+=credit?xp:0;}
+  if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
+    run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
     if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
   if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227')}rollLoot(m);saveInv();}
@@ -524,6 +526,7 @@ function giveItem(id,n,k){
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
   if(i>=0)inv.bags[i].n+=n;
   else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
+  if(zoneId==='dun')run.loot.push(it.name);
   log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar]);
   floatText(player.x,player.y-30-(k||0)*8,it.name,RAR[it.rar]);
   return true;
@@ -951,6 +954,13 @@ function drawGlows(){
 
 /* ---------- Zones: the overworld and the Dungeon 1 instance ---------- */
 let promptAction=null;
+// Stats for the current dungeon run, shown on the ending screen.
+const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null};
+function finishRun(){
+  const secs=Math.round(time-run.t0),mm=Math.floor(secs/60),ss=String(secs%60).padStart(2,'0');
+  const loot=run.loot.filter(n=>!/Whisker|Shell|Bone|Rag/.test(n));
+  prompt('Dungeon 1 complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Return to the graveyard',()=>enterZone('over'));
+}
 function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;openModal('promptUI')}
 $('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');running=true;if(promptAction)promptAction();promptAction=null});
 function enterZone(id){
@@ -960,22 +970,25 @@ function enterZone(id){
   WW=MW*T;WH=MH*T;
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;sp.timer=0;spawn(sp)});
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
-  if(id==='dun'){player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
+  if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   player.onTile=tileAt(player.x,player.y);
 }
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
 function checkPortals(){
+  if(zoneId==='dun'&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
+    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227');giveItem(pick(UNCOMMONS));saveInv();}
+  if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
-    if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. The dungeon resets each time you enter.','Enter',()=>enterZone('dun'));
+    if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
     if(t===8)prompt('Leave Dungeon 1?','Leaving resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));
   }
 }
 // Boss 1: a shadow bolt every 8 seconds at range, and it calls two skeletons at half health.
 function bossThink(m,dt){
   m.bolt=(m.bolt===undefined?5:m.bolt)-dt;
-  if(m.bolt<=0&&dist(m,player)<110){m.bolt=8;beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
+  if(m.bolt<=0&&dist(m,player)<110){m.bolt=7;beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
     let dmg=(8+2*m.lv)*rr(0.85,1.15);dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('Boss 1 hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0)playerDie(m)}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('Boss 1 calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
@@ -1036,7 +1049,6 @@ function update(dt){
       if(!player.dead&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
-      if(Math.hypot(m.x-m.hx,m.y-m.hy)>210){m.state='return';m.dots=[];log(cap(m.def.name)+' loses interest and wanders home.','#9aa');if(player.target===m)player.target=null;return}
       const d=dist(m,player);
       if(m.def.boss)bossThink(m,dt);if(m.dead||player.dead)return;
       if(d>11){if(spd>0)moveToward(m,player.x,player.y,spd,dt)}
@@ -1090,6 +1102,8 @@ function render(){
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
   if(zoneId==='over'){drawCamp();drawCritters();}
+  if(zoneId==='dun'&&run.portal){const p=run.portal;lx.fillStyle='#7dffa6';for(let a=0;a<24;a++){if((a+Math.floor(time*8))%3===0)continue;const an=a/24*Math.PI*2;lx.fillRect(Math.round(p.x+Math.cos(an)*7),Math.round(p.y+Math.sin(an)*4),1,1)}lx.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,2,2)}
+  if(zoneId==='dun'&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;

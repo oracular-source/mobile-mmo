@@ -16,17 +16,16 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | --- | --- | --- | --- |
 | 0 | Controls and core combat | You can fight and kite comfortably on your phone | Done (v0.6) |
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
-| 2 | First dungeon | A run is fun enough to repeat | In progress (v0.8 first pass) |
+| 2 | First dungeon | A run is fun enough to repeat | Nearly done (v0.9) |
 | 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Next |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Dungeon 1 play-test** (M): is it fun to repeat, is Boss 1 too hard or too easy, is the length right (aim 15–20 min)?
+- **Dungeon 1 re-test** (S): with faster mobs and no leashing, is it a little harder but still fair at level 5–6?
 
 ## Next
-1. Dungeon 1 tuning from play-test notes (S)
 2. Class system refactor: move Druid-only code into class data (M)
 3. Warrior (M–L)
 4. Necromancer (M–L)
@@ -54,6 +53,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | First-hit tagging: the first player or group to hit a mob owns it | M | S | phase 3 |
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
+| Longer dungeons (later ones grow past the short first one) | H | M | after classes |
 
 ## Known issues
 - Lag and jitter reported on phone (v0.8): fixed in v0.8.1; confirm on device.
@@ -62,6 +62,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.9** From the first dungeon play-test: no leashing (mobs chase until someone dies or the guards step in, so running out of range no longer resets them); mobs much faster (24–31 vs the Druid's 34), so kiting needs snares; shorter Dungeon 1 (13 mobs, room 3 is now a quiet passage); dungeon mobs ~10% tougher, Boss 1 +18% HP, shadow bolt every 7s; an ending: Boss 1 leaves a chest (copper + uncommon item) and a way out with a run summary (time, kills, XP, gear).
 - **v0.8.2** Test shortcut: add `?level=7` to the game link to jump to that level (prototype only).
 - **v0.8.1** Performance: lighting is now drawn from pre-made light stamps instead of rewriting every pixel each frame (about 3x faster on a slowed-down test CPU: ~55 ms to ~18 ms per frame); the camera follows a rounded player position so the Druid no longer shimmers; screen resolution capped at 2x; HUD updates 10 times a second.
 - **v0.8** Dungeon 1: crypt door at the back of the graveyard; five-room instanced crypt (levels 4–6 crypt rats and skeletons, social groups); Boss 1 (level 7, shadow bolt every 8s, calls two skeletons at half health); better dungeon drops; Boss 1 always drops a named item (staff, robe or charm); exit circle; death wakes you at the crypt entrance; the dungeon resets each time you enter. Placeholder names: Town 1, Dungeon 1, Boss 1.

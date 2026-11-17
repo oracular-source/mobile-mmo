@@ -111,6 +111,7 @@ Level difference is the main source of danger, like EverQuest. A mob two or more
 - **Resists:** every targeted spell can be resisted, at any level. Even-level mobs resist about 5% of the time, plus 10% for each level they're above you, down to 2% for much lower mobs. A resist still costs the mana. There are no fizzles.
 - **Durations:** roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones (15% per level, between 25% and 150% of normal).
 - **Harder hits:** mobs above your level hit 15% harder per level; lower ones hit a little softer.
+- **No leashing:** a pulled mob chases you until it dies, you die, or guards kill it. Mobs move almost as fast as you, so snares matter and running away is possible but tight.
 - **Guards:** town guards attack any mob chasing you that comes near them, so running to the gate is a real escape. If guards do most of the damage, you get no XP or loot.
 
 - **No auto-attack.** Every attack is a spell with a normal mana cost. Optional auto-cast repeats your main spell on the enemy you're fighting; any other spell you tap during the cooldown is queued and goes first. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
@@ -187,10 +188,11 @@ Layout: Hub city → Gate Road (1–3) → either Sunken Graveyard (3–5) or Wo
 
 A crypt behind a door at the back of the Sunken Graveyard, for levels 4–7, scaled for one player until multiplayer exists.
 
-- **Layout:** five rooms in a line: entry (with the exit circle), crypt rats, skeleton pairs, a mixed room, then the boss room with two skeleton guards.
-- **Mobs:** crypt rats and crypt skeletons, levels 4–6, many in social groups, so pulls matter. Nothing respawns inside; the whole dungeon resets each time you enter.
-- **Boss 1 (level 7):** melee hits hard, throws a shadow bolt every 8 seconds at range, and calls two skeletons at half health. Always drops one named item: Boss 1 Staff, Boss 1 Robe or Boss 1 Charm.
+- **Layout:** five rooms in a line: entry (with the exit circle), crypt rats, skeleton pairs, a quiet passage, then the boss room with two skeleton guards. The first dungeon is deliberately short (13 mobs); later dungeons get longer.
+- **Mobs:** crypt rats and crypt skeletons, levels 4–6, many in social groups, so pulls matter. Nothing respawns inside. Mobs never leash: once pulled, they chase until you or they die.
+- **Boss 1 (level 7):** melee hits hard, throws a shadow bolt every 7 seconds at range, and calls two skeletons at half health. Always drops one named item: Boss 1 Staff, Boss 1 Robe or Boss 1 Charm.
 - **Loot:** trash drops uncommon gear twice as often as outside, and rare gear more often.
+- **Ending:** Boss 1 leaves a chest (copper and an uncommon item) and a way out. Stepping into it shows a run summary (time, kills, XP, gear) and returns you to the graveyard.
 - **Death:** you wake at the crypt entrance; cleared rooms stay cleared.
 - **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
 
