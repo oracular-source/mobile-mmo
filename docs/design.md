@@ -77,8 +77,8 @@ The Druid is the prototype class because it touches every system at once: damage
 | --- | --- | --- | --- | --- |
 | 1 | Thornlash | Nuke | Small nature damage, fast cast | Starting |
 | 1 | Mending Touch | Heal | Single-target heal | Starting |
-| 2 | Tanglefoot | Snare | Slows target movement by 50% | Trainer |
-| 4 | Creeping Rot | DoT | Nature damage over 18 seconds | Trainer |
+| 2 | Creeping Rot | DoT | Nature damage over 18 seconds | Trainer |
+| 3 | Tanglefoot | Snare | Slows target movement by 50% | Trainer |
 | 6 | Rootgrip | Crowd control | Roots target in place; can break when it takes damage | Trainer |
 | 8 | Barkskin | Buff | Raises armor on self or an ally | Trainer |
 | 10 | Thorn Aura | Buff | Damage shield: attackers take damage | Trainer |
@@ -96,7 +96,7 @@ The Druid is the prototype class because it touches every system at once: damage
 
 **Rank upgrades** replace earlier versions instead of taking book space: Thornlash II at 12, Mending Touch II at 16, Rootgrip II at 24.
 
-**Prototype scope:** levels 1–10 in Zone 1 only need the first 7 abilities. Snare comes before root on purpose: it's the safer kiting tool, and root is the stronger upgrade. The full snare, DoT and nuke loop is available by level 4. Default loadout: center Thornlash, then clockwise from up: Mending Touch, Tanglefoot, Creeping Rot, Rootgrip, Barkskin.
+**Prototype scope:** levels 1–10 in Zone 1 only need the first 7 abilities. Snare comes before root on purpose: it's the safer kiting tool, and root is the stronger upgrade. Creeping Rot comes at level 2 so armored beetles are beatable early. The full DoT, snare and nuke loop is available by level 3. Default loadout: center Thornlash, then clockwise from up: Mending Touch, Tanglefoot, Creeping Rot, Rootgrip, Barkskin.
 
 ## Combat
 

@@ -41,6 +41,8 @@
 
 - v0.6.1: movement options in Settings: tap + drag stick (stick can be shown or hidden) or hold to move (press and hold to walk toward your finger)
 
+- v0.6.2: Creeping Rot moved to level 2 and Tanglefoot to level 3, so early armored beetles are beatable
+
 ## Next (milestone 1: feel and polish, see docs/roadmap.md)
 1. Tune numbers from phone play-tests
 2. Sound effects (generated, CC0)
@@ -49,7 +51,6 @@
 5. Simple minimap
 
 ## Known issues / notes
-- Level 2 mire beetles at the gate are slow to kill at level 1 (armor halves Thornlash; no DoT until level 4). Intended as "DoTs beat armor", but may feel bad; watch in play-tests.
 - Gate Road mobs top out at level 5, so leveling slows sharply after 5-6 until the rest of Zone 1 is built (milestone 3).
 - Sprites draw on top of tree canopies (no depth sorting with scenery yet).
 - The game pauses while the Spellbook or Settings is open (single-player convenience; an MMO wouldn't pause).
