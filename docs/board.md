@@ -27,6 +27,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 - **UI and controls pass** (M). Owner is switching to the joystick (more control, can move while casting). In order:
   1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
   2. ~~**Better targeting:**~~ v0.11.4: a Next ⟳ button sits just above the spells; the 1st hit / Auto toggles moved to the top right (set between fights). Confirm on phone.
+  - Done along the way (v0.11.5): zoomed out, pinch-to-zoom + Zoom setting, bigger bosses with a boss bar.
   3. **Rethink the bottom bar and hotbar** (see the Hotbar redesign card): what belongs on screen, what goes in menus, room for more spells.
   Talk through the layout with the owner before building step 3.
 
@@ -36,6 +37,8 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 3. Milestone 4: start screen polish, fix anything clearly broken. **No big balance pass yet** (see Decisions).
 
 ## Decisions
+- **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
+- **Zoom:** default view is about 235 game pixels wide (was 170); players pick Near / Normal / Far or pinch. Bosses draw 2–3x player size.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
@@ -46,6 +49,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | --- | --- | --- | --- |
 | Buff spells and a buff bar. Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
+| Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room | M | S | 2 (with the feel pass) |
 | Hotbar redesign: small left-hand bar (shows in tap-to-move mode), room for more spells; covers slots 7 and 8. Joystick stays the default for new players | H | M | 2 |
 | Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
@@ -72,12 +76,14 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
 
 ## Known issues
+- Boss 1 is the skeleton sprite scaled up 3x, so its pixels are chunkier than everything else. Placeholder until the art pass draws it at full size.
 - Lag and jitter reported on phone (v0.8): fixed in v0.8.1; confirm on device.
 - Sprites draw on top of tree canopies (no depth sorting with scenery).
 - Gate Road mobs top out at level 5, so overworld leveling slows after 5–6 until more zones exist.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11.5** Zoom and bosses: the view is zoomed out (about 40% more world on screen); **pinch** the map to zoom in or out, or pick Near / Normal / Far in Settings → Zoom (it's remembered). Pinching never walks or targets. Boss 1 draws at 3x player size, and a wide **boss health bar** appears across the top while a boss is fighting you. The camera can now scroll a little past the map's top edge so the top bars never cover you. Sharper screens on 3x phones (finer zoom steps); frame time unchanged in testing.
 - **v0.11.4** Targeting: a **Next ⟳** button right above your spells switches to the next enemy mid-fight (same as the bottom bar's Target). The **1st hit** and **Auto** toggles moved to the top right under the target frame, since they're set between fights. DEV button and cast bar shifted down to make room.
 - **v0.11.3** Joystick fix: while one finger holds the joystick, a quick tap on an enemy with another finger now targets it (and casts your main attack if **1st hit** is on). A second-finger tap on empty ground does nothing, so it never fights the joystick.
 - **v0.11.2** Home-screen app: add the game to your phone's home screen and it opens full screen with its own icon (the Druid), no browser bars. Settings → Developer tools On/Off, since a home-screen app can't use `?dev` in its link.
