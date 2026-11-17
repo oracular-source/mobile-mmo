@@ -19,26 +19,30 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
 | 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Done (v0.11.1) |
+| 3b | Remaining launch classes (Rogue, Cleric, Enchanter) + testing grounds and balance | All six launch classes play like themselves and are roughly even in the sim | Now |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **UI and controls pass** (M). Owner is switching to the joystick (more control, can move while casting). In order:
-  1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
-  2. ~~**Better targeting:**~~ v0.11.4: a Next ⟳ button sits just above the spells; the 1st hit / Auto toggles moved to the top right (set between fights). Confirm on phone.
-  - Done along the way (v0.11.5): zoomed out, pinch-to-zoom + Zoom setting, bigger bosses with a boss bar.
-  3. ~~**Rethink the bottom bar and hotbar:**~~ v0.12–v0.12.1: no bottom bar; 6 spells on the right, slots 7–8 + Sit stacked on the left above the chat box, Menu top right, toggles top left. Confirm on phone, then this card is done.
+- **Launch classes baseline** (L, one release per class). Get all six launch classes playable at a baseline before any feel or balance work. Baseline = sprite, 6–8 abilities from level 1 to 8, class gear, Boss 1 drops; it plays like itself, not polished. The class identity pass happens inside each release. In order:
+  1. **Rogue** (melee damage): backstab from behind, opens from stealth, Evade drops aggro. Hits hard, can't take hits, weak solo.
+  2. **Cleric** (pure healer): big slow heals and heals over time, hammer melee, strong vs undead. Slow solo outdoors.
+  3. **Enchanter** (crowd control): mez (sleep until hit), charm (temporary pet that can break free), mana regen. Needs a touch-friendly mez control.
+- Finished: UI and controls pass (v0.11.3–v0.12.1), layout approved on phone.
 
 ## Next
-1. Class identity pass: with the UI settled, decide what each class should look and feel like.
-2. Feel pass, all at once: melee feel (hit sparks, knockback, swing), animations, sound. Owner wants these done together, not piecemeal.
-3. Milestone 4: start screen polish, fix anything clearly broken. **No big balance pass yet** (see Decisions).
+1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
+2. **Balance pass** on all six launch classes using the testing grounds.
+3. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
+4. Milestone 4: start screen polish, fix anything clearly broken.
 
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
 - **Zoom:** farthest (and default) view is about 215–235 game pixels wide on most phones, tuned by play-test (v0.11.5's ~290 was too far, v0.11.6's ~195 too close). Players pick Near / Far or pinch.
 - **Screen layout (v0.12.1):** max 8 ability buttons on screen: 6 on the right (pad or classic) plus slots 7–8 on the left, in joystick and tap-to-move alike. Left column above the chat box: slot 7, slot 8, Sit (kept on screen: Necros sit while the pet and DoTs fight). Top left under the portrait: 1st hit / Auto. Top right: Menu (Spells, Arrange, Settings). No bottom bar. Character = tap the portrait. Target button dropped; Next ⟳ does that job.
+- **Launch six (Nov 17):** Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. Enchanter replaces Wizard (more unique); Wizard moves to later.
+- **Classes before feel:** all launch classes reach baseline before animations, sound or feel work.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 

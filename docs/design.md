@@ -56,16 +56,18 @@ The full roster is 14 classic classes, each with one signature mechanic and a re
 | Cleric | Healer | Resurrection | Best heals, the only full rez | Very low damage, slow solo | Yes |
 | Druid | Healer | Root and kite | DoTs, snares, group teleports, great outdoor solo | Weaker heals, fragile, struggles indoors | Yes |
 | Shaman | Healer | Slow | Slows, buffs, DoTs | Low burst damage | Later |
-| Wizard | Caster | Burst nukes | Highest burst, emergency group teleport | Burns mana, pulls aggro, dies fast | Yes |
+| Wizard | Caster | Burst nukes | Highest burst, emergency group teleport | Burns mana, pulls aggro, dies fast | Later |
 | Magician | Caster | Elemental pet | Strong pet, summons gear for the group | Helpless if the pet dies | Later |
 | Necromancer | Caster | Undead pet + feign death | Best soloer: DoTs, lifetaps, pet | Slow group damage, can't heal others | Yes |
-| Enchanter | Caster | Mez and charm | Crowd control, haste, mana regen | Fragile, hardest to play | Later |
+| Enchanter | Caster | Mez and charm | Crowd control, haste, mana regen | Fragile, hardest to play | Yes |
 | Rogue | Melee | Backstab | Top melee damage, stealth, traps, locks | Needs a tank, weak solo | Yes |
 | Monk | Melee | Feign death pulls | High damage, best puller | Light armor only | Later |
 | Ranger | Melee | Bow + tracking | Ranged damage, snares, can tank in a pinch | Best at nothing | Later |
 | Bard | Support | Songs | Group buffs, crowd control, run speed | Low personal power | Later |
 
-Bard songs and Enchanter crowd control need touch-specific controls, such as a song playlist that cycles automatically. That's one reason both come after launch.
+The launch six cover one tank (Warrior), two healers (Cleric, Druid), two damage dealers (Rogue, Necromancer) and crowd control (Enchanter), and spread out for solo play: Necromancer strong; Druid and Enchanter medium; Warrior, Cleric and Rogue weak and rewarded for grouping. Enchanter replaced Wizard at launch (Nov 17, 2026) because it plays more differently from the existing casters.
+
+Enchanter crowd control needs a touch-friendly way to mez (put a mob to sleep until it's hit) and charm (borrow a mob as a temporary pet), designed when the class is built. Bard songs need their own touch controls, such as a song playlist that cycles automatically; that's one reason Bard comes after launch.
 
 ### Warrior (playable)
 

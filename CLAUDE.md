@@ -10,7 +10,7 @@ A tab-target fantasy MMO for phones, inspired by EverQuest (camps, pulls, classe
 
 ## Current phase
 Phase 2: solo prototype. Gate Road, the Sunken Graveyard and Dungeon 1; playable classes Druid, Warrior and Necromancer; single-player, no server.
-Launch classes (later phases): Warrior, Cleric, Druid, Wizard, Rogue, Necromancer. The full 14-class roster is in the design doc.
+Launch classes (later phases): Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. The full 14-class roster is in the design doc.
 Don't add multiplayer, accounts or server code until I say we're in phase 3.
 
 ## Tech stack (prototype)
