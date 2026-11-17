@@ -90,7 +90,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.3: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.4: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
@@ -227,13 +227,16 @@ const AB=[
   {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:12,cast:0,col:'#a07850',tgt:0,tag:'Armor'}
 ];
 const ABI={};AB.forEach(a=>ABI[a.id]=a);
+// HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
-  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:16,hpl:6,dmg:2,dmgl:1.1,spd:26,aggro:40,armor:0},
-  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:26,hpl:10,dmg:3,dmgl:1.2,spd:12,aggro:30,armor:0.5},
-  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:30,hpl:11,dmg:4,dmgl:1.5,spd:9,aggro:48,armor:0},
-  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:44,hpl:12,dmg:4,dmgl:1.5,spd:24,aggro:50,armor:0.1,named:1}
+  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:40,hpl:16,dmg:2,dmgl:1.2,spd:26,aggro:40,armor:0},
+  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:36,hpl:15,dmg:3,dmgl:1.3,spd:12,aggro:30,armor:0.5},
+  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:44,hpl:18,dmg:4,dmgl:1.6,spd:9,aggro:48,armor:0},
+  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:90,hpl:25,dmg:4,dmgl:1.6,spd:24,aggro:50,armor:0.1,named:1}
 };
-const need=L=>Math.round(25*Math.pow(L,1.5)); // XP per level (boosted for testing)
+// XP needed per level: about 10 even-level kills for level 2, then roughly 15-18 per level.
+// Aim: levels 1-10 in about 3-5 hours across all of Zone 1.
+const need=L=>Math.round(100*Math.pow(L,1.8));
 const maxHP=L=>40+12*L, maxMP=L=>40+10*L;
 const GCD=1.5, PSPEED=34;
 
@@ -245,9 +248,9 @@ if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))load
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set('ashfen-loadout',loadout);
 
 const player={x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
-const prog=store.get('ashfen-druid',null);if(prog&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
+const prog=store.get('ashfen-druid',null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
 player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
-const save=()=>store.set('ashfen-druid',{lvl:player.lvl,xp:player.xp});
+const save=()=>store.set('ashfen-druid',{v:2,lvl:player.lvl,xp:player.xp});
 
 /* ---------- Spawns ---------- */
 function findSpot(x0,x1,y0,y1){

@@ -21,6 +21,8 @@
   - Arrange mode: drag spells on the pad or buttons to swap them in place
   - Classic buttons: smaller main button, tap to cast
 
+- v0.4 pacing: mob HP raised (even-level mob takes about 5-6 Thornlash hits); XP curve slowed to about 10 kills for level 2, then 15-18 per level; old saves reset
+
 ## Next (milestone 1: feel and polish, see docs/roadmap.md)
 1. Tune numbers from phone play-tests
 2. Sound effects (generated, CC0)
@@ -29,6 +31,6 @@
 5. Simple minimap
 
 ## Known issues / notes
-- XP curve is boosted for testing (`need()` in the script).
+- Gate Road mobs top out at level 5, so leveling slows sharply after 5-6 until the rest of Zone 1 is built (milestone 3).
 - Sprites draw on top of tree canopies (no depth sorting with scenery yet).
 - The game pauses while the Spellbook or Settings is open (single-player convenience; an MMO wouldn't pause).
