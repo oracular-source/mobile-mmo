@@ -4,6 +4,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Ashfen Hollow - Prototype</title>
+<!-- Home-screen app: opens full screen, no browser bars -->
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-180.png">
+<link rel="icon" href="icon-192.png">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Ashfen">
+<meta name="theme-color" content="#050507">
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden;touch-action:none}
@@ -903,9 +912,12 @@ function renderSettings(){
     (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?
       seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
-      seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'');
+      seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'')+
+    // Prototype only: lets the home-screen app (which can't use ?dev) turn developer tools on.
+    '<h2>Developer tools (prototype)</h2><div class="seg"><button id="devoff" class="'+(dev.on?'':'active')+'">Off</button><button id="devon" class="'+(dev.on?'active':'')+'">On</button></div>';
 }
 $('setbox').addEventListener('click',e=>{
+  if(e.target.id==='devon'||e.target.id==='devoff'){const on=e.target.id==='devon';if(on!==dev.on){store.set('ashfen-dev',on);location.reload()}return}
   if(e.target.id==='chgcls'){$('settingsUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
