@@ -12,3 +12,6 @@ Ideas to revisit later. Not scheduled yet; most belong to phase 3 (multiplayer) 
 
 ## Journal
 - Kill journal is in (v0.6). Later: dungeon named bosses tracked per dungeon, with their drops listed once found, like a bestiary.
+
+## Buffs
+- **Buff spells and a buff bar:** more buff spells (on yourself and others), with a bar on the HUD showing active buffs and their remaining time. Barkskin is the first buff today.
