@@ -62,6 +62,8 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .slot .lbl{font-size:9.5px;color:#c9a227;margin-bottom:3px}
 .slot.over{border-color:#ffd27a;background:#221f14}
 .seg{display:flex;gap:5px;margin-bottom:4px}
+.jrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2a2531;font-size:12px}
+.jrow .q{color:#9aa}
 .seg button{flex:1;height:34px;font-size:11.5px}
 #ghost{position:absolute;pointer-events:none;z-index:9;opacity:.9;display:none}
 </style>
@@ -71,8 +73,8 @@ button.active{border-color:#c9a227;color:#ffd27a}
   <div id="view">
     <canvas id="c"></canvas>
     <div id="hud">
-      <div class="frame">
-        <div class="row"><span>Druid</span><span id="plv">Lv 1</span></div>
+      <div class="frame" id="pframe" style="pointer-events:auto;cursor:pointer">
+        <div class="row"><span>Druid ▸</span><span id="plv">Lv 1</span></div>
         <div class="bar hp"><i id="php"></i></div>
         <div class="bar mp"><i id="pmp"></i></div>
         <div class="bar xp" style="height:4px"><i id="pxp"></i></div>
@@ -90,14 +92,16 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.5.1: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.6: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
           <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
+          <li>Auto-cast (on by default) keeps firing your main spell at the enemy you're fighting, so your thumb is free to kite. Toggle it with the Auto pill above the pad.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
           <li>Kite: snare it, rot it, walk away, nuke it. Higher-level enemies resist more and shrug off roots sooner.</li>
           <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
+          <li>Tap your <b>Druid</b> frame (top left) for your Journal of kills and named mobs.</li>
           <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
@@ -112,6 +116,15 @@ button.active{border-color:#c9a227;color:#ffd27a}
         <h2>Loadout</h2>
         <div id="slots"></div>
         <button class="go" data-close="spellsUI">Done</button>
+      </div>
+    </div>
+
+    <div id="journalUI" class="modal">
+      <div class="card">
+        <h1>Journal</h1>
+        <p class="hint">Creatures you've slain. Named mobs are tracked separately; dungeon bosses will join this list.</p>
+        <div id="jbox"></div>
+        <button class="go" data-close="journalUI">Done</button>
       </div>
     </div>
 
@@ -230,21 +243,22 @@ const world=document.createElement('canvas');world.width=WW;world.height=WH;cons
 /* ---------- Game data (tune numbers here) ---------- */
 // cast: seconds of standing still. 0 = instant (usable while moving).
 const AB=[
-  {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:6,cast:0.4,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke'},
-  {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:10,cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal'},
-  {id:'snare',name:'Tanglefoot',short:'Tangle',lvl:2,mana:7,cast:0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare'},
-  {id:'rot',name:'Creeping Rot',short:'Rot',lvl:4,mana:10,cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT'},
-  {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:8,cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root'},
-  {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:12,cast:0,col:'#a07850',tgt:0,tag:'Armor'}
+  {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:5,cast:0,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke'},
+  {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:9,cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal'},
+  {id:'snare',name:'Tanglefoot',short:'Tangle',lvl:2,mana:6,cast:0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare'},
+  {id:'rot',name:'Creeping Rot',short:'Rot',lvl:4,mana:8,cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT'},
+  {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:7,cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root'},
+  {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:10,cast:0,col:'#a07850',tgt:0,tag:'Armor'}
 ];
 const ABI={};AB.forEach(a=>ABI[a.id]=a);
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
-  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:40,hpl:16,dmg:2,dmgl:1.2,spd:26,aggro:40,armor:0},
-  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:36,hpl:15,dmg:3,dmgl:1.3,spd:12,aggro:30,armor:0.5},
-  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:44,hpl:18,dmg:4,dmgl:1.6,spd:9,aggro:48,armor:0},
-  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:90,hpl:25,dmg:4,dmgl:1.6,spd:24,aggro:50,armor:0.1,named:1}
+  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:26,aggro:40,armor:0},
+  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:12,aggro:30,armor:0.5},
+  dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:51,hpl:21,dmg:4.4,dmgl:1.75,spd:9,aggro:48,armor:0},
+  gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:104,hpl:29,dmg:4.4,dmgl:1.75,spd:24,aggro:50,armor:0.1,named:1}
 };
+const XP_MULT=1.25; // mobs got tougher, so each kill is worth a bit more
 // XP needed per level, EverQuest-shaped: early levels are quick, later ones slow down a lot.
 // Target at roughly 50 kills an hour: L2 ~10 min, L5 ~1.3 h, L10 ~10 h total.
 const NEED=[0,80,260,670,1680,3800,8400,15400,27200,47500];
@@ -254,9 +268,10 @@ const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true},store.get('ashfen-settings',{}));
 let loadout=store.get('ashfen-loadout',null);
 if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=['thorn','mend','snare','rot','root','bark'];
+const kills=store.get('ashfen-kills',{});
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set('ashfen-loadout',loadout);
 
 const player={x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
@@ -339,11 +354,13 @@ function killMob(m){
   burst(m.x,m.y-6,'#cfc8b2',10,false);
   log('You have slain '+m.def.name+'!','#ffd27a');
   const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
-  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.named?3:1));
+  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.named?3:1)*XP_MULT);
   const credit=m.pdmg>=m.odmg;
   if(player.lvl>=10)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
+  if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
+    if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
   if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0)log('You receive '+coin+' copper.','#c9a227');
     if(m.type==='gnaw')log('Old Gnawbone drops a Gnawed Ring! (+2 STA)','#ff9de2');}
   if(player.target===m)player.target=null;
@@ -485,6 +502,7 @@ function buildControls(){
     pad.addEventListener('pointermove',padMove);
     pad.addEventListener('pointerup',padUp);pad.addEventListener('pointercancel',()=>{gest=null});
     ctrl.appendChild(pad);
+    autoPill(side,P+20);
   }else{
     // Classic: main button in the corner, five more fanned in a quarter circle around it.
     const main=62,sm=50,R=132,cxp=12+main/2,cyp=12+main/2;
@@ -497,7 +515,15 @@ function buildControls(){
       b.addEventListener('pointerdown',e=>{e.preventDefault();castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
+    autoPill(side,12+main+R+4);
   }
+}
+function autoPill(side,bottom){
+  const b=document.createElement('button');b.id='autopill';b.className=settings.autoCast?'active':'';
+  b.textContent='Auto '+(settings.autoCast?'on':'off');
+  b.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':16px;height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+  b.addEventListener('click',()=>{settings.autoCast=!settings.autoCast;saveSettings();buildControls();log('Auto-cast '+(settings.autoCast?'on':'off')+'.','#9aa')});
+  ctrl.appendChild(b);
 }
 function flash(el){if(!el)return;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),160)}
 function padDown(e){
@@ -527,7 +553,7 @@ function padUp(e){
 /* ---------- Arrange mode: drag spells on the pad or buttons to swap them ---------- */
 function swapSlots(a,b){if(a===b)return;const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
 ctrl.addEventListener('pointerdown',e=>{
-  if(!arranging)return;
+  if(!arranging||e.target.id==='autopill')return;
   e.stopPropagation();e.preventDefault();
   const el=e.target.closest('[data-slot]');if(!el)return;
   arrDrag={slot:slotOf(el),sx:e.clientX,sy:e.clientY,id:e.pointerId,moved:false};
@@ -607,6 +633,7 @@ function renderSettings(){
     seg('Controls','scheme',[['pad','Spell pad'],['buttons','Classic buttons']])+
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Tap an enemy','tapCast',[['true','Target + cast'],['false','Target only']])+
+    seg('Auto-cast main spell','autoCast',[['true','On'],['false','Off']])+
     (settings.scheme==='pad'?
       seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
       seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'');
@@ -619,11 +646,22 @@ $('setbox').addEventListener('click',e=>{
 
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
-function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
+function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='journalUI')renderJournal();if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
 $('bspells').addEventListener('click',()=>{if(arranging)setArranging(false);openModal('spellsUI')});
 $('barr').addEventListener('click',()=>setArranging(!arranging));
 $('bset').addEventListener('click',()=>openModal('settingsUI'));
+$('pframe').addEventListener('click',()=>openModal('journalUI'));
+function renderJournal(){
+  const named=Object.keys(TYPES).filter(k=>TYPES[k].named).map(k=>TYPES[k]);
+  let h='<h2>Named</h2>';
+  named.forEach(t=>{const k=kills[t.name];h+='<div class="jrow"><span>'+t.name+'</span><span class="q">'+(k?'Slain ×'+k.count+' · first '+k.first:'Not yet slain')+'</span></div>'});
+  h+='<h2>Creatures</h2>';
+  const rest=Object.keys(kills).filter(n=>!kills[n].named).sort((a,b)=>kills[b].count-kills[a].count);
+  if(!rest.length)h+='<div class="jrow"><span class="q">Nothing slain yet.</span></div>';
+  rest.forEach(n=>{h+='<div class="jrow"><span>'+cap(n.replace(/^an? /,''))+'</span><span class="q">×'+kills[n].count+'</span></div>'});
+  $('jbox').innerHTML=h;
+}
 function nextTarget(){
   const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
   if(!list.length){log('No targets nearby.','#9aa');return}
@@ -743,6 +781,10 @@ function update(dt){
         else if(player.mp<a.mana){log('Not enough mana.','#ff8a80')}
         else{player.mp-=a.mana;applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
+    // Auto-cast: once you're fighting your target, the main (center) spell repeats whenever it's ready.
+    // Normal mana cost. Pauses below 15% mana so there's always enough left to heal.
+    const at=player.target;
+    if(settings.autoCast&&at&&!at.dead&&at.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,at)<=(ABI[loadout[0]].range||80)&&player.mp>maxMP(player.lvl)*0.15)castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);

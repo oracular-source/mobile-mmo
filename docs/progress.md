@@ -33,6 +33,12 @@
   - Marrow the Peddler, campfire (doubles resting speed), wall torches, signpost, crows, frogs, fireflies, NPC chatter and speech bubbles
   - Several light sources in the dusk lighting
 
+- v0.6:
+  - Auto-cast for the main spell (on by default, Auto pill above the pad, also in Settings); pauses below 15% mana
+  - Thornlash is now instant so auto-cast works while kiting
+  - Mana costs about 15% lower; mobs +15% HP and +10% damage; XP per kill +25%
+  - Journal (tap the Druid frame): named mobs slain or not yet slain, and kill counts per creature
+
 ## Next (milestone 1: feel and polish, see docs/roadmap.md)
 1. Tune numbers from phone play-tests
 2. Sound effects (generated, CC0)
@@ -41,6 +47,7 @@
 5. Simple minimap
 
 ## Known issues / notes
+- Level 2 mire beetles at the gate are slow to kill at level 1 (armor halves Thornlash; no DoT until level 4). Intended as "DoTs beat armor", but may feel bad; watch in play-tests.
 - Gate Road mobs top out at level 5, so leveling slows sharply after 5-6 until the rest of Zone 1 is built (milestone 3).
 - Sprites draw on top of tree canopies (no depth sorting with scenery yet).
 - The game pauses while the Spellbook or Settings is open (single-player convenience; an MMO wouldn't pause).
