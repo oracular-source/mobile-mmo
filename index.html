@@ -568,7 +568,8 @@ function playerDie(m){
   player.hp=0;player.dead=3;player.cast=null;player.tx=null;player.target=null;player.sit=false;
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
   const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
-  mobs.forEach(o=>{if(o.state==='chase')o.state='return'});
+  // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
+  mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;if(o.state==='chase')o.state='return'});
   if(pet){log('Your skeleton crumbles to dust.','#9aa');pet=null;}
 }
 function hurtPet(m){
@@ -592,10 +593,15 @@ function updatePet(dt){
     else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
   const t=pet.target;
   if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=1.8;burst(t.x,t.y-6,'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee','skeleton','pet')}}}
-  else{if(dist(pet,player)>22)moveToward(pet,player.x-12*player.dir,player.y+4,42,dt);pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
+  // Follow with a dead zone: start walking past 30px, stop once close to its spot. One threshold made it stop and start every frame (the jitter).
+  else{const d=dist(pet,player);if(d>30)pet.follow=true;
+    if(pet.follow){const fx=player.x-12*player.dir,fy=player.y+4;if(moveToward(pet,fx,fy,d>60?52:40,dt)||Math.hypot(pet.x-fx,pet.y-fy)<6)pet.follow=false;}
+    pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
 function respawnPlayer(){if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
+
+const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
 /* ---------- Loot ---------- */
 // Drop chances grow a little with mob level. Gear: ~11-15% common, ~3-5% uncommon, 1% rare from level 4+ mobs.
@@ -607,7 +613,8 @@ function rollLoot(m){
   if(r<0.10+lb)got.push(pick(COMMONS));
   else if(r<0.10+lb+(0.025+lb*0.5)*(dun?2:1))got.push(pick(UNCOMMONS));
   if(m.lv>=4&&Math.random()<(dun?0.03:0.01))got.push(pick(RARES));
-  if(m.type==='boss1'){got.push(pick(BOSS1));if(Math.random()<0.5)got.push(pick(UNCOMMONS));if(Math.random()<0.15)got.push(pick(RARES));}
+  // Boss 1's loot waits in its chest: one named item and one uncommon, every time, plus a small rare chance.
+  if(m.type==='boss1'){const c=[pick(BOSS1),pick(UNCOMMONS)];if(Math.random()<0.15)c.push(pick(RARES));if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
   if(m.type==='gnaw'){got.push('gnawring');if(Math.random()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }
@@ -674,7 +681,7 @@ function applyAbility(a,t){
   else if(a.kind==='lifetap'){
     beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
     const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
-    player.hp=Math.min(maxHP(L),player.hp+dmg);floatText(player.x,player.y-22,'+'+dmg,'#b48cff');}
+    const h=Math.max(1,Math.round(dmg*LIFETAP_HEAL));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff');}
   else if(a.kind==='pet'){raisePet();}
   else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your skeleton for '+h+'.','#7dffa6');}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
@@ -772,12 +779,15 @@ function buildControls(){
   }
   ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));
 }
+// Two quick toggles above the abilities: "1st hit" = tapping an enemy casts your main attack once; "Auto" = it keeps casting.
 function autoPill(side,bottom){
-  const b=document.createElement('button');b.id='autopill';b.className=settings.autoCast?'active':'';
-  b.textContent='Auto '+(settings.autoCast?'on':'off');
-  b.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':16px;height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
-  b.addEventListener('click',()=>{settings.autoCast=!settings.autoCast;saveSettings();buildControls();log('Auto-cast '+(settings.autoCast?'on':'off')+'.','#9aa')});
-  ctrl.appendChild(b);
+  const mk=(key,label,off,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='autopill'+(settings[key]?' active':'');
+    b.textContent=label+' '+(settings[key]?'on':'off');
+    b.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':'+off+'px;height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+    b.addEventListener('click',()=>{settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
+    ctrl.appendChild(b);};
+  mk('autoCast','Auto',16,'Auto attack','autopill');
+  mk('tapCast','1st hit',84,'Auto first attack','firstpill');
 }
 function flash(el){if(!el)return;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),160)}
 function padDown(e){
@@ -807,7 +817,7 @@ function padUp(e){
 /* ---------- Arrange mode: drag spells on the pad or buttons to swap them ---------- */
 function swapSlots(a,b){if(a===b)return;const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
 ctrl.addEventListener('pointerdown',e=>{
-  if(!arranging||e.target.id==='autopill')return;
+  if(!arranging||e.target.id==='autopill'||e.target.id==='firstpill')return;
   e.stopPropagation();e.preventDefault();
   const el=e.target.closest('[data-slot]');if(!el)return;
   arrDrag={slot:slotOf(el),sx:e.clientX,sy:e.clientY,id:e.pointerId,moved:false};
@@ -887,8 +897,8 @@ function renderSettings(){
     '<button class="go" id="chgcls" style="margin:0 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
     seg('Controls','scheme',[['pad','Spell pad'],['buttons','Classic buttons']])+
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
-    seg('Tap an enemy','tapCast',[['true','Target + cast'],['false','Target only']])+
-    seg('Auto-cast main spell','autoCast',[['true','On'],['false','Off']])+
+    seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
+    seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
     seg('Movement','move',[['drag','Tap + drag stick'],['hold','Hold to move']])+
     (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?
@@ -1090,7 +1100,7 @@ function enterZone(id){
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
 function checkPortals(){
   if(zoneId==='dun'&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
-    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227');giveItem(pick(UNCOMMONS));saveInv();}
+    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;

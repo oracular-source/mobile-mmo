@@ -17,16 +17,17 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 0 | Controls and core combat | You can fight and kite comfortably on your phone | Done (v0.6) |
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
-| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Built (v0.11), needs play-test |
+| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Play-tested; fixes in v0.11.1, Necro re-check left |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Class play-test** (S): Warrior and Necromancer. Does each feel different? Does the skeleton hold aggro well enough? Use the DEV panel to jump levels and teleport.
+- **Re-check v0.11.1** (S): death resets fights, skeleton no longer jitters, both toggles work, boss loot is in the chest. Then run Dungeon 1 again as a level 5 Necro: with Lifetap healing less, is it still too easy? (Warrior at 6 could not solo Boss 1, which is the intended feel.)
 
 ## Next
 1. Melee feel: hit sparks, small knockback, a swing animation (S)
+   - If the Necro still clears too easily after the re-check, a small Necro tuning card jumps ahead of this.
 2. Milestone 4: sound effects, tuning pass across the three classes, start screen polish (M)
 
 ## Idea backlog
@@ -34,12 +35,17 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 | Idea | Value | Effort | Phase |
 | --- | --- | --- | --- |
-| Buff spells and a buff bar showing active buffs and timers | M | M | 2 |
+| Buff spells and a buff bar. Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
+| Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
+| Hotbar redesign: small left-hand bar (shows in tap-to-move mode), room for more spells; covers slots 7 and 8. Joystick stays the default for new players | H | M | 2 |
+| Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
+| Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
+| Raids | M | L | phase 4+ |
+| First Dungeon 1 visit is public: everyone shares it until they've reached the end (or been grouped); later visits are private. Lets Warriors find groups | H | L | phase 3 |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
 | Art pass: sprites, tiles and the overall look | H | L | 2 (milestone 4) |
 | Simple minimap | M | M | 2 |
-| Trigger for spell slots 7 and 8 (levels 15 and 25): second ring or two extra buttons | M | S | before level 15 content |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
 | Stat points (3 per level) | M | M | later |
 | Rest of Zone 1: Wolfwood Edge, the Mire, Ruined Chapel, Greyfang, Brother Malrec | H | L | after classes |
@@ -60,6 +66,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11.1** From the class play-test: dying now ends every fight (mobs forget you, lingering DoTs are cleared, and everything walks back to its spot; before, a DoT tick after you respawned could pull the mob back and your new skeleton would chase it); the skeleton dies with you; skeleton follow no longer jitters; two quick toggles above your abilities: **1st hit** (tapping an enemy casts your main attack) and **Auto** (keeps casting), also in Settings; all of Boss 1's gear now waits in the chest: one named item and one uncommon every time, plus a small rare chance; Lifetap heals 85% of its damage (was 100%).
 - **v0.11** **Necromancer** added with the first pet: Raise Bones summons a skeleton that follows you, attacks what you're fighting and tanks (a threat system decides who mobs hit; the pet's hits count triple). Lifetap (main attack, heals you), Siphon Plague (strong DoT), Dread (fear: the mob runs away), Feign Death (mobs forget you and stay put, no reset), Mend Bones (heal the pet). Pet HP bar under your health. Caster gear is shared by Druid and Necromancer. **Developer tools:** open the game once with `?dev` for a DEV button: level up/down, full heal, reset cooldowns, god mode, kill target, give gear, teleports (gate, crypt door, dungeon start, boss room), spawn Old Gnawbone, wipe saves. Turn off with `?dev=0`.
 - **v0.10** Class system: classes are data (stats, abilities, loadout, sprite); abilities are generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave). Spells grow each level: more damage and healing, longer roots, snares and stuns. Each class has its own level, bags and loadout; pick your class on the start screen (or Settings → Change class). **Warrior** added: no mana, high HP, built-in plate armor, Strike, Bandage, Throw Stone, Shield Bash (stun), Hamstring, Defensive Stance, Cleave; STR stat and warrior gear; personal loot only drops gear your class can use; Boss 1 drops a Warrior blade, breastplate or shield for Warriors. Dungeon: the entrance exit is blocked while something is chasing you; the end portal only appears after Boss 1 dies.
 - **v0.9** From the first dungeon play-test: no leashing (mobs chase until someone dies or the guards step in, so running out of range no longer resets them); mobs much faster (24–31 vs the Druid's 34), so kiting needs snares; shorter Dungeon 1 (13 mobs, room 3 is now a quiet passage); dungeon mobs ~10% tougher, Boss 1 +18% HP, shadow bolt every 7s; an ending: Boss 1 leaves a chest (copper + uncommon item) and a way out with a run summary (time, kills, XP, gear).
