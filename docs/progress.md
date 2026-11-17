@@ -21,12 +21,12 @@
   - Arrange mode: drag spells on the pad or buttons to swap them in place
   - Classic buttons: smaller main button, tap to cast
 
-## Next
-1. Play-test the pad on a real phone; tune the flick distance default
-2. Old Gnawbone's add-summon at half health (in the design, not built yet)
-3. Loot window and simple inventory
-4. Wolfwood Edge with blight wolves (flee at low health)
-5. Decide how slots 7 and 8 will be triggered (levels 15 and 25)
+## Next (milestone 1: feel and polish, see docs/roadmap.md)
+1. Tune numbers from phone play-tests
+2. Sound effects (generated, CC0)
+3. Fix sprites drawing over tree canopies
+4. Old Gnawbone's add-summon at half health
+5. Simple minimap
 
 ## Known issues / notes
 - XP curve is boosted for testing (`need()` in the script).
