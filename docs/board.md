@@ -9,6 +9,7 @@ One place for the work: what's being built now, what's next, every idea, and wha
 - **Definition of done:** works in a headless test with no errors → docs updated (this board, `design.md` if rules changed) → committed and pushed → owner plays it on the phone.
 - **Feedback loop:** play-test notes become cards. Defects get fixed before new features.
 - **Prioritize by value ÷ effort.** Value = does it make the core loop more fun or answer an open question. Effort = S (one session), M (2–3), L (4+).
+- **Dev game artifact:** after each release, republish `index.html` (with `dev.on` forced to true) to the owner's "Mobile MMO — Dev game" artifact, slug `4705b8bf-2515-4e08-89d4-64251da5813f`, so it stays current.
 - **Single source of truth:** GitHub. The Claude design doc gets refreshed at milestones only.
 
 ## Roadmap (phase 2: solo prototype)
