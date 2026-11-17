@@ -114,7 +114,7 @@ Level difference is the main source of danger, like EverQuest. A mob two or more
 - **No auto-attack.** Every attack is a spell with a normal mana cost. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
 - **Smart targeting:** a spell cast with no target picks the nearest enemy. Out of range shows the spell's range ring; there's no auto-walking into range.
 - **Cast times:** most damage and control spells are instant or nearly so and can be used on the move. Heals and big spells need you to stand still.
-- **Movement:** tap the ground to walk there, or drag anywhere on the game screen to steer with an invisible floating joystick.
+- **Movement:** tap the ground to walk there, or drag anywhere on the game screen to steer with a floating joystick (hidden by default, can be shown). Option: hold to move, walking toward wherever your finger presses.
 - **Global cooldown:** around 1.5 seconds, more deliberate than an action game.
 - **Danger:** aggro and pulls matter. Pulling too many mobs is the main way to die.
 - **Downtime:** sitting speeds up mana and health regen, like EverQuest's med breaks, but much shorter.

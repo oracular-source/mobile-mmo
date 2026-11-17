@@ -39,6 +39,8 @@
   - Mana costs about 15% lower; mobs +15% HP and +10% damage; XP per kill +25%
   - Journal (tap the Druid frame): named mobs slain or not yet slain, and kill counts per creature
 
+- v0.6.1: movement options in Settings: tap + drag stick (stick can be shown or hidden) or hold to move (press and hold to walk toward your finger)
+
 ## Next (milestone 1: feel and polish, see docs/roadmap.md)
 1. Tune numbers from phone play-tests
 2. Sound effects (generated, CC0)
