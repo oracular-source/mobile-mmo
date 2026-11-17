@@ -111,7 +111,7 @@ Level difference is the main source of danger, like EverQuest. A mob two or more
 - **Harder hits:** mobs above your level hit 15% harder per level; lower ones hit a little softer.
 - **Guards:** town guards attack any mob chasing you that comes near them, so running to the gate is a real escape. If guards do most of the damage, you get no XP or loot.
 
-- **No auto-attack.** Every attack is a spell with a normal mana cost. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
+- **No auto-attack.** Every attack is a spell with a normal mana cost. Optional auto-cast repeats your main spell on the enemy you're fighting; any other spell you tap during the cooldown is queued and goes first. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
 - **Smart targeting:** a spell cast with no target picks the nearest enemy. Out of range shows the spell's range ring; there's no auto-walking into range.
 - **Cast times:** most damage and control spells are instant or nearly so and can be used on the move. Heals and big spells need you to stand still.
 - **Movement:** tap the ground to walk there, or drag anywhere on the game screen to steer with a floating joystick (hidden by default, can be shown). Option: hold to move, walking toward wherever your finger presses.
@@ -197,7 +197,7 @@ The level cap is 30 at launch and gets raised with each expansion. Builds come f
 - **Stats:** every level gives 3 points to spend on STR, STA, AGI, INT or WIS.
 - **Abilities:** EverQuest-style spellbook. Each class learns 15–20 abilities by level 30 but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
 - **Respec:** cheap respecs in town, so experimenting is encouraged.
-- **Gear:** 8 slots, with drops from camps, named mobs and dungeon bosses, in rarity tiers. No gear score gates.
+- **Gear:** 8 slots (head, chest, legs, feet, hands, weapon, off-hand, ring), with drops from camps, named mobs and dungeon bosses, in rarity tiers (junk, common, uncommon, rare, named). Loot is personal and goes straight to your bags. Stats: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens incoming hits. No gear score gates.
 - **Alts:** an account-wide bank and cosmetic unlocks make leveling a second class feel good.
 
 **Spellbook rules**

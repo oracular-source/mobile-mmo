@@ -62,6 +62,13 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .slot .lbl{font-size:9.5px;color:#c9a227;margin-bottom:3px}
 .slot.over{border-color:#ffd27a;background:#221f14}
 .seg{display:flex;gap:5px;margin-bottom:4px}
+.bagg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bc{border:1px solid #3a3343;border-radius:6px;min-height:46px;padding:4px;font-size:9.5px;line-height:1.2;background:#1c1922;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.bc.sel{border-color:#ffd27a;background:#2a2516}
+.bc small{color:#9aa}
+.idet{margin-top:8px;padding:8px;border:1px solid #3a3343;border-radius:6px;background:#1a1720;font-size:11.5px}
+.idet .acts{display:flex;gap:6px;margin-top:8px}.idet .acts button{flex:1;height:34px;font-size:11.5px}
+.up{color:#5fdf6f}.down{color:#ff6b6b}
 .jrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2a2531;font-size:12px}
 .jrow .q{color:#9aa}
 .seg button{flex:1;height:34px;font-size:11.5px}
@@ -92,7 +99,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.6.2: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.7: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
@@ -101,7 +108,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
           <li>Kite: snare it, rot it, walk away, nuke it. Higher-level enemies resist more and shrug off roots sooner.</li>
           <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
-          <li>Tap your <b>Druid</b> frame (top left) for your Journal of kills and named mobs.</li>
+          <li>Tap your <b>Druid</b> frame (top left) for your gear, bags and journal. Loot goes straight into your bags. Walk up to Marrow the Peddler and tap him to sell.</li>
           <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
@@ -119,12 +126,12 @@ button.active{border-color:#c9a227;color:#ffd27a}
       </div>
     </div>
 
-    <div id="journalUI" class="modal">
+    <div id="charUI" class="modal">
       <div class="card">
-        <h1>Journal</h1>
-        <p class="hint">Creatures you've slain. Named mobs are tracked separately; dungeon bosses will join this list.</p>
-        <div id="jbox"></div>
-        <button class="go" data-close="journalUI">Done</button>
+        <h1>Druid</h1>
+        <div class="seg" id="ctabs"><button data-tab="gear">Gear</button><button data-tab="bags">Bags</button><button data-tab="journal">Journal</button></div>
+        <div id="cbox"></div>
+        <button class="go" data-close="charUI">Done</button>
       </div>
     </div>
 
@@ -263,7 +270,46 @@ const XP_MULT=1.25; // mobs got tougher, so each kill is worth a bit more
 // Target at roughly 50 kills an hour: L2 ~10 min, L5 ~1.3 h, L10 ~10 h total.
 const NEED=[0,80,260,670,1680,3800,8400,15400,27200,47500];
 const need=L=>NEED[L]||NEED[NEED.length-1];
-const maxHP=L=>40+12*L, maxMP=L=>40+10*L;
+/* ---------- Items, bags and gear (personal loot: every drop is yours) ---------- */
+const RAR={junk:'#9a9a9a',common:'#e8e2cf',uncommon:'#5fdf6f',rare:'#5fa8ff',named:'#ff9de2'};
+const ITEMS={
+  whisker:{name:'Rat Whisker',rar:'junk',value:1,stack:true},
+  shell:{name:'Beetle Shell',rar:'junk',value:3,stack:true},
+  bone:{name:'Brittle Bone',rar:'junk',value:4,stack:true},
+  rag:{name:'Grave Rag',rar:'junk',value:2,stack:true},
+  cap:{name:'Cloth Cap',slot:'head',rar:'common',ac:1,value:6},
+  robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10},
+  legs:{name:'Patched Leggings',slot:'legs',rar:'common',ac:1,value:6},
+  sandals:{name:'Worn Sandals',slot:'feet',rar:'common',ac:1,value:5},
+  gloves:{name:'Rough Gloves',slot:'hands',rar:'common',ac:1,value:5},
+  oakstaff:{name:'Oak Staff',slot:'weapon',rar:'common',int:1,value:8},
+  charm:{name:'Bone Charm',slot:'offhand',rar:'common',wis:1,value:8},
+  cring:{name:'Copper Ring',slot:'ring',rar:'common',sta:1,value:8},
+  mosscap:{name:'Mossweave Cap',slot:'head',rar:'uncommon',ac:2,wis:1,value:20},
+  barkrobe:{name:'Barkweave Robe',slot:'chest',rar:'uncommon',ac:3,sta:1,wis:2,value:35},
+  thornstaff:{name:'Thornwood Staff',slot:'weapon',rar:'uncommon',int:3,wis:1,value:40},
+  gravecharm:{name:'Gravebloom Charm',slot:'offhand',rar:'uncommon',wis:2,int:1,value:30},
+  boots:{name:'Bog-walker Boots',slot:'feet',rar:'uncommon',ac:2,sta:1,value:22},
+  shroud:{name:"Mourner's Shroud",slot:'chest',rar:'rare',ac:4,sta:2,wis:3,int:2,value:90},
+  gnawring:{name:'Gnawed Ring',slot:'ring',rar:'named',sta:2,wis:1,value:60}
+};
+const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
+const COMMONS=['cap','robe','legs','sandals','gloves','oakstaff','charm','cring'];
+const UNCOMMONS=['mosscap','barkrobe','thornstaff','gravecharm','boots'];
+const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker'};
+const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['wis','WIS'],['int','INT']];
+const inv=(function(){
+  const d={bags:new Array(BAG_SIZE).fill(null),equip:{},copper:0};
+  try{const v=JSON.parse(localStorage.getItem('ashfen-inv')||'null');
+    if(v&&v.v===1){v.bags.forEach((b,i)=>{if(i<BAG_SIZE&&b&&ITEMS[b.id])d.bags[i]=b});Object.keys(v.equip||{}).forEach(k=>{if(ITEMS[v.equip[k]])d.equip[k]=v.equip[k]});d.copper=v.copper|0}}catch(e){}
+  return d;
+})();
+const saveInv=()=>{try{localStorage.setItem('ashfen-inv',JSON.stringify({v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper}))}catch(e){}};
+const stat=k=>Object.values(inv.equip).reduce((t,id)=>t+(ITEMS[id][k]||0),0);
+const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
+const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
+// STA: +3 HP per point. WIS: +3 mana per point.
+const maxHP=L=>40+12*L+stat('sta')*3, maxMP=L=>40+10*L+stat('wis')*3;
 const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
@@ -361,8 +407,7 @@ function killMob(m){
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
     if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
-  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0)log('You receive '+coin+' copper.','#c9a227');
-    if(m.type==='gnaw')log('Old Gnawbone drops a Gnawed Ring! (+2 STA)','#ff9de2');}
+  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<10&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
@@ -379,6 +424,7 @@ function hurtPlayer(m){
   // Higher-level mobs hit much harder; lower-level ones a little softer.
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
   if(player.bark>0)dmg*=0.75;
+  dmg*=100/(100+stat('ac')*4); // AC from gear softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;
   floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
@@ -394,12 +440,35 @@ function playerDie(m){
 }
 function respawnPlayer(){player.x=3.5*T;player.y=15*T+8;player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log('You return to the Gate Road.','#9aa')}
 
+/* ---------- Loot ---------- */
+// Drop chances grow a little with mob level. Gear: ~11-15% common, ~3-5% uncommon, 1% rare from level 4+ mobs.
+function rollLoot(m){
+  const got=[];
+  if(Math.random()<0.6)got.push(JUNK[m.type]);
+  if(m.type==='dead'&&Math.random()<0.3)got.push('rag');
+  const lb=m.lv*0.01,r=Math.random();
+  if(r<0.10+lb)got.push(pick(COMMONS));
+  else if(r<0.10+lb+0.025+lb*0.5)got.push(pick(UNCOMMONS));
+  if(m.lv>=4&&Math.random()<0.01)got.push('shroud');
+  if(m.type==='gnaw'){got.push('gnawring');if(Math.random()<0.5)got.push(pick(UNCOMMONS));}
+  got.forEach((id,i)=>giveItem(id,1,i));
+}
+function giveItem(id,n,k){
+  const it=ITEMS[id];n=n||1;
+  let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
+  if(i>=0)inv.bags[i].n+=n;
+  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
+  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar]);
+  floatText(player.x,player.y-30-(k||0)*8,it.name,RAR[it.rar]);
+  return true;
+}
+
 /* ---------- Casting ---------- */
 // Returns true if the spell started. "quiet" skips spam messages during hold-to-repeat.
 function cast(a,quiet){
   if(!a||player.dead)return false;
   if(player.lvl<a.lvl){if(!quiet)log(a.name+' unlocks at level '+a.lvl+'.','#9aa');return false}
-  if(player.cast||player.gcd>0)return false;
+  if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
   if(player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
   if(a.tgt){
@@ -426,11 +495,11 @@ const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t){
   const L=player.lvl;
   if(a.tgt&&Math.random()<resistChance(t)){floatText(t.x,t.y-18,'RESIST','#c8a0ff');log(cap(t.def.name)+' resists your '+a.name+'!','#c8a0ff');engage(t);return;}
-  if(a.id==='thorn'){beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:'#9be37a'});burst(t.x,t.y-6,'#9be37a',6);hitMob(t,(8+3*L)*rr(0.85,1.15)*(1-t.def.armor),'direct','Thornlash');}
-  else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('Mending Touch heals you for '+h+'.','#7dffa6');}
+  if(a.id==='thorn'){beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:'#9be37a'});burst(t.x,t.y-6,'#9be37a',6);hitMob(t,(8+3*L)*rr(0.85,1.15)*(1-t.def.armor)*spellMult(),'direct','Thornlash');}
+  else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1)*spellMult());player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('Mending Touch heals you for '+h+'.','#7dffa6');}
   else if(a.id==='root'){t.root=12*durMult(t);burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
   else if(a.id==='bark'){player.bark=120;burst(player.x,player.y-6,'#a07850',12,true);log('Your skin hardens like bark.','#c8b07a');}
-  else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');const dur=18*durMult(t);t.dots.push({id:'rot',t:dur,next:3,dmg:3+1.6*L});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot ('+Math.round(dur)+'s).','#9be37a');engage(t);}
+  else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');const dur=18*durMult(t);t.dots.push({id:'rot',t:dur,next:3,dmg:(3+1.6*L)*spellMult()});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   else if(a.id==='snare'){t.snare=24*durMult(t);burst(t.x,t.y,'#5f9ea0',8);log(cap(t.def.name)+' is tangled and slowed ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
 }
 
@@ -460,7 +529,7 @@ cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{
 function tapWorld(clientX,clientY){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
-  for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){say(n,pick(LINES[n.kind]),true);return}}
+  for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){if(n.kind==='peddler'&&nearMerchant()){say(n,'Let us see what you have found.',true);charTab='bags';bagSel=null;openModal('charUI')}else say(n,pick(LINES[n.kind]),true);return}}
   if(Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
@@ -650,22 +719,64 @@ $('setbox').addEventListener('click',e=>{
 
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
-function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='journalUI')renderJournal();if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
+function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
 $('bspells').addEventListener('click',()=>{if(arranging)setArranging(false);openModal('spellsUI')});
 $('barr').addEventListener('click',()=>setArranging(!arranging));
 $('bset').addEventListener('click',()=>openModal('settingsUI'));
-$('pframe').addEventListener('click',()=>openModal('journalUI'));
-function renderJournal(){
-  const named=Object.keys(TYPES).filter(k=>TYPES[k].named).map(k=>TYPES[k]);
-  let h='<h2>Named</h2>';
-  named.forEach(t=>{const k=kills[t.name];h+='<div class="jrow"><span>'+t.name+'</span><span class="q">'+(k?'Slain ×'+k.count+' · first '+k.first:'Not yet slain')+'</span></div>'});
-  h+='<h2>Creatures</h2>';
-  const rest=Object.keys(kills).filter(n=>!kills[n].named).sort((a,b)=>kills[b].count-kills[a].count);
-  if(!rest.length)h+='<div class="jrow"><span class="q">Nothing slain yet.</span></div>';
-  rest.forEach(n=>{h+='<div class="jrow"><span>'+cap(n.replace(/^an? /,''))+'</span><span class="q">×'+kills[n].count+'</span></div>'});
-  $('jbox').innerHTML=h;
+$('pframe').addEventListener('click',()=>{charTab='gear';openModal('charUI')});
+let charTab='gear',bagSel=null;
+const nearMerchant=()=>{const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
+$('ctabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;charTab=b.dataset.tab;bagSel=null;renderChar()});
+function renderChar(){
+  document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
+  const L=player.lvl;let h='';
+  if(charTab==='gear'){
+    h+='<p class="hint">Level '+L+' Druid · HP '+maxHP(L)+' · Mana '+maxMP(L)+' · '+STAT_KEYS.map(k=>k[1]+' '+stat(k[0])).join(' · ')+' · '+inv.copper+' copper</p>';
+    SLOTS.forEach(sl=>{const id=inv.equip[sl[0]],it=id&&ITEMS[id];
+      h+='<div class="jrow" data-act="unequip" data-slot="'+sl[0]+'" style="cursor:pointer"><span class="q">'+sl[1]+'</span><span'+(it?' style="color:'+RAR[it.rar]+'"':' class="q"')+'>'+(it?it.name+' <small class="q">'+itemStats(it)+'</small>':'Empty')+'</span></div>'});
+    h+='<p class="hint" style="margin-top:8px">Tap a worn item to take it off. Equip gear from your Bags.</p>';
+  }else if(charTab==='bags'){
+    const near=nearMerchant();
+    h+='<p class="hint">'+inv.copper+' copper'+(near?' · Marrow is buying.':' · Stand near Marrow the Peddler to sell.')+'</p>';
+    if(near)h+='<button data-act="selljunk" style="width:100%;height:34px;margin-bottom:8px">Sell all junk</button>';
+    h+='<div class="bagg">';
+    inv.bags.forEach((b,i)=>{const it=b&&ITEMS[b.id];h+='<div class="bc'+(bagSel===i?' sel':'')+'" data-act="pick" data-i="'+i+'">'+(it?'<span style="color:'+RAR[it.rar]+'">'+it.name+'</span>'+(b.n>1?'<small>×'+b.n+'</small>':''):'<small>·</small>')+'</div>'});
+    h+='</div>';
+    if(bagSel!==null&&inv.bags[bagSel]){
+      const b=inv.bags[bagSel],it=ITEMS[b.id];
+      h+='<div class="idet"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:'Junk')+' · sells for '+it.value*b.n+'c</span>';
+      if(it.slot){h+='<br>'+(itemStats(it)||'No stats');const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
+        const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
+        h+='<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');}
+      h+='<div class="acts">'+(it.slot?'<button data-act="equip">Equip</button>':'')+(near?'<button data-act="sell">Sell</button>':'')+'<button data-act="destroy">Destroy</button></div></div>';
+    }
+  }else{
+    const named=Object.keys(TYPES).filter(k=>TYPES[k].named).map(k=>TYPES[k]);
+    h+='<h2>Named</h2>';
+    named.forEach(t=>{const k=kills[t.name];h+='<div class="jrow"><span>'+t.name+'</span><span class="q">'+(k?'Slain ×'+k.count+' · first '+k.first:'Not yet slain')+'</span></div>'});
+    h+='<h2>Creatures</h2>';
+    const rest=Object.keys(kills).filter(n=>!kills[n].named).sort((a,b)=>kills[b].count-kills[a].count);
+    if(!rest.length)h+='<div class="jrow"><span class="q">Nothing slain yet.</span></div>';
+    rest.forEach(n=>{h+='<div class="jrow"><span>'+cap(n.replace(/^an? /,''))+'</span><span class="q">×'+kills[n].count+'</span></div>'});
+  }
+  $('cbox').innerHTML=h;
 }
+$('cbox').addEventListener('click',e=>{
+  const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act;
+  if(act==='pick'){const i=+el.dataset.i;bagSel=inv.bags[i]?(bagSel===i?null:i):null}
+  else if(act==='unequip'){const sl=el.dataset.slot,id=inv.equip[sl];if(!id)return;const i=inv.bags.indexOf(null);if(i<0){log('Your bags are full.','#ff8a80');return}
+    inv.bags[i]={id:id,n:1};delete inv.equip[sl];log('You remove the '+ITEMS[id].name+'.','#9aa')}
+  else if(act==='equip'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],old=inv.equip[it.slot];
+    inv.equip[it.slot]=b.id;inv.bags[bagSel]=old?{id:old,n:1}:null;log('You equip the '+it.name+'.',RAR[it.rar]);bagSel=old?bagSel:null}
+  else if(act==='sell'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bagSel]=null;bagSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
+  else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}});bagSel=null;
+    log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227');inv.copper+=c}
+  else if(act==='destroy'&&bagSel!==null){log('You destroy the '+ITEMS[inv.bags[bagSel].id].name+'.','#9aa');inv.bags[bagSel]=null;bagSel=null}
+  player.hp=Math.min(player.hp,maxHP(player.lvl));player.mp=Math.min(player.mp,maxMP(player.lvl));
+  saveInv();renderChar();
+});
+
 function nextTarget(){
   const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
   if(!list.length){log('No targets nearby.','#9aa');return}
@@ -684,7 +795,7 @@ const npcs=[
 ];
 const LINES={
   guard:['Keep to the road, friend.','Pulled more than you can handle? Run back to the gate. We will deal with it.','The graveyard is no place for the green.','Watch the names. Red means run.','Quiet night. Too quiet.'],
-  peddler:['Sit by my fire. Your mana comes back faster in the warmth.','They say Old Gnawbone ate a whole cart once. Wheels and all.','Rat whiskers, beetle shells... I will buy it all, once my cart is fixed.','Mind the dead after dark. They never tire.']
+  peddler:['Sit by my fire. Your mana comes back faster in the warmth.','They say Old Gnawbone ate a whole cart once. Wheels and all.','Rat whiskers, beetle shells, old bones... bring them to me, I buy it all.','Mind the dead after dark. They never tire.']
 };
 const bubbles=[];
 // cd: seconds this speaker stays quiet afterward. Taps pass force=true so you always get an answer.
@@ -791,8 +902,11 @@ function update(dt){
     player.gcd=Math.max(0,player.gcd-dt);
     // Auto-cast: once you're fighting your target, the main (center) spell repeats whenever it's ready.
     // Normal mana cost. Pauses below 15% mana so there's always enough left to heal.
+    // A spell you tapped during the cooldown goes first; auto-cast waits its turn.
+    if(player.queued&&(time>player.queued.until||player.dead))player.queued=null;
+    if(player.queued&&!player.cast&&player.gcd<=0){const q=player.queued.a;player.queued=null;cast(q);}
     const at=player.target;
-    if(settings.autoCast&&at&&!at.dead&&at.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,at)<=(ABI[loadout[0]].range||80)&&player.mp>maxMP(player.lvl)*0.15)castSlot(0,true);
+    if(!player.queued&&settings.autoCast&&at&&!at.dead&&at.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,at)<=(ABI[loadout[0]].range||80)&&player.mp>maxMP(player.lvl)*0.15)castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);

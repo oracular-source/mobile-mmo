@@ -43,12 +43,17 @@
 
 - v0.6.2: Creeping Rot moved to level 2 and Tanglefoot to level 3, so early armored beetles are beatable
 
-## Next (milestone 1: feel and polish, see docs/roadmap.md)
-1. Tune numbers from phone play-tests
-2. Sound effects (generated, CC0)
-3. Fix sprites drawing over tree canopies
-4. Old Gnawbone's add-summon at half health
-5. Simple minimap
+- v0.7 (milestone 1, basic loot):
+  - Personal loot straight into bags: junk per mob type, common gear (~11-15%), uncommon (~3-5%), a rare chest from level 4+ mobs (1%), Old Gnawbone always drops the Gnawed Ring
+  - 16-slot bags, 8 gear slots (head, chest, legs, feet, hands, weapon, off-hand, ring)
+  - Stats that matter: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens hits
+  - Copper from kills; sell items or all junk to Marrow the Peddler (tap him up close)
+  - Character screen from the Druid frame: Gear, Bags (with compare vs worn item), Journal
+  - Spell queue: a spell tapped during the cooldown fires next, ahead of auto-cast
+
+## Next (see docs/roadmap.md)
+1. Play-test loot pacing: does something worth equipping drop often enough?
+2. Milestone 2: first dungeon (needs a setting/title decision for names)
 
 ## Known issues / notes
 - Gate Road mobs top out at level 5, so leveling slows sharply after 5-6 until the rest of Zone 1 is built (milestone 3).
