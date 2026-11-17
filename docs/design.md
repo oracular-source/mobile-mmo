@@ -183,6 +183,17 @@ Layout: Hub city → Gate Road (1–3) → either Sunken Graveyard (3–5) or Wo
 | Greyfang | 7 | Leads a wolf pack, about 30-minute timer | Never flees; howls to call the pack back | Greyfang Cloak (+AGI, small run speed) |
 | Brother Malrec | 10 | Chapel altar, about 45-minute timer | Heals his cultists; kill or root his guards first | Malrec's Censer (off-hand, +WIS) |
 
+## Dungeon 1 (placeholder name)
+
+A crypt behind a door at the back of the Sunken Graveyard, for levels 4–7, scaled for one player until multiplayer exists.
+
+- **Layout:** five rooms in a line: entry (with the exit circle), crypt rats, skeleton pairs, a mixed room, then the boss room with two skeleton guards.
+- **Mobs:** crypt rats and crypt skeletons, levels 4–6, many in social groups, so pulls matter. Nothing respawns inside; the whole dungeon resets each time you enter.
+- **Boss 1 (level 7):** melee hits hard, throws a shadow bolt every 8 seconds at range, and calls two skeletons at half health. Always drops one named item: Boss 1 Staff, Boss 1 Robe or Boss 1 Charm.
+- **Loot:** trash drops uncommon gear twice as often as outside, and rare gear more often.
+- **Death:** you wake at the crypt entrance; cleared rooms stay cleared.
+- **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
+
 ## Solo vs group
 
 Every class can solo to level cap. Grouping is never required, just clearly worth it.
@@ -266,4 +277,4 @@ All durations are rough estimates for a part-time solo developer. If the solo pr
 
 ## Ideas backlog
 
-See `docs/ideas.md`.
+See `board.md`.

@@ -25,7 +25,9 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - Before finishing, open the game in a headless browser if you can and check for JavaScript errors.
 - When I report a bug, ask for what I saw (or a screenshot) before guessing.
 - When a feature works, commit with a short, clear message.
-- Keep `docs/progress.md` updated: what's done, what's next, known bugs.
+- Work flows through `docs/board.md` (lean): one card at a time, small batches, ideas go to the backlog before any building, defects before features. Update the board's Now/Next, changelog and known issues with every change.
+- GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
+- Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
 - Game numbers (damage, XP, mob stats) live in the data tables near the top of the script (`AB`, `TYPES`, `need`). Tune there.
 
 ## Game rules to protect
