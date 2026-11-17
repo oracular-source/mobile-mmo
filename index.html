@@ -90,7 +90,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.5: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.5.1: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
@@ -441,8 +441,8 @@ cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{
 function tapWorld(clientX,clientY){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
-  for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){say(n,pick(LINES[n.kind]));return}}
-  if(Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text);return}
+  for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){say(n,pick(LINES[n.kind]),true);return}}
+  if(Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
   if(best){player.target=best;if(settings.tapCast)castSlot(0);return}
@@ -638,7 +638,6 @@ const SIGN={x:264,y:206,name:'Signpost',text:'East: Sunken Graveyard. Turn back 
 const npcs=[
   {kind:'guard',name:'Guard Hollis',x:46,y:214,hx:46,hy:214,dir:1,walk:0,target:null,atk:0},
   {kind:'guard',name:'Guard Bren',x:46,y:282,hx:46,hy:282,dir:1,walk:0,target:null,atk:0},
-  {kind:'guard',name:'Guard Wyck',x:70,y:246,hx:70,hy:246,dir:1,walk:0,target:null,atk:0,patrol:[[70,246],[236,240]],pi:1},
   {kind:'peddler',name:'Marrow the Peddler',x:94,y:188,hx:94,hy:188,dir:1,walk:0}
 ];
 const LINES={
@@ -646,7 +645,14 @@ const LINES={
   peddler:['Sit by my fire. Your mana comes back faster in the warmth.','They say Old Gnawbone ate a whole cart once. Wheels and all.','Rat whiskers, beetle shells... I will buy it all, once my cart is fixed.','Mind the dead after dark. They never tire.']
 };
 const bubbles=[];
-function say(o,text){for(let i=bubbles.length-1;i>=0;i--)if(bubbles[i].o===o)bubbles.splice(i,1);bubbles.push({o:o,text:text,t:0});log(o.name+' says, "'+text+'"','#d8c8ff')}
+// cd: seconds this speaker stays quiet afterward. Taps pass force=true so you always get an answer.
+function say(o,text,force){
+  const now=performance.now()/1000;
+  if(!force&&o.quietUntil&&now<o.quietUntil)return;
+  o.quietUntil=now+(force?3:20);
+  for(let i=bubbles.length-1;i>=0;i--)if(bubbles[i].o===o)bubbles.splice(i,1);
+  bubbles.push({o:o,text:text,t:0});log(o.name+' says, "'+text+'"','#d8c8ff');
+}
 const pick=a=>a[Math.floor(Math.random()*a.length)];
 let chatT=12;
 function updateNPCs(dt){
@@ -655,9 +661,8 @@ function updateNPCs(dt){
     n.atk=Math.max(0,n.atk-dt);
     if(n.target&&(n.target.dead||Math.hypot(n.target.x-n.hx,n.target.y-n.hy)>180))n.target=null;
     // Guards attack any mob chasing you that comes near them: run to the gate when you over-pull.
-    if(!n.target){const m=mobs.find(m=>!m.dead&&m.state==='chase'&&dist(m,n)<75);if(m){n.target=m;if(Math.random()<0.4)say(n,pick(['For the gate!','Back, vermin!','I have this one!']))}}
+    if(!n.target){const m=mobs.find(m=>!m.dead&&m.state==='chase'&&dist(m,n)<75&&Math.hypot(m.x-n.hx,m.y-n.hy)<170);if(m){n.target=m;say(n,pick(['For the gate!','Back, vermin!','I have this one!']))}}
     if(n.target){const t=n.target;if(dist(n,t)>12)moveToward(n,t.x,t.y,44,dt);else{n.dir=t.x>n.x?1:-1;if(n.atk<=0){n.atk=1.2;burst(t.x,t.y-6,'#cfd6e0',4);hitMob(t,22+rr(0,8),'melee',n.name,'npc')}}}
-    else if(n.patrol){const p=n.patrol[n.pi];if(moveToward(n,p[0],p[1],14,dt))n.pi=(n.pi+1)%n.patrol.length}
     else if(Math.hypot(n.x-n.hx,n.y-n.hy)>2)moveToward(n,n.hx,n.hy,30,dt);
   });
   chatT-=dt;
@@ -815,7 +820,7 @@ function render(){
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
-    if(e.kind){shadow(e.x,e.y,5);const mv=e.target||e.patrol||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
+    if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));

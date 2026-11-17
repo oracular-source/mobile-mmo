@@ -159,7 +159,7 @@ Raids come after the MVP, once group dungeons are proven fun.
 
 A blighted marsh-wood just outside the hub city. Each mob teaches one part of the Druid's kit, so the zone doubles as the tutorial. The name is a placeholder until the setting is decided.
 
-Mobs are spread out by level: only level 1–2 near the gate, 2–3 further down the road, 3–5 in the graveyard. The gate camp has three guards (one patrolling the road), Marrow the Peddler with a campfire that doubles resting speed, wall torches, a signpost, and ambient life (crows, frogs, fireflies).
+Mobs are spread out by level: only level 1–2 near the gate, 2–3 further down the road, 3–5 in the graveyard. The gate camp has two guards, Marrow the Peddler with a campfire that doubles resting speed, wall torches, a signpost, and ambient life (crows, frogs, fireflies).
 
 Layout: Hub city → Gate Road (1–3) → either Sunken Graveyard (3–5) or Wolfwood Edge (4–7) → The Mire (6–9) → Ruined Chapel (7–10, zone finale).
 

@@ -29,7 +29,7 @@
   - Higher-level mobs hit harder
   - XP curve targets about 10 hours to level 10
   - Mobs spread by level: 1–2 at the gate, 2–3 down the road, 3–5 in the graveyard
-  - Guards (two at the gate, one patrolling) kill mobs you drag to them; no XP or loot if they did most of the damage
+  - Guards (two at the gate) kill mobs you drag to them; no XP or loot if they did most of the damage
   - Marrow the Peddler, campfire (doubles resting speed), wall torches, signpost, crows, frogs, fireflies, NPC chatter and speech bubbles
   - Several light sources in the dusk lighting
 
