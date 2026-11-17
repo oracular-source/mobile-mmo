@@ -18,18 +18,21 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 0 | Controls and core combat | You can fight and kite comfortably on your phone | Done (v0.6) |
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
-| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Play-tested; fixes in v0.11.1, Necro re-check left |
+| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Done (v0.11.1) |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Re-check v0.11.1** (S): death resets fights, skeleton no longer jitters, both toggles work, boss loot is in the chest. Then run Dungeon 1 again as a level 5 Necro: with Lifetap healing less, is it still too easy? (Warrior at 6 could not solo Boss 1, which is the intended feel.)
+- **Melee feel** (S): hit sparks, small knockback and a swing animation, so Warrior hits (and pet hits) land with weight.
 
 ## Next
-1. Melee feel: hit sparks, small knockback, a swing animation (S)
-   - If the Necro still clears too easily after the re-check, a small Necro tuning card jumps ahead of this.
-2. Milestone 4: sound effects, tuning pass across the three classes, start screen polish (M)
+1. Hotbar redesign (M): the controls feel clumsy on the phone; small left-hand bar in tap-to-move mode, room for more spells (see backlog).
+2. Milestone 4 (M): sound effects, start screen polish, a light pass for anything clearly broken. **No big balance pass yet:** the owner wants full balancing once most launch classes exist. The three current classes are close enough.
+
+## Decisions
+- **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
+- **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
 ## Idea backlog
 Value: H/M/L. Effort: S/M/L. Phase: when it fits.
@@ -43,6 +46,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
 | Raids | M | L | phase 4+ |
 | First Dungeon 1 visit is public: everyone shares it until they've reached the end (or been grouped); later visits are private. Lets Warriors find groups | H | L | phase 3 |
+| Class picker shows how solo-friendly each class is (e.g. Warrior: groups recommended; Necro: strong solo) | M | S | 2 (milestone 4) |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
 | Art pass: sprites, tiles and the overall look | H | L | 2 (milestone 4) |
