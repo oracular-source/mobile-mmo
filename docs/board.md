@@ -24,11 +24,16 @@ One place for the work: what's being built now, what's next, every idea, and wha
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Melee feel** (S): hit sparks, small knockback and a swing animation, so Warrior hits (and pet hits) land with weight.
+- **UI and controls pass** (M). Owner is switching to the joystick (more control, can move while casting). In order:
+  1. **Bug:** while the joystick is held, tapping an enemy with another finger does nothing (the canvas only tracks one finger, so the second tap is ignored). Allow a second finger to target.
+  2. **Better targeting:** the bottom bar's Target button doesn't feel intuitive for tab-targeting. Make next-target easy to reach mid-fight, likely a thumb-sized button near the spells.
+  3. **Rethink the bottom bar and hotbar** (see the Hotbar redesign card): what belongs on screen, what goes in menus, room for more spells.
+  Talk through the layout with the owner before building step 3.
 
 ## Next
-1. Hotbar redesign (M): the controls feel clumsy on the phone; small left-hand bar in tap-to-move mode, room for more spells (see backlog).
-2. Milestone 4 (M): sound effects, start screen polish, a light pass for anything clearly broken. **No big balance pass yet:** the owner wants full balancing once most launch classes exist. The three current classes are close enough.
+1. Class identity pass: with the UI settled, decide what each class should look and feel like.
+2. Feel pass, all at once: melee feel (hit sparks, knockback, swing), animations, sound. Owner wants these done together, not piecemeal.
+3. Milestone 4: start screen polish, fix anything clearly broken. **No big balance pass yet** (see Decisions).
 
 ## Decisions
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
@@ -54,6 +59,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Simple minimap | M | M | 2 |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
 | Stat points (3 per level) | M | M | later |
+| Level design: the Gate Road is a rough sandbox. Design a real starting area that feels lively and detailed | H | L | after UI and classes |
 | Rest of Zone 1: Wolfwood Edge, the Mire, Ruined Chapel, Greyfang, Brother Malrec | H | L | after classes |
 | Quests and a hub city (Town 1) | M | L | after classes |
 | NPC companion to fill a missing role | M | L | phase 3 |
