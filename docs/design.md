@@ -77,10 +77,10 @@ The Druid is the prototype class because it touches every system at once: damage
 | --- | --- | --- | --- | --- |
 | 1 | Thornlash | Nuke | Small nature damage, fast cast | Starting |
 | 1 | Mending Touch | Heal | Single-target heal | Starting |
-| 2 | Rootgrip | Crowd control | Roots target in place; can break when it takes damage | Trainer |
-| 4 | Barkskin | Buff | Raises armor on self or an ally | Trainer |
-| 6 | Creeping Rot | DoT | Nature damage over 18 seconds | Trainer |
-| 8 | Tanglefoot | Snare | Slows target movement by 50% | Trainer |
+| 2 | Tanglefoot | Snare | Slows target movement by 50% | Trainer |
+| 4 | Creeping Rot | DoT | Nature damage over 18 seconds | Trainer |
+| 6 | Rootgrip | Crowd control | Roots target in place; can break when it takes damage | Trainer |
+| 8 | Barkskin | Buff | Raises armor on self or an ally | Trainer |
 | 10 | Thorn Aura | Buff | Damage shield: attackers take damage | Trainer |
 | 12 | Wild Regrowth | Heal | Heal over time | Trainer |
 | 14 | Cleanse | Cure | Removes poison or disease | Trainer |
@@ -96,17 +96,30 @@ The Druid is the prototype class because it touches every system at once: damage
 
 **Rank upgrades** replace earlier versions instead of taking book space: Thornlash II at 12, Mending Touch II at 16, Rootgrip II at 24.
 
-**Prototype scope:** levels 1–10 in Zone 1 only need the first 7 abilities. The starting 6-slot loadout is Thornlash, Mending Touch, Rootgrip, Barkskin, Creeping Rot and Tanglefoot.
+**Prototype scope:** levels 1–10 in Zone 1 only need the first 7 abilities. Snare comes before root on purpose: it's the safer kiting tool, and root is the stronger upgrade. The full snare, DoT and nuke loop is available by level 4. Default loadout: Tap Thornlash, Hold Mending Touch, Flick up Tanglefoot, Flick down Creeping Rot, Flick left Rootgrip, Flick right Barkskin.
 
 ## Combat
 
-Tab-target combat is the core mobile bet. It plays well on touch, and it handles lag on cell networks much better than action combat.
+Tab-target combat is the core mobile bet. It plays well on touch, and it handles lag on cell networks much better than action combat. EverQuest is inspiration for spells and skills, not a rulebook.
 
-- **Targeting:** tap an enemy to target it, or use a Tab button to cycle to the nearest one. Auto-attack starts once you have a target.
-- **Buttons:** 6–8 loaded ability slots, growing with level; potion, sit and mount live in a small corner menu. The global cooldown is around 1.5 seconds, slower and more deliberate like EverQuest.
-- **Movement:** a virtual joystick, with tap-to-move as an option.
-- **Danger:** aggro and threat matter. Pulling too many mobs is the main way to die.
-- **Downtime:** sitting speeds up mana and endurance regen, like EverQuest's med breaks, but much shorter so the pace stays mobile-friendly.
+- **No auto-attack.** Every attack is a spell with a normal mana cost. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
+- **Smart targeting:** a spell cast with no target picks the nearest enemy. Out of range shows the spell's range ring; there's no auto-walking into range.
+- **Cast times:** most damage and control spells are instant or nearly so and can be used on the move. Heals and big spells need you to stand still.
+- **Movement:** tap the ground to walk there, or drag anywhere on the game screen to steer with an invisible floating joystick.
+- **Global cooldown:** around 1.5 seconds, more deliberate than an action game.
+- **Danger:** aggro and pulls matter. Pulling too many mobs is the main way to die.
+- **Downtime:** sitting speeds up mana and health regen, like EverQuest's med breaks, but much shorter.
+
+### Controls and customization
+
+Which spell sits in which slot is separate from how you trigger a slot. The loadout always has 6 slots; the control scheme only changes the trigger.
+
+- **Spell pad (default):** one circular pad under the right thumb. Tap = slot 1, hold = slot 2 (keeps recasting while held), flick up/down/left/right = slots 3–6. Icons around the ring show each direction's spell and can also be tapped directly.
+- **Classic buttons:** a big main button in the corner with five buttons fanned around it. Tap to cast, hold to keep recasting.
+- **Loadout:** drag spells onto slots in the Spellbook, or tap a spell then tap a slot.
+- **Settings:** control scheme, left-handed mode (mirrors the pad or buttons), tap-enemy behavior, pad size, hold time and flick distance.
+- **Not yet:** a free-form editor for placing every button anywhere.
+- **Open question:** slots 7 and 8 (levels 15 and 25) need a trigger once the pad's six gestures are used, for example hold-then-flick or two extra buttons.
 
 ## World and zones
 

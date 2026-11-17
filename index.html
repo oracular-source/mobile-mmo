@@ -5,11 +5,11 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <title>Ashfen Hollow - Druid Prototype</title>
 <style>
-*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden;touch-action:none}
 #app{position:fixed;inset:0;display:flex;flex-direction:column}
-#view{position:relative;flex:1;min-height:0}
-#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges}
+#view{position:relative;flex:1;min-height:0;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none}
 #hud{position:absolute;left:6px;right:6px;top:calc(6px + env(safe-area-inset-top));display:flex;gap:6px;pointer-events:none}
 .frame{flex:1;background:rgba(10,9,14,.8);border:1px solid #3a3343;border-radius:6px;padding:5px 7px;font-size:11px;min-width:0}
 .bar{height:7px;background:#1a171f;border-radius:2px;margin-top:3px;overflow:hidden}
@@ -18,30 +18,52 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .row{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
-#log{position:absolute;left:6px;right:6px;bottom:6px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000}
-#castbar{position:absolute;left:50%;transform:translateX(-50%);bottom:82px;width:160px;display:none;pointer-events:none}
+#log{position:absolute;bottom:8px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
+#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
 #castbar .bar{height:9px;border:1px solid #3a3343}
 #castbar .bar>i{background:#7dffa6}
 #castname{font-size:10px;text-align:center;text-shadow:0 1px 0 #000}
 #bottom{background:#0d0b11;border-top:1px solid #2a2531;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
-#util{display:flex;gap:6px;margin-bottom:6px}
-#util button{flex:1;height:34px;font-size:12px}
-#abil{display:grid;grid-template-columns:repeat(6,1fr);gap:5px}
+#util{display:flex;gap:6px}
+#util button{flex:1;height:36px;font-size:12px}
 button{font:inherit;color:#e8e2cf;background:#1c1922;border:1px solid #3a3343;border-radius:6px;padding:0;touch-action:manipulation;cursor:pointer}
 button.active{border-color:#c9a227;color:#ffd27a}
-.ab{position:relative;height:60px;font-size:9px;line-height:1.15;overflow:hidden;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:2px}
-.ab b{font-size:9.5px;font-weight:600}
-.ab small{color:#8ea0d8;font-size:9px}
-.ab .cd{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.62);height:0;pointer-events:none}
-.ab.lock{opacity:.35}
-.ab.nomana small{color:#ff6b6b}
-.ab .ic{width:16px;height:16px;border-radius:3px;margin-bottom:3px;border:1px solid #0b0a0f}
-#overlay{position:absolute;inset:0;background:rgba(5,5,7,.88);display:flex;align-items:center;justify-content:center;padding:20px;z-index:5}
-#overlay .card{max-width:340px;background:#14121a;border:1px solid #3a3343;border-radius:10px;padding:18px;font-size:13px;line-height:1.5}
-#overlay h1{font-size:18px;margin:0 0 6px;color:#c9a227;font-weight:600}
-#overlay ul{padding-left:18px;margin:8px 0 14px}
-#overlay li{margin-bottom:3px}
-#overlay button{width:100%;height:44px;font-size:14px;background:#2b5239;border-color:#3f8f5a}
+/* Spell pad */
+#pad{position:absolute;border-radius:50%;background:rgba(10,9,14,.38);border:1px solid rgba(201,162,39,.35);touch-action:none}
+.pi{position:absolute;border-radius:50%;background:rgba(20,18,26,.88);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;pointer-events:auto}
+.pi .ic,.fb .ic,.chip .ic{width:12px;height:12px;border-radius:3px;border:1px solid #0b0a0f;margin-bottom:2px;flex:none}
+.pi.flash,.fb.flash{border-color:#ffd27a;background:rgba(80,70,30,.9)}
+.lock{opacity:.35}
+.nomana .nm{color:#ff6b6b}
+.cd{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);height:0;pointer-events:none}
+#padc{position:absolute;border-radius:50%;background:rgba(20,18,26,.92);border:2px solid #c9a227;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;line-height:1.15;overflow:hidden;text-align:center}
+#padc small{font-size:8.5px;color:#9aa}
+#holdring{position:absolute;border-radius:50%;pointer-events:none}
+/* Classic buttons */
+.fb{position:absolute;border-radius:50%;background:rgba(20,18,26,.9);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;touch-action:none}
+.fb.main{border:2px solid #c9a227;font-size:10px}
+/* Modals */
+.modal{position:absolute;inset:0;background:rgba(5,5,7,.9);display:none;align-items:center;justify-content:center;padding:14px;z-index:6;touch-action:none}
+.modal.show{display:flex}
+.card{width:100%;max-width:380px;max-height:100%;overflow:auto;background:#14121a;border:1px solid #3a3343;border-radius:10px;padding:16px;font-size:13px;line-height:1.45;touch-action:pan-y}
+.card h1{font-size:18px;margin:0 0 6px;color:#c9a227;font-weight:600}
+.card h2{font-size:13px;margin:14px 0 6px;color:#c9a227;font-weight:600}
+.card ul{padding-left:18px;margin:8px 0 12px}
+.card li{margin-bottom:3px}
+.card .go{width:100%;height:44px;font-size:14px;background:#2b5239;border-color:#3f8f5a;margin-top:12px}
+.hint{color:#9aa;font-size:11.5px;margin:0 0 8px}
+#book{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{display:flex;align-items:center;gap:6px;padding:7px;border:1px solid #3a3343;border-radius:6px;background:#1c1922;font-size:11px;touch-action:none}
+.chip .ic{margin:0}
+.chip.sel{border-color:#ffd27a;background:#2a2516}
+.chip small{color:#9aa;display:block;font-size:9.5px}
+.slot{border:1px dashed #4a4354;border-radius:6px;padding:5px;min-height:52px}
+.slot .lbl{font-size:9.5px;color:#c9a227;margin-bottom:3px}
+.slot.over{border-color:#ffd27a;background:#221f14}
+.seg{display:flex;gap:5px;margin-bottom:4px}
+.seg button{flex:1;height:34px;font-size:11.5px}
+#ghost{position:absolute;pointer-events:none;z-index:9;opacity:.9;display:none}
 </style>
 </head>
 <body>
@@ -63,24 +85,46 @@ button.active{border-color:#c9a227;color:#ffd27a}
     </div>
     <div id="castbar"><div id="castname"></div><div class="bar"><i id="castfill"></i></div></div>
     <div id="log"></div>
-    <div id="overlay">
+    <div id="controls"></div>
+
+    <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.2: Gate Road and the edge of the Sunken Graveyard.
         <ul>
-          <li>Tap the ground to move. Tap an enemy to target it.</li>
-          <li>Cast with the ability buttons. Moving cancels a cast.</li>
-          <li>Kite: root it, rot it, walk away, nuke it.</li>
-          <li>Name colors show difficulty: green easy, blue a bit easier, white even, yellow and red dangerous.</li>
-          <li>Sit to recover faster. Getting hit stands you up.</li>
+          <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
+          <li><b>Spell pad</b> (bottom corner): tap, hold, or flick up, down, left or right. Each gesture casts a different spell.</li>
+          <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
+          <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
+          <li>Kite: snare it, rot it, walk away, nuke it.</li>
+          <li><b>Spells</b> changes your loadout. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
-        <button id="start">Enter the Hollow</button>
+        <button id="start" class="go">Enter the Hollow</button>
       </div>
     </div>
+
+    <div id="spellsUI" class="modal">
+      <div class="card">
+        <h1>Spellbook</h1>
+        <p class="hint">Drag a spell onto a slot, or tap a spell and then tap a slot. Slots swap if the spell is already loaded.</p>
+        <div id="book"></div>
+        <h2>Loadout</h2>
+        <div id="slots"></div>
+        <button class="go" data-close="spellsUI">Done</button>
+      </div>
+    </div>
+
+    <div id="settingsUI" class="modal">
+      <div class="card">
+        <h1>Settings</h1>
+        <div id="setbox"></div>
+        <button class="go" data-close="settingsUI">Done</button>
+      </div>
+    </div>
+    <div id="ghost"></div>
   </div>
   <div id="bottom">
-    <div id="util"><button id="btab">Next target</button><button id="bsit">Sit</button><button id="bstop">Stop</button></div>
-    <div id="abil"></div>
+    <div id="util"><button id="btab">Next target</button><button id="bsit">Sit</button><button id="bspells">Spells</button><button id="bset">Settings</button></div>
   </div>
 </div>
 <script>
@@ -110,7 +154,7 @@ function mk(rows,pal,scale){
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2)};
 
-/* ---------- Seeded random ---------- */
+/* ---------- Seeded random (same map every visit) ---------- */
 let seed=20261117;
 function rnd(){seed=seed+0x6D2B79F5|0;let t=Math.imul(seed^seed>>>15,1|seed);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}
 const rr=(a,b)=>a+Math.random()*(b-a);
@@ -136,7 +180,7 @@ for(let y=1;y<MH-1;y++)for(let x=3;x<MW-1;x++){
 const tileAt=(px,py)=>{const tx=Math.floor(px/T),ty=Math.floor(py/T);if(tx<0||ty<0||tx>=MW||ty>=MH)return 3;return map[ty][tx]};
 const blocked=(px,py)=>{const t=tileAt(px,py);return t===2||t===3||t===4||t===5};
 
-/* ---------- Pre-render the world ---------- */
+/* ---------- Pre-render the world once ---------- */
 const world=document.createElement('canvas');world.width=WW;world.height=WH;const wg=world.getContext('2d');
 (function(){
   const id=wg.createImageData(WW,WH),d=id.data;
@@ -172,29 +216,38 @@ const world=document.createElement('canvas');world.width=WW;world.height=WH;cons
   }
 })();
 
-/* ---------- Game data ---------- */
+/* ---------- Game data (tune numbers here) ---------- */
+// cast: seconds of standing still. 0 = instant (usable while moving).
 const AB=[
-  {id:'thorn',name:'Thornlash',lvl:1,mana:6,cast:1.0,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke'},
-  {id:'mend',name:'Mending Touch',lvl:1,mana:10,cast:1.5,col:'#7dffa6',tgt:0,tag:'Heal'},
-  {id:'root',name:'Rootgrip',lvl:2,mana:8,cast:1.0,range:80,col:'#9b7b3a',tgt:1,tag:'Root'},
-  {id:'bark',name:'Barkskin',lvl:4,mana:12,cast:0,col:'#a07850',tgt:0,tag:'Armor'},
-  {id:'rot',name:'Creeping Rot',lvl:6,mana:10,cast:1.0,range:80,col:'#6aa84f',tgt:1,tag:'DoT'},
-  {id:'snare',name:'Tanglefoot',lvl:8,mana:8,cast:1.0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare'}
+  {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:6,cast:0.4,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke'},
+  {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:10,cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal'},
+  {id:'snare',name:'Tanglefoot',short:'Tangle',lvl:2,mana:7,cast:0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare'},
+  {id:'rot',name:'Creeping Rot',short:'Rot',lvl:4,mana:10,cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT'},
+  {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:8,cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root'},
+  {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:12,cast:0,col:'#a07850',tgt:0,tag:'Armor'}
 ];
+const ABI={};AB.forEach(a=>ABI[a.id]=a);
 const TYPES={
   rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:16,hpl:6,dmg:2,dmgl:1.1,spd:26,aggro:40,armor:0},
   beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:26,hpl:10,dmg:3,dmgl:1.2,spd:12,aggro:30,armor:0.5},
   dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:30,hpl:11,dmg:4,dmgl:1.5,spd:9,aggro:48,armor:0},
   gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:44,hpl:12,dmg:4,dmgl:1.5,spd:24,aggro:50,armor:0.1,named:1}
 };
-const need=L=>Math.round(25*Math.pow(L,1.5));
+const need=L=>Math.round(25*Math.pow(L,1.5)); // XP per level (boosted for testing)
 const maxHP=L=>40+12*L, maxMP=L=>40+10*L;
-const GCD=1.5;
+const GCD=1.5, PSPEED=34;
 
-const player={x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,atk:0,bark:0,target:null,dead:0,walk:0};
-try{const s=JSON.parse(localStorage.getItem('ashfen-druid')||'null');if(s&&s.lvl){player.lvl=Math.min(10,s.lvl|0);player.xp=s.xp|0;}}catch(e){}
+/* ---------- Saved progress, settings and loadout ---------- */
+const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',holdMs:300,flick:'normal',tapCast:true},store.get('ashfen-settings',{}));
+let loadout=store.get('ashfen-loadout',null);
+if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=['thorn','mend','snare','rot','root','bark'];
+const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set('ashfen-loadout',loadout);
+
+const player={x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
+const prog=store.get('ashfen-druid',null);if(prog&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
 player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
-function save(){try{localStorage.setItem('ashfen-druid',JSON.stringify({lvl:player.lvl,xp:player.xp}))}catch(e){}}
+const save=()=>store.set('ashfen-druid',{lvl:player.lvl,xp:player.xp});
 
 /* ---------- Spawns ---------- */
 function findSpot(x0,x1,y0,y1){
@@ -220,6 +273,7 @@ spawns.forEach(spawn);
 
 /* ---------- Effects, text, log ---------- */
 const floats=[],parts=[],beams=[];
+let rangeShow=0,rangeR=80;
 function floatText(x,y,txt,col,big){floats.push({x:x,y:y,txt:txt,col:col,t:0,big:!!big})}
 function burst(x,y,col,n,up){for(let i=0;i<n;i++)parts.push({x:x+rr(-4,4),y:y+rr(-4,2),vx:rr(-12,12),vy:up?rr(-28,-12):rr(-18,8),t:0,life:rr(0.4,0.9),col:col})}
 const logEl=$('log'),lines=[];
@@ -229,7 +283,7 @@ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
 /* ---------- Helpers ---------- */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-function con(lv){const d=lv-player.lvl;return d<=-3?'#5fbf5f':d===-2?'#5fbf5f':d===-1?'#5fa8ff':d===0?'#f2f2f2':d===1?'#ffd23f':'#ff4d4d'}
+function con(lv){const d=lv-player.lvl;return d<=-2?'#5fbf5f':d===-1?'#5fa8ff':d===0?'#f2f2f2':d===1?'#ffd23f':'#ff4d4d'}
 function moveToward(e,tx,ty,spd,dt){
   const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);if(d<0.5)return true;
   const step=Math.min(d,spd*dt),vx=dx/d*step,vy=dy/d*step;
@@ -239,7 +293,8 @@ function moveToward(e,tx,ty,spd,dt){
   if(Math.abs(vx)>0.01)e.dir=vx>0?1:-1;e.walk+=dt;
   return d<=step+0.01;
 }
-function inCombat(){return mobs.some(m=>!m.dead&&m.state==='chase')}
+const inCombat=()=>mobs.some(m=>!m.dead&&m.state==='chase');
+function nearestMob(maxD){let best=null,bd=maxD;mobs.forEach(m=>{if(m.dead)return;const d=dist(m,player);if(d<bd){bd=d;best=m}});return best}
 
 /* ---------- Combat ---------- */
 function engage(m){
@@ -251,7 +306,7 @@ function hitMob(m,dmg,kind,label){
   if(m.dead)return;
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
   floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');
-  if(kind!=='melee'||Math.random()<0.5)log((label?'Your '+label+' hits ':'You hit ')+m.def.name+' for '+dmg+' points of '+(kind==='melee'?'':'non-melee ')+'damage.','#e8e2cf');
+  log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');
   engage(m);
   if(kind==='direct'&&m.root>0&&Math.random()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
@@ -271,7 +326,8 @@ function killMob(m){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
     floatText(player.x,player.y-26,'LEVEL '+player.lvl+'!','#ffd27a',true);burst(player.x,player.y-8,'#ffd27a',24,true);
     log('You have reached level '+player.lvl+'!','#ffd27a');
-    AB.forEach(a=>{if(a.lvl===player.lvl)log('You have learned '+a.name+'!','#7dffa6')});
+    AB.forEach(a=>{if(a.lvl===player.lvl)log('You have learned '+a.name+'! Check your Spells.','#7dffa6')});
+    buildControls();
   }
   save();
   setTimeout(()=>{const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1)},800);
@@ -282,7 +338,7 @@ function hurtPlayer(m){
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;
   floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
-  log(cap(m.def.name)+' hits YOU for '+dmg+' points of damage.','#ff8a80');
+  log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
   if(player.cast&&Math.random()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
   if(player.hp<=0)playerDie(m);
 }
@@ -294,63 +350,260 @@ function playerDie(m){
 }
 function respawnPlayer(){player.x=3.5*T;player.y=15*T+8;player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log('You return to the Gate Road.','#9aa')}
 
-/* ---------- Abilities ---------- */
-function useAbility(i){
-  const a=AB[i];if(!a||player.dead)return;
-  if(player.lvl<a.lvl){log(a.name+' unlocks at level '+a.lvl+'.','#9aa');return}
-  if(player.cast||player.gcd>0)return;
-  if(player.mp<a.mana){log('Insufficient mana to cast this spell!','#ff8a80');return}
+/* ---------- Casting ---------- */
+// Returns true if the spell started. "quiet" skips spam messages during hold-to-repeat.
+function cast(a,quiet){
+  if(!a||player.dead)return false;
+  if(player.lvl<a.lvl){if(!quiet)log(a.name+' unlocks at level '+a.lvl+'.','#9aa');return false}
+  if(player.cast||player.gcd>0)return false;
+  if(player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
-  if(a.tgt){t=player.target;
-    if(!t||t.dead){log('You must first select a target for this spell!','#ff8a80');return}
-    if(dist(player,t)>a.range){log('Your target is out of range, get closer!','#ff8a80');return}}
+  if(a.tgt){
+    t=player.target;
+    // Smart targeting: no target means the nearest enemy, preferring one already in range.
+    if(!t||t.dead){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
+    if(!t){if(!quiet)log('No enemy nearby.','#9aa');return false}
+    if(dist(player,t)>a.range){if(!quiet){log('Out of range. Move closer.','#ff8a80');floatText(player.x,player.y-24,'Out of range','#ff8a80')}rangeShow=0.8;rangeR=a.range;return false}
+    if(t.x!==player.x)player.dir=t.x>player.x?1:-1;
+  }
   if(player.sit)player.sit=false;
-  player.tx=null;
   player.gcd=GCD;
-  if(a.cast<=0){player.mp-=a.mana;applyAbility(a,t);return}
+  if(a.cast<=0){player.mp-=a.mana;applyAbility(a,t);return true}
+  player.tx=null; // cast-time spells stop a tap-to-move walk
   player.cast={a:a,t:t,time:0};
+  return true;
 }
+const castSlot=(i,quiet)=>cast(ABI[loadout[i]],quiet);
 function applyAbility(a,t){
   const L=player.lvl;
   if(a.id==='thorn'){beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:'#9be37a'});burst(t.x,t.y-6,'#9be37a',6);hitMob(t,(8+3*L)*rr(0.85,1.15)*(1-t.def.armor),'direct','Thornlash');}
-  else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('You feel the touch of the grove. ('+h+')','#7dffa6');}
-  else if(a.id==='root'){t.root=12;burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+"'s feet are gripped by roots.",'#c8b07a');engage(t);}
+  else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('Mending Touch heals you for '+h+'.','#7dffa6');}
+  else if(a.id==='root'){t.root=12;burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+' is held by roots.','#c8b07a');engage(t);}
   else if(a.id==='bark'){player.bark=120;burst(player.x,player.y-6,'#a07850',12,true);log('Your skin hardens like bark.','#c8b07a');}
   else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');t.dots.push({id:'rot',t:18,next:3,dmg:3+1.6*L});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot.','#9be37a');engage(t);}
   else if(a.id==='snare'){t.snare=24;burst(t.x,t.y,'#5f9ea0',8);log(cap(t.def.name)+' is tangled and slowed.','#9fd0d0');engage(t);}
 }
 
+/* ---------- Input: movement (tap to move, invisible drag joystick) ---------- */
+const joy={id:null,sx:0,sy:0,dx:0,dy:0,active:false};
+const keys={};
+cv.addEventListener('pointerdown',e=>{
+  e.preventDefault();
+  if(joy.id!==null)return;
+  joy.id=e.pointerId;joy.sx=e.clientX;joy.sy=e.clientY;joy.dx=0;joy.dy=0;joy.active=false;
+  try{cv.setPointerCapture(e.pointerId)}catch(_){}
+});
+cv.addEventListener('pointermove',e=>{
+  if(e.pointerId!==joy.id)return;
+  const dx=e.clientX-joy.sx,dy=e.clientY-joy.sy;
+  if(!joy.active&&Math.hypot(dx,dy)>12){joy.active=true;player.tx=null;player.sit=false;}
+  joy.dx=dx;joy.dy=dy;
+});
+function endJoy(e){
+  if(e.pointerId!==joy.id)return;
+  const wasTap=!joy.active;joy.id=null;joy.active=false;
+  if(wasTap)tapWorld(joy.sx,joy.sy);
+}
+cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{if(e.pointerId===joy.id){joy.id=null;joy.active=false}});
+function tapWorld(clientX,clientY){
+  if(player.dead)return;
+  const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
+  let best=null,bd=1e9;
+  mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
+  if(best){player.target=best;if(settings.tapCast)castSlot(0);return}
+  player.tx=wx;player.ty=wy;player.sit=false;
+}
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=6)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();nextTarget()}});
+window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
+
+/* ---------- Input: spell pad and classic buttons ---------- */
+const SLOT_LABELS={pad:['Tap','Hold','Flick up','Flick down','Flick left','Flick right'],buttons:['Button 1 (main)','Button 2','Button 3','Button 4','Button 5','Button 6']};
+const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
+let gest=null, holdSlot=null;
+const ctrl=$('controls');
+function slotHTML(i,showName){
+  const a=ABI[loadout[i]];
+  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showName?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span>';
+}
+function buildControls(){
+  ctrl.innerHTML='';
+  const side=settings.left?'left':'right';
+  logEl.style.left=settings.left?'auto':'6px';logEl.style.right=settings.left?'6px':'auto';
+  if(settings.scheme==='pad'){
+    const P=PAD_PX[settings.padSize]||160,ic=Math.round(P*0.27),cc=Math.round(P*0.42);
+    const pad=document.createElement('div');pad.id='pad';
+    pad.style.cssText='width:'+P+'px;height:'+P+'px;bottom:12px;'+side+':12px';
+    const pos=[null,null,{l:(P-ic)/2,t:3},{l:(P-ic)/2,t:P-ic-3},{l:3,t:(P-ic)/2},{l:P-ic-3,t:(P-ic)/2}];
+    for(let i=2;i<6;i++){const d=document.createElement('div');d.className='pi';d.dataset.slot=i;
+      d.style.cssText='width:'+ic+'px;height:'+ic+'px;left:'+pos[i].l+'px;top:'+pos[i].t+'px';d.innerHTML=slotHTML(i,false);pad.appendChild(d)}
+    const ring=document.createElement('div');ring.id='holdring';const rs=cc+10;
+    ring.style.cssText='width:'+rs+'px;height:'+rs+'px;left:'+(P-rs)/2+'px;top:'+(P-rs)/2+'px';pad.appendChild(ring);
+    const c=document.createElement('div');c.id='padc';
+    c.style.cssText='width:'+cc+'px;height:'+cc+'px;left:'+(P-cc)/2+'px;top:'+(P-cc)/2+'px';
+    const a0=ABI[loadout[0]],a1=ABI[loadout[1]];
+    c.innerHTML='<span class="ic" style="background:'+a0.col+';width:13px;height:13px;border-radius:3px;border:1px solid #0b0a0f;margin-bottom:2px"></span><span>'+a0.short+'</span><small>hold: '+a1.short+'</small><span class="cd"></span>';
+    c.dataset.slot='c';pad.appendChild(c);
+    pad.addEventListener('pointerdown',padDown);
+    pad.addEventListener('pointermove',padMove);
+    pad.addEventListener('pointerup',padUp);pad.addEventListener('pointercancel',padUp);
+    ctrl.appendChild(pad);
+  }else{
+    // Classic: big main button in the corner, five more fanned around it.
+    const main=76,sm=50,R=140,cxp=12+main/2,cyp=12+main/2;
+    for(let i=0;i<6;i++){
+      const b=document.createElement('div');b.className='fb'+(i===0?' main':'');b.dataset.slot=i;
+      let sz=i===0?main:sm,ox=cxp,oy=cyp;
+      // Fan the five smaller buttons in a quarter circle: from beside the main button to straight above it.
+      if(i>0){const a=(i-1)*(Math.PI/2)/4;ox=cxp+Math.cos(a)*R;oy=cyp+Math.sin(a)*R;}
+      b.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+(oy-sz/2)+'px;'+side+':'+(ox-sz/2)+'px';
+      b.innerHTML=slotHTML(i,true);
+      b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}holdSlot=i;castSlot(i);flash(b)});
+      const up=()=>{if(holdSlot===i)holdSlot=null};
+      b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+      ctrl.appendChild(b);
+    }
+  }
+}
+function flash(el){if(!el)return;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),160)}
+function padDown(e){
+  e.preventDefault();if(gest)return;
+  const pad=e.currentTarget;try{pad.setPointerCapture(e.pointerId)}catch(_){}
+  const icon=e.target.closest('[data-slot]');
+  gest={id:e.pointerId,sx:e.clientX,sy:e.clientY,t0:performance.now(),fired:false,holding:false,moved:false,icon:icon&&icon.dataset.slot!=='c'?+icon.dataset.slot:null};
+  gest.timer=setTimeout(()=>{if(gest&&!gest.fired&&!gest.moved&&gest.icon===null){gest.fired=true;gest.holding=true;castSlot(1);}},settings.holdMs);
+}
+function padMove(e){
+  if(!gest||e.pointerId!==gest.id||gest.fired)return;
+  const dx=e.clientX-gest.sx,dy=e.clientY-gest.sy,d=Math.hypot(dx,dy);
+  if(d>12)gest.moved=true;
+  if(d>=(FLICK_PX[settings.flick]||32)){
+    gest.fired=true;clearTimeout(gest.timer);
+    const slot=Math.abs(dx)>Math.abs(dy)?(dx<0?4:5):(dy<0?2:3);
+    castSlot(slot);flash(document.querySelector('#pad .pi[data-slot="'+slot+'"]'));
+  }
+}
+function padUp(e){
+  if(!gest||e.pointerId!==gest.id)return;
+  clearTimeout(gest.timer);
+  if(!gest.fired&&!gest.moved){
+    if(gest.icon!==null){castSlot(gest.icon);flash(document.querySelector('#pad .pi[data-slot="'+gest.icon+'"]'))}
+    else{castSlot(0);flash($('padc'))}
+  }
+  gest=null;
+}
+
+/* ---------- Spellbook (drag and drop loadout) ---------- */
+let selected=null,drag=null;
+const ghost=$('ghost');
+function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+'</b><small>'+a.tag+' · '+a.mana+' mana · '+(a.cast?a.cast+'s cast':'instant')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
+function renderBook(){
+  const book=$('book'),slots=$('slots');
+  book.innerHTML='';slots.innerHTML='';
+  AB.forEach(a=>{const c=document.createElement('div');c.className='chip'+(player.lvl<a.lvl?' lock':'')+(selected===a.id?' sel':'');c.dataset.id=a.id;c.innerHTML=chipHTML(a);book.appendChild(c)});
+  const labels=SLOT_LABELS[settings.scheme];
+  loadout.forEach((id,i)=>{const s=document.createElement('div');s.className='slot';s.dataset.i=i;
+    const a=ABI[id];s.innerHTML='<div class="lbl">'+labels[i]+'</div><div class="chip'+(player.lvl<a.lvl?' lock':'')+'" data-id="'+id+'" data-from="'+i+'">'+chipHTML(a)+'</div>';slots.appendChild(s)});
+}
+function assign(id,i){
+  const j=loadout.indexOf(id);
+  if(j===i)return;
+  if(j>=0)loadout[j]=loadout[i]; else {/* spell not loaded: replace */}
+  loadout[i]=id;saveLoadout();buildControls();
+}
+$('spellsUI').addEventListener('pointerdown',e=>{
+  const chip=e.target.closest('.chip');
+  if(chip){e.preventDefault();drag={id:chip.dataset.id,sx:e.clientX,sy:e.clientY,moved:false,pid:e.pointerId,el:chip};return}
+  const slot=e.target.closest('.slot');
+  if(slot&&selected){assign(selected,+slot.dataset.i);selected=null;renderBook()}
+});
+window.addEventListener('pointermove',e=>{
+  if(!drag||e.pointerId!==drag.pid)return;
+  if(!drag.moved&&Math.hypot(e.clientX-drag.sx,e.clientY-drag.sy)>8){drag.moved=true;ghost.innerHTML='<div class="chip">'+chipHTML(ABI[drag.id])+'</div>';ghost.style.display='block'}
+  if(drag.moved){const r=$('view').getBoundingClientRect();ghost.style.left=(e.clientX-r.left-60)+'px';ghost.style.top=(e.clientY-r.top-20)+'px';
+    document.querySelectorAll('.slot').forEach(s=>s.classList.remove('over'));
+    const el=document.elementFromPoint(e.clientX,e.clientY),s=el&&el.closest('.slot');if(s)s.classList.add('over')}
+});
+window.addEventListener('pointerup',e=>{
+  if(!drag||e.pointerId!==drag.pid)return;
+  ghost.style.display='none';document.querySelectorAll('.slot').forEach(s=>s.classList.remove('over'));
+  if(drag.moved){const el=document.elementFromPoint(e.clientX,e.clientY),s=el&&el.closest('.slot');if(s){assign(drag.id,+s.dataset.i);selected=null}}
+  else{
+    const inSlot=drag.el.closest('.slot');
+    if(inSlot&&selected){assign(selected,+inSlot.dataset.i);selected=null}
+    else selected=(selected===drag.id?null:drag.id);
+  }
+  drag=null;renderBook();
+});
+
+/* ---------- Settings ---------- */
+function renderSettings(){
+  const box=$('setbox');
+  const seg=(label,key,opts)=>'<h2>'+label+'</h2><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div>';
+  box.innerHTML=
+    seg('Controls','scheme',[['pad','Spell pad'],['buttons','Classic buttons']])+
+    seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
+    seg('Tap an enemy','tapCast',[['true','Target + cast'],['false','Target only']])+
+    (settings.scheme==='pad'?
+      seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
+      seg('Hold time','holdMs',[['200','Quick'],['300','Normal'],['450','Long']])+
+      seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'');
+}
+$('setbox').addEventListener('click',e=>{
+  const b=e.target.closest('button[data-k]');if(!b)return;
+  let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
+  settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();
+});
+
+/* ---------- Modals and utility buttons ---------- */
+let running=false;
+function openModal(id){$(id).classList.add('show');running=false;if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=true;selected=null}));
+$('bspells').addEventListener('click',()=>openModal('spellsUI'));
+$('bset').addEventListener('click',()=>openModal('settingsUI'));
+function nextTarget(){
+  const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
+  if(!list.length){log('No targets nearby.','#9aa');return}
+  const i=list.indexOf(player.target);player.target=list[(i+1)%list.length];
+}
+$('btab').addEventListener('pointerdown',e=>{e.preventDefault();nextTarget()});
+$('bsit').addEventListener('pointerdown',e=>{e.preventDefault();if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')});
+
 /* ---------- Update ---------- */
 function update(dt){
   if(player.dead>0){player.dead-=dt;if(player.dead<=0)respawnPlayer();}
   else{
-    if(player.tx!==null){
-      if(player.cast){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
-      if(moveToward(player,player.tx,player.ty,34,dt))player.tx=null;
-    }
+    // Movement: joystick drag or keyboard steers; otherwise walk to a tapped point.
+    let mx=0,my=0;
+    if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
+    if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
+    const steering=mx!==0||my!==0;
+    if(steering){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,PSPEED,dt);}
+    else if(player.tx!==null){if(moveToward(player,player.tx,player.ty,PSPEED,dt))player.tx=null;}
+    if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
       if(player.cast.time>=a.cast){player.cast=null;
         if(a.tgt&&(!t||t.dead)){log('Your spell fizzles: no target.','#9aa')}
-        else if(a.tgt&&dist(player,t)>a.range*1.2){log('Your target is out of range!','#ff8a80')}
-        else if(player.mp<a.mana){log('Insufficient mana!','#ff8a80')}
+        else if(a.tgt&&dist(player,t)>a.range*1.2){log('Your target moved out of range.','#ff8a80')}
+        else if(player.mp<a.mana){log('Not enough mana.','#ff8a80')}
         else{player.mp-=a.mana;applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
-    const t=player.target;
-    player.atk-=dt;
-    if(t&&!t.dead&&!player.cast&&dist(player,t)<16&&player.atk<=0){player.atk=2;hitMob(t,(1.6+0.6*player.lvl)*rr(0.8,1.2)*(1-t.def.armor),'melee');if(!t.dead&&t.x!==player.x)player.dir=t.x>player.x?1:-1;}
+    // Hold-to-repeat: pad hold recasts slot 2, a held classic button recasts its slot.
+    if(gest&&gest.holding)castSlot(1,true);
+    if(holdSlot!==null)castSlot(holdSlot,true);
     const fight=inCombat(),L=player.lvl,f=1+L*0.1;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*dt);
     player.bark=Math.max(0,player.bark-dt);
   }
+  rangeShow=Math.max(0,rangeShow-dt);
   spawns.forEach(sp=>{if(!sp.mob){sp.timer-=dt;if(sp.timer<=0)spawn(sp)}});
   mobs.forEach(m=>{
     if(m.dead)return;
     for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
       if(d.next<=0){d.next+=3;hitMob(m,d.dmg*rr(0.9,1.1),'dot','Creeping Rot');if(m.dead)return;}
-      if(d.t<=0){m.dots.splice(i,1);log('Your Creeping Rot on '+m.def.name+' has worn off.','#9aa')}}
-    if(m.root>0){m.root-=dt;if(m.root<=0)log('Your Rootgrip on '+m.def.name+' has worn off.','#ffb37a')}
-    if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('Your Tanglefoot on '+m.def.name+' has worn off.','#9aa')}
+      if(d.t<=0){m.dots.splice(i,1);log('Creeping Rot on '+m.def.name+' wears off.','#9aa')}}
+    if(m.root>0){m.root-=dt;if(m.root<=0)log('Rootgrip on '+m.def.name+' wears off.','#ffb37a')}
+    if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('Tanglefoot on '+m.def.name+' wears off.','#9aa')}
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1);
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
@@ -397,14 +650,15 @@ function render(){
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
+  if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
   if(t&&!t.dead){for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}}
-  const ents=mobs.filter(m=>!m.dead||true).concat([player]).sort((a,b)=>a.y-b.y);
+  const ents=mobs.concat([player]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
     if(e===player){
       if(player.dead>0)return;
       shadow(player.x,player.y,5);
-      const moving=player.tx!==null,bob=moving?(Math.floor(player.walk*8)%2):((Math.floor(time*2)%2)&&!player.sit?0:0);
+      const moving=player.tx!==null||joy.active||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
       drawSprite(IMG.druid,player.x,player.y+1,player.dir,bob,player.sit);
       if(player.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
@@ -416,7 +670,7 @@ function render(){
     const bob=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)?(Math.floor(m.walk*6)%2):0;
     drawSprite(img,m.x,m.y+1,m.dir,m.root>0?0:bob,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
-    if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1)}
+    if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.dots.length&&Math.random()<0.25)parts.push({x:m.x+rr(-4,4),y:m.y-rr(4,12),vx:0,vy:-10,t:0,life:0.5,col:'#6aa84f'});
   });
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
@@ -427,7 +681,7 @@ function render(){
   const pxs=player.x-camX,pys=player.y-8-camY,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
   for(let y=0;y<VH;y++)for(let x=0;x<VW;x++){
     const dd=Math.hypot(x-pxs,(y-pys)*1.15),v=Math.max(0,1-dd/(95*fl));
-    let L=0.38+v*v*0.9;
+    const L=0.38+v*v*0.9;
     const q=Math.min(1.1,Math.floor(L*6+bay[(y&3)*4+(x&3)]/16)/6);
     const o=(y*VW+x)*4;d[o]=Math.min(255,d[o]*q+v*v*18);d[o+1]=d[o+1]*q+v*v*6;d[o+2]=d[o+2]*q*0.95;
   }
@@ -442,25 +696,7 @@ function render(){
   if(player.dead>0){cx.fillStyle='rgba(60,0,0,0.35)';cx.fillRect(0,0,cv.width,cv.height);cx.font='700 '+Math.round(16*dpr)+'px ui-monospace,Menlo,monospace';cx.fillStyle='#ff6b6b';cx.fillText('You have died',cv.width/2,cv.height/2)}
 }
 
-/* ---------- UI ---------- */
-const abEl=$('abil'),btns=[];
-AB.forEach((a,i)=>{const b=document.createElement('button');b.className='ab';
-  b.innerHTML='<span class="ic" style="background:'+a.col+'"></span><b>'+a.name+'</b><small>'+a.mana+' mana</small><span class="cd"></span>';
-  b.addEventListener('pointerdown',e=>{e.preventDefault();useAbility(i)});abEl.appendChild(b);btns.push(b)});
-$('btab').addEventListener('pointerdown',e=>{e.preventDefault();
-  const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
-  if(!list.length){log('No targets nearby.','#9aa');return}
-  const i=list.indexOf(player.target);player.target=list[(i+1)%list.length]});
-$('bsit').addEventListener('pointerdown',e=>{e.preventDefault();if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')});
-$('bstop').addEventListener('pointerdown',e=>{e.preventDefault();player.tx=null;if(player.cast){player.cast=null;log('You stop casting.','#9aa')}});
-cv.addEventListener('pointerdown',e=>{
-  e.preventDefault();if(player.dead)return;
-  const r=cv.getBoundingClientRect(),wx=camX+(e.clientX-r.left)*dpr/S,wy=camY+(e.clientY-r.top)*dpr/S;
-  let best=null,bd=1e9;
-  mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const cxm=m.x,cym=m.y-img.h/2;const d=Math.hypot(wx-cxm,wy-cym);if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
-  if(best){player.target=best;return}
-  player.tx=wx;player.ty=wy;player.sit=false;
-});
+/* ---------- HUD ---------- */
 function ui(){
   const L=player.lvl;
   $('plv').textContent='Lv '+L;
@@ -475,23 +711,28 @@ function ui(){
   else tf.style.visibility='hidden';
   const cb=$('castbar');
   if(player.cast){cb.style.display='block';$('castname').textContent=player.cast.a.name;$('castfill').style.width=(100*player.cast.time/player.cast.a.cast)+'%'}else cb.style.display='none';
-  AB.forEach((a,i)=>{const b=btns[i];const locked=L<a.lvl;b.classList.toggle('lock',locked);
-    b.querySelector('small').textContent=locked?'Lv '+a.lvl:a.mana+' mana';
-    b.classList.toggle('nomana',!locked&&player.mp<a.mana);
-    b.querySelector('.cd').style.height=(locked?0:100*player.gcd/GCD)+'%'});
+  const cdPct=100*player.gcd/GCD;
+  ctrl.querySelectorAll('[data-slot]').forEach(el=>{
+    const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];
+    el.classList.toggle('lock',L<a.lvl);el.classList.toggle('nomana',L>=a.lvl&&player.mp<a.mana);
+    const cd=el.querySelector('.cd');if(cd)cd.style.height=(L<a.lvl?0:cdPct)+'%';
+  });
+  const ring=$('holdring');
+  if(ring){let p=0;if(gest&&!gest.fired&&!gest.moved&&gest.icon===null)p=Math.min(1,(performance.now()-gest.t0)/settings.holdMs);else if(gest&&gest.holding)p=1;
+    ring.style.background=p>0?'conic-gradient(#7dffa6 '+(p*360)+'deg, transparent 0)':'transparent';}
   $('bsit').classList.toggle('active',player.sit);$('bsit').textContent=player.sit?'Stand':'Sit';
 }
 
 /* ---------- Loop ---------- */
-let running=false,last=0,uiT=0;
+let last=0,uiT=0;
 function loop(ts){
   const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
   if(running&&!document.hidden){time+=dt;update(dt);}
-  render();uiT+=dt;if(uiT>0.08){ui();uiT=0}
+  render();uiT+=dt;if(uiT>0.05){ui();uiT=0}
   requestAnimationFrame(loop);
 }
-resize();
-$('start').addEventListener('click',()=>{$('overlay').style.display='none';running=true;log('Welcome to Ashfen Hollow, Druid.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa')});
+resize();buildControls();
+$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, Druid.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa')});
 requestAnimationFrame(t=>{last=t;loop(t)});
 })();
 </script>
