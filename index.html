@@ -28,7 +28,7 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
 #log{position:absolute;bottom:8px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
-#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(70px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
+#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(96px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
 #castbar .bar{height:9px;border:1px solid #3a3343}
 #castbar .bar>i{background:#7dffa6}
 #castname{font-size:10px;text-align:center;text-shadow:0 1px 0 #000}
@@ -41,7 +41,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
 #pad{position:absolute;border-radius:50%;background:rgba(10,9,14,.38);border:1px solid rgba(201,162,39,.35);touch-action:none}
 .pi{position:absolute;border-radius:50%;background:rgba(20,18,26,.88);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;pointer-events:auto}
 .pi .ic,.fb .ic,.chip .ic{width:12px;height:12px;border-radius:3px;border:1px solid #0b0a0f;margin-bottom:2px;flex:none}
-.pi.flash,.fb.flash{border-color:#ffd27a;background:rgba(80,70,30,.9)}
+.pi.flash,.fb.flash,#nexttgt.flash{border-color:#ffd27a;background:rgba(80,70,30,.9)}
 .lock{opacity:.35}
 .nomana .nm{color:#ff6b6b}
 .cd{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);height:0;pointer-events:none}
@@ -103,7 +103,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
         <div id="tfx"></div>
       </div>
     </div>
-    <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(64px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
+    <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(94px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
     <div id="castbar"><div id="castname"></div><div class="bar"><i id="castfill"></i></div></div>
     <div id="log"></div>
     <div id="controls"></div>
@@ -118,7 +118,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
           <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
-          <li>Auto-cast (on by default) keeps firing your main spell at the enemy you're fighting, so your thumb is free to kite. Toggle it with the Auto pill above the pad.</li>
+          <li>Auto-cast (on by default) keeps firing your main spell at the enemy you're fighting, so your thumb is free to kite. Toggle it with the Auto pill at the top right. The Next button above your spells switches targets.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
           <li>Higher-level enemies resist (or dodge) more and shrug off roots, snares and stuns sooner.</li>
           <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
@@ -795,15 +795,22 @@ function buildControls(){
   }
   ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));
 }
-// Two quick toggles above the abilities: "1st hit" = tapping an enemy casts your main attack once; "Auto" = it keeps casting.
+// Two quick toggles, top right under the target frame: "1st hit" = tapping an enemy casts your main attack once;
+// "Auto" = it keeps casting. They're set between fights, so they live out of the thumb's way.
+// Their old spot above the abilities now holds a Next target button, which IS needed mid-fight.
 function autoPill(side,bottom){
   const mk=(key,label,off,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='autopill'+(settings[key]?' active':'');
     b.textContent=label+' '+(settings[key]?'on':'off');
-    b.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':'+off+'px;height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+    b.style.cssText='position:absolute;top:calc(62px + env(safe-area-inset-top));right:'+off+'px;height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
     b.addEventListener('click',()=>{settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
     ctrl.appendChild(b);};
-  mk('autoCast','Auto',16,'Auto attack','autopill');
-  mk('tapCast','1st hit',84,'Auto first attack','firstpill');
+  mk('autoCast','Auto',6,'Auto attack','autopill');
+  mk('tapCast','1st hit',74,'Auto first attack','firstpill');
+  // Next target: thumb-reachable, just above the spells. Same as the bottom bar's Target button.
+  const t=document.createElement('button');t.id='nexttgt';t.textContent='Next ⟳';
+  t.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':16px;height:34px;padding:0 12px;font-size:12px;border-radius:17px;background:rgba(20,18,26,.88);border-color:#7a6a3a';
+  t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;nextTarget();flash(t)});
+  ctrl.appendChild(t);
 }
 function flash(el){if(!el)return;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),160)}
 function padDown(e){
@@ -833,7 +840,7 @@ function padUp(e){
 /* ---------- Arrange mode: drag spells on the pad or buttons to swap them ---------- */
 function swapSlots(a,b){if(a===b)return;const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
 ctrl.addEventListener('pointerdown',e=>{
-  if(!arranging||e.target.id==='autopill'||e.target.id==='firstpill')return;
+  if(!arranging||e.target.id==='autopill'||e.target.id==='firstpill'||e.target.id==='nexttgt')return;
   e.stopPropagation();e.preventDefault();
   const el=e.target.closest('[data-slot]');if(!el)return;
   arrDrag={slot:slotOf(el),sx:e.clientX,sy:e.clientY,id:e.pointerId,moved:false};

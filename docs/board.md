@@ -26,7 +26,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Now
 - **UI and controls pass** (M). Owner is switching to the joystick (more control, can move while casting). In order:
   1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
-  2. **Better targeting:** the bottom bar's Target button doesn't feel intuitive for tab-targeting. Make next-target easy to reach mid-fight, likely a thumb-sized button near the spells.
+  2. ~~**Better targeting:**~~ v0.11.4: a Next ⟳ button sits just above the spells; the 1st hit / Auto toggles moved to the top right (set between fights). Confirm on phone.
   3. **Rethink the bottom bar and hotbar** (see the Hotbar redesign card): what belongs on screen, what goes in menus, room for more spells.
   Talk through the layout with the owner before building step 3.
 
@@ -78,6 +78,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11.4** Targeting: a **Next ⟳** button right above your spells switches to the next enemy mid-fight (same as the bottom bar's Target). The **1st hit** and **Auto** toggles moved to the top right under the target frame, since they're set between fights. DEV button and cast bar shifted down to make room.
 - **v0.11.3** Joystick fix: while one finger holds the joystick, a quick tap on an enemy with another finger now targets it (and casts your main attack if **1st hit** is on). A second-finger tap on empty ground does nothing, so it never fights the joystick.
 - **v0.11.2** Home-screen app: add the game to your phone's home screen and it opens full screen with its own icon (the Druid), no browser bars. Settings → Developer tools On/Off, since a home-screen app can't use `?dev` in its link.
 - **v0.11.1** From the class play-test: dying now ends every fight (mobs forget you, lingering DoTs are cleared, and everything walks back to its spot; before, a DoT tick after you respawned could pull the mob back and your new skeleton would chase it); the skeleton dies with you; skeleton follow no longer jitters; two quick toggles above your abilities: **1st hit** (tapping an enemy casts your main attack) and **Auto** (keeps casting), also in Settings; all of Boss 1's gear now waits in the chest: one named item and one uncommon every time, plus a small rare chance; Lifetap heals 85% of its damage (was 100%).
