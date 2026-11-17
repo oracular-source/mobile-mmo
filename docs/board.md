@@ -17,17 +17,17 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 0 | Controls and core combat | You can fight and kite comfortably on your phone | Done (v0.6) |
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
-| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | In progress (class system + Warrior done) |
+| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Built (v0.11), needs play-test |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Warrior play-test** (S): does melee feel different from the Druid in a good way? Is the Warrior too tanky or too weak solo?
+- **Class play-test** (S): Warrior and Necromancer. Does each feel different? Does the skeleton hold aggro well enough? Use the DEV panel to jump levels and teleport.
 
 ## Next
-1. Necromancer: pet class (pet AI is the new system) (L)
-2. Melee feel: hit sparks, small knockback, a swing animation (S)
+1. Melee feel: hit sparks, small knockback, a swing animation (S)
+2. Milestone 4: sound effects, tuning pass across the three classes, start screen polish (M)
 
 ## Idea backlog
 Value: H/M/L. Effort: S/M/L. Phase: when it fits.
@@ -60,6 +60,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11** **Necromancer** added with the first pet: Raise Bones summons a skeleton that follows you, attacks what you're fighting and tanks (a threat system decides who mobs hit; the pet's hits count triple). Lifetap (main attack, heals you), Siphon Plague (strong DoT), Dread (fear: the mob runs away), Feign Death (mobs forget you and stay put, no reset), Mend Bones (heal the pet). Pet HP bar under your health. Caster gear is shared by Druid and Necromancer. **Developer tools:** open the game once with `?dev` for a DEV button: level up/down, full heal, reset cooldowns, god mode, kill target, give gear, teleports (gate, crypt door, dungeon start, boss room), spawn Old Gnawbone, wipe saves. Turn off with `?dev=0`.
 - **v0.10** Class system: classes are data (stats, abilities, loadout, sprite); abilities are generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave). Spells grow each level: more damage and healing, longer roots, snares and stuns. Each class has its own level, bags and loadout; pick your class on the start screen (or Settings → Change class). **Warrior** added: no mana, high HP, built-in plate armor, Strike, Bandage, Throw Stone, Shield Bash (stun), Hamstring, Defensive Stance, Cleave; STR stat and warrior gear; personal loot only drops gear your class can use; Boss 1 drops a Warrior blade, breastplate or shield for Warriors. Dungeon: the entrance exit is blocked while something is chasing you; the end portal only appears after Boss 1 dies.
 - **v0.9** From the first dungeon play-test: no leashing (mobs chase until someone dies or the guards step in, so running out of range no longer resets them); mobs much faster (24–31 vs the Druid's 34), so kiting needs snares; shorter Dungeon 1 (13 mobs, room 3 is now a quiet passage); dungeon mobs ~10% tougher, Boss 1 +18% HP, shadow bolt every 7s; an ending: Boss 1 leaves a chest (copper + uncommon item) and a way out with a run summary (time, kills, XP, gear).
 - **v0.8.2** Test shortcut: add `?level=7` to the game link to jump to that level (prototype only).

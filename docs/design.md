@@ -81,6 +81,21 @@ Armored tank with no mana: every skill runs on its own cooldown. High HP (60 + 1
 | 6 | Defensive Stance | Defense | Half damage taken for 10s; 45s cooldown, down to 30s |
 | 8 | Cleave | Area | Hits every enemy next to you; 10s cooldown, down to 6s |
 
+### Necromancer (playable)
+
+Dark caster with an undead pet. Low HP, mana like the Druid, and caster gear (shared with the Druid). The pet is the class: it tanks while the Necromancer drains and DoTs.
+
+| Level | Spell | Type | What it does |
+| --- | --- | --- | --- |
+| 1 | Lifetap | Lifetap | Main attack; heals you for the damage dealt |
+| 1 | Raise Bones | Pet | 3s cast; summons a skeleton (HP 30 + 14 per level) that follows you, attacks your target and holds aggro |
+| 2 | Siphon Plague | DoT | Stronger DoT than the Druid's |
+| 3 | Dread | Fear | The target runs away from you for a few seconds |
+| 6 | Feign Death | Escape | Mobs forget you and stay where they are (no heal, no reset); your pet keeps fighting |
+| 8 | Mend Bones | Pet heal | Heals your skeleton |
+
+**Threat:** every mob tracks threat from you and from your pet and attacks whoever has more. Damage adds threat; the pet's hits count triple, plus a bonus on its first hit, so it can tank.
+
 **All classes:** abilities grow a little stronger every level after you learn them: more damage and healing, and longer roots, snares and stuns. Each class keeps its own level, bags and loadout, and personal loot only drops gear your class can use.
 
 ### Prototype class: Druid

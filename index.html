@@ -86,6 +86,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
         <div class="bar hp"><i id="php"></i></div>
         <div class="bar mp"><i id="pmp"></i></div>
         <div class="bar xp" style="height:4px"><i id="pxp"></i></div>
+        <div class="bar" id="petrow" style="height:4px;display:none"><i id="petbar" style="background:#cfc8b2"></i></div>
       </div>
       <div class="frame" id="tframe" style="visibility:hidden">
         <div class="row"><span id="tname">-</span><span id="tlv"></span></div>
@@ -93,6 +94,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
         <div id="tfx"></div>
       </div>
     </div>
+    <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(64px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
     <div id="castbar"><div id="castname"></div><div class="bar"><i id="castfill"></i></div></div>
     <div id="log"></div>
     <div id="controls"></div>
@@ -100,7 +102,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.10: Gate Road, the Sunken Graveyard and Dungeon 1.
+        Prototype v0.11: Gate Road, the Sunken Graveyard and Dungeon 1.
         <div id="clspick" class="seg" style="margin:10px 0 2px"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
         <ul>
@@ -148,6 +150,15 @@ button.active{border-color:#c9a227;color:#ffd27a}
       </div>
     </div>
 
+    <div id="devUI" class="modal">
+      <div class="card">
+        <h1>Developer tools</h1>
+        <p class="hint">Testing only. Turn off with ?dev=0 in the address.</p>
+        <div id="devbox"></div>
+        <button class="go" data-close="devUI">Done</button>
+      </div>
+    </div>
+
     <div id="settingsUI" class="modal">
       <div class="card">
         <h1>Settings</h1>
@@ -183,6 +194,7 @@ const SPR={
   crow:[".ff..","ffff.",".fff.",".f.f."],
   crowfly:["f...f",".fff.","..f.."],
   frog:[".n.n.","nnnnn","n...n"],
+  necro:["....kkkk.ww.","...kPPPPkwkw","..kPPPPPPkw.","..kPmkkmPko.","..kPxxxxPko.","...kPxxPk.o.","..kpppppkxo.",".kpppwpppko.",".kppppwppko.",".kpppppwpko.",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","..kPk..kPk..","..kkk..kkk.."],
   warrior:["...kkkkk....","..kGGGGGk...","..kGkkkGk...","..kGsksGk..l","..kGssssk..l",".kkgRRRRgk.l","kbbkRyyRgkkl","kbybRyyRgksk","kyyybRRRgk..","kbybkRRRgk..",".kbkoooook..","..kgg.ggk...","..kgk.kgk...","..kgk.kgk...","..kDk.kDk...","..kkk.kkk..."]
 };
 function mk(rows,pal,scale){
@@ -193,7 +205,9 @@ function mk(rows,pal,scale){
   return{c:c,f:f,w:c.width,h:c.height};
 }
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
-  guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
+  guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),
+  necro:mk(SPR.necro,Object.assign({},PAL,{p:'#2e2338',P:'#1d1626',x:'#b8b4c4'})),
+  pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
   crat:mk(SPR.rat,Object.assign({},PAL,{a:'#8a8494',A:'#b5b0bc'})),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
@@ -324,8 +338,17 @@ const CLASSES={
     {id:'bash',name:'Shield Bash',short:'Bash',lvl:2,mana:0,cast:0,cd:[12,8,0.5],range:18,col:'#6a82b0',tgt:1,tag:'Stun',kind:'stun',dmg:[4,1],dur:[2,0.1],melee:1},
     {id:'ham',name:'Hamstring',short:'Hamstr',lvl:3,mana:0,cast:0,cd:[18,10,1],range:18,col:'#a3252f',tgt:1,tag:'Snare',kind:'snare',dur:[16,1],melee:1},
     {id:'stance',name:'Defensive Stance',short:'Stance',lvl:6,mana:0,cast:0,cd:[45,30,1.5],col:'#c9a227',tgt:0,tag:'Defense',kind:'buff',buff:'stance',dur:[10,0.5]},
-    {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]}
+    {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]},
+  necro:{name:'Necromancer',sprite:'necro',hp:[36,11],mana:[44,11],ac:0,regen:1,caster:1,desc:'Dark caster with an undead pet that tanks for you. Lifetaps, plague, fear and feign death.',
+    loadout:['tap','raise','plague','dread','feign','mendb'],abilities:[
+    {id:'tap',name:'Lifetap',short:'Tap',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[6,2.4],beam:'#b48cff'},
+    {id:'raise',name:'Raise Bones',short:'Raise',lvl:1,mana:15,cast:3,cd:[30,15,1.5],col:'#cfc8b2',tgt:0,tag:'Pet',kind:'pet'},
+    {id:'plague',name:'Siphon Plague',short:'Plague',lvl:2,mana:9,cast:0,cd:[10,5,0.5],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
+    {id:'dread',name:'Dread',short:'Dread',lvl:3,mana:8,cast:0,cd:[20,12,0.8],range:80,col:'#6a4fa3',tgt:1,tag:'Fear',kind:'fear',dur:[6,0.3]},
+    {id:'feign',name:'Feign Death',short:'Feign',lvl:6,mana:5,cast:0,cd:[60,35,2.5],col:'#9a9a9a',tgt:0,tag:'Escape',kind:'feign'},
+    {id:'mendb',name:'Mend Bones',short:'MendB',lvl:8,mana:10,cast:1,cd:[10,6,0.4],col:'#e8e2cf',tgt:0,tag:'Pet heal',kind:'petheal',heal:[20,8]}]}
 };
+CLASSES.druid.caster=1;
 const CLS=(function(){let c='druid';try{c=JSON.parse(localStorage.getItem('ashfen-class')||'"druid"')}catch(e){}return CLASSES[c]?c:'druid'})();
 const C=CLASSES[CLS];
 const KEY=k=>CLS==='druid'?'ashfen-'+k:'ashfen-'+k+'-'+CLS; // Druid keeps the original save names
@@ -357,24 +380,24 @@ const ITEMS={
   bone:{name:'Brittle Bone',rar:'junk',value:4,stack:true},
   rag:{name:'Grave Rag',rar:'junk',value:2,stack:true},
   cap:{name:'Cloth Cap',slot:'head',rar:'common',ac:1,value:6},
-  robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10,cls:'druid'},
+  robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10,cls:'caster'},
   legs:{name:'Patched Leggings',slot:'legs',rar:'common',ac:1,value:6},
   sandals:{name:'Worn Sandals',slot:'feet',rar:'common',ac:1,value:5},
   gloves:{name:'Rough Gloves',slot:'hands',rar:'common',ac:1,value:5},
-  oakstaff:{name:'Oak Staff',slot:'weapon',rar:'common',int:1,value:8,cls:'druid'},
-  charm:{name:'Bone Charm',slot:'offhand',rar:'common',wis:1,value:8,cls:'druid'},
+  oakstaff:{name:'Oak Staff',slot:'weapon',rar:'common',int:1,value:8,cls:'caster'},
+  charm:{name:'Bone Charm',slot:'offhand',rar:'common',wis:1,value:8,cls:'caster'},
   cring:{name:'Copper Ring',slot:'ring',rar:'common',sta:1,value:8},
   mosscap:{name:'Mossweave Cap',slot:'head',rar:'uncommon',ac:2,wis:1,value:20},
-  barkrobe:{name:'Barkweave Robe',slot:'chest',rar:'uncommon',ac:3,sta:1,wis:2,value:35,cls:'druid'},
-  thornstaff:{name:'Thornwood Staff',slot:'weapon',rar:'uncommon',int:3,wis:1,value:40,cls:'druid'},
-  gravecharm:{name:'Gravebloom Charm',slot:'offhand',rar:'uncommon',wis:2,int:1,value:30,cls:'druid'},
+  barkrobe:{name:'Barkweave Robe',slot:'chest',rar:'uncommon',ac:3,sta:1,wis:2,value:35,cls:'caster'},
+  thornstaff:{name:'Thornwood Staff',slot:'weapon',rar:'uncommon',int:3,wis:1,value:40,cls:'caster'},
+  gravecharm:{name:'Gravebloom Charm',slot:'offhand',rar:'uncommon',wis:2,int:1,value:30,cls:'caster'},
   boots:{name:'Bog-walker Boots',slot:'feet',rar:'uncommon',ac:2,sta:1,value:22},
-  shroud:{name:"Mourner's Shroud",slot:'chest',rar:'rare',ac:4,sta:2,wis:3,int:2,value:90,cls:'druid'},
+  shroud:{name:"Mourner's Shroud",slot:'chest',rar:'rare',ac:4,sta:2,wis:3,int:2,value:90,cls:'caster'},
   gravemail:{name:'Gravewarden Mail',slot:'chest',rar:'rare',ac:7,sta:3,str:2,value:90,cls:'warrior'},
   gnawring:{name:'Gnawed Ring',slot:'ring',rar:'named',sta:2,wis:1,value:60},
-  b1staff:{name:'Boss 1 Staff',slot:'weapon',rar:'named',int:5,wis:2,value:120,cls:'druid'},
-  b1robe:{name:'Boss 1 Robe',slot:'chest',rar:'named',ac:5,sta:2,wis:3,value:120,cls:'druid'},
-  b1charm:{name:'Boss 1 Charm',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110,cls:'druid'},
+  b1staff:{name:'Boss 1 Staff',slot:'weapon',rar:'named',int:5,wis:2,value:120,cls:'caster'},
+  b1robe:{name:'Boss 1 Robe',slot:'chest',rar:'named',ac:5,sta:2,wis:3,value:120,cls:'caster'},
+  b1charm:{name:'Boss 1 Charm',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110,cls:'caster'},
   b1blade:{name:'Boss 1 Blade',slot:'weapon',rar:'named',str:5,sta:2,value:120,cls:'warrior'},
   b1plate:{name:'Boss 1 Breastplate',slot:'chest',rar:'named',ac:8,sta:3,str:1,value:120,cls:'warrior'},
   b1shield:{name:'Boss 1 Shield',slot:'offhand',rar:'named',ac:5,sta:2,value:110,cls:'warrior'},
@@ -387,7 +410,7 @@ const ITEMS={
   ringmail:{name:'Ringmail Shirt',slot:'chest',rar:'uncommon',ac:5,sta:1,str:1,value:35,cls:'warrior'}
 };
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
-const forMe=id=>!ITEMS[id].cls||ITEMS[id].cls===CLS; // personal loot: only gear your class can use drops for you
+const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)}; // personal loot: only gear your class can use drops for you
 const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
 const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0);
 const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',cskel:'bone',boss1:'bone'};
@@ -412,6 +435,8 @@ const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');re
 const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false},store.get('ashfen-settings',{}));
 let loadout=store.get(KEY('loadout'),null);
 if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=C.loadout.slice();
+// Developer tools: open the game once with ?dev in the address to turn them on (?dev=0 turns them off).
+const dev={on:(function(){const m=/[?&]dev(=(\d))?/.exec(location.search);if(m)store.set('ashfen-dev',m[2]!=='0');return !!store.get('ashfen-dev',false)})(),god:false};
 const kills=store.get('ashfen-kills',{});
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set(KEY('loadout'),loadout);
 
@@ -450,7 +475,7 @@ function spawn(sp){
   if(sp.gy&&type==='rat'&&!mobs.some(m=>!m.dead&&m.type==='gnaw')&&Math.random()<0.2)type='gnaw';
   const T0=TYPES[type],range=type==='gnaw'?T0.lv:(sp.lv||T0.lv),lv=Math.floor(rr(range[0],range[1]+1));
   const m={sp:sp,type:type,def:T0,lv:lv,maxhp:T0.hp+T0.hpl*lv,x:sp.x,y:sp.y,hx:sp.x,hy:sp.y,state:'idle',wt:rr(1,4),wx:sp.x,wy:sp.y,root:0,snare:0,dots:[],atk:1,dir:1,dead:false,walk:0,pdmg:0,odmg:0};
-  m.hp=m.maxhp;sp.mob=m;mobs.push(m);return m;
+  m.hp=m.maxhp;m.threat={p:0,pet:0};sp.mob=m;mobs.push(m);return m;
 }
 spawns.forEach(spawn);
 
@@ -480,8 +505,11 @@ const inCombat=()=>mobs.some(m=>!m.dead&&m.state==='chase');
 function nearestMob(maxD){let best=null,bd=maxD;mobs.forEach(m=>{if(m.dead)return;const d=dist(m,player);if(d<bd){bd=d;best=m}});return best}
 
 /* ---------- Combat ---------- */
-function engage(m){
+let pet=null; // Necromancer's skeleton
+const victim=m=>(pet&&m.threat.pet>m.threat.p)?pet:player;
+function engage(m,byPet){
   if(m.dead||player.dead)return;
+  if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
   if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&dist(o,m)<70){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
 }
@@ -490,7 +518,8 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
-  else{m.pdmg+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
+  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*3+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(Math.random()<0.35)log('Your skeleton hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
+  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
   if(kind==='direct'&&m.root>0&&Math.random()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
@@ -529,7 +558,7 @@ function hurtPlayer(m){
   if(player.buffs.stance>0)dmg*=0.5;
   dmg*=100/(100+(stat('ac')+C.ac)*4); // AC from gear (and Warrior plate) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
-  dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;
+  dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;player.hp-=dmg;
   floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
   log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
   if(player.cast&&Math.random()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
@@ -540,6 +569,31 @@ function playerDie(m){
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
   const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
   mobs.forEach(o=>{if(o.state==='chase')o.state='return'});
+  if(pet){log('Your skeleton crumbles to dust.','#9aa');pet=null;}
+}
+function hurtPet(m){
+  let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25)*100/(100+pet.ac*4);
+  dmg=Math.max(1,Math.round(dmg));pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a');
+  if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);log('Your skeleton crumbles to dust. Cast Raise Bones for another.','#ffb37a');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
+}
+function raisePet(){
+  const L=player.lvl,hp=30+14*L;
+  pet={kind:'pet',x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:3+1.6*L,ac:6+L,atk:0,target:null};
+  if(blocked(pet.x,pet.y)){pet.x=player.x;pet.y=player.y}
+  burst(pet.x,pet.y-6,'#7dffa6',16,true);log('A skeleton claws its way out of the ground to serve you.','#b48cff');
+}
+// The skeleton follows you, attacks whatever you're fighting, and holds aggro: its hits count triple for threat, plus a bonus on its first hit.
+function updatePet(dt){
+  if(!pet)return;
+  pet.atk=Math.max(0,pet.atk-dt);
+  if(pet.target&&pet.target.dead)pet.target=null;
+  if(!pet.target){const pt=player.target;
+    if(pt&&!pt.dead&&pt.state==='chase')pet.target=pt;
+    else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
+  const t=pet.target;
+  if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=1.8;burst(t.x,t.y-6,'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee','skeleton','pet')}}}
+  else{if(dist(pet,player)>22)moveToward(pet,player.x-12*player.dir,player.y+4,42,dt);pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
+  if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
 function respawnPlayer(){if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
 
@@ -578,6 +632,8 @@ function cast(a,quiet){
   if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
   if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
+  if(player.fd>0&&a.kind!=='feign'){if(!quiet)log('You are playing dead. Move to get up.','#9aa');return false}
+  if(a.kind==='petheal'&&!pet){if(!quiet)log('You have no skeleton to mend.','#9aa');return false}
   if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
   if(a.tgt){
     t=player.target;
@@ -615,6 +671,15 @@ function applyAbility(a,t){
   else if(a.kind==='snare'){t.snare=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
   else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you ('+Math.round(player.buffs[a.buff])+'s).','#c8b07a');}
+  else if(a.kind==='lifetap'){
+    beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
+    const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
+    player.hp=Math.min(maxHP(L),player.hp+dmg);floatText(player.x,player.y-22,'+'+dmg,'#b48cff');}
+  else if(a.kind==='pet'){raisePet();}
+  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your skeleton for '+h+'.','#7dffa6');}
+  else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
+  else if(a.kind==='feign'){player.fd=4;player.cast=null;player.tx=null;let n=0;mobs.forEach(m=>{if(!m.dead&&m.state==='chase'){m.threat.p=0;n++}});
+    log('You fall to the ground, feigning death.'+(n?' Your foes lose interest in you.':''),'#bdbdbd');}
   else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);
     hits.forEach(m=>{if(Math.random()<resistChance(m)){floatText(m.x,m.y-18,'MISS','#cfd6e0');engage(m)}else hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name)});}
 }
@@ -1019,6 +1084,7 @@ function enterZone(id){
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
+  if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   player.onTile=tileAt(player.x,player.y);
 }
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
@@ -1036,7 +1102,7 @@ function checkPortals(){
 function bossThink(m,dt){
   m.bolt=(m.bolt===undefined?5:m.bolt)-dt;
   if(m.bolt<=0&&dist(m,player)<110){m.bolt=7;beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
-    let dmg=(8+2*m.lv)*rr(0.85,1.15);dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('Boss 1 hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0)playerDie(m)}
+    let dmg=(8+2*m.lv)*rr(0.85,1.15);dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;player.hp-=dmg;floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('Boss 1 hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0)playerDie(m)}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('Boss 1 calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
 }
@@ -1054,7 +1120,8 @@ function update(dt){
     }else if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     const steering=mx!==0||my!==0;
-    if(steering){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,PSPEED,dt);}
+    if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}}
+    if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,PSPEED,dt);}
     else if(player.tx!==null){if(moveToward(player,player.tx,player.ty,PSPEED,dt))player.tx=null;}
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
@@ -1081,6 +1148,7 @@ function update(dt){
   rangeShow=Math.max(0,rangeShow-dt);
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
   if(!player.dead)checkPortals();
+  updatePet(dt);
   spawns.forEach(sp=>{if(!sp.mob){sp.timer-=dt;if(sp.timer<=0)spawn(sp)}});
   mobs.forEach(m=>{
     if(m.dead)return;
@@ -1094,13 +1162,17 @@ function update(dt){
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);
-      if(!player.dead&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      if(!player.dead&&!(player.fd>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
-      const d=dist(m,player);
+      if(m.fear>0){m.fear-=dt;const dx=m.x-player.x,dy=m.y-player.y,dd=Math.hypot(dx,dy)||1;if(spd>0)moveToward(m,m.x+dx/dd*20,m.y+dy/dd*20,spd*0.7,dt);return} // feared: runs from you
+      const v=victim(m);
+      if(v===player&&player.fd>0){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
+      const d=dist(m,v);
       if(m.def.boss)bossThink(m,dt);if(m.dead||player.dead)return;
-      if(d>11){if(spd>0)moveToward(m,player.x,player.y,spd,dt)}
-      else{m.dir=player.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2;hurtPlayer(m)}}
+      if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
+      else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2;if(v===pet)hurtPet(m);else hurtPlayer(m)}}
     }else if(m.state==='return'){
       if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0}
     }
@@ -1156,18 +1228,19 @@ function render(){
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
   if(t&&!t.dead){for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}}
-  const ents=mobs.concat(zoneId==='over'?npcs:[],[player]).sort((a,b)=>a.y-b.y);
+  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],[player]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
     if(e===player){
       if(player.dead>0)return;
       shadow(player.x,player.y,5);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
-      drawSprite(IMG[C.sprite],player.x,player.y+1,player.dir,bob,player.sit);
+      drawSprite(IMG[C.sprite],player.x,player.y+1,player.dir,bob,player.sit||player.fd>0);
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
+    if(e===pet){shadow(e.x,e.y,4);drawSprite(IMG.pet,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);return}
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
@@ -1228,6 +1301,7 @@ function ui(){
   $('plv').textContent='Lv '+L;
   $('php').style.width=(100*player.hp/maxHP(L))+'%';
   $('pmp').style.width=(100*player.mp/maxMP(L))+'%';
+  $('petrow').style.display=pet?'block':'none';if(pet)$('petbar').style.width=(100*pet.hp/pet.maxhp)+'%';
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
@@ -1257,8 +1331,37 @@ function loop(ts){
   requestAnimationFrame(loop);
 }
 resize();buildControls();
+/* ---------- Developer tools ---------- */
+function devAct(a){
+  const L=player.lvl;
+  if(a==='lvlup'||a==='lvldn'){player.lvl=Math.max(1,Math.min(10,L+(a==='lvlup'?1:-1)));player.xp=0;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);player.cds={};save();buildControls();log('Dev: level '+player.lvl+'.','#ff8a80')}
+  else if(a==='heal'){player.hp=maxHP(L);player.mp=maxMP(L);if(pet)pet.hp=pet.maxhp;log('Dev: full health and mana.','#ff8a80')}
+  else if(a==='cds'){player.cds={};player.gcd=0;log('Dev: cooldowns reset.','#ff8a80')}
+  else if(a==='god'){dev.god=!dev.god;log('Dev: god mode '+(dev.god?'on':'off')+'.','#ff8a80')}
+  else if(a==='kill'){const t=player.target;if(t&&!t.dead)hitMob(t,t.hp+999,'direct','dev strike');else log('Dev: no target.','#ff8a80')}
+  else if(a==='gear'){giveItem(pick(UNCOMMONS));saveInv()}
+  else if(a==='rare'){giveItem(pick(RARES));saveInv()}
+  else if(a==='boss'){giveItem(pick(BOSS1));saveInv()}
+  else if(a==='copper'){inv.copper+=500;saveInv();log('Dev: +500 copper.','#ff8a80')}
+  else if(a==='gate'){if(zoneId!=='over')enterZone('over');player.x=3.5*T;player.y=15*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='door'){if(zoneId!=='over')enterZone('over');player.x=DOOR.x;player.y=DOOR.y+26;player.onTile=tileAt(player.x,player.y);if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='dun'){enterZone('dun')}
+  else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='gnaw'){if(zoneId!=='over'){log('Dev: Old Gnawbone lives outside.','#ff8a80');return}const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
+  else if(a==='wipe'){if(!devAct.armed){devAct.armed=true;log('Dev: tap Wipe again to erase all saves for every class.','#ff8a80');renderDev();return}
+    Object.keys(localStorage).filter(k=>k.indexOf('ashfen-')===0&&k!=='ashfen-dev').forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});location.reload();return}
+  devAct.armed=false;renderDev();
+}
+function renderDev(){
+  const b=(a,t)=>'<button data-dev="'+a+'"'+(a==='god'&&dev.god?' class="active"':'')+'>'+t+'</button>';
+  $('devbox').innerHTML='<h2>Character</h2><div class="seg">'+b('lvldn','Level −')+b('lvlup','Level +')+'</div><div class="seg">'+b('heal','Full heal')+b('cds','Reset cooldowns')+'</div><div class="seg">'+b('god','God mode')+b('kill','Kill target')+'</div>'+
+    '<h2>Loot</h2><div class="seg">'+b('gear','Uncommon')+b('rare','Rare')+b('boss','Boss 1 item')+'</div><div class="seg">'+b('copper','+500 copper')+'</div>'+
+    '<h2>Teleport</h2><div class="seg">'+b('gate','Gate')+b('door','Crypt door')+'</div><div class="seg">'+b('dun','Dungeon start')+b('bossroom','Boss room')+'</div>'+
+    '<h2>World</h2><div class="seg">'+b('gnaw','Spawn Gnawbone')+b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')+'</div>';
+}
+if(dev.on){$('devbtn').style.display='block';$('devbtn').addEventListener('click',()=>{renderDev();openModal('devUI')});$('devbox').addEventListener('click',e=>{const b=e.target.closest('button[data-dev]');if(b)devAct(b.dataset.dev)});}
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem};
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct};
 // Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
