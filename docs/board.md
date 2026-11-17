@@ -62,6 +62,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.8.2** Test shortcut: add `?level=7` to the game link to jump to that level (prototype only).
 - **v0.8.1** Performance: lighting is now drawn from pre-made light stamps instead of rewriting every pixel each frame (about 3x faster on a slowed-down test CPU: ~55 ms to ~18 ms per frame); the camera follows a rounded player position so the Druid no longer shimmers; screen resolution capped at 2x; HUD updates 10 times a second.
 - **v0.8** Dungeon 1: crypt door at the back of the graveyard; five-room instanced crypt (levels 4–6 crypt rats and skeletons, social groups); Boss 1 (level 7, shadow bolt every 8s, calls two skeletons at half health); better dungeon drops; Boss 1 always drops a named item (staff, robe or charm); exit circle; death wakes you at the crypt entrance; the dungeon resets each time you enter. Placeholder names: Town 1, Dungeon 1, Boss 1.
 - **v0.7.1** Per-spell cooldowns that shrink with level; countdown on buttons.
