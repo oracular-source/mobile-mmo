@@ -100,7 +100,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.8: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.8.1: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
@@ -617,6 +617,7 @@ function slotHTML(i,showMana){
   const a=ABI[loadout[i]];
   return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
 }
+let ctrlEls=[];
 function buildControls(){
   ctrl.innerHTML='';
   ctrl.classList.toggle('arrange',arranging);
@@ -654,6 +655,7 @@ function buildControls(){
     }
     autoPill(side,12+main+R+4);
   }
+  ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));
 }
 function autoPill(side,bottom){
   const b=document.createElement('button');b.id='autopill';b.className=settings.autoCast?'active':'';
@@ -1049,13 +1051,26 @@ function update(dt){
 /* ---------- Render ---------- */
 let S=3,VW=160,VH=200,camX=0,camY=0,dpr=1;
 function resize(){
-  const r=$('view').getBoundingClientRect();dpr=Math.min(3,window.devicePixelRatio||1);
+  const r=$('view').getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);
   cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
   S=Math.max(2,Math.round(cv.width/170));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
   low.width=VW;low.height=VH;
 }
 window.addEventListener('resize',resize);
 const bay=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
+const dark=document.createElement('canvas'),dg=dark.getContext('2d'),stampCache={};
+// A light pool, pre-dithered into 6 brightness steps. 'cut' removes darkness, 'warm' adds firelight color.
+function lightStamp(r,amb,kind){
+  const key=r+'|'+amb+'|'+kind;if(stampCache[key])return stampCache[key];
+  const size=r*2+2,c=document.createElement('canvas');c.width=c.height=size;const g=c.getContext('2d'),id=g.createImageData(size,size),d=id.data;
+  for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+    const v=Math.max(0,1-Math.hypot(x-r-1,(y-r-1)*1.15)/r);if(v<=0)continue;
+    let a=kind==='cut'?Math.min(1,v*v*0.9/(1-amb)):v*v;
+    a=Math.min(1,Math.floor(a*6+bay[(y&3)*4+(x&3)]/16)/6);
+    const o=(y*size+x)*4;if(kind==='warm'){d[o]=255;d[o+1]=150;d[o+2]=60}d[o+3]=a*255;
+  }
+  g.putImageData(id,0,0);stampCache[key]=c;return c;
+}
 function shadow(x,y,r){lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2,2);lx.fillRect(x-r+1,y+1,r*2-2,1)}
 function drawSprite(img,x,y,dir,bob,sit){
   const im=dir<0?img.f:img.c,w=img.w,h=img.h;const dx=Math.round(x-w/2),dy=Math.round(y-h)+(bob||0);
@@ -1066,7 +1081,8 @@ function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
 let time=0;
 function render(){
-  camX=Math.round(Math.max(0,Math.min(WW-VW,player.x-VW/2)));camY=Math.round(Math.max(0,Math.min(WH-VH,player.y-VH/2-10)));
+  const pxr=Math.round(player.x),pyr=Math.round(player.y);
+  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(0,Math.min(WH-VH,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
@@ -1100,18 +1116,21 @@ function render(){
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();
-  // Lighting: dusk, with light pools from the Druid's lantern, the campfire and the gate torches, dithered in steps.
-  const img=lx.getImageData(0,0,VW,VH),d=img.data,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
+  // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
+  // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
+  const amb=zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
   const zl=zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):DUN.braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
-  const lights=[{x:player.x,y:player.y-8,r:95,w:18}].concat(zl)
-    .map(l=>({x:l.x-camX,y:l.y-camY,r:l.r*fl,w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
-  for(let y=0;y<VH;y++)for(let x=0;x<VW;x++){
-    let L=zoneId==='dun'?0.22:0.38,warm=0;
-    for(let i=0;i<lights.length;i++){const l=lights[i],dd=Math.hypot(x-l.x,(y-l.y)*1.15);if(dd<l.r){const v=1-dd/l.r,v2=v*v;L+=v2*0.9;warm+=v2*l.w}}
-    const q=Math.min(1.1,Math.floor(Math.min(1.1,L)*6+bay[(y&3)*4+(x&3)]/16)/6);
-    const o=(y*VW+x)*4;d[o]=Math.min(255,d[o]*q+warm);d[o+1]=d[o+1]*q+warm*0.35;d[o+2]=d[o+2]*q*0.95;
-  }
-  lx.putImageData(img,0,0);
+  const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
+    .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*fl),w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
+  if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}
+  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle='rgba(0,0,0,'+(1-amb)+')';dg.fillRect(0,0,VW,VH);
+  dg.globalCompositeOperation='destination-out';
+  lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-l.r-1,l.y-l.r-1));
+  dg.globalCompositeOperation='source-over';
+  lx.drawImage(dark,0,0);
+  lx.globalCompositeOperation='lighter';
+  lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}});
+  lx.globalAlpha=1;lx.globalCompositeOperation='source-over';
   drawGlows();
   cx.imageSmoothingEnabled=false;
   cx.drawImage(low,0,0,VW*S,VH*S);
@@ -1154,7 +1173,7 @@ function ui(){
   const cb=$('castbar');
   if(player.cast){cb.style.display='block';$('castname').textContent=player.cast.a.name;$('castfill').style.width=(100*player.cast.time/player.cast.a.cast)+'%'}else cb.style.display='none';
   const cdPct=100*player.gcd/GCD;
-  ctrl.querySelectorAll('[data-slot]').forEach(el=>{
+  ctrlEls.forEach(el=>{
     const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];
     el.classList.toggle('lock',L<a.lvl);el.classList.toggle('nomana',L>=a.lvl&&player.mp<a.mana);
     const own=player.cds[a.id]||0,full=cdFor(a)||1,pct=L<a.lvl?0:Math.max(cdPct,100*own/full);
@@ -1169,7 +1188,7 @@ let last=0,uiT=0;
 function loop(ts){
   const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
   if(running&&!document.hidden){time+=dt;update(dt);}
-  render();uiT+=dt;if(uiT>0.05){ui();uiT=0}
+  render();uiT+=dt;if(uiT>0.1){ui();uiT=0}
   requestAnimationFrame(loop);
 }
 resize();buildControls();

@@ -40,6 +40,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Buff spells and a buff bar showing active buffs and timers | M | M | 2 |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
+| Art pass: sprites, tiles and the overall look | H | L | 2 (milestone 4) |
 | Simple minimap | M | M | 2 |
 | Trigger for spell slots 7 and 8 (levels 15 and 25): second ring or two extra buttons | M | S | before level 15 content |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
@@ -55,11 +56,13 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 
 ## Known issues
+- Lag and jitter reported on phone (v0.8): fixed in v0.8.1; confirm on device.
 - Sprites draw on top of tree canopies (no depth sorting with scenery).
 - Gate Road mobs top out at level 5, so overworld leveling slows after 5–6 until more zones exist.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.8.1** Performance: lighting is now drawn from pre-made light stamps instead of rewriting every pixel each frame (about 3x faster on a slowed-down test CPU: ~55 ms to ~18 ms per frame); the camera follows a rounded player position so the Druid no longer shimmers; screen resolution capped at 2x; HUD updates 10 times a second.
 - **v0.8** Dungeon 1: crypt door at the back of the graveyard; five-room instanced crypt (levels 4–6 crypt rats and skeletons, social groups); Boss 1 (level 7, shadow bolt every 8s, calls two skeletons at half health); better dungeon drops; Boss 1 always drops a named item (staff, robe or charm); exit circle; death wakes you at the crypt entrance; the dungeon resets each time you enter. Placeholder names: Town 1, Dungeon 1, Boss 1.
 - **v0.7.1** Per-spell cooldowns that shrink with level; countdown on buttons.
 - **v0.7** Basic loot: personal drops, 16-slot bags, 8 gear slots, STA/WIS/INT/AC, copper, selling to Marrow, Character screen (Gear, Bags, Journal); spell queue so other spells work during auto-cast.
