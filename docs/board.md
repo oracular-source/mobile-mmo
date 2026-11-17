@@ -28,7 +28,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
   1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
   2. ~~**Better targeting:**~~ v0.11.4: a Next ⟳ button sits just above the spells; the 1st hit / Auto toggles moved to the top right (set between fights). Confirm on phone.
   - Done along the way (v0.11.5): zoomed out, pinch-to-zoom + Zoom setting, bigger bosses with a boss bar.
-  3. ~~**Rethink the bottom bar and hotbar:**~~ v0.12: bottom bar is Sit / Character / Menu; 6 spells on the right + a 2-slot side bar on the left (both movement modes). Confirm on phone, then this card is done.
+  3. ~~**Rethink the bottom bar and hotbar:**~~ v0.12–v0.12.1: no bottom bar; 6 spells on the right, slots 7–8 + Sit stacked on the left above the chat box, Menu top right, toggles top left. Confirm on phone, then this card is done.
 
 ## Next
 1. Class identity pass: with the UI settled, decide what each class should look and feel like.
@@ -38,7 +38,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
 - **Zoom:** farthest (and default) view is about 215–235 game pixels wide on most phones, tuned by play-test (v0.11.5's ~290 was too far, v0.11.6's ~195 too close). Players pick Near / Far or pinch.
-- **Screen layout (v0.12):** max 8 ability buttons on screen: 6 on the right (pad or classic) plus slots 7–8 as a small side bar on the left edge, in joystick and tap-to-move alike. Bottom bar: Sit (kept on screen: Necros sit while the pet and DoTs fight), Character, Menu (Spells, Arrange, Settings). Target button dropped; Next ⟳ does that job.
+- **Screen layout (v0.12.1):** max 8 ability buttons on screen: 6 on the right (pad or classic) plus slots 7–8 on the left, in joystick and tap-to-move alike. Left column above the chat box: slot 7, slot 8, Sit (kept on screen: Necros sit while the pet and DoTs fight). Top left under the portrait: 1st hit / Auto. Top right: Menu (Spells, Arrange, Settings). No bottom bar. Character = tap the portrait. Target button dropped; Next ⟳ does that job.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
@@ -82,6 +82,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.12.1** Layout from play-test: the **bottom bar is gone** (more room for the map). Slots 7–8 and **Sit** now stack on the left, right above the chat box, instead of squeezed beside it. **Menu** moved to the top right; the **1st hit / Auto** toggles moved to the top left under your portrait. The Character button is gone; tap your portrait instead. The chat box keeps a fixed height so it never runs up under the buttons.
 - **v0.12** Hotbar and bottom bar: the bottom bar is now **Sit / Character / Menu**. Menu holds Spells, Arrange and Settings; the old Target button is gone (Next ⟳ above your spells does the same). Two new spell slots (7 and 8) sit as small buttons on the **left edge** (right edge in left-handed mode), in both joystick and tap-to-move. The Warrior's Throw Stone now has a slot; Druid and Necromancer slots 7–8 show "empty" until new spells arrive. Existing saves keep their arrangement. Keyboard 7 and 8 cast them. While arranging, the Menu button reads **Done**.
 - **v0.11.7** Zoom out allowed one notch further than v0.11.6: the farthest (default) view is about 234 game pixels wide on a typical phone.
 - **v0.11.6** Zoom out pulled in two notches after play-testing: the farthest view (also the default) is now about 195 game pixels wide on a typical phone instead of up to 290. Settings → Zoom is now Near / Far.
