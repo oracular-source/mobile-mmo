@@ -9,7 +9,7 @@ A tab-target fantasy MMO for phones, inspired by EverQuest (camps, pulls, classe
 - Ask before big or hard-to-undo changes (deleting files, restructuring folders, adding new tools or frameworks).
 
 ## Current phase
-Phase 2: solo prototype. Gate Road, the Sunken Graveyard and Dungeon 1; playable classes Druid, Warrior and Necromancer; single-player, no server.
+Phase 2: solo prototype. Gate Road, the Sunken Graveyard and Dungeon 1; playable classes Druid, Warrior, Necromancer and Rogue; single-player, no server.
 Launch classes (later phases): Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. The full 14-class roster is in the design doc.
 Don't add multiplayer, accounts or server code until I say we're in phase 3.
 
@@ -30,7 +30,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Developer panel for manual testing: open the game with `?dev` (DEV button: levels, heal, god mode, loot, teleports). `?dev=0` turns it off.
 - Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
-- Game numbers live in data tables near the top of the script: `CLASSES` (stats, abilities, loadouts), `TYPES` (mobs), `ITEMS`, `NEED` (XP). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign). Mobs pick targets by threat (player vs pet).
+- Game numbers live in data tables near the top of the script: `CLASSES` (stats, abilities, loadouts), `TYPES` (mobs), `ITEMS`, `NEED` (XP). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
 
 ## Game rules to protect
 These come from the design pillars. Flag any feature that breaks one.

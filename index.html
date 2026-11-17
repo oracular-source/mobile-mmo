@@ -116,13 +116,13 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.12.1: Gate Road, the Sunken Graveyard and Dungeon 1.
+        Prototype v0.13: Gate Road, the Sunken Graveyard and Dungeon 1.
         <div id="clspick" class="seg" style="margin:10px 0 2px"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
-          <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
+          <li><b>Tap an enemy</b> to target it and use your main attack.</li>
           <li>Auto-cast (on by default) keeps firing your main spell at the enemy you're fighting, so your thumb is free to kite. Toggle it with the Auto pill at the top right. The Next button above your spells switches targets.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
           <li>Higher-level enemies resist (or dodge) more and shrug off roots, snares and stuns sooner.</li>
@@ -217,6 +217,7 @@ const SPR={
   crowfly:["f...f",".fff.","..f.."],
   frog:[".n.n.","nnnnn","n...n"],
   necro:["....kkkk.ww.","...kPPPPkwkw","..kPPPPPPkw.","..kPmkkmPko.","..kPxxxxPko.","...kPxxPk.o.","..kpppppkxo.",".kpppwpppko.",".kppppwppko.",".kpppppwpko.",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","..kPk..kPk..","..kkk..kkk.."],
+  rogue:["....kkkk....","...kffffk...","..kffffffk..","..kfskskfk..","..kfssssfk..","...kfrrfk...","..krrrrrrk..",".krkrrrrkrk.",".krkryyrkrk.",".kskooooksk.",".lkkrrrrkkl.",".l.krrrrk.l.","...krk.krk..","...krk.krk..","...kDk.kDk..","...kkk.kkk.."],
   warrior:["...kkkkk....","..kGGGGGk...","..kGkkkGk...","..kGsksGk..l","..kGssssk..l",".kkgRRRRgk.l","kbbkRyyRgkkl","kbybRyyRgksk","kyyybRRRgk..","kbybkRRRgk..",".kbkoooook..","..kgg.ggk...","..kgk.kgk...","..kgk.kgk...","..kDk.kDk...","..kkk.kkk..."]
 };
 function mk(rows,pal,scale){
@@ -227,7 +228,7 @@ function mk(rows,pal,scale){
   return{c:c,f:f,w:c.width,h:c.height};
 }
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
-  guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),
+  guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),rogue:mk(SPR.rogue,PAL),
   necro:mk(SPR.necro,Object.assign({},PAL,{p:'#2e2338',P:'#1d1626',x:'#b8b4c4'})),
   pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
@@ -361,6 +362,16 @@ const CLASSES={
     {id:'ham',name:'Hamstring',short:'Hamstr',lvl:3,mana:0,cast:0,cd:[18,10,1],range:18,col:'#a3252f',tgt:1,tag:'Snare',kind:'snare',dur:[16,1],melee:1},
     {id:'stance',name:'Defensive Stance',short:'Stance',lvl:6,mana:0,cast:0,cd:[45,30,1.5],col:'#c9a227',tgt:0,tag:'Defense',kind:'buff',buff:'stance',dur:[10,0.5]},
     {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]},
+  rogue:{name:'Rogue',sprite:'rogue',hp:[44,13],mana:null,ac:5,regen:1.2,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Fragile and weak solo: best with a tank.',
+    loadout:['stab','backstab','hide','gouge','evade','rend','knife','sprint'],abilities:[
+    {id:'stab',name:'Stab',short:'Stab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#d8dde6',tgt:1,tag:'Melee',kind:'nuke',dmg:[8,3.2],melee:1},
+    {id:'backstab',name:'Backstab',short:'Backst',lvl:1,mana:0,cast:0,cd:[10,6,0.4],range:18,col:'#e05a5a',tgt:1,tag:'Backstab',kind:'backstab',dmg:[12,4.5],melee:1},
+    {id:'hide',name:'Hide',short:'Hide',lvl:1,mana:0,cast:0,cd:[6,3,0.3],col:'#6b6f80',tgt:0,tag:'Stealth',kind:'stealth',melee:1},
+    {id:'knife',name:'Throwing Knife',short:'Knife',lvl:1,mana:0,cast:0,cd:[6,4,0.25],range:80,col:'#9aa3b0',tgt:1,tag:'Pull',kind:'nuke',dmg:[3,1.2],melee:1,beam:'#d8dde6'},
+    {id:'gouge',name:'Gouge',short:'Gouge',lvl:2,mana:0,cast:0,cd:[14,9,0.5],range:18,col:'#c9a227',tgt:1,tag:'Stun',kind:'stun',dmg:[3,1],dur:[2.5,0.1],melee:1},
+    {id:'rend',name:'Rend',short:'Rend',lvl:3,mana:0,cast:0,cd:[12,6,0.6],range:18,col:'#a3252f',tgt:1,tag:'Bleed',kind:'dot',dmg:[3,1.4],dur:[15,0.5],melee:1},
+    {id:'evade',name:'Evade',short:'Evade',lvl:5,mana:0,cast:0,cd:[30,18,1.2],col:'#8d8692',tgt:0,tag:'Drop aggro',kind:'evade',dur:[3,0.15],melee:1},
+    {id:'sprint',name:'Sprint',short:'Sprint',lvl:7,mana:0,cast:0,cd:[40,25,1.5],col:'#7dbbd0',tgt:0,tag:'Speed',kind:'buff',buff:'sprint',dur:[8,0.3],melee:1}]},
   necro:{name:'Necromancer',sprite:'necro',hp:[36,11],mana:[44,11],ac:0,regen:1,caster:1,desc:'Dark caster with an undead pet that tanks for you. Lifetaps, plague, fear and feign death.',
     loadout:['tap','raise','plague','dread','feign','mendb'],abilities:[
     {id:'tap',name:'Lifetap',short:'Tap',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[6,2.4],beam:'#b48cff'},
@@ -429,7 +440,17 @@ const ITEMS={
   coif:{name:'Chain Coif',slot:'head',rar:'uncommon',ac:3,sta:1,value:22,cls:'warrior'},
   axe:{name:'Grave-iron Axe',slot:'weapon',rar:'uncommon',str:3,sta:1,value:40,cls:'warrior'},
   kite:{name:'Kite Shield',slot:'offhand',rar:'uncommon',ac:4,sta:1,value:30,cls:'warrior'},
-  ringmail:{name:'Ringmail Shirt',slot:'chest',rar:'uncommon',ac:5,sta:1,str:1,value:35,cls:'warrior'}
+  ringmail:{name:'Ringmail Shirt',slot:'chest',rar:'uncommon',ac:5,sta:1,str:1,value:35,cls:'warrior'},
+  dagger:{name:'Chipped Dagger',slot:'weapon',rar:'common',str:1,value:8,cls:'rogue'},
+  pdagger:{name:'Parrying Dagger',slot:'offhand',rar:'common',str:1,value:8,cls:'rogue'},
+  jerkin:{name:'Leather Jerkin',slot:'chest',rar:'common',ac:2,str:1,value:10,cls:'rogue'},
+  hood:{name:'Cutpurse Hood',slot:'head',rar:'uncommon',ac:2,str:1,value:22,cls:'rogue'},
+  dirk:{name:'Bone-hilt Dirk',slot:'weapon',rar:'uncommon',str:3,sta:1,value:40,cls:'rogue'},
+  shadowvest:{name:'Shadowhide Vest',slot:'chest',rar:'uncommon',ac:4,str:1,sta:1,value:35,cls:'rogue'},
+  nightleather:{name:'Nightveil Leathers',slot:'chest',rar:'rare',ac:5,sta:2,str:3,value:90,cls:'rogue'},
+  b1dagger:{name:'Boss 1 Dagger',slot:'weapon',rar:'named',str:6,sta:1,value:120,cls:'rogue'},
+  b1jerkin:{name:'Boss 1 Jerkin',slot:'chest',rar:'named',ac:6,sta:3,str:2,value:120,cls:'rogue'},
+  b1parry:{name:'Boss 1 Parrying Blade',slot:'offhand',rar:'named',ac:1,str:3,sta:2,value:110,cls:'rogue'}
 };
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
 const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)}; // personal loot: only gear your class can use drops for you
@@ -451,6 +472,8 @@ const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]
 const maxHP=L=>C.hp[0]+C.hp[1]*L+stat('sta')*3, maxMP=L=>C.mana?C.mana[0]+C.mana[1]*L+stat('wis')*3:0;
 const meleeMult=()=>1+stat('str')*0.02; // STR: +2% melee damage and bandage healing per point
 const GCD=1.5, PSPEED=34;
+// Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.
+const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1);
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
@@ -541,6 +564,12 @@ function nearestMob(maxD){let best=null,bd=maxD;mobs.forEach(m=>{if(m.dead)retur
 /* ---------- Combat ---------- */
 let pet=null; // Necromancer's skeleton
 const victim=m=>(pet&&m.threat.pet>m.threat.p)?pet:player;
+// Rogue helpers. "Behind" = on the side the mob's back faces (mobs face left or right).
+const hidden=()=>player.buffs.hide>0;
+const behind=m=>(player.x-m.x)*(m.dir||1)<-2;
+const unhide=msg=>{if(player.buffs.hide>0){player.buffs.hide=0;if(msg)log(msg,'#9aa')}};
+// Mobs actively fighting you (Evade's confusion doesn't count).
+const fightingMe=()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.lost>0));
 function engage(m,byPet){
   if(m.dead||player.dead)return;
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
@@ -554,6 +583,7 @@ function hitMob(m,dmg,kind,label,src){
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
   else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*3+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(Math.random()<0.35)log('Your skeleton hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
+  if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
   if(kind==='direct'&&m.root>0&&Math.random()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
@@ -595,6 +625,7 @@ function hurtPlayer(m){
   dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;player.hp-=dmg;
   floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
   log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
+  unhide('You are no longer hidden.');
   if(player.cast&&Math.random()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
   if(player.hp<=0)playerDie(m);
 }
@@ -603,7 +634,7 @@ function playerDie(m){
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
   const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
-  mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;if(o.state==='chase')o.state='return'});
+  mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
   if(pet){log('Your skeleton crumbles to dust.','#9aa');pet=null;}
 }
 function hurtPet(m){
@@ -674,6 +705,11 @@ function cast(a,quiet){
   if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
   if(player.fd>0&&a.kind!=='feign'){if(!quiet)log('You are playing dead. Move to get up.','#9aa');return false}
+  // Rogue: attacking from Hide with your main attack opens with Backstab when it's ready.
+  if(hidden()&&a===ABI[loadout[0]]&&ABI.backstab&&a.melee&&!(player.cds.backstab>0)&&player.lvl>=ABI.backstab.lvl)a=ABI.backstab;
+  if(a.kind==='stealth'&&hidden()){if(!quiet)log('You are already hidden.','#9aa');return false}
+  if(a.kind==='stealth'&&fightingMe().length){if(!quiet)log("You can't hide while something is fighting you. Try Evade first.",'#9aa');return false}
+  if(a.kind==='evade'&&!fightingMe().length){if(!quiet)log('Nothing is fighting you.','#9aa');return false}
   if(a.kind==='petheal'&&!pet){if(!quiet)log('You have no skeleton to mend.','#9aa');return false}
   if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
   if(a.tgt){
@@ -682,11 +718,14 @@ function cast(a,quiet){
     if(!t||t.dead){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
     if(!t){if(!quiet)log('No enemy nearby.','#9aa');return false}
     if(dist(player,t)>a.range){if(!quiet){log('Out of range. Move closer.','#ff8a80');floatText(player.x,player.y-24,'Out of range','#ff8a80')}rangeShow=0.8;rangeR=a.range;return false}
+    if(a.kind==='backstab'&&!hidden()&&!behind(t)){if(!quiet){log('You must be behind your target (or hidden) to Backstab.','#ff8a80');floatText(player.x,player.y-24,'Get behind it','#ff8a80')}return false}
     if(t.x!==player.x)player.dir=t.x>player.x?1:-1;
   }
   if(player.sit)player.sit=false;
   player.gcd=GCD;
-  if(a.cast<=0){player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t);return true}
+  // Using anything but Hide brings you out of hiding (Backstab still gets its stealth bonus).
+  const fromHide=hidden();if(a.kind!=='stealth')unhide();
+  if(a.cast<=0){player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t,fromHide);return true}
   player.tx=null; // cast-time spells stop a tap-to-move walk
   player.cast={a:a,t:t,time:0};
   return true;
@@ -697,9 +736,10 @@ const castSlot=(i,quiet)=>{const a=ABI[loadout[i]];return a?cast(a,quiet):false}
 function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0.9,0.05+(d>0?d*0.10:d*0.015)))}
 // Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
 const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
-function applyAbility(a,t){
+function applyAbility(a,t,fromHide){
   const L=player.lvl,mult=a.melee?meleeMult():spellMult();
-  if(a.tgt&&Math.random()<resistChance(t)){
+  // A Backstab from Hide never misses: they didn't see you coming.
+  if(a.tgt&&!(a.kind==='backstab'&&fromHide)&&Math.random()<resistChance(t)){
     floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
     log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff');engage(t);return;}
   if(a.kind==='nuke'||a.kind==='stun'){
@@ -716,6 +756,16 @@ function applyAbility(a,t){
     beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
     const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
     const h=Math.max(1,Math.round(dmg*LIFETAP_HEAL));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff');}
+  else if(a.kind==='backstab'){
+    // x3 damage from Hide, x2 from behind.
+    const x=fromHide?3:2;burst(t.x,t.y-6,a.col,fromHide?14:9);
+    if(fromHide){floatText(t.x,t.y-28,'AMBUSH!','#ffd27a')}
+    hitMob(t,at(a.dmg)*x*rr(0.9,1.1)*(1-t.def.armor)*mult,'direct',a.name+(fromHide?' (from hiding)':''));}
+  else if(a.kind==='stealth'){player.buffs.hide=9999;burst(player.x,player.y-6,a.col,10,true);log('You melt into the shadows. Mobs won\'t notice you; attacking or getting hit ends it.','#bdbdbd');}
+  else if(a.kind==='evade'){let n=0;const d=at(a.dur,a);
+    fightingMe().forEach(m=>{m.threat.p=0;m.lost=m.def.boss?d*0.5:d;n++});
+    burst(player.x,player.y-6,a.col,10,true);
+    log('You slip away. '+n+(n===1?' foe loses':' foes lose')+' track of you for a moment: Hide now to escape, or get behind to Backstab.','#bdbdbd');}
   else if(a.kind==='pet'){raisePet();}
   else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your skeleton for '+h+'.','#7dffa6');}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
@@ -1227,8 +1277,8 @@ function update(dt){
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     const steering=mx!==0||my!==0;
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}}
-    if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,PSPEED,dt);}
-    else if(player.tx!==null){if(moveToward(player,player.tx,player.ty,PSPEED,dt))player.tx=null;}
+    if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,pSpeed(),dt);}
+    else if(player.tx!==null){if(moveToward(player,player.tx,player.ty,pSpeed(),dt))player.tx=null;}
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
       if(player.cast.time>=a.cast){player.cast=null;
@@ -1244,7 +1294,7 @@ function update(dt){
     if(player.queued&&(time>player.queued.until||player.dead))player.queued=null;
     if(player.queued&&!player.cast&&player.gcd<=0){const q=player.queued.a;player.queued=null;cast(q);}
     const tg=player.target;
-    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
+    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!(tg.lost>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
@@ -1268,11 +1318,13 @@ function update(dt){
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);
-      if(!player.dead&&!(player.fd>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      if(!player.dead&&!(player.fd>0)&&!hidden()&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
       else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
       if(m.fear>0){m.fear-=dt;const dx=m.x-player.x,dy=m.y-player.y,dd=Math.hypot(dx,dy)||1;if(spd>0)moveToward(m,m.x+dx/dd*20,m.y+dy/dd*20,spd*0.7,dt);return} // feared: runs from you
+      // Evaded: stands confused, doesn't turn or attack. If you Hide meanwhile, it gives up and walks home.
+      if(m.lost>0){m.lost-=dt;if(hidden()){m.lost=0;m.state='return';m.threat.p=0;log(cap(m.def.name)+' loses track of you.','#9aa')}return}
       const v=victim(m);
       if(v===player&&player.fd>0){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
       const d=dist(m,v);
@@ -1356,7 +1408,9 @@ function render(){
       if(player.dead>0)return;
       shadow(player.x,player.y,5);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
+      if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
       drawSprite(IMG[C.sprite],player.x,player.y+1,player.dir,bob,player.sit||player.fd>0);
+      lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
@@ -1487,7 +1541,7 @@ function renderDev(){
 }
 if(dev.on){$('devbtn').style.display='block';$('devbtn').addEventListener('click',()=>{renderDev();openModal('devUI')});$('devbox').addEventListener('click',e=>{const b=e.target.closest('button[data-dev]');if(b)devAct(b.dataset.dev)});}
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct};
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout};
 // Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;

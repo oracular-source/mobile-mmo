@@ -26,7 +26,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Now
 - **Launch classes baseline** (L, one release per class). Get all six launch classes playable at a baseline before any feel or balance work. Baseline = sprite, 6–8 abilities from level 1 to 8, class gear, Boss 1 drops; it plays like itself, not polished. The class identity pass happens inside each release. In order:
-  1. **Rogue** (melee damage): backstab from behind, opens from stealth, Evade drops aggro. Hits hard, can't take hits, weak solo.
+  1. ~~**Rogue**~~ Done in v0.13, waiting on the owner's phone play-test.
   2. **Cleric** (pure healer): big slow heals and heals over time, hammer melee, strong vs undead. Slow solo outdoors.
   3. **Enchanter** (crowd control): mez (sleep until hit), charm (temporary pet that can break free), mana regen. Needs a touch-friendly mez control.
 - Finished: UI and controls pass (v0.11.3–v0.12.1), layout approved on phone.
@@ -86,6 +86,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.13** **Rogue** added (no mana, skills on cooldowns, leather armor). **Stab** (main attack), **Backstab** (only from Hide for triple damage that can't miss, or from behind for double), **Hide** (mobs don't notice you, you sneak at 70% speed and show see-through; using a skill or getting hit ends it), **Throwing Knife** (pull), **Gouge** (stun, lvl 2), **Rend** (bleed, lvl 3), **Evade** (lvl 5: mobs fighting you lose track for ~3s; Hide during it and they walk home), **Sprint** (lvl 7, +50% speed). Tapping an enemy from Hide opens with Backstab. Rogue gear (daggers, leathers) and three Boss 1 drops: Boss 1 Dagger, Jerkin and Parrying Blade. Auto-cast no longer swings at an Evaded mob. Start screen tip says "main attack" instead of "Tap spell".
 - **v0.12.1** Layout from play-test: the **bottom bar is gone** (more room for the map). Slots 7–8 and **Sit** now stack on the left, right above the chat box, instead of squeezed beside it. **Menu** moved to the top right; the **1st hit / Auto** toggles moved to the top left under your portrait. The Character button is gone; tap your portrait instead. The chat box keeps a fixed height so it never runs up under the buttons.
 - **v0.12** Hotbar and bottom bar: the bottom bar is now **Sit / Character / Menu**. Menu holds Spells, Arrange and Settings; the old Target button is gone (Next ⟳ above your spells does the same). Two new spell slots (7 and 8) sit as small buttons on the **left edge** (right edge in left-handed mode), in both joystick and tap-to-move. The Warrior's Throw Stone now has a slot; Druid and Necromancer slots 7–8 show "empty" until new spells arrive. Existing saves keep their arrangement. Keyboard 7 and 8 cast them. While arranging, the Menu button reads **Done**.
 - **v0.11.7** Zoom out allowed one notch further than v0.11.6: the farthest (default) view is about 234 game pixels wide on a typical phone.
