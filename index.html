@@ -28,7 +28,10 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
 #log{position:absolute;bottom:8px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
-#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(96px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
+/* Boss health bar: wide, across the top, only while a boss is fighting you */
+#bossbar{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));display:none;pointer-events:none;background:rgba(10,9,14,.85);border:1px solid #6b4a8f;border-radius:6px;padding:4px 8px;font-size:11px;color:#ffd27a}
+#bossbar .bar{height:9px}
+#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(132px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
 #castbar .bar{height:9px;border:1px solid #3a3343}
 #castbar .bar>i{background:#7dffa6}
 #castname{font-size:10px;text-align:center;text-shadow:0 1px 0 #000}
@@ -103,7 +106,8 @@ button.active{border-color:#c9a227;color:#ffd27a}
         <div id="tfx"></div>
       </div>
     </div>
-    <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(94px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
+    <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(132px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
+    <div id="bossbar"><div class="row"><span id="bossname"></span><span id="bosspct"></span></div><div class="bar hp"><i id="bosshp"></i></div></div>
     <div id="castbar"><div id="castname"></div><div class="bar"><i id="castfill"></i></div></div>
     <div id="log"></div>
     <div id="controls"></div>
@@ -220,7 +224,7 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),bee
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
   crat:mk(SPR.rat,Object.assign({},PAL,{a:'#8a8494',A:'#b5b0bc'})),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
-  boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),2)};
+  boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
 
 /* ---------- Seeded random (same map every visit) ---------- */
 let seed=20261117;
@@ -441,7 +445,7 @@ const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:235},store.get('ashfen-settings',{}));
 let loadout=store.get(KEY('loadout'),null);
 if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=C.loadout.slice();
 // Developer tools: open the game once with ?dev in the address to turn them on (?dev=0 turns them off).
@@ -707,13 +711,23 @@ const keys={};
 // Extra fingers while the joystick is held: a quick tap with a second finger
 // targets an enemy (it never walks, so it can't fight the joystick).
 const taps={};
+let pinch=null; // {a,b,d0}: two fingers on the map; spreading zooms in, squeezing zooms out
+const fingers={}; // where each finger on the map is right now
+function fingerDist(){const k=Object.keys(fingers);if(k.length<2)return 0;const a=fingers[k[0]],b=fingers[k[1]];return Math.hypot(a.x-b.x,a.y-b.y)}
 cv.addEventListener('pointerdown',e=>{
   e.preventDefault();
-  if(joy.id!==null){taps[e.pointerId]={x:e.clientX,y:e.clientY,t0:performance.now()};return}
-  joy.id=e.pointerId;joy.sx=joy.cx=e.clientX;joy.sy=joy.cy=e.clientY;joy.dx=0;joy.dy=0;joy.active=false;joy.t0=performance.now();
+  fingers[e.pointerId]={x:e.clientX,y:e.clientY};
+  if(joy.id!==null){taps[e.pointerId]={x:e.clientX,y:e.clientY,t0:performance.now()};
+    try{cv.setPointerCapture(e.pointerId)}catch(_){}return}
+  joy.id=e.pointerId;joy.sx=joy.cx=e.clientX;joy.sy=joy.cy=e.clientY;joy.dx=0;joy.dy=0;joy.active=false;joy.noTap=false;joy.t0=performance.now();
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
 });
 cv.addEventListener('pointermove',e=>{
+  if(fingers[e.pointerId])fingers[e.pointerId]={x:e.clientX,y:e.clientY};
+  // Pinch: starts when a second finger moves more than a tap would. The joystick lets go while pinching.
+  const tp=taps[e.pointerId];
+  if(tp&&!pinch&&Math.hypot(e.clientX-tp.x,e.clientY-tp.y)>=20&&Object.keys(fingers).length>=2){pinch={d0:fingerDist()};joy.active=false;joy.dx=joy.dy=0;}
+  if(pinch){const d=fingerDist();if(d>pinch.d0*1.2){zoomStep(1);pinch.d0=d}else if(d<pinch.d0/1.2){zoomStep(-1);pinch.d0=d}return}
   if(e.pointerId!==joy.id)return;
   joy.cx=e.clientX;joy.cy=e.clientY;
   const dx=e.clientX-joy.sx,dy=e.clientY-joy.sy;
@@ -721,14 +735,19 @@ cv.addEventListener('pointermove',e=>{
   joy.dx=dx;joy.dy=dy;
 });
 function endJoy(e){
+  delete fingers[e.pointerId];
+  if(pinch){delete taps[e.pointerId];if(e.pointerId===joy.id){joy.id=null;joy.active=false}
+    if(Object.keys(fingers).length<2){pinch=null; // pinch over; a joystick finger still down starts steering fresh from where it is
+      const f=fingers[joy.id];if(f){joy.sx=joy.cx=f.x;joy.sy=joy.cy=f.y;joy.active=false;joy.dx=joy.dy=0;joy.noTap=true}}
+    return} // a pinch never walks or targets
   const tp=taps[e.pointerId];
   if(tp){delete taps[e.pointerId];
     if(performance.now()-tp.t0<400&&Math.hypot(e.clientX-tp.x,e.clientY-tp.y)<20)tapWorld(tp.x,tp.y,true);return}
   if(e.pointerId!==joy.id)return;
-  const quick=performance.now()-joy.t0<HOLD_MS,wasTap=!joy.active&&(settings.move!=='hold'||quick);joy.id=null;joy.active=false;
+  const quick=performance.now()-joy.t0<HOLD_MS,wasTap=!joy.active&&!joy.noTap&&(settings.move!=='hold'||quick);joy.id=null;joy.active=false;
   if(wasTap)tapWorld(joy.sx,joy.sy);
 }
-cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{delete taps[e.pointerId];if(e.pointerId===joy.id){joy.id=null;joy.active=false}});
+cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{delete taps[e.pointerId];delete fingers[e.pointerId];if(!Object.keys(fingers).length)pinch=null;if(e.pointerId===joy.id){joy.id=null;joy.active=false}});
 function tapWorld(clientX,clientY,targetOnly){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
@@ -922,6 +941,7 @@ function renderSettings(){
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
+    seg('Zoom (or pinch the screen)','zoom',[[170,'Near'],[235,'Normal'],[300,'Far']])+
     seg('Movement','move',[['drag','Tap + drag stick'],['hold','Hold to move']])+
     (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?
@@ -935,7 +955,7 @@ $('setbox').addEventListener('click',e=>{
   if(e.target.id==='chgcls'){$('settingsUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
-  settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();
+  settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();if(b.dataset.k==='zoom')applyZoom();
 });
 
 /* ---------- Modals and utility buttons ---------- */
@@ -1220,11 +1240,25 @@ function update(dt){
 
 /* ---------- Render ---------- */
 let S=3,VW=160,VH=200,camX=0,camY=0,dpr=1;
-function resize(){
-  const r=$('view').getBoundingClientRect();dpr=Math.min(2,window.devicePixelRatio||1);
-  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
-  S=Math.max(2,Math.round(cv.width/170));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
+// Zoom: settings.zoom is how many game pixels wide the view should be (bigger = see more).
+// The game scales up by whole steps (S) so pixels stay crisp, so the real width snaps to the nearest step.
+// Resolution cap is 3x (was 2x) so phones get finer zoom steps.
+const ZOOM_MIN=150, ZOOM_MAX=320;
+function zoomSteps(){const lo=Math.max(2,Math.ceil(cv.width/ZOOM_MAX)),hi=Math.max(lo,Math.floor(cv.width/ZOOM_MIN));return [lo,hi]}
+function applyZoom(){
+  const [lo,hi]=zoomSteps();
+  S=Math.min(hi,Math.max(lo,Math.round(cv.width/settings.zoom)));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
   low.width=VW;low.height=VH;
+}
+function resize(){
+  const r=$('view').getBoundingClientRect();dpr=Math.min(3,window.devicePixelRatio||1);
+  cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  applyZoom();
+}
+// Step the zoom by one notch (+1 = closer, -1 = farther) and remember it.
+function zoomStep(d){
+  const [lo,hi]=zoomSteps(),n=Math.min(hi,Math.max(lo,S+d));if(n===S)return;
+  S=n;settings.zoom=Math.round(cv.width/S);saveSettings();applyZoom();
 }
 window.addEventListener('resize',resize);
 const bay=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
@@ -1252,7 +1286,9 @@ function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round
 let time=0;
 function render(){
   const pxr=Math.round(player.x),pyr=Math.round(player.y);
-  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(0,Math.min(WH-VH,pyr-Math.round(VH/2)-10));
+  // The camera may scroll a little past the map's top edge so the top bars (and the boss bar) never cover you.
+  const topPad=Math.round(($('bossbar').style.display==='block'?132:66)*dpr/S);
+  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
@@ -1339,6 +1375,9 @@ function ui(){
   $('pmp').style.width=(100*player.mp/maxMP(L))+'%';
   $('petrow').style.display=pet?'block':'none';if(pet)$('petbar').style.width=(100*pet.hp/pet.maxhp)+'%';
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
+  // Boss bar: shows while a boss in this zone is alive and fighting (chasing someone).
+  const boss=mobs.find(m=>m.def.boss&&!m.dead&&m.state==='chase'),bb=$('bossbar');
+  if(boss){bb.style.display='block';$('bossname').textContent=cap(boss.def.name)+' · Lv '+boss.lv;$('bosspct').textContent=Math.ceil(100*boss.hp/boss.maxhp)+'%';$('bosshp').style.width=(100*boss.hp/boss.maxhp)+'%'}else bb.style.display='none';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
