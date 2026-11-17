@@ -25,7 +25,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Now
 - **UI and controls pass** (M). Owner is switching to the joystick (more control, can move while casting). In order:
-  1. **Bug:** while the joystick is held, tapping an enemy with another finger does nothing (the canvas only tracks one finger, so the second tap is ignored). Allow a second finger to target.
+  1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
   2. **Better targeting:** the bottom bar's Target button doesn't feel intuitive for tab-targeting. Make next-target easy to reach mid-fight, likely a thumb-sized button near the spells.
   3. **Rethink the bottom bar and hotbar** (see the Hotbar redesign card): what belongs on screen, what goes in menus, room for more spells.
   Talk through the layout with the owner before building step 3.
@@ -78,6 +78,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11.3** Joystick fix: while one finger holds the joystick, a quick tap on an enemy with another finger now targets it (and casts your main attack if **1st hit** is on). A second-finger tap on empty ground does nothing, so it never fights the joystick.
 - **v0.11.2** Home-screen app: add the game to your phone's home screen and it opens full screen with its own icon (the Druid), no browser bars. Settings → Developer tools On/Off, since a home-screen app can't use `?dev` in its link.
 - **v0.11.1** From the class play-test: dying now ends every fight (mobs forget you, lingering DoTs are cleared, and everything walks back to its spot; before, a DoT tick after you respawned could pull the mob back and your new skeleton would chase it); the skeleton dies with you; skeleton follow no longer jitters; two quick toggles above your abilities: **1st hit** (tapping an enemy casts your main attack) and **Auto** (keeps casting), also in Settings; all of Boss 1's gear now waits in the chest: one named item and one uncommon every time, plus a small rare chance; Lifetap heals 85% of its damage (was 100%).
 - **v0.11** **Necromancer** added with the first pet: Raise Bones summons a skeleton that follows you, attacks what you're fighting and tanks (a threat system decides who mobs hit; the pet's hits count triple). Lifetap (main attack, heals you), Siphon Plague (strong DoT), Dread (fear: the mob runs away), Feign Death (mobs forget you and stay put, no reset), Mend Bones (heal the pet). Pet HP bar under your health. Caster gear is shared by Druid and Necromancer. **Developer tools:** open the game once with `?dev` for a DEV button: level up/down, full heal, reset cooldowns, god mode, kill target, give gear, teleports (gate, crypt door, dungeon start, boss room), spawn Old Gnawbone, wipe saves. Turn off with `?dev=0`.

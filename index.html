@@ -704,9 +704,12 @@ function applyAbility(a,t){
 const joy={id:null,sx:0,sy:0,cx:0,cy:0,dx:0,dy:0,t0:0,active:false};
 const HOLD_MS=180; // hold-to-move: a press longer than this walks instead of tapping
 const keys={};
+// Extra fingers while the joystick is held: a quick tap with a second finger
+// targets an enemy (it never walks, so it can't fight the joystick).
+const taps={};
 cv.addEventListener('pointerdown',e=>{
   e.preventDefault();
-  if(joy.id!==null)return;
+  if(joy.id!==null){taps[e.pointerId]={x:e.clientX,y:e.clientY,t0:performance.now()};return}
   joy.id=e.pointerId;joy.sx=joy.cx=e.clientX;joy.sy=joy.cy=e.clientY;joy.dx=0;joy.dy=0;joy.active=false;joy.t0=performance.now();
   try{cv.setPointerCapture(e.pointerId)}catch(_){}
 });
@@ -718,12 +721,15 @@ cv.addEventListener('pointermove',e=>{
   joy.dx=dx;joy.dy=dy;
 });
 function endJoy(e){
+  const tp=taps[e.pointerId];
+  if(tp){delete taps[e.pointerId];
+    if(performance.now()-tp.t0<400&&Math.hypot(e.clientX-tp.x,e.clientY-tp.y)<20)tapWorld(tp.x,tp.y,true);return}
   if(e.pointerId!==joy.id)return;
   const quick=performance.now()-joy.t0<HOLD_MS,wasTap=!joy.active&&(settings.move!=='hold'||quick);joy.id=null;joy.active=false;
   if(wasTap)tapWorld(joy.sx,joy.sy);
 }
-cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{if(e.pointerId===joy.id){joy.id=null;joy.active=false}});
-function tapWorld(clientX,clientY){
+cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{delete taps[e.pointerId];if(e.pointerId===joy.id){joy.id=null;joy.active=false}});
+function tapWorld(clientX,clientY,targetOnly){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
   if(zoneId==='over')for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){if(n.kind==='peddler'&&nearMerchant()){say(n,'Let us see what you have found.',true);charTab='bags';bagSel=null;openModal('charUI')}else say(n,pick(LINES[n.kind]),true);return}}
@@ -731,6 +737,7 @@ function tapWorld(clientX,clientY){
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
   if(best){player.target=best;if(settings.tapCast)castSlot(0);return}
+  if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
   player.tx=wx;player.ty=wy;player.sit=false;
 }
 window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=6)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();nextTarget()}});
