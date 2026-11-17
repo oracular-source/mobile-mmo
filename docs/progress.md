@@ -15,8 +15,14 @@
   - New spell order: Tanglefoot (snare) at 2, Creeping Rot at 4, Rootgrip at 6, Barkskin at 8
   - Shorter casts: Thornlash 0.4s, Rootgrip 0.6s, Mending Touch 1.2s; Tanglefoot, Creeping Rot and Barkskin instant
 
+- Prototype v0.3 (controls polish):
+  - Removed hold gestures everywhere; every spell is a flick or a tap
+  - Spell pad: smaller center button, five ring spells at 72 degrees, flick toward a spell or tap it
+  - Arrange mode: drag spells on the pad or buttons to swap them in place
+  - Classic buttons: smaller main button, tap to cast
+
 ## Next
-1. Play-test the pad on a real phone; tune hold time and flick distance defaults
+1. Play-test the pad on a real phone; tune the flick distance default
 2. Old Gnawbone's add-summon at half health (in the design, not built yet)
 3. Loot window and simple inventory
 4. Wolfwood Edge with blight wolves (flee at low health)

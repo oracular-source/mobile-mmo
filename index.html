@@ -25,7 +25,7 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 #castname{font-size:10px;text-align:center;text-shadow:0 1px 0 #000}
 #bottom{background:#0d0b11;border-top:1px solid #2a2531;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
 #util{display:flex;gap:6px}
-#util button{flex:1;height:36px;font-size:12px}
+#util button{flex:1;height:36px;font-size:11.5px}
 button{font:inherit;color:#e8e2cf;background:#1c1922;border:1px solid #3a3343;border-radius:6px;padding:0;touch-action:manipulation;cursor:pointer}
 button.active{border-color:#c9a227;color:#ffd27a}
 /* Spell pad */
@@ -37,11 +37,11 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .nomana .nm{color:#ff6b6b}
 .cd{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);height:0;pointer-events:none}
 #padc{position:absolute;border-radius:50%;background:rgba(20,18,26,.92);border:2px solid #c9a227;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;line-height:1.15;overflow:hidden;text-align:center}
-#padc small{font-size:8.5px;color:#9aa}
-#holdring{position:absolute;border-radius:50%;pointer-events:none}
+#controls.arrange .pi,#controls.arrange #padc,#controls.arrange .fb{outline:2px dashed #ffd27a;outline-offset:1px}
+#controls .sel{background:rgba(80,70,30,.95);border-color:#ffd27a}
 /* Classic buttons */
 .fb{position:absolute;border-radius:50%;background:rgba(20,18,26,.9);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;touch-action:none}
-.fb.main{border:2px solid #c9a227;font-size:10px}
+.fb.main{border:2px solid #c9a227;font-size:9.5px}
 /* Modals */
 .modal{position:absolute;inset:0;background:rgba(5,5,7,.9);display:none;align-items:center;justify-content:center;padding:14px;z-index:6;touch-action:none}
 .modal.show{display:flex}
@@ -90,14 +90,14 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.2: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.3: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
-          <li><b>Spell pad</b> (bottom corner): tap, hold, or flick up, down, left or right. Each gesture casts a different spell.</li>
+          <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
           <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
           <li>Kite: snare it, rot it, walk away, nuke it.</li>
-          <li><b>Spells</b> changes your loadout. <b>Settings</b> has classic buttons and left-handed mode.</li>
+          <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
       </div>
@@ -124,7 +124,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="ghost"></div>
   </div>
   <div id="bottom">
-    <div id="util"><button id="btab">Next target</button><button id="bsit">Sit</button><button id="bspells">Spells</button><button id="bset">Settings</button></div>
+    <div id="util"><button id="btab">Target</button><button id="bsit">Sit</button><button id="barr">Arrange</button><button id="bspells">Spells</button><button id="bset">Settings</button></div>
   </div>
 </div>
 <script>
@@ -239,7 +239,7 @@ const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const settings=Object.assign({scheme:'pad',left:false,padSize:'M',holdMs:300,flick:'normal',tapCast:true},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true},store.get('ashfen-settings',{}));
 let loadout=store.get('ashfen-loadout',null);
 if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=['thorn','mend','snare','rot','root','bark'];
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set('ashfen-loadout',loadout);
@@ -417,49 +417,49 @@ window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=par
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
 
 /* ---------- Input: spell pad and classic buttons ---------- */
-const SLOT_LABELS={pad:['Tap','Hold','Flick up','Flick down','Flick left','Flick right'],buttons:['Button 1 (main)','Button 2','Button 3','Button 4','Button 5','Button 6']};
+// Pad: tap the center for slot 1, or flick toward one of the five ring spells (or tap it).
+// Ring order is clockwise from straight up, 72 degrees apart.
+const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6']};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
-let gest=null, holdSlot=null;
-const ctrl=$('controls');
-function slotHTML(i,showName){
+let gest=null, arranging=false, arrSel=null, arrDrag=null;
+const ctrl=$('controls'),ghost=$('ghost');
+const slotOf=el=>el.dataset.slot==='c'?0:+el.dataset.slot;
+function slotHTML(i,showMana){
   const a=ABI[loadout[i]];
-  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showName?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span>';
+  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span>';
 }
 function buildControls(){
   ctrl.innerHTML='';
+  ctrl.classList.toggle('arrange',arranging);
   const side=settings.left?'left':'right';
   logEl.style.left=settings.left?'auto':'6px';logEl.style.right=settings.left?'6px':'auto';
   if(settings.scheme==='pad'){
-    const P=PAD_PX[settings.padSize]||160,ic=Math.round(P*0.27),cc=Math.round(P*0.42);
+    const P=PAD_PX[settings.padSize]||160,ic=Math.round(P*0.27),cc=Math.round(P*0.34),R=P/2-ic/2-3;
     const pad=document.createElement('div');pad.id='pad';
     pad.style.cssText='width:'+P+'px;height:'+P+'px;bottom:12px;'+side+':12px';
-    const pos=[null,null,{l:(P-ic)/2,t:3},{l:(P-ic)/2,t:P-ic-3},{l:3,t:(P-ic)/2},{l:P-ic-3,t:(P-ic)/2}];
-    for(let i=2;i<6;i++){const d=document.createElement('div');d.className='pi';d.dataset.slot=i;
-      d.style.cssText='width:'+ic+'px;height:'+ic+'px;left:'+pos[i].l+'px;top:'+pos[i].t+'px';d.innerHTML=slotHTML(i,false);pad.appendChild(d)}
-    const ring=document.createElement('div');ring.id='holdring';const rs=cc+10;
-    ring.style.cssText='width:'+rs+'px;height:'+rs+'px;left:'+(P-rs)/2+'px;top:'+(P-rs)/2+'px';pad.appendChild(ring);
-    const c=document.createElement('div');c.id='padc';
+    for(let i=1;i<6;i++){
+      const ang=(i-1)*72*Math.PI/180, x=P/2+Math.sin(ang)*R-ic/2, y=P/2-Math.cos(ang)*R-ic/2;
+      const d=document.createElement('div');d.className='pi';d.dataset.slot=i;
+      d.style.cssText='width:'+ic+'px;height:'+ic+'px;left:'+x+'px;top:'+y+'px';d.innerHTML=slotHTML(i,false);pad.appendChild(d);
+    }
+    const c=document.createElement('div');c.id='padc';c.dataset.slot='c';
     c.style.cssText='width:'+cc+'px;height:'+cc+'px;left:'+(P-cc)/2+'px;top:'+(P-cc)/2+'px';
-    const a0=ABI[loadout[0]],a1=ABI[loadout[1]];
-    c.innerHTML='<span class="ic" style="background:'+a0.col+';width:13px;height:13px;border-radius:3px;border:1px solid #0b0a0f;margin-bottom:2px"></span><span>'+a0.short+'</span><small>hold: '+a1.short+'</small><span class="cd"></span>';
-    c.dataset.slot='c';pad.appendChild(c);
+    c.innerHTML=slotHTML(0,false);
+    pad.appendChild(c);
     pad.addEventListener('pointerdown',padDown);
     pad.addEventListener('pointermove',padMove);
-    pad.addEventListener('pointerup',padUp);pad.addEventListener('pointercancel',padUp);
+    pad.addEventListener('pointerup',padUp);pad.addEventListener('pointercancel',()=>{gest=null});
     ctrl.appendChild(pad);
   }else{
-    // Classic: big main button in the corner, five more fanned around it.
-    const main=76,sm=50,R=140,cxp=12+main/2,cyp=12+main/2;
+    // Classic: main button in the corner, five more fanned in a quarter circle around it.
+    const main=62,sm=50,R=132,cxp=12+main/2,cyp=12+main/2;
     for(let i=0;i<6;i++){
       const b=document.createElement('div');b.className='fb'+(i===0?' main':'');b.dataset.slot=i;
       let sz=i===0?main:sm,ox=cxp,oy=cyp;
-      // Fan the five smaller buttons in a quarter circle: from beside the main button to straight above it.
       if(i>0){const a=(i-1)*(Math.PI/2)/4;ox=cxp+Math.cos(a)*R;oy=cyp+Math.sin(a)*R;}
       b.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+(oy-sz/2)+'px;'+side+':'+(ox-sz/2)+'px';
       b.innerHTML=slotHTML(i,true);
-      b.addEventListener('pointerdown',e=>{e.preventDefault();try{b.setPointerCapture(e.pointerId)}catch(_){}holdSlot=i;castSlot(i);flash(b)});
-      const up=()=>{if(holdSlot===i)holdSlot=null};
-      b.addEventListener('pointerup',up);b.addEventListener('pointercancel',up);
+      b.addEventListener('pointerdown',e=>{e.preventDefault();castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
   }
@@ -467,34 +467,63 @@ function buildControls(){
 function flash(el){if(!el)return;el.classList.add('flash');setTimeout(()=>el.classList.remove('flash'),160)}
 function padDown(e){
   e.preventDefault();if(gest)return;
-  const pad=e.currentTarget;try{pad.setPointerCapture(e.pointerId)}catch(_){}
-  const icon=e.target.closest('[data-slot]');
-  gest={id:e.pointerId,sx:e.clientX,sy:e.clientY,t0:performance.now(),fired:false,holding:false,moved:false,icon:icon&&icon.dataset.slot!=='c'?+icon.dataset.slot:null};
-  gest.timer=setTimeout(()=>{if(gest&&!gest.fired&&!gest.moved&&gest.icon===null){gest.fired=true;gest.holding=true;castSlot(1);}},settings.holdMs);
+  try{e.currentTarget.setPointerCapture(e.pointerId)}catch(_){}
+  const el=e.target.closest('[data-slot]');
+  gest={id:e.pointerId,sx:e.clientX,sy:e.clientY,fired:false,moved:false,slot:el?slotOf(el):0};
 }
 function padMove(e){
   if(!gest||e.pointerId!==gest.id||gest.fired)return;
   const dx=e.clientX-gest.sx,dy=e.clientY-gest.sy,d=Math.hypot(dx,dy);
   if(d>12)gest.moved=true;
   if(d>=(FLICK_PX[settings.flick]||32)){
-    gest.fired=true;clearTimeout(gest.timer);
-    const slot=Math.abs(dx)>Math.abs(dy)?(dx<0?4:5):(dy<0?2:3);
-    castSlot(slot);flash(document.querySelector('#pad .pi[data-slot="'+slot+'"]'));
+    gest.fired=true;
+    // Pick the ring spell whose direction is closest to the flick (five 72-degree sectors).
+    let deg=Math.atan2(dx,-dy)*180/Math.PI;if(deg<0)deg+=360;
+    const slot=1+Math.round(deg/72)%5;
+    castSlot(slot);flash(ctrl.querySelector('.pi[data-slot="'+slot+'"]'));
   }
 }
 function padUp(e){
   if(!gest||e.pointerId!==gest.id)return;
-  clearTimeout(gest.timer);
-  if(!gest.fired&&!gest.moved){
-    if(gest.icon!==null){castSlot(gest.icon);flash(document.querySelector('#pad .pi[data-slot="'+gest.icon+'"]'))}
-    else{castSlot(0);flash($('padc'))}
-  }
+  if(!gest.fired&&!gest.moved){castSlot(gest.slot);flash(ctrl.querySelector('[data-slot="'+(gest.slot===0?'c':gest.slot)+'"]'))}
   gest=null;
+}
+
+/* ---------- Arrange mode: drag spells on the pad or buttons to swap them ---------- */
+function swapSlots(a,b){if(a===b)return;const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
+ctrl.addEventListener('pointerdown',e=>{
+  if(!arranging)return;
+  e.stopPropagation();e.preventDefault();
+  const el=e.target.closest('[data-slot]');if(!el)return;
+  arrDrag={slot:slotOf(el),sx:e.clientX,sy:e.clientY,id:e.pointerId,moved:false};
+},true);
+window.addEventListener('pointermove',e=>{
+  if(!arrDrag||e.pointerId!==arrDrag.id)return;
+  if(!arrDrag.moved&&Math.hypot(e.clientX-arrDrag.sx,e.clientY-arrDrag.sy)>8){
+    arrDrag.moved=true;const a=ABI[loadout[arrDrag.slot]];
+    ghost.innerHTML='<div class="pi" style="position:static;width:46px;height:46px"><span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span></div>';ghost.style.display='block';
+  }
+  if(arrDrag.moved){const r=$('view').getBoundingClientRect();ghost.style.left=(e.clientX-r.left-23)+'px';ghost.style.top=(e.clientY-r.top-23)+'px'}
+});
+window.addEventListener('pointerup',e=>{
+  if(!arrDrag||e.pointerId!==arrDrag.id)return;
+  ghost.style.display='none';
+  if(arrDrag.moved){
+    const el=document.elementFromPoint(e.clientX,e.clientY),t=el&&el.closest('#controls [data-slot]');
+    if(t)swapSlots(arrDrag.slot,slotOf(t));arrSel=null;
+  }else if(arrSel===null){arrSel=arrDrag.slot;const el=ctrl.querySelector('[data-slot="'+(arrSel===0?'c':arrSel)+'"]');if(el)el.classList.add('sel')}
+  else{swapSlots(arrSel,arrDrag.slot);arrSel=null}
+  arrDrag=null;
+});
+function setArranging(on){
+  arranging=on;arrSel=null;running=!on&&!document.querySelector('.modal.show');
+  $('barr').textContent=on?'Done':'Arrange';$('barr').classList.toggle('active',on);
+  if(on)log('Arrange: drag a spell onto another to swap, or tap two spells. Tap Done when finished.','#ffd27a');
+  buildControls();
 }
 
 /* ---------- Spellbook (drag and drop loadout) ---------- */
 let selected=null,drag=null;
-const ghost=$('ghost');
 function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+'</b><small>'+a.tag+' · '+a.mana+' mana · '+(a.cast?a.cast+'s cast':'instant')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
 function renderBook(){
   const book=$('book'),slots=$('slots');
@@ -545,7 +574,6 @@ function renderSettings(){
     seg('Tap an enemy','tapCast',[['true','Target + cast'],['false','Target only']])+
     (settings.scheme==='pad'?
       seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
-      seg('Hold time','holdMs',[['200','Quick'],['300','Normal'],['450','Long']])+
       seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'');
 }
 $('setbox').addEventListener('click',e=>{
@@ -556,9 +584,10 @@ $('setbox').addEventListener('click',e=>{
 
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
-function openModal(id){$(id).classList.add('show');running=false;if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=true;selected=null}));
-$('bspells').addEventListener('click',()=>openModal('spellsUI'));
+function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
+$('bspells').addEventListener('click',()=>{if(arranging)setArranging(false);openModal('spellsUI')});
+$('barr').addEventListener('click',()=>setArranging(!arranging));
 $('bset').addEventListener('click',()=>openModal('settingsUI'));
 function nextTarget(){
   const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
@@ -587,9 +616,6 @@ function update(dt){
         else if(player.mp<a.mana){log('Not enough mana.','#ff8a80')}
         else{player.mp-=a.mana;applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
-    // Hold-to-repeat: pad hold recasts slot 2, a held classic button recasts its slot.
-    if(gest&&gest.holding)castSlot(1,true);
-    if(holdSlot!==null)castSlot(holdSlot,true);
     const fight=inCombat(),L=player.lvl,f=1+L*0.1;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*dt);
@@ -717,9 +743,6 @@ function ui(){
     el.classList.toggle('lock',L<a.lvl);el.classList.toggle('nomana',L>=a.lvl&&player.mp<a.mana);
     const cd=el.querySelector('.cd');if(cd)cd.style.height=(L<a.lvl?0:cdPct)+'%';
   });
-  const ring=$('holdring');
-  if(ring){let p=0;if(gest&&!gest.fired&&!gest.moved&&gest.icon===null)p=Math.min(1,(performance.now()-gest.t0)/settings.holdMs);else if(gest&&gest.holding)p=1;
-    ring.style.background=p>0?'conic-gradient(#7dffa6 '+(p*360)+'deg, transparent 0)':'transparent';}
   $('bsit').classList.toggle('active',player.sit);$('bsit').textContent=player.sit?'Stand':'Sit';
 }
 
