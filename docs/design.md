@@ -74,7 +74,7 @@ Armored tank with no mana: every skill runs on its own cooldown. High HP (60 + 1
 | Level | Skill | Type | What it does |
 | --- | --- | --- | --- |
 | 1 | Strike | Melee | Main attack, global cooldown only (auto-cast) |
-| 1 | Bandage | Heal | 2s channel, heals over the cast; 20s cooldown, down to 12s |
+| 1 | Bandage | Heal | 2s cast standing still, then heals; 20s cooldown, down to 12s |
 | 1 | Throw Stone | Pull | Ranged poke to pull mobs; not in the default loadout |
 | 2 | Shield Bash | Stun | Small hit plus a 2s stun; 12s cooldown, down to 8s |
 | 3 | Hamstring | Snare | Slows the target; 18s cooldown, down to 10s |
