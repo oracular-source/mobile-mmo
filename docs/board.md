@@ -28,8 +28,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
   1. ~~**Bug:** second finger can't target while the joystick is held.~~ Fixed in v0.11.3; confirm on phone.
   2. ~~**Better targeting:**~~ v0.11.4: a Next ⟳ button sits just above the spells; the 1st hit / Auto toggles moved to the top right (set between fights). Confirm on phone.
   - Done along the way (v0.11.5): zoomed out, pinch-to-zoom + Zoom setting, bigger bosses with a boss bar.
-  3. **Rethink the bottom bar and hotbar** (see the Hotbar redesign card): what belongs on screen, what goes in menus, room for more spells.
-  Talk through the layout with the owner before building step 3.
+  3. ~~**Rethink the bottom bar and hotbar:**~~ v0.12: bottom bar is Sit / Character / Menu; 6 spells on the right + a 2-slot side bar on the left (both movement modes). Confirm on phone, then this card is done.
 
 ## Next
 1. Class identity pass: with the UI settled, decide what each class should look and feel like.
@@ -39,6 +38,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
 - **Zoom:** farthest (and default) view is about 215–235 game pixels wide on most phones, tuned by play-test (v0.11.5's ~290 was too far, v0.11.6's ~195 too close). Players pick Near / Far or pinch.
+- **Screen layout (v0.12):** max 8 ability buttons on screen: 6 on the right (pad or classic) plus slots 7–8 as a small side bar on the left edge, in joystick and tap-to-move alike. Bottom bar: Sit (kept on screen: Necros sit while the pet and DoTs fight), Character, Menu (Spells, Arrange, Settings). Target button dropped; Next ⟳ does that job.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
@@ -50,7 +50,6 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Buff spells and a buff bar. Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
 | Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room | M | S | 2 (with the feel pass) |
-| Hotbar redesign: small left-hand bar (shows in tap-to-move mode), room for more spells; covers slots 7 and 8. Joystick stays the default for new players | H | M | 2 |
 | Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
 | Raids | M | L | phase 4+ |
@@ -83,6 +82,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.12** Hotbar and bottom bar: the bottom bar is now **Sit / Character / Menu**. Menu holds Spells, Arrange and Settings; the old Target button is gone (Next ⟳ above your spells does the same). Two new spell slots (7 and 8) sit as small buttons on the **left edge** (right edge in left-handed mode), in both joystick and tap-to-move. The Warrior's Throw Stone now has a slot; Druid and Necromancer slots 7–8 show "empty" until new spells arrive. Existing saves keep their arrangement. Keyboard 7 and 8 cast them. While arranging, the Menu button reads **Done**.
 - **v0.11.7** Zoom out allowed one notch further than v0.11.6: the farthest (default) view is about 234 game pixels wide on a typical phone.
 - **v0.11.6** Zoom out pulled in two notches after play-testing: the farthest view (also the default) is now about 195 game pixels wide on a typical phone instead of up to 290. Settings → Zoom is now Near / Far.
 - **v0.11.5** Zoom and bosses: the view is zoomed out (about 40% more world on screen); **pinch** the map to zoom in or out, or pick Near / Normal / Far in Settings → Zoom (it's remembered). Pinching never walks or targets. Boss 1 draws at 3x player size, and a wide **boss health bar** appears across the top while a boss is fighting you. The camera can now scroll a little past the map's top edge so the top bars never cover you. Sharper screens on 3x phones (finer zoom steps); frame time unchanged in testing.

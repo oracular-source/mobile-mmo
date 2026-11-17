@@ -27,7 +27,7 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .row{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
-#log{position:absolute;bottom:8px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
+#log{position:absolute;bottom:8px;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:38%}
 /* Boss health bar: wide, across the top, only while a boss is fighting you */
 #bossbar{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));display:none;pointer-events:none;background:rgba(10,9,14,.85);border:1px solid #6b4a8f;border-radius:6px;padding:4px 8px;font-size:11px;color:#ffd27a}
 #bossbar .bar{height:9px}
@@ -55,6 +55,8 @@ button.active{border-color:#c9a227;color:#ffd27a}
 /* Classic buttons */
 .fb{position:absolute;border-radius:50%;background:rgba(20,18,26,.9);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;touch-action:none}
 .fb.main{border:2px solid #c9a227;font-size:9.5px}
+.fb.empty{border-style:dashed;background:rgba(20,18,26,.5)}
+#menuUI .go{background:#1c1922;border-color:#3a3343;margin-top:8px}
 /* Modals */
 .modal{position:absolute;inset:0;background:rgba(5,5,7,.9);display:none;align-items:center;justify-content:center;padding:14px;z-index:6;touch-action:none}
 .modal.show{display:flex}
@@ -115,7 +117,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.11: Gate Road, the Sunken Graveyard and Dungeon 1.
+        Prototype v0.12: Gate Road, the Sunken Graveyard and Dungeon 1.
         <div id="clspick" class="seg" style="margin:10px 0 2px"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
         <ul>
@@ -128,7 +130,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
           <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
           <li><b>Dungeon 1</b> is behind the crypt door at the back of the graveyard (levels 4 to 7).</li>
           <li>Tap your character frame (top left) for your gear, bags and journal. Loot goes straight into your bags. Walk up to Marrow the Peddler and tap him to sell.</li>
-          <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
+          <li>The two small buttons on the left edge are extra spell slots. <b>Menu</b> (bottom right) has <b>Spells</b> to swap spells, <b>Arrange</b> to drag them around, and <b>Settings</b> (classic buttons, left-handed mode).</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
       </div>
@@ -172,6 +174,17 @@ button.active{border-color:#c9a227;color:#ffd27a}
       </div>
     </div>
 
+    <!-- Menu: things you set up between fights, kept off the main screen -->
+    <div id="menuUI" class="modal">
+      <div class="card">
+        <h1>Menu</h1>
+        <button class="go" id="bspells">Spells</button>
+        <button class="go" id="barr">Arrange buttons</button>
+        <button class="go" id="bset">Settings</button>
+        <button class="go" data-close="menuUI" style="background:#2b5239;border-color:#3f8f5a;margin-top:14px">Back to game</button>
+      </div>
+    </div>
+
     <div id="settingsUI" class="modal">
       <div class="card">
         <h1>Settings</h1>
@@ -182,7 +195,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="ghost"></div>
   </div>
   <div id="bottom">
-    <div id="util"><button id="btab">Target</button><button id="bsit">Sit</button><button id="barr">Arrange</button><button id="bspells">Spells</button><button id="bset">Settings</button></div>
+    <div id="util"><button id="bsit">Sit</button><button id="bchar">Character</button><button id="bmenu">Menu</button></div>
   </div>
 </div>
 <script>
@@ -446,8 +459,20 @@ const GCD=1.5, PSPEED=34;
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:999},store.get('ashfen-settings',{}));
+// 8 ability slots: 0-5 are the spell pad / classic buttons on the right, 6-7 are the small side bar on the left.
+// A slot can be empty (null) when a class has fewer than 8 abilities. Slot 0 (main attack) is never empty.
+const NSLOTS=8;
+function fillLoadout(base){
+  const out=base.slice(0,NSLOTS).map(id=>ABI[id]?id:null);
+  // Put any abilities that aren't loaded yet into the empty slots (e.g. the Warrior's Throw Stone).
+  AB.forEach(a=>{if(out.indexOf(a.id)<0){const e=out.indexOf(null);if(e>=0)out[e]=a.id;else if(out.length<NSLOTS)out.push(a.id)}});
+  while(out.length<NSLOTS)out.push(null);
+  return out;
+}
 let loadout=store.get(KEY('loadout'),null);
-if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=C.loadout.slice();
+// Older saves have 6 slots: keep the player's arrangement and add the two new slots.
+if(!Array.isArray(loadout)||!ABI[loadout[0]])loadout=C.loadout.slice();
+loadout=fillLoadout(loadout);
 // Developer tools: open the game once with ?dev in the address to turn them on (?dev=0 turns them off).
 const dev={on:(function(){const m=/[?&]dev(=(\d))?/.exec(location.search);if(m)store.set('ashfen-dev',m[2]!=='0');return !!store.get('ashfen-dev',false)})(),god:false};
 const kills=store.get('ashfen-kills',{});
@@ -670,7 +695,7 @@ function cast(a,quiet){
   player.cast={a:a,t:t,time:0};
   return true;
 }
-const castSlot=(i,quiet)=>cast(ABI[loadout[i]],quiet);
+const castSlot=(i,quiet)=>{const a=ABI[loadout[i]];return a?cast(a,quiet):false}; // empty slots do nothing
 // Every targeted spell can be resisted. Even-level mobs resist 5% of the time, +10% per level above you,
 // down to 2% for much lower mobs. A resist still costs the mana. There are no fizzles.
 function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0.9,0.05+(d>0?d*0.10:d*0.015)))}
@@ -759,19 +784,20 @@ function tapWorld(clientX,clientY,targetOnly){
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
   player.tx=wx;player.ty=wy;player.sit=false;
 }
-window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=6)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();nextTarget()}});
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();nextTarget()}});
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});
 
 /* ---------- Input: spell pad and classic buttons ---------- */
 // Pad: tap the center for slot 1, or flick toward one of the five ring spells (or tap it).
 // Ring order is clockwise from straight up, 72 degrees apart.
-const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6']};
+const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6','Side bar top','Side bar bottom']};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
 const ctrl=$('controls'),ghost=$('ghost');
 const slotOf=el=>el.dataset.slot==='c'?0:+el.dataset.slot;
 function slotHTML(i,showMana){
   const a=ABI[loadout[i]];
+  if(!a)return '<span style="color:#5a5363">empty</span>';
   return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana&&a.mana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
 }
 let ctrlEls=[];
@@ -779,7 +805,7 @@ function buildControls(){
   ctrl.innerHTML='';
   ctrl.classList.toggle('arrange',arranging);
   const side=settings.left?'left':'right';
-  logEl.style.left=settings.left?'auto':'6px';logEl.style.right=settings.left?'6px':'auto';
+  logEl.style.left=settings.left?'auto':'64px';logEl.style.right=settings.left?'64px':'auto'; // clear of the side bar
   if(settings.scheme==='pad'){
     const P=PAD_PX[settings.padSize]||160,ic=Math.round(P*0.27),cc=Math.round(P*0.34),R=P/2-ic/2-3;
     const pad=document.createElement('div');pad.id='pad';
@@ -812,7 +838,22 @@ function buildControls(){
     }
     autoPill(side,12+main+R+4);
   }
+  sideBar(settings.left?'right':'left');
   ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));
+}
+// Side bar: slots 7 and 8, two small buttons on the other edge of the screen from the spells
+// (left side for right-handed players). Shown in both joystick and tap-to-move. They sit on the
+// very edge, so a thumb starting the joystick a little further in doesn't hit them.
+// Kept to 2 so the screen never shows more than 8 ability buttons (a design rule).
+function sideBar(side){
+  const sz=48;
+  [6,7].forEach((i,k)=>{
+    const b=document.createElement('div');b.className='fb side'+(loadout[i]?'':' empty');b.dataset.slot=i;
+    b.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+(12+(1-k)*(sz+8))+'px;'+side+':8px';
+    b.innerHTML=slotHTML(i,true);
+    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
+    ctrl.appendChild(b);
+  });
 }
 // Two quick toggles, top right under the target frame: "1st hit" = tapping an enemy casts your main attack once;
 // "Auto" = it keeps casting. They're set between fights, so they live out of the thumb's way.
@@ -825,7 +866,7 @@ function autoPill(side,bottom){
     ctrl.appendChild(b);};
   mk('autoCast','Auto',6,'Auto attack','autopill');
   mk('tapCast','1st hit',74,'Auto first attack','firstpill');
-  // Next target: thumb-reachable, just above the spells. Same as the bottom bar's Target button.
+  // Next target: thumb-reachable, just above the spells. (Tab on a keyboard does the same.)
   const t=document.createElement('button');t.id='nexttgt';t.textContent='Next ⟳';
   t.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':16px;height:34px;padding:0 12px;font-size:12px;border-radius:17px;background:rgba(20,18,26,.88);border-color:#7a6a3a';
   t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;nextTarget();flash(t)});
@@ -857,7 +898,7 @@ function padUp(e){
 }
 
 /* ---------- Arrange mode: drag spells on the pad or buttons to swap them ---------- */
-function swapSlots(a,b){if(a===b)return;const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
+function swapSlots(a,b){if(a===b)return;if((a===0&&!loadout[b])||(b===0&&!loadout[a])){log('Your main slot needs a spell.','#ff6b6b');buildControls();return}const t=loadout[a];loadout[a]=loadout[b];loadout[b]=t;saveLoadout();buildControls();}
 ctrl.addEventListener('pointerdown',e=>{
   if(!arranging||e.target.id==='autopill'||e.target.id==='firstpill'||e.target.id==='nexttgt')return;
   e.stopPropagation();e.preventDefault();
@@ -868,7 +909,7 @@ window.addEventListener('pointermove',e=>{
   if(!arrDrag||e.pointerId!==arrDrag.id)return;
   if(!arrDrag.moved&&Math.hypot(e.clientX-arrDrag.sx,e.clientY-arrDrag.sy)>8){
     arrDrag.moved=true;const a=ABI[loadout[arrDrag.slot]];
-    ghost.innerHTML='<div class="pi" style="position:static;width:46px;height:46px"><span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span></div>';ghost.style.display='block';
+    ghost.innerHTML=a?'<div class="pi" style="position:static;width:46px;height:46px"><span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span></div>':'<div class="pi" style="position:static;width:46px;height:46px">empty</div>';ghost.style.display='block';
   }
   if(arrDrag.moved){const r=$('view').getBoundingClientRect();ghost.style.left=(e.clientX-r.left-23)+'px';ghost.style.top=(e.clientY-r.top-23)+'px'}
 });
@@ -884,7 +925,7 @@ window.addEventListener('pointerup',e=>{
 });
 function setArranging(on){
   arranging=on;arrSel=null;running=!on&&!document.querySelector('.modal.show');
-  $('barr').textContent=on?'Done':'Arrange';$('barr').classList.toggle('active',on);
+  $('bmenu').textContent=on?'Done':'Menu';$('bmenu').classList.toggle('active',on);
   if(on)log('Arrange: drag a spell onto another to swap, or tap two spells. Tap Done when finished.','#ffd27a');
   buildControls();
 }
@@ -898,11 +939,12 @@ function renderBook(){
   AB.forEach(a=>{const c=document.createElement('div');c.className='chip'+(player.lvl<a.lvl?' lock':'')+(selected===a.id?' sel':'');c.dataset.id=a.id;c.innerHTML=chipHTML(a);book.appendChild(c)});
   const labels=SLOT_LABELS[settings.scheme];
   loadout.forEach((id,i)=>{const s=document.createElement('div');s.className='slot';s.dataset.i=i;
-    const a=ABI[id];s.innerHTML='<div class="lbl">'+labels[i]+'</div><div class="chip'+(player.lvl<a.lvl?' lock':'')+'" data-id="'+id+'" data-from="'+i+'">'+chipHTML(a)+'</div>';slots.appendChild(s)});
+    const a=ABI[id];s.innerHTML='<div class="lbl">'+labels[i]+'</div>'+(a?'<div class="chip'+(player.lvl<a.lvl?' lock':'')+'" data-id="'+id+'" data-from="'+i+'">'+chipHTML(a)+'</div>':'<div class="hint" style="margin:6px 0 0">Empty</div>');slots.appendChild(s)});
 }
 function assign(id,i){
   const j=loadout.indexOf(id);
   if(j===i)return;
+  if(j===0&&!loadout[i]){log('Your main slot needs a spell.','#ff6b6b');return}
   if(j>=0)loadout[j]=loadout[i]; else {/* spell not loaded: replace */}
   loadout[i]=id;saveLoadout();buildControls();
 }
@@ -962,9 +1004,13 @@ $('setbox').addEventListener('click',e=>{
 let running=false;
 function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
-$('bspells').addEventListener('click',()=>{if(arranging)setArranging(false);openModal('spellsUI')});
-$('barr').addEventListener('click',()=>setArranging(!arranging));
-$('bset').addEventListener('click',()=>openModal('settingsUI'));
+const closeMenu=()=>$('menuUI').classList.remove('show');
+$('bspells').addEventListener('click',()=>{closeMenu();openModal('spellsUI')});
+$('barr').addEventListener('click',()=>{closeMenu();setArranging(true)});
+$('bset').addEventListener('click',()=>{closeMenu();openModal('settingsUI')});
+// While arranging, the Menu button becomes Done so there's always a way out.
+$('bmenu').addEventListener('click',()=>{if(arranging)setArranging(false);else openModal('menuUI')});
+$('bchar').addEventListener('click',()=>{charTab='gear';openModal('charUI')});
 $('pframe').addEventListener('click',()=>{charTab='gear';openModal('charUI')});
 let charTab='gear',bagSel=null;
 const nearMerchant=()=>{const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
@@ -1023,7 +1069,6 @@ function nextTarget(){
   if(!list.length){log('No targets nearby.','#9aa');return}
   const i=list.indexOf(player.target);player.target=list[(i+1)%list.length];
 }
-$('btab').addEventListener('pointerdown',e=>{e.preventDefault();nextTarget()});
 $('bsit').addEventListener('pointerdown',e=>{e.preventDefault();if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')});
 
 /* ---------- The gate camp: guards, peddler, campfire, signpost, critters ---------- */
@@ -1389,6 +1434,7 @@ function ui(){
   const cdPct=100*player.gcd/GCD;
   ctrlEls.forEach(el=>{
     const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];
+    if(!a)return;
     el.classList.toggle('lock',L<a.lvl);el.classList.toggle('nomana',L>=a.lvl&&player.mp<a.mana);
     const own=player.cds[a.id]||0,full=cdFor(a)||1,pct=L<a.lvl?0:Math.max(cdPct,100*own/full);
     const cd=el.querySelector('.cd');if(cd)cd.style.height=pct+'%';
