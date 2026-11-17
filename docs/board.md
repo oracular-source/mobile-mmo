@@ -47,6 +47,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Raids | M | L | phase 4+ |
 | First Dungeon 1 visit is public: everyone shares it until they've reached the end (or been grouped); later visits are private. Lets Warriors find groups | H | L | phase 3 |
 | Class picker shows how solo-friendly each class is (e.g. Warrior: groups recommended; Necro: strong solo) | M | S | 2 (milestone 4) |
+| Tough mobs pay better: mire beetles take half damage (armor 0.5) but their Beetle Shell sells for 3 copper, less than a Brittle Bone (4). Raise to ~8 and always drop one; same rule for future armored mobs | M | S | 2 (with milestone 4) |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
 | Art pass: sprites, tiles and the overall look | H | L | 2 (milestone 4) |
