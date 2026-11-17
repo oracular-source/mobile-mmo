@@ -94,6 +94,8 @@ The Druid is the prototype class because it touches every system at once: damage
 | 26 | Briar Wall | Crowd control | Roots every enemy in an area | Rare drop |
 | 30 | Heart of the Grove | Heal | Huge single heal, 10-minute cooldown | Quest |
 
+**Cooldowns:** stronger spells have their own cooldown that shrinks as you level past the spell, down to a floor: Mending Touch 8s→4s, Creeping Rot 12s→6s, Tanglefoot 18s→10s, Rootgrip 24s→12s, Barkskin 30s→15s. Thornlash only uses the global cooldown.
+
 **Rank upgrades** replace earlier versions instead of taking book space: Thornlash II at 12, Mending Touch II at 16, Rootgrip II at 24.
 
 **Prototype scope:** levels 1–10 in Zone 1 only need the first 7 abilities. Snare comes before root on purpose: it's the safer kiting tool, and root is the stronger upgrade. Creeping Rot comes at level 2 so armored beetles are beatable early. The full DoT, snare and nuke loop is available by level 3. Default loadout: center Thornlash, then clockwise from up: Mending Touch, Tanglefoot, Creeping Rot, Rootgrip, Barkskin.

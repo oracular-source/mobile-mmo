@@ -50,6 +50,7 @@
   - Copper from kills; sell items or all junk to Marrow the Peddler (tap him up close)
   - Character screen from the Druid frame: Gear, Bags (with compare vs worn item), Journal
   - Spell queue: a spell tapped during the cooldown fires next, ahead of auto-cast
+- v0.7.1: per-spell cooldowns that shrink as you level (Mending Touch 8s→4s, Creeping Rot 12s→6s, Tanglefoot 18s→10s, Rootgrip 24s→12s, Barkskin 30s→15s; Thornlash has none), countdown shown on the buttons
 
 ## Next (see docs/roadmap.md)
 1. Play-test loot pacing: does something worth equipping drop often enough?
