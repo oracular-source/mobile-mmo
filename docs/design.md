@@ -102,6 +102,15 @@ The Druid is the prototype class because it touches every system at once: damage
 
 Tab-target combat is the core mobile bet. It plays well on touch, and it handles lag on cell networks much better than action combat. EverQuest is inspiration for spells and skills, not a rulebook.
 
+### Level difference and resists
+
+Level difference is the main source of danger, like EverQuest. A mob two or more levels above you should feel deadly.
+
+- **Resists:** every targeted spell can be resisted, at any level. Even-level mobs resist about 5% of the time, plus 10% for each level they're above you, down to 2% for much lower mobs. A resist still costs the mana. There are no fizzles.
+- **Durations:** roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones (15% per level, between 25% and 150% of normal).
+- **Harder hits:** mobs above your level hit 15% harder per level; lower ones hit a little softer.
+- **Guards:** town guards attack any mob chasing you that comes near them, so running to the gate is a real escape. If guards do most of the damage, you get no XP or loot.
+
 - **No auto-attack.** Every attack is a spell with a normal mana cost. Tapping an enemy targets it and casts your Tap spell (this can be switched to target-only in Settings).
 - **Smart targeting:** a spell cast with no target picks the nearest enemy. Out of range shows the spell's range ring; there's no auto-walking into range.
 - **Cast times:** most damage and control spells are instant or nearly so and can be used on the move. Heals and big spells need you to stand still.
@@ -150,6 +159,8 @@ Raids come after the MVP, once group dungeons are proven fun.
 
 A blighted marsh-wood just outside the hub city. Each mob teaches one part of the Druid's kit, so the zone doubles as the tutorial. The name is a placeholder until the setting is decided.
 
+Mobs are spread out by level: only level 1–2 near the gate, 2–3 further down the road, 3–5 in the graveyard. The gate camp has three guards (one patrolling the road), Marrow the Peddler with a campfire that doubles resting speed, wall torches, a signpost, and ambient life (crows, frogs, fireflies).
+
 Layout: Hub city → Gate Road (1–3) → either Sunken Graveyard (3–5) or Wolfwood Edge (4–7) → The Mire (6–9) → Ruined Chapel (7–10, zone finale).
 
 | Mob | Level | Area | Behavior | What it teaches | Drops |
@@ -181,7 +192,7 @@ Every class can solo to level cap. Grouping is never required, just clearly wort
 
 ## Progression and builds
 
-The level cap is 30 at launch and gets raised with each expansion. Builds come from choices, not from grinding.
+The level cap is 30 at launch and gets raised with each expansion. Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Target: level 2 in about 10 minutes, level 5 in about 1.3 hours, level 10 in about 10 hours. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP.
 
 - **Stats:** every level gives 3 points to spend on STR, STA, AGI, INT or WIS.
 - **Abilities:** EverQuest-style spellbook. Each class learns 15–20 abilities by level 30 but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
@@ -250,3 +261,7 @@ All durations are rough estimates for a part-time solo developer. If the solo pr
 - [ ] Final monetization model
 - [ ] Solo project, or bring in an artist or programmer?
 - [ ] Is PvP in scope, for example an arena like Dreadmyst's?
+
+## Ideas backlog
+
+See `docs/ideas.md`.

@@ -90,13 +90,14 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.4: Gate Road and the edge of the Sunken Graveyard.
+        Druid prototype v0.5: Gate Road and the edge of the Sunken Graveyard.
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
           <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
-          <li>Kite: snare it, rot it, walk away, nuke it.</li>
+          <li>Kite: snare it, rot it, walk away, nuke it. Higher-level enemies resist more and shrug off roots sooner.</li>
+          <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
           <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
@@ -137,12 +138,18 @@ const T=16,MW=40,MH=30,WW=MW*T,WH=MH*T;
 
 /* ---------- Sprites (12x16 style, one character per pixel) ---------- */
 const PAL={k:'#0b0a0f',n:'#3f6b3a',N:'#2a4a28',o:'#6e4a2a',s:'#d9a77c',y:'#c9a227',m:'#7dffa6',M:'#e6ffee',
-  z:'#6f8a5a',Z:'#4d6640',r:'#4a3b33',e:'#ff3b30',a:'#6b6470',A:'#8d8692',c:'#3b4a6b',C:'#6a82b0',w:'#cfc8b2'};
+  z:'#6f8a5a',Z:'#4d6640',r:'#4a3b33',e:'#ff3b30',a:'#6b6470',A:'#8d8692',c:'#3b4a6b',C:'#6a82b0',w:'#cfc8b2',
+  g:'#7f8a9c',G:'#b5bfcc',b:'#2c3a58',l:'#cfd6e0',D:'#24272e',p:'#5a3d6b',P:'#3e2a4b',x:'#bfbfc8',f:'#1a1820'};
 const SPR={
   druid:["...n.nn.n.m.","..kNNNNNkmMm","..kNsssNk.o.","..kNkskNk.o.","...kNsNk..o.","..knnnnnkso.",".knnonnnnko.",".knnnonnnko.",".knnnnonnko.",".kyyyyyyyko.",".knnNnnNnko.",".knNnnnnNko.",".knnnNnnnko.","..kNnnnNk.o.","..kok.kok.o.","..kkk.kkk.o."],
   dead:["....kkkk....","...kzzzzk...","...kzezek...","...kzZZzk...","....kzzk....","..kkrrrrkk..",".kzkrrrrkzk.",".kzkrrrrkzk.",".kzkrrrrkzk.","..kkrrrrkk..","...krrrrk...","...kzk.zk...","...kzk.kzk..","...kZk..kZk.","..kzzk..kzzk","..kkkk..kkkk"],
   rat:["......kk..","..kkkkaak.",".kaaaaaaek","kAaaaaaak.",".kkakkak..","..k..k...."],
-  beetle:["...k..k...","..kkkkkk..",".kcCccCck.","kcccCCccck","kcCccccCck",".kcccccck.",".k.k..k.k."]
+  beetle:["...k..k...","..kkkkkk..",".kcCccCck.","kcccCCccck","kcCccccCck",".kcccccck.",".k.k..k.k."],
+  guard:["....kkkk..l.","...kGGGGk.l.","..kGGGGGGkl.","...ksksk..l.","...kssssk.l.","..kgbbbbgkl.",".kgkbyybkgsk",".kgkbyybkgl.",".kskbbbbk.l.","..koooooo.l.","..kbbbbbbkl.","..kgg.ggk.l.","..kgk.kgk.l.","..kgk.kgk.l.","..kDk.kDk.l.","..kkk.kkk.l."],
+  peddler:["....kkkk....","...kPPPPk...","..kPPPPPPk..","..kPskskPk..","..kPssssPk..","...kxxxxk...","..kpkxxkpk..",".kpppkkpppk.",".kppppppppk.",".ksppyypppsk",".kpppppppk..",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","...kkkkkk..."],
+  crow:[".ff..","ffff.",".fff.",".f.f."],
+  crowfly:["f...f",".fff.","..f.."],
+  frog:[".n.n.","nnnnn","n...n"]
 };
 function mk(rows,pal,scale){
   scale=scale||1;const h=rows.length,w=rows[0].length;
@@ -152,6 +159,7 @@ function mk(rows,pal,scale){
   return{c:c,f:f,w:c.width,h:c.height};
 }
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
+  guard:mk(SPR.guard,PAL),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2)};
 
 /* ---------- Seeded random (same map every visit) ---------- */
@@ -177,6 +185,9 @@ for(let y=1;y<MH-1;y++)for(let x=3;x<MW-1;x++){
   if(x>=25&&x<=38&&y>=2&&y<=11)continue;
   if(rnd()<0.07)map[y][x]=3;
 }
+// Keep the gate camp (guards, peddler, campfire, signpost) clear of trees.
+for(let y=10;y<=19;y++)for(let x=2;x<=9;x++)if(map[y][x]===3)map[y][x]=0;
+for(let y=11;y<=13;y++)for(let x=15;x<=17;x++)if(map[y][x]===3)map[y][x]=0;
 const tileAt=(px,py)=>{const tx=Math.floor(px/T),ty=Math.floor(py/T);if(tx<0||ty<0||tx>=MW||ty>=MH)return 3;return map[ty][tx]};
 const blocked=(px,py)=>{const t=tileAt(px,py);return t===2||t===3||t===4||t===5};
 
@@ -234,9 +245,10 @@ const TYPES={
   dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:44,hpl:18,dmg:4,dmgl:1.6,spd:9,aggro:48,armor:0},
   gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[4,4],hp:90,hpl:25,dmg:4,dmgl:1.6,spd:24,aggro:50,armor:0.1,named:1}
 };
-// XP needed per level: about 10 even-level kills for level 2, then roughly 15-18 per level.
-// Aim: levels 1-10 in about 3-5 hours across all of Zone 1.
-const need=L=>Math.round(100*Math.pow(L,1.8));
+// XP needed per level, EverQuest-shaped: early levels are quick, later ones slow down a lot.
+// Target at roughly 50 kills an hour: L2 ~10 min, L5 ~1.3 h, L10 ~10 h total.
+const NEED=[0,80,260,670,1680,3800,8400,15400,27200,47500];
+const need=L=>NEED[L]||NEED[NEED.length-1];
 const maxHP=L=>40+12*L, maxMP=L=>40+10*L;
 const GCD=1.5, PSPEED=34;
 
@@ -259,17 +271,25 @@ function findSpot(x0,x1,y0,y1){
   return{x:x0*T,y:y0*T};
 }
 const spawns=[];
-for(let i=0;i<7;i++){const p=findSpot(5,23,9,22);spawns.push({type:'rat',x:p.x,y:p.y,timer:0,mob:null,group:null})}
-for(let i=0;i<5;i++){const p=findSpot(8,31,19,28);spawns.push({type:'beetle',x:p.x,y:p.y,timer:0,mob:null,group:null})}
+function addSpawns(type,n,x0,x1,y0,y1,lv,extra){for(let i=0;i<n;i++){const p=findSpot(x0,x1,y0,y1);spawns.push(Object.assign({type:type,x:p.x,y:p.y,timer:0,mob:null,group:null,lv:lv},extra||{}))}}
+// Near the gate: level 1-2 only, with guards close by.
+addSpawns('rat',5,5,14,9,21,[1,1]);
+addSpawns('beetle',3,5,14,19,26,[2,2]);
+// Middle of the road: level 2-3.
+addSpawns('rat',3,16,24,9,22,[2,2]);
+addSpawns('beetle',4,15,26,19,28,[2,3]);
+addSpawns('beetle',2,28,37,19,27,[3,3]);
+// Sunken Graveyard: level 3-5. Deadly for a fresh Druid. Old Gnawbone can replace a graveyard rat.
+addSpawns('rat',2,27,37,3,11,[3,4],{gy:true});
 for(let g=0;g<3;g++){const p=findSpot(27,37,3,11);for(let k=0;k<2;k++){
   let q={x:p.x+k*14,y:p.y+k*6};if(blocked(q.x,q.y))q=p;
-  spawns.push({type:'dead',x:q.x,y:q.y,timer:0,mob:null,group:'g'+g});}}
+  spawns.push({type:'dead',x:q.x,y:q.y,timer:0,mob:null,group:'g'+g,lv:[3,5]});}}
 const mobs=[];
 function spawn(sp){
   let type=sp.type;
-  if(type==='rat'&&!mobs.some(m=>!m.dead&&m.type==='gnaw')&&Math.random()<0.15)type='gnaw';
-  const T0=TYPES[type],lv=Math.floor(rr(T0.lv[0],T0.lv[1]+1));
-  const m={sp:sp,type:type,def:T0,lv:lv,maxhp:T0.hp+T0.hpl*lv,x:sp.x,y:sp.y,hx:sp.x,hy:sp.y,state:'idle',wt:rr(1,4),wx:sp.x,wy:sp.y,root:0,snare:0,dots:[],atk:1,dir:1,dead:false,walk:0};
+  if(sp.gy&&type==='rat'&&!mobs.some(m=>!m.dead&&m.type==='gnaw')&&Math.random()<0.2)type='gnaw';
+  const T0=TYPES[type],range=type==='gnaw'?T0.lv:(sp.lv||T0.lv),lv=Math.floor(rr(range[0],range[1]+1));
+  const m={sp:sp,type:type,def:T0,lv:lv,maxhp:T0.hp+T0.hpl*lv,x:sp.x,y:sp.y,hx:sp.x,hy:sp.y,state:'idle',wt:rr(1,4),wx:sp.x,wy:sp.y,root:0,snare:0,dots:[],atk:1,dir:1,dead:false,walk:0,pdmg:0,odmg:0};
   m.hp=m.maxhp;sp.mob=m;mobs.push(m);return m;
 }
 spawns.forEach(spawn);
@@ -305,12 +325,12 @@ function engage(m){
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
   if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&dist(o,m)<70){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
 }
-function hitMob(m,dmg,kind,label){
+// src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
+function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
-  floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');
-  log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');
-  engage(m);
+  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
+  else{m.pdmg+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
   if(kind==='direct'&&m.root>0&&Math.random()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
@@ -320,10 +340,12 @@ function killMob(m){
   log('You have slain '+m.def.name+'!','#ffd27a');
   const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
   let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.named?3:1));
+  const credit=m.pdmg>=m.odmg;
   if(player.lvl>=10)xp=0;
+  if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
-  const coin=Math.floor(rr(0,3)+m.lv);if(coin>0)log('You receive '+coin+' copper.','#c9a227');
-  if(m.type==='gnaw')log('Old Gnawbone drops a Gnawed Ring! (+2 STA)','#ff9de2');
+  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0)log('You receive '+coin+' copper.','#c9a227');
+    if(m.type==='gnaw')log('Old Gnawbone drops a Gnawed Ring! (+2 STA)','#ff9de2');}
   if(player.target===m)player.target=null;
   while(player.lvl<10&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
@@ -337,6 +359,8 @@ function killMob(m){
 }
 function hurtPlayer(m){
   let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25);
+  // Higher-level mobs hit much harder; lower-level ones a little softer.
+  const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
   if(player.bark>0)dmg*=0.75;
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;
@@ -377,14 +401,20 @@ function cast(a,quiet){
   return true;
 }
 const castSlot=(i,quiet)=>cast(ABI[loadout[i]],quiet);
+// Every targeted spell can be resisted. Even-level mobs resist 5% of the time, +10% per level above you,
+// down to 2% for much lower mobs. A resist still costs the mana. There are no fizzles.
+function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0.9,0.05+(d>0?d*0.10:d*0.015)))}
+// Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
+const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t){
   const L=player.lvl;
+  if(a.tgt&&Math.random()<resistChance(t)){floatText(t.x,t.y-18,'RESIST','#c8a0ff');log(cap(t.def.name)+' resists your '+a.name+'!','#c8a0ff');engage(t);return;}
   if(a.id==='thorn'){beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:'#9be37a'});burst(t.x,t.y-6,'#9be37a',6);hitMob(t,(8+3*L)*rr(0.85,1.15)*(1-t.def.armor),'direct','Thornlash');}
   else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('Mending Touch heals you for '+h+'.','#7dffa6');}
-  else if(a.id==='root'){t.root=12;burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+' is held by roots.','#c8b07a');engage(t);}
+  else if(a.id==='root'){t.root=12*durMult(t);burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
   else if(a.id==='bark'){player.bark=120;burst(player.x,player.y-6,'#a07850',12,true);log('Your skin hardens like bark.','#c8b07a');}
-  else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');t.dots.push({id:'rot',t:18,next:3,dmg:3+1.6*L});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot.','#9be37a');engage(t);}
-  else if(a.id==='snare'){t.snare=24;burst(t.x,t.y,'#5f9ea0',8);log(cap(t.def.name)+' is tangled and slowed.','#9fd0d0');engage(t);}
+  else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');const dur=18*durMult(t);t.dots.push({id:'rot',t:dur,next:3,dmg:3+1.6*L});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot ('+Math.round(dur)+'s).','#9be37a');engage(t);}
+  else if(a.id==='snare'){t.snare=24*durMult(t);burst(t.x,t.y,'#5f9ea0',8);log(cap(t.def.name)+' is tangled and slowed ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
 }
 
 /* ---------- Input: movement (tap to move, invisible drag joystick) ---------- */
@@ -411,6 +441,8 @@ cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{
 function tapWorld(clientX,clientY){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
+  for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){say(n,pick(LINES[n.kind]));return}}
+  if(Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
   if(best){player.target=best;if(settings.tapCast)castSlot(0);return}
@@ -600,6 +632,93 @@ function nextTarget(){
 $('btab').addEventListener('pointerdown',e=>{e.preventDefault();nextTarget()});
 $('bsit').addEventListener('pointerdown',e=>{e.preventDefault();if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')});
 
+/* ---------- The gate camp: guards, peddler, campfire, signpost, critters ---------- */
+const CAMPFIRE={x:118,y:190}, TORCHES=[{x:24,y:212},{x:24,y:284}];
+const SIGN={x:264,y:206,name:'Signpost',text:'East: Sunken Graveyard. Turn back if the names glow red.'};
+const npcs=[
+  {kind:'guard',name:'Guard Hollis',x:46,y:214,hx:46,hy:214,dir:1,walk:0,target:null,atk:0},
+  {kind:'guard',name:'Guard Bren',x:46,y:282,hx:46,hy:282,dir:1,walk:0,target:null,atk:0},
+  {kind:'guard',name:'Guard Wyck',x:70,y:246,hx:70,hy:246,dir:1,walk:0,target:null,atk:0,patrol:[[70,246],[236,240]],pi:1},
+  {kind:'peddler',name:'Marrow the Peddler',x:94,y:188,hx:94,hy:188,dir:1,walk:0}
+];
+const LINES={
+  guard:['Keep to the road, friend.','Pulled more than you can handle? Run back to the gate. We will deal with it.','The graveyard is no place for the green.','Watch the names. Red means run.','Quiet night. Too quiet.'],
+  peddler:['Sit by my fire. Your mana comes back faster in the warmth.','They say Old Gnawbone ate a whole cart once. Wheels and all.','Rat whiskers, beetle shells... I will buy it all, once my cart is fixed.','Mind the dead after dark. They never tire.']
+};
+const bubbles=[];
+function say(o,text){for(let i=bubbles.length-1;i>=0;i--)if(bubbles[i].o===o)bubbles.splice(i,1);bubbles.push({o:o,text:text,t:0});log(o.name+' says, "'+text+'"','#d8c8ff')}
+const pick=a=>a[Math.floor(Math.random()*a.length)];
+let chatT=12;
+function updateNPCs(dt){
+  npcs.forEach(n=>{
+    if(n.kind!=='guard')return;
+    n.atk=Math.max(0,n.atk-dt);
+    if(n.target&&(n.target.dead||Math.hypot(n.target.x-n.hx,n.target.y-n.hy)>180))n.target=null;
+    // Guards attack any mob chasing you that comes near them: run to the gate when you over-pull.
+    if(!n.target){const m=mobs.find(m=>!m.dead&&m.state==='chase'&&dist(m,n)<75);if(m){n.target=m;if(Math.random()<0.4)say(n,pick(['For the gate!','Back, vermin!','I have this one!']))}}
+    if(n.target){const t=n.target;if(dist(n,t)>12)moveToward(n,t.x,t.y,44,dt);else{n.dir=t.x>n.x?1:-1;if(n.atk<=0){n.atk=1.2;burst(t.x,t.y-6,'#cfd6e0',4);hitMob(t,22+rr(0,8),'melee',n.name,'npc')}}}
+    else if(n.patrol){const p=n.patrol[n.pi];if(moveToward(n,p[0],p[1],14,dt))n.pi=(n.pi+1)%n.patrol.length}
+    else if(Math.hypot(n.x-n.hx,n.y-n.hy)>2)moveToward(n,n.hx,n.hy,30,dt);
+  });
+  chatT-=dt;
+  if(chatT<=0){chatT=rr(22,38);const near=npcs.filter(n=>dist(n,player)<120);if(near.length){const n=pick(near);say(n,pick(LINES[n.kind]))}}
+  for(let i=bubbles.length-1;i>=0;i--){bubbles[i].t+=dt;if(bubbles[i].t>4)bubbles.splice(i,1)}
+}
+const nearFire=()=>Math.hypot(player.x-CAMPFIRE.x,player.y-CAMPFIRE.y)<48;
+
+// Critters: crows on the road that scatter, frogs at the pond, fireflies.
+const critters=[],flies=[];
+function roadSpot(){const tx=4+Math.floor(rnd()*32);return{x:tx*T+rnd()*16,y:roadY(tx)*T+4+rnd()*24}}
+for(let i=0;i<5;i++){const p=roadSpot();critters.push({kind:'crow',x:p.x,y:p.y,hx:p.x,hy:p.y,fly:0,vx:0,vy:0,hide:0,dir:1,pk:rr(0,3)})}
+for(let i=0;i<4;i++){const an=rnd()*Math.PI*2;let x=12*T+8+Math.cos(an)*5.2*T,y=6*T+8+Math.sin(an)*3.6*T;if(blocked(x,y)){x+=Math.cos(an)*12;y+=Math.sin(an)*10}
+  critters.push({kind:'frog',x:x,y:y,hx:x,hy:y,hop:rr(1,4),hide:0,dir:1})}
+for(let i=0;i<16;i++){const nearPond=i<9;flies.push({x:nearPond?12*T+rnd()*7*T-3*T:4*T+rnd()*30*T,y:nearPond?6*T+rnd()*5*T-2*T:3*T+rnd()*24*T,ph:rnd()*6.28,sp:0.4+rnd()*0.6})}
+function updateCritters(dt){
+  critters.forEach(c=>{
+    if(c.hide>0){c.hide-=dt;if(c.hide<=0){if(c.kind==='crow'){const p=roadSpot();c.x=c.hx=p.x;c.y=c.hy=p.y;c.fly=0}else{c.x=c.hx;c.y=c.hy}}return}
+    const d=Math.hypot(c.x-player.x,c.y-player.y);
+    if(c.kind==='crow'){
+      if(!c.fly&&d<30){c.fly=1;c.t=0;c.vx=(c.x>player.x?1:-1)*rr(22,36);c.vy=-rr(26,40);c.dir=c.vx>0?1:-1}
+      if(c.fly){c.t+=dt;c.x+=c.vx*dt;c.y+=c.vy*dt;if(c.t>2.5)c.hide=rr(25,45)}
+      else{c.pk-=dt;if(c.pk<=0){c.pk=rr(1,3);c.dir*=-1}}
+    }else{
+      if(d<24){c.hide=rr(8,14);burst(c.x,c.y,'#6fa0b8',6);return}
+      c.hop-=dt;if(c.hop<=0){c.hop=rr(2,5);const nx=c.hx+rr(-8,8),ny=c.hy+rr(-5,5);if(!blocked(nx,ny)){c.dir=nx>c.x?1:-1;c.x=nx;c.y=ny}}
+    }
+  });
+}
+function drawCamp(){
+  // Campfire logs and stones (the flame is drawn after lighting so it glows).
+  const fx=CAMPFIRE.x,fy=CAMPFIRE.y;
+  lx.fillStyle='#55585f';[[-6,1],[-4,3],[0,4],[4,3],[6,1],[4,-1],[-4,-1]].forEach(p=>lx.fillRect(fx+p[0],fy+p[1],2,1));
+  lx.fillStyle='#3b2a1d';lx.fillRect(fx-4,fy,8,2);lx.fillRect(fx-2,fy-1,4,1);
+  // Peddler's stall: a small cart.
+  lx.fillStyle='#0b0a0f';lx.fillRect(70,182,16,9);lx.fillStyle='#6e4a2a';lx.fillRect(71,183,14,6);lx.fillStyle='#5a3d6b';lx.fillRect(70,178,16,4);
+  lx.fillStyle='#0b0a0f';lx.fillRect(72,190,3,3);lx.fillRect(81,190,3,3);
+  // Signpost.
+  const sx=SIGN.x,sy=SIGN.y;lx.fillStyle='#3b2a1d';lx.fillRect(sx,sy-10,2,10);
+  lx.fillStyle='#0b0a0f';lx.fillRect(sx-6,sy-15,14,7);lx.fillStyle='#6e4a2a';lx.fillRect(sx-5,sy-14,12,5);
+  lx.fillStyle='#cfc8b2';lx.fillRect(sx-3,sy-13,7,1);lx.fillRect(sx-3,sy-11,5,1);lx.fillRect(sx+5,sy-12,1,1);
+  // Torch brackets on the wall.
+  TORCHES.forEach(t=>{lx.fillStyle='#3b2a1d';lx.fillRect(t.x-1,t.y,3,6);lx.fillStyle='#55585f';lx.fillRect(t.x-2,t.y,5,1)});
+}
+function drawCritters(){
+  critters.forEach(c=>{if(c.hide>0)return;
+    if(c.kind==='crow'){const img=c.fly?IMG.crowfly:IMG.crow;const flap=c.fly&&Math.floor(time*10)%2;drawSprite(img,c.x,c.y+(flap?1:0),c.dir,0,false)}
+    else drawSprite(IMG.frog,c.x,c.y,c.dir,0,false);
+  });
+}
+// Drawn after lighting, so they glow in the dark.
+function drawGlows(){
+  const flame=(x,y,big)=>{const k=Math.floor(time*8)%3;lx.fillStyle='#e0611f';lx.fillRect(x-1,y-4-(k===1?1:0),3,4);if(big){lx.fillRect(x-2,y-2,5,2)}lx.fillStyle='#ffb347';lx.fillRect(x,y-3,1,2);if(k!==2){lx.fillStyle='#ffe9a8';lx.fillRect(x,y-2,1,1)}};
+  lx.save();lx.translate(-camX,-camY);
+  flame(CAMPFIRE.x,CAMPFIRE.y,true);
+  TORCHES.forEach(t=>flame(t.x,t.y,false));
+  if(Math.random()<0.3)parts.push({x:CAMPFIRE.x+rr(-2,2),y:CAMPFIRE.y-5,vx:rr(-3,3),vy:-rr(10,18),t:0,life:0.8,col:'#ffb347'});
+  flies.forEach(f=>{const x=f.x+Math.sin(time*f.sp+f.ph)*10,y=f.y+Math.cos(time*f.sp*1.3+f.ph)*6;if(Math.sin(time*2.2+f.ph*3)>0.2){lx.fillStyle='#d8ff8a';lx.fillRect(Math.round(x),Math.round(y),1,1)}});
+  lx.restore();
+}
+
 /* ---------- Update ---------- */
 function update(dt){
   if(player.dead>0){player.dead-=dt;if(player.dead<=0)respawnPlayer();}
@@ -614,17 +733,19 @@ function update(dt){
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
       if(player.cast.time>=a.cast){player.cast=null;
-        if(a.tgt&&(!t||t.dead)){log('Your spell fizzles: no target.','#9aa')}
+        if(a.tgt&&(!t||t.dead)){log('Your target is gone.','#9aa')}
         else if(a.tgt&&dist(player,t)>a.range*1.2){log('Your target moved out of range.','#ff8a80')}
         else if(player.mp<a.mana){log('Not enough mana.','#ff8a80')}
         else{player.mp-=a.mana;applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
-    const fight=inCombat(),L=player.lvl,f=1+L*0.1;
+    const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
+    if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*dt);
     player.bark=Math.max(0,player.bark-dt);
   }
   rangeShow=Math.max(0,rangeShow-dt);
+  updateNPCs(dt);updateCritters(dt);
   spawns.forEach(sp=>{if(!sp.mob){sp.timer-=dt;if(sp.timer<=0)spawn(sp)}});
   mobs.forEach(m=>{
     if(m.dead)return;
@@ -678,11 +799,12 @@ function render(){
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
+  drawCamp();drawCritters();
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
   if(t&&!t.dead){for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}}
-  const ents=mobs.concat([player]).sort((a,b)=>a.y-b.y);
+  const ents=mobs.concat(npcs,[player]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
     if(e===player){
       if(player.dead>0)return;
@@ -693,6 +815,7 @@ function render(){
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
+    if(e.kind){shadow(e.x,e.y,5);const mv=e.target||e.patrol||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
@@ -705,16 +828,18 @@ function render(){
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();
-  // Lighting: dusk with a lantern glow around the Druid, dithered in steps
-  const img=lx.getImageData(0,0,VW,VH),d=img.data;
-  const pxs=player.x-camX,pys=player.y-8-camY,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
+  // Lighting: dusk, with light pools from the Druid's lantern, the campfire and the gate torches, dithered in steps.
+  const img=lx.getImageData(0,0,VW,VH),d=img.data,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
+  const lights=[{x:player.x,y:player.y-8,r:95,w:18},{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30})))
+    .map(l=>({x:l.x-camX,y:l.y-camY,r:l.r*fl,w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
   for(let y=0;y<VH;y++)for(let x=0;x<VW;x++){
-    const dd=Math.hypot(x-pxs,(y-pys)*1.15),v=Math.max(0,1-dd/(95*fl));
-    const L=0.38+v*v*0.9;
-    const q=Math.min(1.1,Math.floor(L*6+bay[(y&3)*4+(x&3)]/16)/6);
-    const o=(y*VW+x)*4;d[o]=Math.min(255,d[o]*q+v*v*18);d[o+1]=d[o+1]*q+v*v*6;d[o+2]=d[o+2]*q*0.95;
+    let L=0.38,warm=0;
+    for(let i=0;i<lights.length;i++){const l=lights[i],dd=Math.hypot(x-l.x,(y-l.y)*1.15);if(dd<l.r){const v=1-dd/l.r,v2=v*v;L+=v2*0.9;warm+=v2*l.w}}
+    const q=Math.min(1.1,Math.floor(Math.min(1.1,L)*6+bay[(y&3)*4+(x&3)]/16)/6);
+    const o=(y*VW+x)*4;d[o]=Math.min(255,d[o]*q+warm);d[o+1]=d[o+1]*q+warm*0.35;d[o+2]=d[o+2]*q*0.95;
   }
   lx.putImageData(img,0,0);
+  drawGlows();
   cx.imageSmoothingEnabled=false;
   cx.drawImage(low,0,0,VW*S,VH*S);
   // Crisp text layer
@@ -722,6 +847,16 @@ function render(){
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
   floats.forEach(f=>{const a=1-f.t/1.1,sx=(f.x-camX)*S,sy=(f.y-camY-f.t*18)*S;cx.globalAlpha=Math.max(0,a);
     cx.font='700 '+Math.round((f.big?15:12)*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
+  bubbles.forEach(b=>{
+    const o=b.o,sx=(o.x-camX)*S,sy=(o.y-22-camY)*S,fs=Math.round(10*dpr),pad=5*dpr,maxW=170*dpr;
+    cx.font=fs+'px ui-monospace,Menlo,monospace';
+    const words=b.text.split(' '),ls=[];let cur='';words.forEach(w=>{const t2=cur?cur+' '+w:w;if(cx.measureText(t2).width>maxW&&cur){ls.push(cur);cur=w}else cur=t2});if(cur)ls.push(cur);
+    const w=Math.max(...ls.map(l=>cx.measureText(l).width))+pad*2,h=ls.length*fs*1.25+pad*2;
+    const bx=Math.max(4,Math.min(cv.width-w-4,sx-w/2)),by=Math.max(4,sy-h);
+    cx.globalAlpha=b.t>3.5?Math.max(0,(4-b.t)*2):1;
+    cx.fillStyle='rgba(20,18,26,0.92)';cx.strokeStyle='#c9a227';cx.lineWidth=1*dpr;cx.beginPath();cx.rect(bx,by,w,h);cx.fill();cx.stroke();
+    cx.fillStyle='#e8e2cf';ls.forEach((l,i)=>cx.fillText(l,bx+w/2,by+pad+fs*0.6+i*fs*1.25));cx.globalAlpha=1;
+  });
   if(player.dead>0){cx.fillStyle='rgba(60,0,0,0.35)';cx.fillRect(0,0,cv.width,cv.height);cx.font='700 '+Math.round(16*dpr)+'px ui-monospace,Menlo,monospace';cx.fillStyle='#ff6b6b';cx.fillText('You have died',cv.width/2,cv.height/2)}
 }
 
