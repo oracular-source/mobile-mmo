@@ -9,7 +9,7 @@ A tab-target fantasy MMO for phones, inspired by EverQuest (camps, pulls, classe
 - Ask before big or hard-to-undo changes (deleting files, restructuring folders, adding new tools or frameworks).
 
 ## Current phase
-Phase 2: solo prototype. Zone 1 (Ashfen Hollow, levels 1–10), one class (Druid), single-player, no server.
+Phase 2: solo prototype. Gate Road, the Sunken Graveyard and Dungeon 1; playable classes Druid and Warrior (Necromancer next); single-player, no server.
 Launch classes (later phases): Warrior, Cleric, Druid, Wizard, Rogue, Necromancer. The full 14-class roster is in the design doc.
 Don't add multiplayer, accounts or server code until I say we're in phase 3.
 
@@ -28,7 +28,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - Work flows through `docs/board.md` (lean): one card at a time, small batches, ideas go to the backlog before any building, defects before features. Update the board's Now/Next, changelog and known issues with every change.
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
-- Game numbers (damage, XP, mob stats) live in the data tables near the top of the script (`AB`, `TYPES`, `need`). Tune there.
+- Game numbers live in data tables near the top of the script: `CLASSES` (stats, abilities, loadouts), `TYPES` (mobs), `ITEMS`, `NEED` (XP). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave).
 
 ## Game rules to protect
 These come from the design pillars. Flag any feature that breaks one.

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>Ashfen Hollow - Druid Prototype</title>
+<title>Ashfen Hollow - Prototype</title>
 <style>
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden;touch-action:none}
@@ -82,7 +82,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <canvas id="c"></canvas>
     <div id="hud">
       <div class="frame" id="pframe" style="pointer-events:auto;cursor:pointer">
-        <div class="row"><span>Druid ▸</span><span id="plv">Lv 1</span></div>
+        <div class="row"><span id="pcls">Druid ▸</span><span id="plv">Lv 1</span></div>
         <div class="bar hp"><i id="php"></i></div>
         <div class="bar mp"><i id="pmp"></i></div>
         <div class="bar xp" style="height:4px"><i id="pxp"></i></div>
@@ -100,17 +100,19 @@ button.active{border-color:#c9a227;color:#ffd27a}
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Druid prototype v0.9: Gate Road and the edge of the Sunken Graveyard.
+        Prototype v0.10: Gate Road, the Sunken Graveyard and Dungeon 1.
+        <div id="clspick" class="seg" style="margin:10px 0 2px"></div>
+        <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
         <ul>
           <li><b>Move:</b> tap the ground to walk there, or drag anywhere to steer. Settings has a hold-to-move option and a visible stick.</li>
           <li><b>Spell pad</b> (bottom corner): tap the center for your main spell, or flick toward any spell on the ring (tapping it works too).</li>
           <li><b>Tap an enemy</b> to target it and cast your Tap spell.</li>
           <li>Auto-cast (on by default) keeps firing your main spell at the enemy you're fighting, so your thumb is free to kite. Toggle it with the Auto pill above the pad.</li>
           <li>Spells with a cast time need you to stand still. Instant spells work on the move.</li>
-          <li>Kite: snare it, rot it, walk away, nuke it. Higher-level enemies resist more and shrug off roots sooner.</li>
+          <li>Higher-level enemies resist (or dodge) more and shrug off roots, snares and stuns sooner.</li>
           <li>Pulled too many? Run back to the gate guards. Tap people and signs to talk to them.</li>
           <li><b>Dungeon 1</b> is behind the crypt door at the back of the graveyard (levels 4 to 7).</li>
-          <li>Tap your <b>Druid</b> frame (top left) for your gear, bags and journal. Loot goes straight into your bags. Walk up to Marrow the Peddler and tap him to sell.</li>
+          <li>Tap your character frame (top left) for your gear, bags and journal. Loot goes straight into your bags. Walk up to Marrow the Peddler and tap him to sell.</li>
           <li><b>Arrange</b> lets you drag spells around the pad. <b>Spells</b> swaps in other spells. <b>Settings</b> has classic buttons and left-handed mode.</li>
         </ul>
         <button id="start" class="go">Enter the Hollow</button>
@@ -130,7 +132,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
 
     <div id="charUI" class="modal">
       <div class="card">
-        <h1>Druid</h1>
+        <h1 id="ctitle">Druid</h1>
         <div class="seg" id="ctabs"><button data-tab="gear">Gear</button><button data-tab="bags">Bags</button><button data-tab="journal">Journal</button></div>
         <div id="cbox"></div>
         <button class="go" data-close="charUI">Done</button>
@@ -170,7 +172,7 @@ const T=16;let MW=40,MH=30,WW=MW*T,WH=MH*T,zoneId='over';
 /* ---------- Sprites (12x16 style, one character per pixel) ---------- */
 const PAL={k:'#0b0a0f',n:'#3f6b3a',N:'#2a4a28',o:'#6e4a2a',s:'#d9a77c',y:'#c9a227',m:'#7dffa6',M:'#e6ffee',
   z:'#6f8a5a',Z:'#4d6640',r:'#4a3b33',e:'#ff3b30',a:'#6b6470',A:'#8d8692',c:'#3b4a6b',C:'#6a82b0',w:'#cfc8b2',
-  g:'#7f8a9c',G:'#b5bfcc',b:'#2c3a58',l:'#cfd6e0',D:'#24272e',p:'#5a3d6b',P:'#3e2a4b',x:'#bfbfc8',f:'#1a1820'};
+  g:'#7f8a9c',G:'#b5bfcc',b:'#2c3a58',l:'#cfd6e0',D:'#24272e',p:'#5a3d6b',P:'#3e2a4b',x:'#bfbfc8',f:'#1a1820',R:'#8f2630'};
 const SPR={
   druid:["...n.nn.n.m.","..kNNNNNkmMm","..kNsssNk.o.","..kNkskNk.o.","...kNsNk..o.","..knnnnnkso.",".knnonnnnko.",".knnnonnnko.",".knnnnonnko.",".kyyyyyyyko.",".knnNnnNnko.",".knNnnnnNko.",".knnnNnnnko.","..kNnnnNk.o.","..kok.kok.o.","..kkk.kkk.o."],
   dead:["....kkkk....","...kzzzzk...","...kzezek...","...kzZZzk...","....kzzk....","..kkrrrrkk..",".kzkrrrrkzk.",".kzkrrrrkzk.",".kzkrrrrkzk.","..kkrrrrkk..","...krrrrk...","...kzk.zk...","...kzk.kzk..","...kZk..kZk.","..kzzk..kzzk","..kkkk..kkkk"],
@@ -180,7 +182,8 @@ const SPR={
   peddler:["....kkkk....","...kPPPPk...","..kPPPPPPk..","..kPskskPk..","..kPssssPk..","...kxxxxk...","..kpkxxkpk..",".kpppkkpppk.",".kppppppppk.",".ksppyypppsk",".kpppppppk..",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","...kkkkkk..."],
   crow:[".ff..","ffff.",".fff.",".f.f."],
   crowfly:["f...f",".fff.","..f.."],
-  frog:[".n.n.","nnnnn","n...n"]
+  frog:[".n.n.","nnnnn","n...n"],
+  warrior:["...kkkkk....","..kGGGGGk...","..kGkkkGk...","..kGsksGk..l","..kGssssk..l",".kkgRRRRgk.l","kbbkRyyRgkkl","kbybRyyRgksk","kyyybRRRgk..","kbybkRRRgk..",".kbkoooook..","..kgg.ggk...","..kgk.kgk...","..kgk.kgk...","..kDk.kDk...","..kkk.kkk..."]
 };
 function mk(rows,pal,scale){
   scale=scale||1;const h=rows.length,w=rows[0].length;
@@ -190,7 +193,7 @@ function mk(rows,pal,scale){
   return{c:c,f:f,w:c.width,h:c.height};
 }
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
-  guard:mk(SPR.guard,PAL),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
+  guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
   crat:mk(SPR.rat,Object.assign({},PAL,{a:'#8a8494',A:'#b5b0bc'})),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
@@ -301,17 +304,35 @@ function dunSpawns(){
 }
 
 /* ---------- Game data (tune numbers here) ---------- */
-// cast: seconds of standing still. 0 = instant (usable while moving).
-const AB=[
-  {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:5,cast:0,cd:null,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke'},
-  {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:9,cd:[8,4,0.5],cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal'},
-  {id:'snare',name:'Tanglefoot',short:'Tangle',lvl:3,mana:6,cd:[18,10,1],cast:0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare'},
-  {id:'rot',name:'Creeping Rot',short:'Rot',lvl:2,mana:8,cd:[12,6,0.75],cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT'},
-  {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:7,cd:[24,12,1.5],cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root'},
-  {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:10,cd:[30,15,1.5],cast:0,col:'#a07850',tgt:0,tag:'Armor'}
-];
+// Classes. Every ability has a "kind" that says what it does; numbers are [base, per level].
+// cast: seconds standing still (0 = instant, usable while moving). cd: [start, floor, seconds shaved per level].
+// dur: [seconds, extra seconds per level after learning it]. Spells grow a little stronger every level.
+const CLASSES={
+  druid:{name:'Druid',sprite:'druid',hp:[40,12],mana:[40,10],ac:0,regen:1,desc:'Nature caster. Kites with snares, roots and rot.',
+    loadout:['thorn','mend','snare','rot','root','bark'],abilities:[
+    {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:5,cast:0,cd:null,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke',kind:'nuke',dmg:[8,3],beam:'#9be37a'},
+    {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:9,cd:[8,4,0.5],cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal',kind:'heal',heal:[15,6]},
+    {id:'snare',name:'Tanglefoot',short:'Tangle',lvl:3,mana:6,cd:[18,10,1],cast:0,range:80,col:'#5f9ea0',tgt:1,tag:'Snare',kind:'snare',dur:[24,1]},
+    {id:'rot',name:'Creeping Rot',short:'Rot',lvl:2,mana:8,cd:[12,6,0.75],cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT',kind:'dot',dmg:[3,1.6],dur:[18,0.5]},
+    {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:7,cd:[24,12,1.5],cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root',kind:'root',dur:[12,0.5]},
+    {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:10,cd:[30,15,1.5],cast:0,col:'#a07850',tgt:0,tag:'Armor',kind:'buff',buff:'bark',dur:[120,0]}]},
+  warrior:{name:'Warrior',sprite:'warrior',hp:[60,16],mana:null,ac:12,regen:1.5,desc:'Armored tank. No mana; skills on cooldowns. Stands and takes the hits.',
+    loadout:['strike','bandage','bash','ham','stance','cleave'],abilities:[
+    {id:'strike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,3],melee:1},
+    {id:'bandage',name:'Bandage',short:'Bandage',lvl:1,mana:0,cast:2,cd:[20,12,1],col:'#e8e2cf',tgt:0,tag:'Heal',kind:'heal',heal:[12,5],melee:1},
+    {id:'throw',name:'Throw Stone',short:'Throw',lvl:1,mana:0,cast:0,cd:[6,4,0.25],range:80,col:'#8d8692',tgt:1,tag:'Pull',kind:'nuke',dmg:[3,1],melee:1,beam:'#cfc8b2'},
+    {id:'bash',name:'Shield Bash',short:'Bash',lvl:2,mana:0,cast:0,cd:[12,8,0.5],range:18,col:'#6a82b0',tgt:1,tag:'Stun',kind:'stun',dmg:[4,1],dur:[2,0.1],melee:1},
+    {id:'ham',name:'Hamstring',short:'Hamstr',lvl:3,mana:0,cast:0,cd:[18,10,1],range:18,col:'#a3252f',tgt:1,tag:'Snare',kind:'snare',dur:[16,1],melee:1},
+    {id:'stance',name:'Defensive Stance',short:'Stance',lvl:6,mana:0,cast:0,cd:[45,30,1.5],col:'#c9a227',tgt:0,tag:'Defense',kind:'buff',buff:'stance',dur:[10,0.5]},
+    {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]}
+};
+const CLS=(function(){let c='druid';try{c=JSON.parse(localStorage.getItem('ashfen-class')||'"druid"')}catch(e){}return CLASSES[c]?c:'druid'})();
+const C=CLASSES[CLS];
+const KEY=k=>CLS==='druid'?'ashfen-'+k:'ashfen-'+k+'-'+CLS; // Druid keeps the original save names
+const AB=C.abilities;
 const ABI={};AB.forEach(a=>ABI[a.id]=a);
 // Each spell's own cooldown shrinks as you level past the level you learned it, down to a floor.
+const at=(arr,a)=>arr[0]+arr[1]*Math.max(0,player.lvl-(a?a.lvl:0)); // value that grows each level
 const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl)):0;
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
@@ -336,57 +357,71 @@ const ITEMS={
   bone:{name:'Brittle Bone',rar:'junk',value:4,stack:true},
   rag:{name:'Grave Rag',rar:'junk',value:2,stack:true},
   cap:{name:'Cloth Cap',slot:'head',rar:'common',ac:1,value:6},
-  robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10},
+  robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10,cls:'druid'},
   legs:{name:'Patched Leggings',slot:'legs',rar:'common',ac:1,value:6},
   sandals:{name:'Worn Sandals',slot:'feet',rar:'common',ac:1,value:5},
   gloves:{name:'Rough Gloves',slot:'hands',rar:'common',ac:1,value:5},
-  oakstaff:{name:'Oak Staff',slot:'weapon',rar:'common',int:1,value:8},
-  charm:{name:'Bone Charm',slot:'offhand',rar:'common',wis:1,value:8},
+  oakstaff:{name:'Oak Staff',slot:'weapon',rar:'common',int:1,value:8,cls:'druid'},
+  charm:{name:'Bone Charm',slot:'offhand',rar:'common',wis:1,value:8,cls:'druid'},
   cring:{name:'Copper Ring',slot:'ring',rar:'common',sta:1,value:8},
   mosscap:{name:'Mossweave Cap',slot:'head',rar:'uncommon',ac:2,wis:1,value:20},
-  barkrobe:{name:'Barkweave Robe',slot:'chest',rar:'uncommon',ac:3,sta:1,wis:2,value:35},
-  thornstaff:{name:'Thornwood Staff',slot:'weapon',rar:'uncommon',int:3,wis:1,value:40},
-  gravecharm:{name:'Gravebloom Charm',slot:'offhand',rar:'uncommon',wis:2,int:1,value:30},
+  barkrobe:{name:'Barkweave Robe',slot:'chest',rar:'uncommon',ac:3,sta:1,wis:2,value:35,cls:'druid'},
+  thornstaff:{name:'Thornwood Staff',slot:'weapon',rar:'uncommon',int:3,wis:1,value:40,cls:'druid'},
+  gravecharm:{name:'Gravebloom Charm',slot:'offhand',rar:'uncommon',wis:2,int:1,value:30,cls:'druid'},
   boots:{name:'Bog-walker Boots',slot:'feet',rar:'uncommon',ac:2,sta:1,value:22},
-  shroud:{name:"Mourner's Shroud",slot:'chest',rar:'rare',ac:4,sta:2,wis:3,int:2,value:90},
+  shroud:{name:"Mourner's Shroud",slot:'chest',rar:'rare',ac:4,sta:2,wis:3,int:2,value:90,cls:'druid'},
+  gravemail:{name:'Gravewarden Mail',slot:'chest',rar:'rare',ac:7,sta:3,str:2,value:90,cls:'warrior'},
   gnawring:{name:'Gnawed Ring',slot:'ring',rar:'named',sta:2,wis:1,value:60},
-  b1staff:{name:'Boss 1 Staff',slot:'weapon',rar:'named',int:5,wis:2,value:120},
-  b1robe:{name:'Boss 1 Robe',slot:'chest',rar:'named',ac:5,sta:2,wis:3,value:120},
-  b1charm:{name:'Boss 1 Charm',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110}
+  b1staff:{name:'Boss 1 Staff',slot:'weapon',rar:'named',int:5,wis:2,value:120,cls:'druid'},
+  b1robe:{name:'Boss 1 Robe',slot:'chest',rar:'named',ac:5,sta:2,wis:3,value:120,cls:'druid'},
+  b1charm:{name:'Boss 1 Charm',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110,cls:'druid'},
+  b1blade:{name:'Boss 1 Blade',slot:'weapon',rar:'named',str:5,sta:2,value:120,cls:'warrior'},
+  b1plate:{name:'Boss 1 Breastplate',slot:'chest',rar:'named',ac:8,sta:3,str:1,value:120,cls:'warrior'},
+  b1shield:{name:'Boss 1 Shield',slot:'offhand',rar:'named',ac:5,sta:2,value:110,cls:'warrior'},
+  rsword:{name:'Rusty Sword',slot:'weapon',rar:'common',str:1,value:8,cls:'warrior'},
+  ishield:{name:'Dented Shield',slot:'offhand',rar:'common',ac:2,value:8,cls:'warrior'},
+  tunic:{name:'Studded Tunic',slot:'chest',rar:'common',ac:3,str:1,value:10,cls:'warrior'},
+  coif:{name:'Chain Coif',slot:'head',rar:'uncommon',ac:3,sta:1,value:22,cls:'warrior'},
+  axe:{name:'Grave-iron Axe',slot:'weapon',rar:'uncommon',str:3,sta:1,value:40,cls:'warrior'},
+  kite:{name:'Kite Shield',slot:'offhand',rar:'uncommon',ac:4,sta:1,value:30,cls:'warrior'},
+  ringmail:{name:'Ringmail Shirt',slot:'chest',rar:'uncommon',ac:5,sta:1,str:1,value:35,cls:'warrior'}
 };
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
-const COMMONS=['cap','robe','legs','sandals','gloves','oakstaff','charm','cring'];
-const UNCOMMONS=['mosscap','barkrobe','thornstaff','gravecharm','boots'];
+const forMe=id=>!ITEMS[id].cls||ITEMS[id].cls===CLS; // personal loot: only gear your class can use drops for you
+const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
+const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0);
 const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',cskel:'bone',boss1:'bone'};
-const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['wis','WIS'],['int','INT']];
+const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['str','STR'],['wis','WIS'],['int','INT']];
 const inv=(function(){
   const d={bags:new Array(BAG_SIZE).fill(null),equip:{},copper:0};
-  try{const v=JSON.parse(localStorage.getItem('ashfen-inv')||'null');
+  try{const v=JSON.parse(localStorage.getItem(KEY('inv'))||'null');
     if(v&&v.v===1){v.bags.forEach((b,i)=>{if(i<BAG_SIZE&&b&&ITEMS[b.id])d.bags[i]=b});Object.keys(v.equip||{}).forEach(k=>{if(ITEMS[v.equip[k]])d.equip[k]=v.equip[k]});d.copper=v.copper|0}}catch(e){}
   return d;
 })();
-const saveInv=()=>{try{localStorage.setItem('ashfen-inv',JSON.stringify({v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper}))}catch(e){}};
+const saveInv=()=>{try{localStorage.setItem(KEY('inv'),JSON.stringify({v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper}))}catch(e){}};
 const stat=k=>Object.values(inv.equip).reduce((t,id)=>t+(ITEMS[id][k]||0),0);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
 const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
 // STA: +3 HP per point. WIS: +3 mana per point.
-const maxHP=L=>40+12*L+stat('sta')*3, maxMP=L=>40+10*L+stat('wis')*3;
+const maxHP=L=>C.hp[0]+C.hp[1]*L+stat('sta')*3, maxMP=L=>C.mana?C.mana[0]+C.mana[1]*L+stat('wis')*3:0;
+const meleeMult=()=>1+stat('str')*0.02; // STR: +2% melee damage and bandage healing per point
 const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false},store.get('ashfen-settings',{}));
-let loadout=store.get('ashfen-loadout',null);
-if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=['thorn','mend','snare','rot','root','bark'];
+let loadout=store.get(KEY('loadout'),null);
+if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=C.loadout.slice();
 const kills=store.get('ashfen-kills',{});
-const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set('ashfen-loadout',loadout);
+const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set(KEY('loadout'),loadout);
 
-const player={cds:{},x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
-const prog=store.get('ashfen-druid',null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
+const player={buffs:{},cds:{},x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
+const PROGKEY=CLS==='druid'?'ashfen-druid':'ashfen-prog-'+CLS;
+const prog=store.get(PROGKEY,null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
 // Test shortcut: open the game with ?level=7 in the address to jump to that level (1-10). Prototype only.
-(function(){const m=/[?&]level=(\d+)/.exec(location.search);if(m){player.lvl=Math.max(1,Math.min(10,+m[1]));player.xp=0;store.set('ashfen-druid',{v:2,lvl:player.lvl,xp:0});}})();
+(function(){const m=/[?&]level=(\d+)/.exec(location.search);if(m){player.lvl=Math.max(1,Math.min(10,+m[1]));player.xp=0;store.set(PROGKEY,{v:2,lvl:player.lvl,xp:0});}})();
 player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
-const save=()=>store.set('ashfen-druid',{v:2,lvl:player.lvl,xp:player.xp});
+const save=()=>store.set(PROGKEY,{v:2,lvl:player.lvl,xp:player.xp});
 
 /* ---------- Spawns ---------- */
 function findSpot(x0,x1,y0,y1){
@@ -490,8 +525,9 @@ function hurtPlayer(m){
   let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25);
   // Higher-level mobs hit much harder; lower-level ones a little softer.
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
-  if(player.bark>0)dmg*=0.75;
-  dmg*=100/(100+stat('ac')*4); // AC from gear softens every hit
+  if(player.buffs.bark>0)dmg*=0.75;
+  if(player.buffs.stance>0)dmg*=0.5;
+  dmg*=100/(100+(stat('ac')+C.ac)*4); // AC from gear (and Warrior plate) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));player.hp-=dmg;
   floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
@@ -516,8 +552,8 @@ function rollLoot(m){
   const lb=m.lv*0.01,r=Math.random(),dun=zoneId==='dun';
   if(r<0.10+lb)got.push(pick(COMMONS));
   else if(r<0.10+lb+(0.025+lb*0.5)*(dun?2:1))got.push(pick(UNCOMMONS));
-  if(m.lv>=4&&Math.random()<(dun?0.03:0.01))got.push('shroud');
-  if(m.type==='boss1'){got.push(pick(['b1staff','b1robe','b1charm']));if(Math.random()<0.5)got.push(pick(UNCOMMONS));if(Math.random()<0.15)got.push('shroud');}
+  if(m.lv>=4&&Math.random()<(dun?0.03:0.01))got.push(pick(RARES));
+  if(m.type==='boss1'){got.push(pick(BOSS1));if(Math.random()<0.5)got.push(pick(UNCOMMONS));if(Math.random()<0.15)got.push(pick(RARES));}
   if(m.type==='gnaw'){got.push('gnawring');if(Math.random()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }
@@ -540,8 +576,9 @@ function cast(a,quiet){
   const own=player.cds[a.id]||0;
   if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
   if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
-  if(player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
+  if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
+  if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
   if(a.tgt){
     t=player.target;
     // Smart targeting: no target means the nearest enemy, preferring one already in range.
@@ -564,14 +601,22 @@ function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0
 // Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
 const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t){
-  const L=player.lvl;
-  if(a.tgt&&Math.random()<resistChance(t)){floatText(t.x,t.y-18,'RESIST','#c8a0ff');log(cap(t.def.name)+' resists your '+a.name+'!','#c8a0ff');engage(t);return;}
-  if(a.id==='thorn'){beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:'#9be37a'});burst(t.x,t.y-6,'#9be37a',6);hitMob(t,(8+3*L)*rr(0.85,1.15)*(1-t.def.armor)*spellMult(),'direct','Thornlash');}
-  else if(a.id==='mend'){const h=Math.round((15+6*L)*rr(0.9,1.1)*spellMult());player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,'#7dffa6',12,true);log('Mending Touch heals you for '+h+'.','#7dffa6');}
-  else if(a.id==='root'){t.root=12*durMult(t);burst(t.x,t.y,'#9b7b3a',8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
-  else if(a.id==='bark'){player.bark=120;burst(player.x,player.y-6,'#a07850',12,true);log('Your skin hardens like bark.','#c8b07a');}
-  else if(a.id==='rot'){t.dots=t.dots.filter(d=>d.id!=='rot');const dur=18*durMult(t);t.dots.push({id:'rot',t:dur,next:3,dmg:(3+1.6*L)*spellMult()});burst(t.x,t.y-6,'#6aa84f',8,true);log(cap(t.def.name)+' begins to rot ('+Math.round(dur)+'s).','#9be37a');engage(t);}
-  else if(a.id==='snare'){t.snare=24*durMult(t);burst(t.x,t.y,'#5f9ea0',8);log(cap(t.def.name)+' is tangled and slowed ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
+  const L=player.lvl,mult=a.melee?meleeMult():spellMult();
+  if(a.tgt&&Math.random()<resistChance(t)){
+    floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
+    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff');engage(t);return;}
+  if(a.kind==='nuke'||a.kind==='stun'){
+    if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});
+    burst(t.x,t.y-6,a.beam||a.col,6);
+    hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult,'direct',a.name);
+    if(a.kind==='stun'&&!t.dead){t.stun=at(a.dur,a)*durMult(t);log(cap(t.def.name)+' is stunned ('+t.stun.toFixed(1)+'s).','#9fb8e0')}
+  }else if(a.kind==='heal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6');}
+  else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
+  else if(a.kind==='snare'){t.snare=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
+  else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
+  else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you ('+Math.round(player.buffs[a.buff])+'s).','#c8b07a');}
+  else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);
+    hits.forEach(m=>{if(Math.random()<resistChance(m)){floatText(m.x,m.y-18,'MISS','#cfd6e0');engage(m)}else hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name)});}
 }
 
 /* ---------- Input: movement (tap to move, invisible drag joystick) ---------- */
@@ -620,7 +665,7 @@ const ctrl=$('controls'),ghost=$('ghost');
 const slotOf=el=>el.dataset.slot==='c'?0:+el.dataset.slot;
 function slotHTML(i,showMana){
   const a=ABI[loadout[i]];
-  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
+  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana&&a.mana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
 }
 let ctrlEls=[];
 function buildControls(){
@@ -729,7 +774,7 @@ function setArranging(on){
 
 /* ---------- Spellbook (drag and drop loadout) ---------- */
 let selected=null,drag=null;
-function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+'</b><small>'+a.tag+' · '+a.mana+' mana · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
+function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+'</b><small>'+a.tag+' · '+(a.mana?a.mana+' mana':'no cost')+' · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
 function renderBook(){
   const book=$('book'),slots=$('slots');
   book.innerHTML='';slots.innerHTML='';
@@ -774,6 +819,7 @@ function renderSettings(){
   const box=$('setbox');
   const seg=(label,key,opts)=>'<h2>'+label+'</h2><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div>';
   box.innerHTML=
+    '<button class="go" id="chgcls" style="margin:0 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
     seg('Controls','scheme',[['pad','Spell pad'],['buttons','Classic buttons']])+
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Tap an enemy','tapCast',[['true','Target + cast'],['false','Target only']])+
@@ -785,6 +831,7 @@ function renderSettings(){
       seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'');
 }
 $('setbox').addEventListener('click',e=>{
+  if(e.target.id==='chgcls'){$('settingsUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
   settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();
@@ -805,7 +852,7 @@ function renderChar(){
   document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
   const L=player.lvl;let h='';
   if(charTab==='gear'){
-    h+='<p class="hint">Level '+L+' Druid · HP '+maxHP(L)+' · Mana '+maxMP(L)+' · '+STAT_KEYS.map(k=>k[1]+' '+stat(k[0])).join(' · ')+' · '+inv.copper+' copper</p>';
+    h+='<p class="hint">Level '+L+' '+C.name+' · HP '+maxHP(L)+(C.mana?' · Mana '+maxMP(L):'')+' · '+STAT_KEYS.map(k=>k[1]+' '+stat(k[0])).join(' · ')+' · '+inv.copper+' copper</p>';
     SLOTS.forEach(sl=>{const id=inv.equip[sl[0]],it=id&&ITEMS[id];
       h+='<div class="jrow" data-act="unequip" data-slot="'+sl[0]+'" style="cursor:pointer"><span class="q">'+sl[1]+'</span><span'+(it?' style="color:'+RAR[it.rar]+'"':' class="q"')+'>'+(it?it.name+' <small class="q">'+itemStats(it)+'</small>':'Empty')+'</span></div>'});
     h+='<p class="hint" style="margin-top:8px">Tap a worn item to take it off. Equip gear from your Bags.</p>';
@@ -982,7 +1029,7 @@ function checkPortals(){
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
     if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
-    if(t===8)prompt('Leave Dungeon 1?','Leaving resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));
+    if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));}
   }
 }
 // Boss 1: a shadow bolt every 8 seconds at range, and it calls two skeletons at half health.
@@ -1014,7 +1061,7 @@ function update(dt){
       if(player.cast.time>=a.cast){player.cast=null;
         if(a.tgt&&(!t||t.dead)){log('Your target is gone.','#9aa')}
         else if(a.tgt&&dist(player,t)>a.range*1.2){log('Your target moved out of range.','#ff8a80')}
-        else if(player.mp<a.mana){log('Not enough mana.','#ff8a80')}
+        else if(a.mana&&player.mp<a.mana){log('Not enough mana.','#ff8a80')}
         else{player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
     for(const k in player.cds)player.cds[k]=Math.max(0,player.cds[k]-dt);
@@ -1023,13 +1070,13 @@ function update(dt){
     // A spell you tapped during the cooldown goes first; auto-cast waits its turn.
     if(player.queued&&(time>player.queued.until||player.dead))player.queued=null;
     if(player.queued&&!player.cast&&player.gcd<=0){const q=player.queued.a;player.queued=null;cast(q);}
-    const at=player.target;
-    if(!player.queued&&settings.autoCast&&at&&!at.dead&&at.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,at)<=(ABI[loadout[0]].range||80)&&player.mp>maxMP(player.lvl)*0.15)castSlot(0,true);
+    const tg=player.target;
+    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
-    if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*dt);
-    player.bark=Math.max(0,player.bark-dt);
+    if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*C.regen*dt);
+    for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
   }
   rangeShow=Math.max(0,rangeShow-dt);
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
@@ -1038,10 +1085,11 @@ function update(dt){
   mobs.forEach(m=>{
     if(m.dead)return;
     for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
-      if(d.next<=0){d.next+=3;hitMob(m,d.dmg*rr(0.9,1.1),'dot','Creeping Rot');if(m.dead)return;}
-      if(d.t<=0){m.dots.splice(i,1);log('Creeping Rot on '+m.def.name+' wears off.','#9aa')}}
-    if(m.root>0){m.root-=dt;if(m.root<=0)log('Rootgrip on '+m.def.name+' wears off.','#ffb37a')}
-    if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('Tanglefoot on '+m.def.name+' wears off.','#9aa')}
+      if(d.next<=0){d.next+=3;hitMob(m,d.dmg*rr(0.9,1.1),'dot',d.name||'Creeping Rot');if(m.dead)return;}
+      if(d.t<=0){m.dots.splice(i,1);log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
+    if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
+    if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('The snare on '+m.def.name+' wears off.','#9aa')}
+    if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1);
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
@@ -1114,8 +1162,9 @@ function render(){
       if(player.dead>0)return;
       shadow(player.x,player.y,5);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
-      drawSprite(IMG.druid,player.x,player.y+1,player.dir,bob,player.sit);
-      if(player.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
+      drawSprite(IMG[C.sprite],player.x,player.y+1,player.dir,bob,player.sit);
+      if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
+      if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
@@ -1209,8 +1258,17 @@ function loop(ts){
 }
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals};
-$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, Druid.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa')});
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem};
+// Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
+(function(){
+  $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
+  $('clspick').innerHTML=Object.keys(CLASSES).map(k=>{const pg=store.get(k==='druid'?'ashfen-druid':'ashfen-prog-'+k,null);return '<button data-cls="'+k+'" class="'+(k===CLS?'active':'')+'">'+CLASSES[k].name+(pg&&pg.v===2?' · Lv '+pg.lvl:'')+'</button>'}).join('');
+  $('clsdesc').textContent=C.desc;
+  $('clspick').addEventListener('click',e=>{const b=e.target.closest('button[data-cls]');if(!b||b.dataset.cls===CLS)return;store.set('ashfen-class',b.dataset.cls);location.reload()});
+  $('start').textContent='Play '+C.name;
+  if(!C.mana)document.querySelector('.bar.mp').style.display='none';
+})();
+$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa')});
 requestAnimationFrame(t=>{last=t;loop(t)});
 })();
 </script>

@@ -67,6 +67,22 @@ The full roster is 14 classic classes, each with one signature mechanic and a re
 
 Bard songs and Enchanter crowd control need touch-specific controls, such as a song playlist that cycles automatically. That's one reason both come after launch.
 
+### Warrior (playable)
+
+Armored tank with no mana: every skill runs on its own cooldown. High HP (60 + 16 per level) and built-in plate armor; STR adds 2% melee damage per point. Melee range is short, and there's no auto-walking, so the Warrior steps in and holds ground instead of kiting.
+
+| Level | Skill | Type | What it does |
+| --- | --- | --- | --- |
+| 1 | Strike | Melee | Main attack, global cooldown only (auto-cast) |
+| 1 | Bandage | Heal | 2s channel, heals over the cast; 20s cooldown, down to 12s |
+| 1 | Throw Stone | Pull | Ranged poke to pull mobs; not in the default loadout |
+| 2 | Shield Bash | Stun | Small hit plus a 2s stun; 12s cooldown, down to 8s |
+| 3 | Hamstring | Snare | Slows the target; 18s cooldown, down to 10s |
+| 6 | Defensive Stance | Defense | Half damage taken for 10s; 45s cooldown, down to 30s |
+| 8 | Cleave | Area | Hits every enemy next to you; 10s cooldown, down to 6s |
+
+**All classes:** abilities grow a little stronger every level after you learn them: more damage and healing, and longer roots, snares and stuns. Each class keeps its own level, bags and loadout, and personal loot only drops gear your class can use.
+
 ### Prototype class: Druid
 
 The Druid is the prototype class because it touches every system at once: damage, healing, crowd control, kiting and travel. If it feels good, the other classes are variations on solved problems.

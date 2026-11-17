@@ -16,26 +16,24 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | --- | --- | --- | --- |
 | 0 | Controls and core combat | You can fight and kite comfortably on your phone | Done (v0.6) |
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
-| 2 | First dungeon | A run is fun enough to repeat | Nearly done (v0.9) |
-| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Next |
+| 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
+| 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | In progress (class system + Warrior done) |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Dungeon 1 re-test** (S): with faster mobs and no leashing, is it a little harder but still fair at level 5–6?
+- **Warrior play-test** (S): does melee feel different from the Druid in a good way? Is the Warrior too tanky or too weak solo?
 
 ## Next
-2. Class system refactor: move Druid-only code into class data (M)
-3. Warrior (M–L)
-4. Necromancer (M–L)
+1. Necromancer: pet class (pet AI is the new system) (L)
+2. Melee feel: hit sparks, small knockback, a swing animation (S)
 
 ## Idea backlog
 Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 | Idea | Value | Effort | Phase |
 | --- | --- | --- | --- |
-| Spells get a little stronger every level: more damage, longer root and snare | H | S | 2 |
 | Buff spells and a buff bar showing active buffs and timers | M | M | 2 |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
@@ -62,6 +60,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.10** Class system: classes are data (stats, abilities, loadout, sprite); abilities are generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave). Spells grow each level: more damage and healing, longer roots, snares and stuns. Each class has its own level, bags and loadout; pick your class on the start screen (or Settings → Change class). **Warrior** added: no mana, high HP, built-in plate armor, Strike, Bandage, Throw Stone, Shield Bash (stun), Hamstring, Defensive Stance, Cleave; STR stat and warrior gear; personal loot only drops gear your class can use; Boss 1 drops a Warrior blade, breastplate or shield for Warriors. Dungeon: the entrance exit is blocked while something is chasing you; the end portal only appears after Boss 1 dies.
 - **v0.9** From the first dungeon play-test: no leashing (mobs chase until someone dies or the guards step in, so running out of range no longer resets them); mobs much faster (24–31 vs the Druid's 34), so kiting needs snares; shorter Dungeon 1 (13 mobs, room 3 is now a quiet passage); dungeon mobs ~10% tougher, Boss 1 +18% HP, shadow bolt every 7s; an ending: Boss 1 leaves a chest (copper + uncommon item) and a way out with a run summary (time, kills, XP, gear).
 - **v0.8.2** Test shortcut: add `?level=7` to the game link to jump to that level (prototype only).
 - **v0.8.1** Performance: lighting is now drawn from pre-made light stamps instead of rewriting every pixel each frame (about 3x faster on a slowed-down test CPU: ~55 ms to ~18 ms per frame); the camera follows a rounded player position so the Druid no longer shimmers; screen resolution capped at 2x; HUD updates 10 times a second.
