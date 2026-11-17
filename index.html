@@ -445,7 +445,7 @@ const GCD=1.5, PSPEED=34;
 
 /* ---------- Saved progress, settings and loadout ---------- */
 const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:210},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:999},store.get('ashfen-settings',{}));
 let loadout=store.get(KEY('loadout'),null);
 if(!Array.isArray(loadout)||loadout.length!==6||!loadout.every(id=>ABI[id]))loadout=C.loadout.slice();
 // Developer tools: open the game once with ?dev in the address to turn them on (?dev=0 turns them off).
@@ -941,7 +941,7 @@ function renderSettings(){
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
-    seg('Zoom (or pinch the screen)','zoom',[[160,'Near'],[210,'Far']])+
+    seg('Zoom (or pinch the screen)','zoom',[[160,'Near'],[999,'Far']])+
     seg('Movement','move',[['drag','Tap + drag stick'],['hold','Hold to move']])+
     (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?
@@ -1243,8 +1243,8 @@ let S=3,VW=160,VH=200,camX=0,camY=0,dpr=1;
 // Zoom: settings.zoom is how many game pixels wide the view should be (bigger = see more).
 // The game scales up by whole steps (S) so pixels stay crisp, so the real width snaps to the nearest step.
 // Resolution cap is 3x (was 2x) so phones get finer zoom steps.
-const ZOOM_MIN=150, ZOOM_MAX=210; // v0.11.6: farthest zoom pulled in two notches (was 320) after play-testing
-function zoomSteps(){const lo=Math.max(2,Math.ceil(cv.width/ZOOM_MAX)),hi=Math.max(lo,Math.floor(cv.width/ZOOM_MIN));return [lo,hi]}
+const ZOOM_MIN=150, ZOOM_MAX=210; // farthest zoom is one notch past a 210-pixel-wide view (tuned by play-test in v0.11.7)
+function zoomSteps(){const lo=Math.max(2,Math.ceil(cv.width/ZOOM_MAX)-1),hi=Math.max(lo,Math.floor(cv.width/ZOOM_MIN));return [lo,hi]}
 function applyZoom(){
   const [lo,hi]=zoomSteps();
   S=Math.min(hi,Math.max(lo,Math.round(cv.width/settings.zoom)));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
