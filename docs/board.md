@@ -38,7 +38,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
-- **Zoom:** default view is about 235 game pixels wide (was 170); players pick Near / Normal / Far or pinch. Bosses draw 2–3x player size.
+- **Zoom:** farthest (and default) view is about 185–195 game pixels wide on most phones (was 170 before v0.11.5; 235–290 in v0.11.5 was too far). Players pick Near / Far or pinch. Bosses draw 2–3x player size.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
@@ -83,6 +83,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.11.6** Zoom out pulled in two notches after play-testing: the farthest view (also the default) is now about 195 game pixels wide on a typical phone instead of up to 290. Settings → Zoom is now Near / Far.
 - **v0.11.5** Zoom and bosses: the view is zoomed out (about 40% more world on screen); **pinch** the map to zoom in or out, or pick Near / Normal / Far in Settings → Zoom (it's remembered). Pinching never walks or targets. Boss 1 draws at 3x player size, and a wide **boss health bar** appears across the top while a boss is fighting you. The camera can now scroll a little past the map's top edge so the top bars never cover you. Sharper screens on 3x phones (finer zoom steps); frame time unchanged in testing.
 - **v0.11.4** Targeting: a **Next ⟳** button right above your spells switches to the next enemy mid-fight (same as the bottom bar's Target). The **1st hit** and **Auto** toggles moved to the top right under the target frame, since they're set between fights. DEV button and cast bar shifted down to make room.
 - **v0.11.3** Joystick fix: while one finger holds the joystick, a quick tap on an enemy with another finger now targets it (and casts your main attack if **1st hit** is on). A second-finger tap on empty ground does nothing, so it never fights the joystick.
