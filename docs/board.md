@@ -19,37 +19,36 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
 | 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Done (v0.11.1) |
-| 3b | Remaining launch classes (Rogue, Cleric, Enchanter) + testing grounds and balance | All six launch classes play like themselves and are roughly even in the sim | Now |
+| 3b | All 14 classes at baseline, in two batches of 5, on one default skin + testing grounds | Every class plays like itself and the sim can run them all | Now |
+| 3c | Balance (overnight sim runs) | All classes roughly even in the sim, anchored on Necro (top) and Cleric (bottom) | Next |
+| 3d | Art redo: mock-ups, lock one character, write the style guide, roll it out to every class and the world | Everything follows one look | Later |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-- **Launch classes baseline** (L, one release per class). Get all six launch classes playable at a baseline before any feel or balance work. Baseline = sprite, 6–8 abilities from level 1 to 8, class gear, Boss 1 drops; it plays like itself, not polished. The class identity pass happens inside each release. In order:
-  1. ~~**Rogue**~~ Done in v0.13; buffed in v0.13.1 after play-test (felt undertuned).
-  2. **Cleric** (pure healer): big slow heals and heals over time, hammer melee, strong vs undead. Slow solo outdoors.
-  3. **Enchanter** (crowd control): mez (sleep until hit), charm (temporary pet that can break free), mana regen. Needs a touch-friendly mez control.
-- Finished: UI and controls pass (v0.11.3–v0.12.1), layout approved on phone.
+Plan changed Nov 17 (owner): build wide first, balance and art later. Classes ship **five at a time** on **one default skin**; the sim tunes numbers overnight; then the art gets redone from one locked character.
+1. **Default skin** (S): one shared body for every class, told apart by color and weapon. New classes use it; existing sprites can stay until the art redo.
+2. **Batch 1 playbooks** (first draft written Nov 17, `docs/playbooks.md`): Cleric, Enchanter, Paladin, Shadow Knight, Wizard. Owner reviews and answers the four questions at the bottom.
 
 ## Next
-Owner asked for these Nov 17, before the rest of the class baseline (Cleric, Enchanter):
-1. ~~**Research notes**~~ Done Nov 17: `docs/research/` (coding practices, MMO lessons). Art and assets research comes later, before the art pass.
-2. ~~**Split `index.html` into files**~~ Done in v0.14: `css/game.css`, `js/` by job, `js/data/` for numbers. Plain scripts sharing one scope instead of ES modules (simpler, and still opens straight from disk). Versioned saves followed in v0.14.1.
-3. ~~**Versioned saves**~~ Done in v0.14.1: one save version number, upgrade steps for old saves, storage problems never crash the game.
-4. ~~**Class combos saved as data**~~ Moved into the testing grounds (card 7), Nov 17: combos get built with the sim that uses them.
-5. Continue Now: Cleric, then Enchanter.
-6. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
-7. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun. Includes each class's `rotation` (solo combo) saved as data next to its abilities, listed in the design doc.
-8. **Balance pass** on all six launch classes using the testing grounds.
-9. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
-10. Milestone 4: start screen polish, fix anything clearly broken.
+1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Follows the playbooks (when X, do Y). Includes fixed-step rules and seeded randomness so runs repeat. Built before batch 1 so new classes get tested as they land.
+2. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin. New rules: undead tag, heal over time, mez, charm, area nuke, small pet, taunt, Tash, Blink/Gate, Divine Aura, Mana Shield. One release.
+3. **Batch 2 playbooks, then build:** Magician, Ranger, Monk, Shaman, Bard. Needs the buff bar (from the backlog) and Bard songs.
+4. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here.
+5. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
+6. **Feel pass:** hit sparks, knockback, animations, sound.
+7. Milestone 4: start screen polish, fix anything clearly broken.
+
+Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), versioned saves (v0.14.1), Rogue (v0.13, v0.13.1).
 
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
 - **Zoom:** farthest (and default) view is about 215–235 game pixels wide on most phones, tuned by play-test (v0.11.5's ~290 was too far, v0.11.6's ~195 too close). Players pick Near / Far or pinch.
 - **Screen layout (v0.12.1):** max 8 ability buttons on screen: 6 on the right (pad or classic) plus slots 7–8 on the left, in joystick and tap-to-move alike. Left column above the chat box: slot 7, slot 8, Sit (kept on screen: Necros sit while the pet and DoTs fight). Top left under the portrait: 1st hit / Auto. Top right: Menu (Spells, Arrange, Settings). No bottom bar. Character = tap the portrait. Target button dropped; Next ⟳ does that job.
+- **Build wide (Nov 17):** all 14 classes reach baseline in batches of 5 on one default skin before balance, art or feel work. Supersedes "one class per release" for this phase.
+- **One boss health bar:** bosses use the normal target frame (top right). The separate wide boss bar was removed in v0.14.2 as redundant.
 - **Launch six (Nov 17):** Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. Enchanter replaces Wizard (more unique); Wizard moves to later.
-- **Classes before feel:** all launch classes reach baseline before animations, sound or feel work.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
@@ -60,7 +59,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | --- | --- | --- | --- |
 | Buff spells and a buff bar. Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
-| Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room | M | S | 2 (with the feel pass) |
+| Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room (no separate boss bar) | M | S | 2 (with the feel pass) |
 | Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
 | Raids | M | L | phase 4+ |
@@ -69,7 +68,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Tough mobs pay better: mire beetles take half damage (armor 0.5) but their Beetle Shell sells for 3 copper, less than a Brittle Bone (4). Raise to ~8 and always drop one; same rule for future armored mobs | M | S | 2 (with milestone 4) |
 | Journal per dungeon: boss drops listed once found, like a bestiary | M | S | 2 |
 | Sound effects (generated, CC0) | H | M | 2 (milestone 4) |
-| Art pass: sprites, tiles and the overall look | H | L | 2 (milestone 4) |
+| Art pass: sprites, tiles and the overall look. Method (Nov 17): mock-ups, lock one character, write a style guide, then roll out | H | L | 2 (milestone 3d) |
 | Simple minimap | M | M | 2 |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
 | Stat points (3 per level) | M | M | later |
@@ -96,6 +95,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.14.2** Removed the wide boss health bar across the top of the screen. Bosses now show only in the regular target frame (top right), like every other mob. Plan change on the board: all 14 classes in batches of 5 on a default skin, then balance, then an art redo. Batch 1 playbooks drafted.
 - **v0.14.1** Safer saves (no gameplay change): all saving goes through one place (`js/save.js`). The save now carries a **version number**, and future changes come with an upgrade step so old characters carry over instead of breaking. Before upgrading, a backup copy of the old save is kept. Half-written or corrupted save entries are cleared instead of lingering. If the phone blocks storage (private browsing) or it's full, the game still runs and keeps progress for that session. Existing characters, levels, bags and settings carry over unchanged.
 - **v0.14** Same game, new insides: `index.html` is split into `css/game.css` and 18 small `js/` files by job (data, map, state, combat, input, UI, world, update, render, dev, main). Game numbers now live in `js/data/` (classes, mobs, items, sprites). Every gameplay random roll goes through one `rng()` so the testing grounds can replay fights later. Headless test: all four classes load, cast every spell, enter Dungeon 1 and loot with no errors, same stats and loadouts as v0.13.1.
 - **Docs (Nov 17)** Research notes in `docs/research/`: coding practices for a no-build browser game (file split, data vs. code, game loop, saves, seeded randomness, phone performance, testing) and MMO lessons (authoritative server, instancing, Koster's laws). No game changes.

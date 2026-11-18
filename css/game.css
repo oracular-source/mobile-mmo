@@ -16,8 +16,6 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 #log{position:absolute;bottom:8px;height:96px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
 #toggles{position:absolute;left:6px;top:calc(62px + env(safe-area-inset-top));display:flex;gap:6px}
 /* Boss health bar: wide, across the top, only while a boss is fighting you */
-#bossbar{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));display:none;pointer-events:none;background:rgba(10,9,14,.85);border:1px solid #6b4a8f;border-radius:6px;padding:4px 8px;font-size:11px;color:#ffd27a}
-#bossbar .bar{height:9px}
 #castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(132px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
 #castbar .bar{height:9px;border:1px solid #3a3343}
 #castbar .bar>i{background:#7dffa6}

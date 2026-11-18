@@ -64,8 +64,8 @@ function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round
 let time=0;
 function render(){
   const pxr=Math.round(player.x),pyr=Math.round(player.y);
-  // The camera may scroll a little past the map's top edge so the top bars (and the boss bar) never cover you.
-  const topPad=Math.round(($('bossbar').style.display==='block'?132:66)*dpr/S);
+  // The camera may scroll a little past the map's top edge so the top bars never cover you.
+  const topPad=Math.round(66*dpr/S);
   camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
@@ -155,9 +155,6 @@ function ui(){
   $('pmp').style.width=(100*player.mp/maxMP(L))+'%';
   $('petrow').style.display=pet?'block':'none';if(pet)$('petbar').style.width=(100*pet.hp/pet.maxhp)+'%';
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
-  // Boss bar: shows while a boss in this zone is alive and fighting (chasing someone).
-  const boss=mobs.find(m=>m.def.boss&&!m.dead&&m.state==='chase'),bb=$('bossbar');
-  if(boss){bb.style.display='block';$('bossname').textContent=cap(boss.def.name)+' · Lv '+boss.lv;$('bosspct').textContent=Math.ceil(100*boss.hp/boss.maxhp)+'%';$('bosshp').style.width=(100*boss.hp/boss.maxhp)+'%'}else bb.style.display='none';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
