@@ -35,11 +35,12 @@ Things all classes share (from the game rules today):
 ---
 
 ## Warrior: the anvil
-**Idea:** stand in it, use cooldowns well, and pull one mob at a time. **Owner's direction (Nov 17): the Warrior is the ultimate tank,** the hardest class in the game to kill. How is open (see the Warrior card on the board); tuned in the balance pass.
+**Idea:** stand in it, use cooldowns well, and pull one mob at a time. **Owner's direction (Nov 17): the Warrior is the ultimate tank,** the hardest class in the game to kill. Owner picked **Hold the Line** (less damage for each mob on you) and **Last Stand** (once a fight, a killing blow leaves you at 1 HP and you can't die for 5s). Both are passives, so no new buttons (built v0.18.2).
 
 **Pull:** Throw Stone, then wait for the mob to come to you.
 
 **Fight, in order:**
+0. Last Stand just went off and Bandage is ready → Bandage (nothing can kill you for 5s, so this is the safest heal of the fight).
 1. Health low and Defensive Stance ready (level 6) → Defensive Stance.
 2. Health low and nothing hitting you → Bandage (2s cast; a hit interrupts it).
 3. The mob is trying to run (low health) → Hamstring.

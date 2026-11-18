@@ -13,7 +13,7 @@ const CLASSES={
     {id:'rot',name:'Creeping Rot',short:'Rot',lvl:2,mana:8,cd:[12,6,0.75],cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT',kind:'dot',dmg:[3,1.6],dur:[18,0.5]},
     {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:7,cd:[24,12,1.5],cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root',kind:'root',dur:[12,0.5]},
     {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:10,cd:[30,15,1.5],cast:0,col:'#a07850',tgt:0,tag:'Armor',kind:'buff',buff:'bark',dur:[120,0]}]},
-  warrior:{name:'Warrior',sprite:'warrior',hp:[60,16],mana:null,ac:12,regen:1.5,desc:'Armored tank. No mana; skills on cooldowns. Stands and takes the hits.',
+  warrior:{name:'Warrior',sprite:'warrior',hp:[60,16],mana:null,ac:12,regen:1.5,holdLine:0.2,holdMax:3,lastStand:{dr:0.75,dur:5},desc:'Armored tank. No mana; skills on cooldowns. Hold the Line: takes 20% less damage for each mob on you (up to 3). Last Stand: once a fight, a killing blow leaves you at 1 HP and you can\'t die for 5s (damage cut by 75%). Hardest class to kill.',
     loadout:['strike','bandage','bash','ham','stance','cleave'],abilities:[
     {id:'strike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,3],melee:1},
     {id:'bandage',name:'Bandage',short:'Bandage',lvl:1,mana:0,cast:2,cd:[20,12,1],col:'#e8e2cf',tgt:0,tag:'Heal',kind:'heal',heal:[12,5],melee:1},

@@ -81,6 +81,7 @@ function hurtPlayer(m){
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
   if(player.buffs.bark>0)dmg*=0.75;
   if(player.buffs.stance>0)dmg*=0.5;
+  dmg=tankMods(dmg);
   dmg*=100/(100+(stat('ac')+C.ac+(player.buffs.ward>0?8:0))*4); // AC from gear (and Warrior plate, and Spirit Ward) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;
@@ -93,7 +94,24 @@ function hurtPlayer(m){
   log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
   unhide('You are no longer hidden.');
   if(player.cast&&rng()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
-  if(player.hp<=0)playerDie(m);
+  if(player.hp<=0&&!lastStand())playerDie(m);
+}
+// Warrior's Last Stand: once a fight, a killing blow leaves you at 1 HP, and for a few seconds nothing can drop you below 1
+// (damage is also cut, so a Bandage in that window sticks). Resets when the fight ends (see update.js).
+function lastStand(){
+  if(player.buffs.laststand>0){player.hp=1;return true}
+  if(!C.lastStand||player.lsUsed)return false;
+  player.hp=1;player.lsUsed=true;player.buffs.laststand=C.lastStand.dur;
+  floatText(player.x,player.y-28,'LAST STAND!','#ffd27a',true);burst(player.x,player.y-8,'#ffd27a',18,true);
+  log('You refuse to fall! Last Stand ('+C.lastStand.dur+'s).','#ffd27a');
+  return true;
+}
+// Warrior passives, used by melee hits and Boss 1's bolt alike.
+function tankMods(dmg){
+  // Hold the Line: the more mobs on you, the less each one hurts (the Shadow Knight heals per mob; the Warrior shrugs per mob).
+  if(C.holdLine)dmg*=1-C.holdLine*Math.min(C.holdMax||4,Math.max(1,fightingMe().length));
+  if(player.buffs.laststand>0)dmg*=1-C.lastStand.dr;
+  return dmg;
 }
 function playerDie(m){
   player.hp=0;player.dead=3;player.cast=null;player.tx=null;player.target=null;player.sit=false;
@@ -101,7 +119,7 @@ function playerDie(m){
   const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
   mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
-  player.buffs={};player.bval={};player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
+  player.buffs={};player.bval={};player.lsUsed=false;player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
   if(pet&&pet.charm)releaseCharm(true);
   else if(pet){log('Your '+petName()+' is gone.','#9aa');pet=null;}
 }

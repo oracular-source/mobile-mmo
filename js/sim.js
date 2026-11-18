@@ -102,6 +102,8 @@ const BOTS={
       if(!B.fighting().length){if(B.near(t,75)&&B.can('throw'))B.use('throw',t);return}
       if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0))B.stop();else B.near(t,14);
       const hitting=B.onMe().filter(m=>dist(m,player)<16&&!(m.stun>0));
+      // Last Stand window: get a Bandage off while nothing can kill you.
+      if(player.buffs.laststand>0&&B.can('bandage')){B.stop();B.use('bandage');return}
       if(B.hp()<0.35&&B.can('stance')){B.use('stance');return}
       if(B.hp()<0.35&&!hitting.length&&B.can('bandage')){B.stop();B.use('bandage');return}
       if(dist(player,t)>18)return;

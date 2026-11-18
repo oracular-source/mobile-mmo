@@ -180,7 +180,7 @@ function render(){
 
 /* ---------- HUD ---------- */
 // Buff bar names and colours come from the abilities that give them (plus a few that aren't on every class).
-const BUFFS={sprint:{short:'Sprint',col:'#7dbbd0'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,col:a.col}});
+const BUFFS={sprint:{short:'Sprint',col:'#7dbbd0'},laststand:{short:'Last Stand',col:'#ffd27a'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,col:a.col}});
 function ui(){
   const L=player.lvl;
   $('plv').textContent='Lv '+L;
@@ -210,6 +210,7 @@ function ui(){
   // Buff bar: one small tag per buff and song on you (seconds left on short ones).
   const bb=$('buffbar');if(bb){const tags=[];
     for(const k in player.buffs){const v=player.buffs[k];if(!(v>0)||k==='hide')continue;const d=BUFFS[k]||{short:k,col:'#cfc8b2'};tags.push('<span style="background:'+d.col+'">'+d.short+(v<100?' '+Math.ceil(v):'')+'</span>')}
+    if(C.holdLine){const n=Math.min(C.holdMax||4,fightingMe().length);if(n)tags.push('<span style="background:#8a9bb5">Hold -'+Math.round(C.holdLine*n*100)+'%</span>')} // Warrior: shows how much Hold the Line is saving you
     (player.songs||[]).forEach(id=>{const a=ABI[id];if(a)tags.push('<span style="background:'+a.col+'">♪ '+a.short+'</span>')});
     const h=tags.join('');if(bb.dataset.h!==h){bb.dataset.h=h;bb.innerHTML=h}
     // Keep the 1st hit / Auto toggles just under the portrait, which grows when buffs wrap to a new line.

@@ -73,6 +73,8 @@ Enchanter touch controls (v0.17): the Mez button puts to sleep the closest awake
 
 Armored tank with no mana: every skill runs on its own cooldown. High HP (60 + 16 per level) and built-in plate armor; STR adds 2% melee damage per point. Melee range is short, and there's no auto-walking, so the Warrior steps in and holds ground instead of kiting.
 
+**Passives (v0.18.2), the ultimate tank:** **Hold the Line:** takes 20% less damage for each mob on you, up to 3 (so 20–60%); counts Boss 1's bolt too. A small tag on the buff bar shows the current cut. **Last Stand:** once a fight, a killing blow leaves you at 1 HP; for 5s nothing can drop you lower and damage is cut by 75%, so a Bandage in that window sticks. Comes back when the fight ends.
+
 | Level | Skill | Type | What it does |
 | --- | --- | --- | --- |
 | 1 | Strike | Melee | Main attack, global cooldown only (auto-cast) |

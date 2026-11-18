@@ -33,6 +33,7 @@ function update(dt){
     const tg=player.target;
     if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!(tg.lost>0)&&!(tg.mez>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
+    if(!fight)player.lsUsed=false; // Last Stand comes back once the fight is over
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
     player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*(player.buffs.clarity>0?1.5:1)*dt); // Clarity: +50% mana regen
     // Heals over time (Cleric's Renew) tick every 2s; each tick also burns nearby undead.

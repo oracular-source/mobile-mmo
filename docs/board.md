@@ -34,11 +34,11 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Now
 1. **Owner play-test:** the ten default-skin classes on the phone (batch 1 from v0.17, batch 2 from v0.18). Notes become cards; bugs get fixed before balance starts.
 2. **Balance** (milestone 3c, L): overnight sim runs across all 14 classes, anchors first (Necro, Cleric), owner plays to judge fun. Yardstick (owner, Nov 17): beating the level-7 Boss 1 at level 6–8 is fine, 9 is borderline, **10 or never needs a look**; losing two skeletons at level 1 is fine. The sim now runs every level 1–10 (v0.18.1). Agreed order, one at a time:
-   1. **Warrior ultimate-tank pass:** owner picked **(d) Hold the Line** (less damage taken for each mob on it) **+ (b) Last Stand** (once a fight, a killing blow leaves you at 1 HP with big damage reduction for 5s). Build both as data, add them to the Warrior bot and playbook, rerun the Warrior sim; target: wins two skeletons and beats Boss 1 by level 8, kills stay slow. Warrior is the only class that never wins two skeletons or Boss 1 at any level, and it's flat: ~42% of its health per even skeleton at every level.
-   2. Rerun the sim for all 14.
+   1. ~~**Warrior ultimate-tank pass**~~ (v0.18.2): Hold the Line + Last Stand built. Two skeletons 10/10 from level 1 (was never); Boss 1 at level 9 (was never; 4/10 at 8). Kills still slow. Owner to play-test; nudge further only if the full rerun says so.
+   2. **Next:** rerun the sim for all 14 (check the Warrior is now the hardest to kill).
    3. **Boss telegraphs** on Boss 1's shadow bolt (backlog card), aimed at the classes that die just short (Rogue, Monk, Shadow Knight, Magician, Wizard: level 10 today).
    4. Per-class touches: Enchanter and Bard can't hurt Boss 1 enough (never by 10); Shaman (level 6) and Ranger (7) too safe; Shadow Knight two skeletons only from level 8.
-Done: batch 2 build (v0.18), batch 2 playbooks (Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
+Done: Warrior pass (v0.18.2), batch 2 build (v0.18), batch 2 playbooks (Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
 ## Next
 1. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
@@ -76,7 +76,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | ~~Buff spells and a buff bar~~ (built v0.18). Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
 | Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room (no separate boss bar) | M | S | 2 (with the feel pass) |
-| **Warrior = ultimate tank** (owner, Nov 17; **picked d + b**, now in Now): hardest class to kill, ahead of the Cleric. Options to pick from: (a) clearly the most health and armor in the game; (b) **Last Stand:** once a fight, a killing blow leaves you at 1 HP with big damage reduction for 5s; (c) **Shield Block:** a chance to block a hit outright, higher with a shield; (d) **Hold the Line:** takes less damage for each mob on it (the opposite of the Shadow Knight healing per mob). Sim target: Warrior survives longest of all classes, kills stay slow | H | S–M | 2 (milestone 3c, balance) |
+| **Warrior = ultimate tank** (owner, Nov 17; **picked d + b**, built v0.18.2): hardest class to kill, ahead of the Cleric. Options to pick from: (a) clearly the most health and armor in the game; (b) **Last Stand:** once a fight, a killing blow leaves you at 1 HP with big damage reduction for 5s; (c) **Shield Block:** a chance to block a hit outright, higher with a shield; (d) **Hold the Line:** takes less damage for each mob on it (the opposite of the Shadow Knight healing per mob). Sim target: Warrior survives longest of all classes, kills stay slow | H | S–M | 2 (milestone 3c, balance) |
 | Magician Air and Water elementals (Air: fast, knocks back and stuns; Water: weak hits, heals you) at levels past 8 | M | S | 2–3 (when levels past 10 exist) |
 | Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
@@ -136,7 +136,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 ## Known issues
 - **Most humanoid monsters are one recoloured sprite:** the crypt skeleton, the Necromancer's skeleton, the Shadow Knight's minion and Boss 1 all reuse the shambling corpse body, so skeletons look like zombies. Rats (grave, crypt, Old Gnawbone) share one 10×6 sprite. Fixed by the monster templates and art pass.
-- **Boss 1 by level (v0.18.1 sim):** fine by 8: Shaman 6, Ranger 7, Druid, Cleric, Paladin 8; borderline: Necro 9; only at 10: Rogue, Shadow Knight, Magician, Monk, Wizard; never: Warrior, Enchanter, Bard. Shadow Knight wins two skeletons only from level 8; Enchanter kills are slow (30–45s a single mob). Tune in the balance pass (order in Now).
+- **Boss 1 by level (v0.18.1 sim):** fine by 8: Shaman 6, Ranger 7, Druid, Cleric, Paladin 8; borderline: Necro 9; only at 10: Rogue, Shadow Knight, Magician, Monk, Wizard; never: Enchanter, Bard. Warrior: level 9 since v0.18.2 (was never). Shadow Knight wins two skeletons only from level 8; Enchanter kills are slow (30–45s a single mob). Tune in the balance pass (order in Now).
 - **Buffs only hit you for now.** "You and everyone nearby" waits for groups; your pet doesn't get them either (Song of Mending does heal the pet).
 - New pets (earth and fire elementals) are one placeholder shape in two colours; Monk fights bare-handed on the default body; Ranger's bow and Bard's lute are tiny overlays.
 - New classes draw on the shared default body, and their pets reuse placeholder art (the minion is a dark recolour of the skeleton; the sword is a tiny sprite).
@@ -149,6 +149,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.18.2** **Warrior: the ultimate tank** (balance pass, step 1). Two passives, no new buttons: **Hold the Line** takes 20% less damage for each mob on you, up to 3 (a "Hold -40%" tag on the buff bar shows it), and counts Boss 1's shadow bolt too. **Last Stand:** once a fight, a killing blow leaves you at 1 HP; for 5s you can't drop lower and take 75% less damage (gold "LAST STAND!" and a buff-bar tag), so Bandage then. It comes back when the fight ends. The Warrior bot Bandages during Last Stand. Sim: two skeletons 10/10 from level 1 (was never), Boss 1 at level 9 (was never), kill times unchanged. No save changes.
 - **Docs (Nov 17)** Map chat decisions: Zone 1 is 2 minutes end to end to start; summoning a named needs a key drop and a per-player cooldown; rares are 1 in 100 spawns; Malrec's dungeon is a crypt under the chapel altar plus cult halls. No game changes.
 - **Docs (Nov 17)** Zone 1 decisions from the owner: about a 2–3 minute walk end to end; rat tunnel and crypt become shared areas with summonable named; the first instanced dungeon moves to Brother Malrec's chapel; a map that fills in as you explore; hidden chests; rare spawns; lore later. New cards: summon the named, rare spawns, hidden chests, explore map. No game changes.
 - **Docs (Nov 17)** Map design deep dive: `docs/research/map-design.md` (Disney weenies, Breath of the Wild, Elden Ring, Dark Souls, Hollow Knight, Zelda, EverQuest's Blackburrow, WoW's Hogger, OSRS): landmarks, hide and reveal, loops over dead ends, easy-at-the-door dungeons, and a Zone 1 layout proposal with a look and a move for each named. Owner decisions logged: gore on, mid-size rats, no hit-stop, Skeleton King, Zone 1 named and rework. No game changes.
