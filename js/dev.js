@@ -18,7 +18,7 @@ function devAct(a){
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='gnaw'){if(zoneId!=='over'){log('Dev: Old Gnawbone lives outside.','#ff8a80');return}const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
   else if(a==='wipe'){if(!devAct.armed){devAct.armed=true;log('Dev: tap Wipe again to erase all saves for every class.','#ff8a80');renderDev();return}
-    Object.keys(localStorage).filter(k=>k.indexOf('ashfen-')===0&&k!=='ashfen-dev').forEach(k=>{try{localStorage.removeItem(k)}catch(e){}});location.reload();return}
+    store.keys().filter(k=>k!=='ashfen-dev').forEach(k=>store.del(k));location.reload();return}
   devAct.armed=false;renderDev();
 }
 function renderDev(){

@@ -16,7 +16,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 ## Tech stack (prototype)
 - Plain HTML, CSS and JavaScript drawn on a canvas, split by job (since v0.14): `index.html` (page and buttons), `css/game.css`, and `js/` files. No build step, no frameworks.
 - The `js/` files are plain scripts (not modules) that share one scope, loaded in the order listed at the bottom of `index.html`. A new file must be added to that list in the right spot, and top-level names must be unique across files. Code that runs at load time can only use things from files above it; code inside functions can use anything.
-- Split rules: `js/data/` holds numbers only, no logic. Game rules (`combat.js`, `update.js`, `world.js`) don't draw or read touch input. Every gameplay random roll uses `rng()` (`js/rng.js`); `rnd()` is the seeded one for the map and spawn spots. Each file starts with a one-line note on what it does.
+- Split rules: `js/data/` holds numbers only, no logic. Game rules (`combat.js`, `update.js`, `world.js`) don't draw or read touch input. All saving goes through `store` in `js/save.js`; if a change alters how something is saved, bump `SAVE_VERSION` and add an upgrade step. Every gameplay random roll uses `rng()` (`js/rng.js`); `rnd()` is the seeded one for the map and spawn spots. Each file starts with a one-line note on what it does.
 - It runs in any phone browser (or opened straight from disk) and is hosted on GitHub Pages from the `main` branch.
 - Later options: Phaser + Capacitor (stay on web, ship to app stores) or Godot 4. Server: Nakama. Decide after the prototype.
 
@@ -53,7 +53,7 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 ## Folder layout
 - `index.html` the page (HUD and menu markup) and the list of scripts
 - `css/game.css` styles
-- `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `dev` (DEV panel), `main` (loop, start screen; loads last)
+- `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `save` (safe storage, save version, upgrade steps for old saves), `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `dev` (DEV panel), `main` (loop, start screen; loads last)
 - `js/data/` numbers only: classes, mobs, items, sprites
 - `docs/` design doc, progress notes, credits
 - `art/` palette, and sprite sheets once we export them

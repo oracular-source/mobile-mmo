@@ -34,14 +34,15 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Next
 Owner asked for these Nov 17, before the rest of the class baseline (Cleric, Enchanter):
 1. ~~**Research notes**~~ Done Nov 17: `docs/research/` (coding practices, MMO lessons). Art and assets research comes later, before the art pass.
-2. ~~**Split `index.html` into files**~~ Done in v0.14: `css/game.css`, `js/` by job, `js/data/` for numbers. Plain scripts sharing one scope instead of ES modules (simpler, and still opens straight from disk). Next up: versioned saves (backlog, S) fits right after this; then class combos.
-3. **Class combos saved as data:** each class gets a `rotation` (its solo combo) next to its abilities, so the sim plays every class the same way it's meant to be played, and the design doc lists them.
-4. Continue Now: Cleric, then Enchanter.
-5. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
-6. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
-7. **Balance pass** on all six launch classes using the testing grounds.
-8. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
-9. Milestone 4: start screen polish, fix anything clearly broken.
+2. ~~**Split `index.html` into files**~~ Done in v0.14: `css/game.css`, `js/` by job, `js/data/` for numbers. Plain scripts sharing one scope instead of ES modules (simpler, and still opens straight from disk). Versioned saves followed in v0.14.1.
+3. ~~**Versioned saves**~~ Done in v0.14.1: one save version number, upgrade steps for old saves, storage problems never crash the game.
+4. **Class combos saved as data:** each class gets a `rotation` (its solo combo) next to its abilities, so the sim plays every class the same way it's meant to be played, and the design doc lists them.
+5. Continue Now: Cleric, then Enchanter.
+6. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
+7. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
+8. **Balance pass** on all six launch classes using the testing grounds.
+9. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
+10. Milestone 4: start screen polish, fix anything clearly broken.
 
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
@@ -83,7 +84,6 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
-| Versioned saves: saves carry a version number and old saves get upgraded instead of breaking; storage errors never crash the game (from research) | H | S | 2 (right after the split) |
 | Fixed-step game rules and seeded randomness, so fights play the same on any phone and the sim gives repeatable numbers (from research) | M | S | 2 (with the testing grounds) |
 
 ## Known issues
@@ -95,6 +95,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.14.1** Safer saves (no gameplay change): all saving goes through one place (`js/save.js`). The save now carries a **version number**, and future changes come with an upgrade step so old characters carry over instead of breaking. Before upgrading, a backup copy of the old save is kept. Half-written or corrupted save entries are cleared instead of lingering. If the phone blocks storage (private browsing) or it's full, the game still runs and keeps progress for that session. Existing characters, levels, bags and settings carry over unchanged.
 - **v0.14** Same game, new insides: `index.html` is split into `css/game.css` and 18 small `js/` files by job (data, map, state, combat, input, UI, world, update, render, dev, main). Game numbers now live in `js/data/` (classes, mobs, items, sprites). Every gameplay random roll goes through one `rng()` so the testing grounds can replay fights later. Headless test: all four classes load, cast every spell, enter Dungeon 1 and loot with no errors, same stats and loadouts as v0.13.1.
 - **Docs (Nov 17)** Research notes in `docs/research/`: coding practices for a no-build browser game (file split, data vs. code, game loop, saves, seeded randomness, phone performance, testing) and MMO lessons (authoritative server, instancing, Koster's laws). No game changes.
 - **v0.13.1** Rogue buff from play-test: **Backstab from Hide one-shots most mobs a level or two below you** (damage 12+4.5/level → 20+7/level). Backstab now also works from any side on a **stunned** mob (double damage) or an **Evaded** one (triple, can't miss, like an ambush), so the combo is Gouge → Backstab and Evade → Backstab with no fiddly stepping around. Stab, Rend and Gouge's cooldown a bit better; Rogue HP 48 + 14/level (was 44 + 13) and AC 8 (was 5).

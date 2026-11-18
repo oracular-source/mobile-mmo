@@ -1,6 +1,6 @@
 // Your character: which class you picked, bags and gear, stats, saves, settings and loadout.
 'use strict';
-const CLS=(function(){let c='druid';try{c=JSON.parse(localStorage.getItem('ashfen-class')||'"druid"')}catch(e){}return CLASSES[c]?c:'druid'})();
+const CLS=(function(){const c=store.get('ashfen-class','druid');return CLASSES[c]?c:'druid'})();
 const C=CLASSES[CLS];
 const KEY=k=>CLS==='druid'?'ashfen-'+k:'ashfen-'+k+'-'+CLS; // Druid keeps the original save names
 const AB=C.abilities;
@@ -16,11 +16,11 @@ const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whiske
 const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['str','STR'],['wis','WIS'],['int','INT']];
 const inv=(function(){
   const d={bags:new Array(BAG_SIZE).fill(null),equip:{},copper:0};
-  try{const v=JSON.parse(localStorage.getItem(KEY('inv'))||'null');
+  try{const v=store.get(KEY('inv'),null);
     if(v&&v.v===1){v.bags.forEach((b,i)=>{if(i<BAG_SIZE&&b&&ITEMS[b.id])d.bags[i]=b});Object.keys(v.equip||{}).forEach(k=>{if(ITEMS[v.equip[k]])d.equip[k]=v.equip[k]});d.copper=v.copper|0}}catch(e){}
   return d;
 })();
-const saveInv=()=>{try{localStorage.setItem(KEY('inv'),JSON.stringify({v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper}))}catch(e){}};
+const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper});
 const stat=k=>Object.values(inv.equip).reduce((t,id)=>t+(ITEMS[id][k]||0),0);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
 const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
@@ -32,7 +32,7 @@ const GCD=1.5, PSPEED=34;
 const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1);
 
 /* ---------- Saved progress, settings and loadout ---------- */
-const store={get(k,d){try{const v=JSON.parse(localStorage.getItem(k)||'null');return v==null?d:v}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+// Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.
 const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:999},store.get('ashfen-settings',{}));
 // 8 ability slots: 0-5 are the spell pad / classic buttons on the right, 6-7 are the small side bar on the left.
 // A slot can be empty (null) when a class has fewer than 8 abilities. Slot 0 (main attack) is never empty.
