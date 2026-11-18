@@ -6,8 +6,8 @@ Short notes on how games (and MMOs especially) are usually built, so our choices
 | --- | --- |
 | [coding-practices.md](coding-practices.md) | How to organize the game's code: splitting files without a build step, data vs. code, the game loop, saves, randomness, phone performance, testing |
 | [mmo-development.md](mmo-development.md) | Lessons from MMO development: the server is the boss, what we can prepare now in single-player, and design "laws" from older online worlds |
-
-Art and assets research comes later, before the art pass (see `docs/board.md`).
+| [progression-and-retention.md](progression-and-retention.md) | The leveling plan so far (cap 30 now, 50 planned, skill tree from 5, 10–12 abilities by 30) and the research behind it: ability pacing, kits that change, retention (Nov 17) |
+| [art-direction.md](art-direction.md) | How to decide the look as a non-artist: visual pillars, mood board, the six style-guide rules, readability tests (Nov 17) |
 
 ## The short version
 1. **Split by job, keep it simple.** Modern phone browsers load JavaScript files directly ("ES modules"), so we can split `index.html` into `css/` and `js/` files with no build tools, and GitHub Pages keeps serving it from the same link.

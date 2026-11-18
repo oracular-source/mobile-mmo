@@ -275,10 +275,11 @@ Every class can solo to level cap. Grouping is never required, just clearly wort
 
 ## Progression and builds
 
-The level cap is 30 at launch and gets raised with each expansion. Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Target: level 2 in about 10 minutes, level 5 in about 1.3 hours, level 10 in about 10 hours. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP.
+The level cap is 30 at launch and gets raised with each expansion; the game is planned as levels 1–50 (31–40 and 41–50 in expansions). Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Target: level 2 in about 10 minutes, level 5 in about 1.3 hours, level 10 in about 10 hours. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP. Leaning (Nov 17, not locked): about 60–80 hours of play to level 30, and never more than about 3 sessions without something new. Plan and research: `docs/research/progression-and-retention.md`.
 
-- **Stats:** every level gives 3 points to spend on STR, STA, AGI, INT or WIS.
-- **Abilities:** EverQuest-style spellbook. Each class learns 15–20 abilities by level 30 but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
+- **Stats:** come from gear. (Leaning, Nov 17: skill points replace the 3 stat points per level.)
+- **Skill tree (leaning, Nov 17):** opens at level 5, 1 point per level. About 30 upgrades per class in three branches tied to its playstyle, so you can afford most but not all. Upgrades change how an ability plays (two skeletons, a DoT that spreads, an extra charge), not "+5%"; pick-one-of-two spots at key points. Abilities still grow a little every level on their own so they keep pace with mobs. Cheap respec in town.
+- **Abilities:** EverQuest-style spellbook. Each class learns about 10–12 abilities by level 30 and 13–15 by 50 (leaning, Nov 17; was 15–20), with similar abilities merged into tree upgrades, but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
 - **Respec:** cheap respecs in town, so experimenting is encouraged.
 - **Gear:** 8 slots (head, chest, legs, feet, hands, weapon, off-hand, ring), with drops from camps, named mobs and dungeon bosses, in rarity tiers (junk, common, uncommon, rare, named). Loot is personal and goes straight to your bags. Stats: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens incoming hits. No gear score gates.
 - **Alts:** an account-wide bank and cosmetic unlocks make leveling a second class feel good.
@@ -287,7 +288,7 @@ The level cap is 30 at launch and gets raised with each expansion. Builds come f
 
 - Swap loaded abilities out of combat only, with a short load time (a few seconds, not EverQuest's long memorizing).
 - Save loadout presets, such as solo, group and raid, and switch with one tap out of combat.
-- Higher ranks replace lower ones (Minor Heal becomes Heal), so the book stays at 15–20 meaningful choices instead of filling with obsolete versions.
+- Higher ranks replace lower ones (Minor Heal becomes Heal), so the book stays at 10–15 meaningful choices instead of filling with obsolete versions.
 - Some abilities are rare drops or quest rewards, not trainer purchases, which gives camps and named mobs another reason to exist.
 
 ## Social and economy

@@ -70,7 +70,6 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Art pass: sprites, tiles and the overall look. Method (Nov 17): mock-ups, lock one character, write a style guide, then roll out | H | L | 2 (milestone 3d) |
 | Simple minimap | M | M | 2 |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
-| Stat points (3 per level) | M | M | later |
 | Level design: the Gate Road is a rough sandbox. Design a real starting area that feels lively and detailed | H | L | after UI and classes |
 | Rest of Zone 1: Wolfwood Edge, the Mire, Ruined Chapel, Greyfang, Brother Malrec | H | L | after classes |
 | Quests and a hub city (Town 1) | M | L | after classes |
@@ -82,6 +81,18 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
+| **Leveling plan (leaning, Nov 17):** plan for level 50, launch at 30; about 60–80 hours to 30; something new every ~3 sessions; 10–12 abilities by 30 and 13–15 by 50. Details: `docs/research/progression-and-retention.md` | H | S | 2 (revisit once real leveling times are known) |
+| **Skill tree from level 5:** 1 point per level, about 30 upgrades per class in 3 branches, pick-one spots, cheap respec. Replaces stat points (stats from gear). Upgrades as generic data kinds (cooldown cut, charge, duration, area, spread). Launch six first | H | L | 2–3 (when levels past 10 exist) |
+| Fold the Druid's 18 abilities into 11 + tree upgrades (list in the progression note); same pass for other classes as they reach 30 | M | M | with the skill tree |
+| Necromancer Bone Pair / Bone Knight as the first pick-one upgrade (sim checks two pets) | H | M | with the skill tree |
+| "Next unlock" preview on level-up and the character screen | M | S | 2 |
+| Collection log for named drops (extends the dungeon journal card) | M | S | 2 |
+| Post-cap side perks (capped, catch-up friendly), harder dungeon tiers | M | L | later |
+| **Pixel art deep dive** (owner, Nov 17): what makes a 2D pixel world feel alive and well designed, looking well beyond MMOs (Stardew Valley and others): ambient life, animation, light, color, readability. Research note in `docs/research/`, then draft character mock-ups as artifacts (no game changes) | H | M | next art step, before 3d |
+| Owner mood board (10–20 references + 3–5 "not this"), see `docs/research/art-direction.md` | H | S | before 3d |
+| Visual pillars agreed and written at the top of `art/palette.md` (draft in the art note) | H | S | before 3d |
+| Palette rebuilt as hue-shifted ramps | M | S | 3d |
+| DEV panel grayscale and silhouette views for readability checks | M | S | 3d |
 | **Boss telegraphs:** a cast bar or timer pops up before a boss's big ability so players see it coming and can counter it (step out, stun, Divine Aura, Feign Death). Adds depth to boss fights | H | M | 2 (with the balance or feel pass) |
 | **Short teleports for everyone:** walking less in general. Some classes get fun travel tools as flavor (Wizard Blink and Gate, Druid circles), not as big unlocks; may live in class passives. Mounts possibly later | M | M | 2–3 |
 | **Class passives:** a small always-on perk per class that adds flavor (travel tools could live here). Not written down yet; owner to describe | M | M | later |
@@ -104,6 +115,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 ## Changelog
 - **Docs (Nov 17)** Rogue's Evade settled as damage (A): playbook updated, the sim runs only that version. No game changes for players.
+- **Docs (Nov 17)** Research notes `docs/research/progression-and-retention.md` (leveling plan: cap 30 now and 50 planned, skill tree from level 5, 10–12 abilities by 30) and `docs/research/art-direction.md` (how to decide the look). design.md progression updated as "leaning"; backlog cards added. No game changes.
 - **v0.17** **Batch 1: five new classes**, each with 8 abilities (levels 1–8), its own gear and Boss 1 drops, on the shared default skin, and a sim bot. Pick them on the start screen. **Cleric:** hammer and heals; every heal also burns nearby undead; Renew (heal over time), Holy Light, Daze, Turn Undead, Greater Heal, Divine Aura (4s immune, can't attack). **Enchanter:** no bolts; Mind Rot, **Mesmerize** (sleeps the closest extra mob coming at you; sleeping mobs show Zz and a timer; any hit wakes them), a floating sword pet, Slow Mind (slower moving and attacking), Clarity, **Charm** (a mob fights for you, the pet bar turns pink and counts down, then it breaks free and comes for you), Color Flash (area stun), Phantasm (decoy). **Paladin:** Lay on Hands, Holy Bash, Mend, Smite Undead, Taunt, **Consecrate** (gold ring on the floor: heals you inside, burns undead), Divine Strike. **Shadow Knight:** Siphon, Disease Cloud, Terror, a small minion, **Harm Touch** (costs 20% of your health), Feign Death, **Dark Cleave** (heals per mob hit). **Wizard:** Frost Bolt **chills** (stacking slow), Freeze, **Shatter** (huge on a frozen mob), Blink, Fireball, Frost Nova, Mana Shield, Gate (home to the guards). Mobs now have an **undead** tag (corpses, skeletons, Boss 1), shown in the target frame. Buffs now end when you die. Target frame names each DoT. No save changes; existing characters are untouched. Sim results in `docs/sim-results.md`.
 - **v0.16** **Testing grounds and sim** (developer tools only; no gameplay or save changes). DEV panel → **Testing grounds**: **Go there** opens an empty walled arena (exit circle bottom left); **Rat / Beetle / Skeleton / Two skeletons / Boss 1** spawn a test fight at your level; **Bot plays me** lets the playbook bot play your character live in the arena; **Run sim** fights every scenario 10 times at levels 1, 4 and 8 for your class (about a minute) and shows kill time, rest time, damage taken, mana used, deaths and how much health the mobs had left when you lost. Bots for Druid, Warrior, Necromancer and Rogue (both Evade versions) follow `docs/playbooks.md`. The sim runs in fixed steps (30 per second) with seeded random rolls, so the same seed gives the same fight; your character, bags, journal and saves are put back afterward. First results: `docs/sim-results.md`.
 - **v0.15** **Default skin:** one shared body for every class, told apart by clothes colour, trim, hair and weapon (staff, sword, mace, dagger, shield). New classes get it automatically by having an entry in `SKINS` (`js/data/sprites.js`) and no own sprite; the four current classes keep their sprites until the art redo. Colours are ready for all nine classes so far (the four current ones plus Cleric, Enchanter, Paladin, Shadow Knight, Wizard). DEV panel → **Look**: a **Default skin** toggle shows your class on the shared body, and a gallery shows all nine side by side. No gameplay or save changes.
