@@ -43,7 +43,7 @@ Done: boss telegraph (v0.18.3), Warrior pass (v0.18.2), batch 2 build (v0.18), b
 **Map chat (world design, runs alongside the build):** Zone 1 rework is designed in `design.md` (Zone 1, Dungeon 1) and `docs/research/map-design.md`; rough layout in the "Mobile MMO — Zone 1 layout (rough)" sketch. Next for the map chat: owner reacts to the sketch on the phone, then a second layout pass (areas, roads, camps, chest and rare spots). Malrec's dungeon is designed (4 rooms, Malrec level 11; `design.md` Dungeon 1). No game changes until the owner says build.
 
 ## Next
-1. **Gear-look ladder mock-up** (character chat, next): on the character-looks canvas, one class per armour group (Druid cloth, Rogue leather, Cleric chain, Warrior plate) in take 1, across tiers 0–4 from rags and sticks to named, plus one earned cosmetic over gear. Owner picks gear-shows vs cosmetics-only from it. Artifact only, no game changes.
+1. **Gear-look ladder** (character chat): **Necromancer draft done** ("Necromancer: rags to named" board on the character-looks canvas: tiers 0 rags, 1 worn, 2 crafted, 3 fine, 4 named; outline grows, materials get richer, light from tier 3). Owner judges it on the phone and confirms gear-shows-by-tier. If yes: the same ladder for Rogue (leather), Cleric (chain) and Warrior (plate), then lock the golden character for 3d. Artifact only, no game changes.
 2. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
 3. **Feel pass:** hit sparks, knockback, animations, sound.
 4. Milestone 4: start screen polish, fix anything clearly broken.
@@ -157,6 +157,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Character chat: Necromancer gear-look ladder drafted (tiers 0–4, rags to named) on the character-looks canvas. No game changes.
 - **Docs (Nov 17)** Character chat: look set to the A+B mix, take 1 (normal heads); which classes show faces; everyone starts in rags and sticks. New card: gear shows by tier (recommendation, owner to confirm). Next: gear-look ladder mock-up. No game changes.
 - **Docs (Nov 17)** Character chat: research note `docs/research/characters-and-spells.md` (shape and silhouette, one signature per class, faces hidden vs shown, three-beat spells, stacked feedback and sound, paper-doll cost) and the "Mobile MMO — Character looks" canvas: six looks (A Grave Lantern, B Hollow Saints, C Wicker & Moss, D Storybook Norrath, E Neon Drifters, F Plague & Brass), then two A+B mix takes and a prestige cosmetics sample. Owner leaning logged (A+B mix, B's spell). New card: prestige cosmetics. No game changes.
 - **Docs (Nov 17)** Backlog card: solo vs group tuning for dungeons, plus difficulty tiers (phase 3). No game changes.
