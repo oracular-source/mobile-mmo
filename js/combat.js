@@ -2,8 +2,18 @@
 // No drawing or touch input here.
 'use strict';
 /* ---------- Combat ---------- */
-let pet=null; // Necromancer's skeleton
-const victim=m=>(pet&&m.threat.pet>m.threat.p)?pet:player;
+let pet=null; // your one pet: Necro skeleton, Shadow Knight minion, Enchanter sword, or a charmed mob
+let decoy=null; // Enchanter's Phantasm: a see-through copy of you that nearby mobs attack for a few seconds
+const grounds=[]; // Paladin's Consecrate circles on the floor
+const victim=m=>(decoy&&dist(m,decoy)<110)?decoy:(pet&&m.threat.pet>m.threat.p)?pet:player;
+const petName=()=>pet?(pet.name||'skeleton'):'skeleton';
+const isUndead=m=>!!(m&&m.def.undead);
+// Divine Aura blocks all damage; Mana Shield takes damage out of your mana first. Returns what's left to hit your health.
+function shieldDmg(dmg){
+  if(player.buffs.aura>0){floatText(player.x,player.y-20,'IMMUNE','#ffd27a');return 0}
+  if(player.buffs.mshield>0&&player.mp>0){const soak=Math.min(player.mp,dmg);player.mp-=soak;dmg-=soak;floatText(player.x+6,player.y-24,'-'+Math.round(soak)+' mana','#7dbbff');if(player.mp<1){player.buffs.mshield=0;log('Your Mana Shield collapses.','#ffb37a')}}
+  return dmg;
+}
 // Rogue helpers. "Behind" = on the side the mob's back faces (mobs face left or right).
 const hidden=()=>player.buffs.hide>0;
 const behind=m=>(player.x-m.x)*(m.dir||1)<-2;
@@ -23,8 +33,10 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
-  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*3+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(rng()<0.35)log('Your skeleton hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
+  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*3+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(rng()<0.35)log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
+  // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
+  if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
   if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
@@ -64,8 +76,8 @@ function hurtPlayer(m){
   if(player.buffs.stance>0)dmg*=0.5;
   dmg*=100/(100+(stat('ac')+C.ac)*4); // AC from gear (and Warrior plate) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
-  dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;player.hp-=dmg;
-  floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
+  dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;
+  if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
   log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
   unhide('You are no longer hidden.');
   if(player.cast&&rng()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
@@ -77,29 +89,60 @@ function playerDie(m){
   const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
   mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
-  if(pet){log('Your skeleton crumbles to dust.','#9aa');pet=null;}
+  player.buffs={};player.hots=[];decoy=null;grounds.length=0; // buffs (Clarity, Barkskin...) last until you die
+  if(pet&&pet.charm)releaseCharm(true);
+  else if(pet){log('Your '+petName()+' is gone.','#9aa');pet=null;}
 }
 function hurtPet(m){
   let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25)*100/(100+pet.ac*4);
   dmg=Math.max(1,Math.round(dmg));pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a');
-  if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);log('Your skeleton crumbles to dust. Cast Raise Bones for another.','#ffb37a');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
+  if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);
+    if(pet.charm){const cm=pet.charm;cm.dead=true;cm.sp.mob=null;cm.sp.timer=cm.sp.noRespawn?Infinity:24;log('Your charmed '+cm.def.name.replace(/^an? /,'')+' is slain.','#ffb37a')}
+    else log('Your '+petName()+' is destroyed.','#ffb37a');
+    pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
 }
-function raisePet(){
-  const L=player.lvl,hp=30+14*L;
-  pet={kind:'pet',x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:3+1.6*L,ac:6+L,atk:0,target:null};
+// A summon's numbers come from its ability's pet:{} data (no data = the Necro's skeleton). One pet at a time.
+function raisePet(def){
+  const L=player.lvl;def=def||{name:'skeleton',img:'pet',hp:[30,14],dmg:[3,1.6],ac:6};
+  if(pet&&pet.charm)releaseCharm();
+  const hp=Math.round(def.hp[0]+def.hp[1]*L);
+  pet={kind:'pet',name:def.name,img:def.img,x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:def.dmg[0]+def.dmg[1]*L,ac:def.ac+L,atk:0,rate:def.atk||1.8,life:def.life||0,target:null};
   if(blocked(pet.x,pet.y)){pet.x=player.x;pet.y=player.y}
-  burst(pet.x,pet.y-6,'#7dffa6',16,true);log('A skeleton claws its way out of the ground to serve you.','#b48cff');
+  burst(pet.x,pet.y-6,'#7dffa6',16,true);
+  log(def.img==='blade'?'A sword lifts into the air and floats beside you.':'A '+def.name+' claws its way out of the ground to serve you.','#b48cff');
+}
+// Charm: the mob leaves the enemy list and becomes your pet until the charm runs out. Then it breaks free and always comes for you.
+function charmMob(m,dur){
+  if(pet&&pet.charm)releaseCharm();
+  const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1);
+  mobs.forEach(o=>{if(o.threat)o.threat.pet=0});
+  if(player.target===m)player.target=null;
+  const d=m.def.dmg+m.def.dmgl*m.lv;
+  pet={kind:'pet',charm:m,name:m.def.name.replace(/^an? /,''),img:m.def.img,x:m.x,y:m.y,dir:m.dir,walk:0,hp:m.hp,maxhp:m.maxhp,dmg:d*1.3,ac:6+m.lv,atk:0,rate:2,charmT:dur,charmMax:dur,target:null};
+  burst(m.x,m.y-6,'#ff9de2',14,true);log(cap(m.def.name)+' is charmed and fights for you ('+Math.round(dur)+'s). When it breaks free, it comes for YOU.','#ff9de2');
+}
+function releaseCharm(quiet){
+  if(!pet||!pet.charm)return;
+  const m=pet.charm;
+  // It comes back where your pet stood, with your pet's health, and nothing from before still on it.
+  Object.assign(m,{x:pet.x,y:pet.y,hp:Math.max(1,Math.round(pet.hp)),dots:[],mez:0,stun:0,fear:0,root:0,snare:0,lost:0,aslow:0,chill:0});
+  pet=null;mobs.push(m);
+  if(quiet||player.dead){m.state='return';m.threat={p:0,pet:0};return}
+  m.state='chase';m.threat={p:999,pet:0};m.atk=1;
+  burst(m.x,m.y-6,'#ff4d4d',12);floatText(m.x,m.y-26,'FREE!','#ff4d4d');log(cap(m.def.name)+' breaks free of your charm and turns on YOU!','#ff4d4d');
 }
 // The skeleton follows you, attacks whatever you're fighting, and holds aggro: its hits count triple for threat, plus a bonus on its first hit.
 function updatePet(dt){
   if(!pet)return;
   pet.atk=Math.max(0,pet.atk-dt);
-  if(pet.target&&pet.target.dead)pet.target=null;
+  if(pet.charm){pet.charmT-=dt;if(pet.charmT<=0){releaseCharm();return}}
+  if(pet.life){pet.life-=dt;if(pet.life<=0){burst(pet.x,pet.y-6,'#cfd6e0',8);log('Your '+petName()+' falls to the ground.','#9aa');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});return}}
+  if(pet.target&&(pet.target.dead||pet.target.mez>0||mobs.indexOf(pet.target)<0))pet.target=null; // never wake a sleeping mob
   if(!pet.target){const pt=player.target;
-    if(pt&&!pt.dead&&pt.state==='chase')pet.target=pt;
-    else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
+    if(pt&&!pt.dead&&pt.state==='chase'&&!(pt.mez>0))pet.target=pt;
+    else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
   const t=pet.target;
-  if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=1.8;burst(t.x,t.y-6,'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee','skeleton','pet')}}}
+  if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=pet.rate||1.8;burst(t.x,t.y-6,'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee',petName(),'pet')}}}
   // Follow with a dead zone: start walking past 30px, stop once close to its spot. One threshold made it stop and start every frame (the jitter).
   else{const d=dist(pet,player);if(d>30)pet.follow=true;
     if(pet.follow){const fx=player.x-12*player.dir,fy=player.y+4;if(moveToward(pet,fx,fy,d>60?52:40,dt)||Math.hypot(pet.x-fx,pet.y-fy)<6)pet.follow=false;}
@@ -152,15 +195,25 @@ function cast(a,quiet){
   if(a.kind==='stealth'&&hidden()){if(!quiet)log('You are already hidden.','#9aa');return false}
   if(a.kind==='stealth'&&fightingMe().length){if(!quiet)log("You can't hide while something is fighting you. Try Evade first.",'#9aa');return false}
   if(a.kind==='evade'&&!fightingMe().length){if(!quiet)log('Nothing is fighting you.','#9aa');return false}
-  if(a.kind==='petheal'&&!pet){if(!quiet)log('You have no skeleton to mend.','#9aa');return false}
+  if(a.kind==='petheal'&&(!pet||pet.charm||pet.img==='blade')){if(!quiet)log('You have no skeleton to mend.','#9aa');return false}
+  // Divine Aura: nothing can hurt you, but you can't attack either (heals and buffs still work).
+  if(player.buffs.aura>0&&!/^(heal|hot|buff)$/.test(a.kind)){if(!quiet)log("You can't attack inside Divine Aura.",'#9aa');return false}
+  if(a.hpCost&&player.hp<=maxHP(player.lvl)*a.hpCost+1){if(!quiet)log('Not enough health for '+a.name+'.','#ff8a80');return false}
   if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
   if(a.tgt){
     t=player.target;
+    // Mesmerize goes on the closest awake mob coming at you that you are NOT fighting, so you can keep hitting your target.
+    // With no extra mob around, it uses your target. Your target never changes.
+    let picked=false;
+    if(a.kind==='mez'){const ex=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&m!==player.target&&!m.def.boss&&dist(m,player)<=a.range).sort((x,y)=>dist(x,player)-dist(y,player))[0];if(ex){t=ex;picked=true}}
     // Smart targeting: no target means the nearest enemy, preferring one already in range.
-    if(!t||t.dead){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
+    if(!picked&&(!t||t.dead)){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
     if(!t){if(!quiet)log('No enemy nearby.','#9aa');return false}
     if(dist(player,t)>a.range){if(!quiet){log('Out of range. Move closer.','#ff8a80');floatText(player.x,player.y-24,'Out of range','#ff8a80')}rangeShow=0.8;rangeR=a.range;return false}
     if(a.kind==='backstab'&&!hidden()&&!behind(t)&&!openTo(t)){if(!quiet){log('Backstab needs you hidden, behind the target, or the target stunned or Evaded.','#ff8a80');floatText(player.x,player.y-24,'Get behind it','#ff8a80')}return false}
+    if(a.undeadOnly&&!isUndead(t)){if(!quiet){log(a.name+' only works on the undead.','#ff8a80');floatText(player.x,player.y-24,'Undead only','#ff8a80')}return false}
+    if((a.kind==='mez'||a.kind==='charm')&&t.def.boss){if(!quiet)log(cap(t.def.name)+' can not be '+(a.kind==='mez'?'mesmerized':'charmed')+'.','#ff8a80');return false}
+    if(a.kind==='charm'&&(t.def.named||t.lv>player.lvl)){if(!quiet)log('Charm only works on ordinary mobs your level or lower.','#ff8a80');return false}
     if(t.x!==player.x)player.dir=t.x>player.x?1:-1;
   }
   if(player.sit)player.sit=false;
@@ -180,20 +233,28 @@ function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0
 const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t,fromHide){
   const L=player.lvl,mult=a.melee?meleeMult():spellMult();
+  if(a.hpCost){const c=Math.round(maxHP(L)*a.hpCost);player.hp=Math.max(1,player.hp-c);floatText(player.x,player.y-20,'-'+c,'#a3252f');log(a.name+' costs you '+c+' health.','#c87a80')}
   // A Backstab from Hide never misses: they didn't see you coming.
   // An Evaded mob counts as an ambush too: Evade, then Backstab.
   if(a.kind==='backstab'&&t&&t.lost>0)fromHide=true;
-  if(a.tgt&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
+  if(a.tgt&&a.kind!=='taunt'&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
     floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
     log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff');engage(t);return;}
   if(a.kind==='nuke'||a.kind==='stun'){
     if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});
     burst(t.x,t.y-6,a.beam||a.col,6);
-    hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult,'direct',a.name);
+    let x=a.undead&&isUndead(t)?a.undead:1;
+    // Shatter: huge on a frozen (rooted) mob and breaks the freeze; weak on anything else.
+    if(a.shatter){if(t.root>0){t.root=0;floatText(t.x,t.y-28,'SHATTER!','#e6f6ff',true);burst(t.x,t.y-6,'#e6f6ff',16,true)}else x*=0.35}
+    hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult*x,a.shatter?'shatter':'direct',a.name);
+    // Chill: each Frost Bolt slows a bit more (up to 4 stacks), wearing off 8s after the last one.
+    if(a.chill&&!t.dead){t.chill=Math.min(4,(t.chill||0)+1);t.chillT=8}
     if(a.kind==='stun'&&!t.dead){t.stun=at(a.dur,a)*durMult(t);log(cap(t.def.name)+' is stunned ('+t.stun.toFixed(1)+'s).','#9fb8e0')}
-  }else if(a.kind==='heal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6');}
+  }else if(a.kind==='heal'){const h=a.full?maxHP(L)-player.hp:Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6');
+    if(a.holy)holyPulse(Math.max(at(a.heal)*mult,h)*a.holy,a.name);}
+  else if(a.kind==='hot'){player.hots=(player.hots||[]).filter(o=>o.id!==a.id);player.hots.push({id:a.id,name:a.name,t:at(a.dur,a),next:2,heal:at(a.heal,a)*mult,holy:a.holy||0});burst(player.x,player.y-6,a.col,10,true);log(a.name+' is on you ('+Math.round(at(a.dur,a))+'s).','#7dffa6');}
   else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
-  else if(a.kind==='snare'){t.snare=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
+  else if(a.kind==='snare'){t.snare=at(a.dur,a)*durMult(t);if(a.aslow)t.aslow=t.snare;burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
   else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you ('+Math.round(player.buffs[a.buff])+'s).','#c8b07a');}
   else if(a.kind==='lifetap'){
@@ -210,11 +271,52 @@ function applyAbility(a,t,fromHide){
     fightingMe().forEach(m=>{m.threat.p=0;m.lost=m.def.boss?d*0.5:d;n++});
     burst(player.x,player.y-6,a.col,10,true);
     log('You slip away. '+n+(n===1?' foe loses':' foes lose')+' track of you for a moment: Hide now to escape, or get behind to Backstab.','#bdbdbd');}
-  else if(a.kind==='pet'){raisePet();}
+  else if(a.kind==='pet'){raisePet(a.pet);}
+  else if(a.kind==='mez'){t.mez=at(a.dur,a)*durMult(t);t.stun=0;if(pet&&pet.target===t)pet.target=null;burst(t.x,t.y-10,a.col,10,true);floatText(t.x,t.y-26,'Zz','#e0c3ff');log(cap(t.def.name)+' falls asleep ('+Math.round(t.mez)+'s). Anything that hits it wakes it.','#e0c3ff');}
+  else if(a.kind==='charm'){charmMob(t,at(a.dur,a));}
+  else if(a.kind==='taunt'){t.threat.p=Math.max(t.threat.p,t.threat.pet+40);engage(t);burst(t.x,t.y-8,a.col,8);floatText(t.x,t.y-26,'TAUNT','#ffb37a');log(cap(t.def.name)+' turns its attention to YOU.','#ffb37a');}
+  else if(a.kind==='decoy'){decoy={x:player.x+12*player.dir,y:player.y,dir:player.dir,t:at(a.dur,a)};burst(decoy.x,decoy.y-6,a.col,14,true);log('A see-through copy of you appears. Nearby enemies attack it instead ('+Math.round(decoy.t)+'s).','#c8a0ff');}
+  else if(a.kind==='ground'){grounds.length=0;grounds.push({x:player.x,y:player.y,r:a.radius,t:at(a.dur,a),next:1,heal:at(a.heal,a)*mult,dmg:at(a.dmg,a)*mult,name:a.name,col:a.col});burst(player.x,player.y,a.col,16,true);log('You consecrate the ground. Stand in it to heal; undead that step in burn.','#ffd27a');}
+  else if(a.kind==='blink'){blink(a.range);burst(player.x,player.y-6,a.col,10,true);}
+  else if(a.kind==='gate'){gateHome();}
   else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your skeleton for '+h+'.','#7dffa6');}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
   else if(a.kind==='feign'){player.fd=4;player.cast=null;player.tx=null;let n=0;mobs.forEach(m=>{if(!m.dead&&m.state==='chase'){m.threat.p=0;n++}});
     log('You fall to the ground, feigning death.'+(n?' Your foes lose interest in you.':''),'#bdbdbd');}
-  else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);
-    hits.forEach(m=>{if(rng()<resistChance(m)){floatText(m.x,m.y-18,'MISS','#cfd6e0');engage(m)}else hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name)});}
+  // Area: hits every mob around you. Depending on the ability it also stuns (Color Flash), freezes (Frost Nova),
+  // hits undead harder (Divine Strike) or heals you per mob hit (Dark Cleave).
+  else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);let healed=0;
+    hits.forEach(m=>{if(rng()<resistChance(m)){floatText(m.x,m.y-18,a.melee?'MISS':'RESIST','#cfd6e0');engage(m);return}
+      if(a.dmg)hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult*(a.undead&&isUndead(m)?a.undead:1),'direct',a.name);else engage(m);
+      if(m.dead)return;
+      if(a.stun){m.stun=at(a.stun,a)*durMult(m);m.mez=0}
+      if(a.root){m.root=at(a.root,a)*durMult(m)}
+      if(a.tapPer)healed+=at(a.tapPer,a)*mult;});
+    if(a.stun&&hits.length)log('A flash of color stuns '+hits.length+(hits.length===1?' enemy.':' enemies.'),'#e8e2cf');
+    if(a.root&&hits.length)log(hits.length+(hits.length===1?' enemy is':' enemies are')+' frozen in place.','#bfe6ff');
+    if(healed>0){const h=Math.round(healed);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff')}}
+}
+
+// Cleric's twist: holy power from a heal burns every undead fighting near you.
+function holyPulse(amount,name){
+  const near=mobs.filter(m=>!m.dead&&isUndead(m)&&m.state==='chase'&&dist(m,player)<=40);
+  if(!near.length)return;
+  burst(player.x,player.y-6,'#fff3c4',10,true);
+  near.forEach(m=>hitMob(m,amount*rr(0.9,1.1)*(1-m.def.armor),'holy',name+' (holy)'));
+}
+// Blink: a short teleport the way you last moved (or faced). Stops early at a wall.
+function blink(range){
+  const fx=player.fx||player.dir,fy=player.fy||0,d=Math.hypot(fx,fy)||1;let n=0;
+  for(let s=2;s<=range;s+=2){const x=player.x+fx/d*s,y=player.y+fy/d*s;if(blocked(x,y))break;n=s}
+  player.x+=fx/d*n;player.y+=fy/d*n;player.tx=null;
+  log('You blink.','#c8e8ff');
+}
+// Gate: home to the Gate Road guards. Every fight ends (mobs forget you). In Dungeon 1 this leaves the run.
+function gateHome(){
+  log('You gate home to the Gate Road.','#c8a0ff');
+  mobs.forEach(o=>{if(!o.dead&&o.state==='chase'){o.threat.p=0;o.state='return'}});
+  if(zoneId!=='over')enterZone('over');
+  player.x=3.5*T;player.y=15*T+8;player.target=null;
+  if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null}
+  burst(player.x,player.y-6,'#c8a0ff',16,true);
 }

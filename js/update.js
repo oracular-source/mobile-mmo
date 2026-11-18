@@ -14,8 +14,8 @@ function update(dt){
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     const steering=mx!==0||my!==0;
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}}
-    if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,pSpeed(),dt);}
-    else if(player.tx!==null){if(moveToward(player,player.tx,player.ty,pSpeed(),dt))player.tx=null;}
+    if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.fx=mx/d;player.fy=my/d;player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,pSpeed(),dt);}
+    else if(player.tx!==null){const fd=Math.hypot(player.tx-player.x,player.ty-player.y);if(fd>1){player.fx=(player.tx-player.x)/fd;player.fy=(player.ty-player.y)/fd}if(moveToward(player,player.tx,player.ty,pSpeed(),dt))player.tx=null;}
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
       if(player.cast.time>=a.cast){player.cast=null;
@@ -31,14 +31,25 @@ function update(dt){
     if(player.queued&&(time>player.queued.until||player.dead))player.queued=null;
     if(player.queued&&!player.cast&&player.gcd<=0){const q=player.queued.a;player.queued=null;cast(q);}
     const tg=player.target;
-    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!(tg.lost>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
+    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!(tg.lost>0)&&!(tg.mez>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
-    player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*dt);
+    player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*(player.buffs.clarity>0?1.5:1)*dt); // Clarity: +50% mana regen
+    // Heals over time (Cleric's Renew) tick every 2s; each tick also burns nearby undead.
+    if(player.hots&&player.hots.length)for(let i=player.hots.length-1;i>=0;i--){const o=player.hots[i];o.t-=dt;o.next-=dt;
+      if(o.next<=0){o.next+=2;const h=Math.round(o.heal*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');if(o.holy)holyPulse(o.heal*o.holy,o.name);}
+      if(o.t<=0)player.hots.splice(i,1);}
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*C.regen*dt);
     for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
   }
   rangeShow=Math.max(0,rangeShow-dt);
+  // Holy ground (Paladin's Consecrate): once a second, heals you if you stand in it and burns undead inside.
+  for(let i=grounds.length-1;i>=0;i--){const g=grounds[i];g.t-=dt;g.next-=dt;
+    if(g.next<=0){g.next+=1;
+      if(!player.dead&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r){const h=Math.max(1,Math.round(g.heal));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#ffd27a')}
+      mobs.forEach(m=>{if(!m.dead&&isUndead(m)&&m.state==='chase'&&Math.hypot(m.x-g.x,m.y-g.y)<=g.r)hitMob(m,g.dmg*rr(0.9,1.1),'holy',g.name)});}
+    if(g.t<=0){grounds.splice(i,1);log('The holy ground fades.','#9aa')}}
+  if(decoy){decoy.t-=dt;if(decoy.t<=0){burst(decoy.x,decoy.y-6,'#c8a0ff',8);decoy=null;log('Your Phantasm fades.','#9aa')}}
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
   if(!player.dead)checkPortals();
   updatePet(dt);
@@ -50,8 +61,11 @@ function update(dt){
       if(d.t<=0){m.dots.splice(i,1);log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
     if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
     if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('The snare on '+m.def.name+' wears off.','#9aa')}
+    if(m.aslow>0)m.aslow-=dt;
+    if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
+    if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
-    const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1);
+    const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1)*(1-0.12*(m.chill||0)); // each chill stack: -12% speed
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);
@@ -67,9 +81,10 @@ function update(dt){
       const d=dist(m,v);
       if(m.def.boss)bossThink(m,dt);if(m.dead||player.dead)return;
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
-      else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2;if(v===pet)hurtPet(m);else hurtPlayer(m)}}
+      else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=m.aslow>0?3.2:2; // Slow Mind: attacks 60% slower
+        if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet)hurtPet(m);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0}
+      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0}
     }
   });
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>1.1)floats.splice(i,1)}

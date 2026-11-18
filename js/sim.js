@@ -36,7 +36,10 @@ const B={
   mp:()=>C.mana?player.mp/maxMP(player.lvl):1,
   live:()=>mobs.filter(m=>!m.dead),
   fighting:()=>mobs.filter(m=>!m.dead&&m.state==='chase'),
-  onMe:()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.fear>0)&&!(m.lost>0)),
+  onMe:()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.fear>0)&&!(m.lost>0)&&!(m.mez>0)),
+  hot:id=>(player.hots||[]).some(o=>o.id===id),
+  // Point Blink away from a mob (Blink goes the way you last moved).
+  faceAway:m=>{const dx=player.x-m.x,dy=player.y-m.y,d=Math.hypot(dx,dy)||1;player.fx=dx/d;player.fy=dy/d},
   dot:(m,id)=>m.dots.some(d=>d.id===id),
   stop:()=>{player.tx=null},
   // Walk toward a mob until within r. Returns true once in range.
@@ -167,6 +170,157 @@ const BOTS={
       // 5. Stab.
       if(B.can('stab'))B.use('stab',t);
     }
+  },
+  // ---- Batch 1 (v0.17) ----
+  cleric:{
+    prep:()=>true,
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting(),on=B.onMe();
+      // Pull: Holy Light (level 3), then let it come. Before that, walk in and Smite.
+      if(!fight.length){if(player.lvl>=3){if(B.near(t,75)&&B.can('hlight'))B.use('hlight',t)}else if(B.near(t,14)&&B.can('smite'))B.use('smite',t);return}
+      if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0)&&!(t.fear>0))B.stop();else B.near(t,14);
+      // 1. Very low: Divine Aura, then Greater Heal inside it.
+      if(B.hp()<0.2&&B.can('aura')){B.use('aura');return}
+      if(player.buffs.aura>0){if(B.can('gheal')){B.stop();B.use('gheal')}else if(B.can('mheal')){B.stop();B.use('mheal')}return}
+      // 2. Low: Greater Heal, else Minor Heal.
+      if(B.hp()<0.35){if(B.can('gheal')){B.stop();B.use('gheal');return}if(B.can('mheal')){B.stop();B.use('mheal');return}}
+      // 3. Taking hits and no Renew: Renew.
+      if(on.length&&!B.hot('renew')&&B.can('renew')){B.use('renew');return}
+      // 4. Two mobs and one is undead: Turn Undead on it, fight the other.
+      if(fight.length>=2){const u=fight.find(m=>isUndead(m)&&!(m.fear>0)&&m!==t);
+        if(u&&B.can('turn')&&dist(player,u)<=80){B.use('turn',u);player.target=t;return}}
+      // Against undead: heal on cooldown, since every heal also burns them.
+      const dead=fight.some(m=>isUndead(m)&&dist(m,player)<=40);
+      if(dead&&B.hp()<0.95&&B.mp()>0.25&&B.can('mheal')){B.stop();B.use('mheal');return}
+      if(dist(player,t)>18)return;
+      // 5. Daze. 6. Smite.
+      if(B.can('daze')){B.use('daze',t);return}
+      if(B.can('smite'))B.use('smite',t);
+    }
+  },
+  enchanter:{
+    prep(){if(player.cast)return false;
+      if(player.lvl>=4&&!(player.buffs.clarity>0)&&B.can('clarity')){B.use('clarity');return false}
+      if(player.lvl>=2&&!pet&&B.can('blade')){B.use('blade');return false}
+      return true},
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      // Pull: Mind Rot on one mob.
+      if(!fight.length){if(B.near(t,75)&&B.can('mrot'))B.use('mrot',t);return}
+      // Fight the mob that's awake; the others sleep.
+      let main=player.target;if(!main||main.dead||main.mez>0||mobs.indexOf(main)<0){main=fight.find(m=>!(m.mez>0))||fight[0];player.target=main}
+      const on=B.onMe();
+      // 1. An awake extra coming at you: Mesmerize it (the spell picks the extra, not your target).
+      const extra=fight.filter(m=>m!==main&&!(m.mez>0)&&!m.def.boss);
+      if(extra.length&&B.can('mez')&&dist(extra[0],player)<=80){B.use('mez');player.target=main;return}
+      // 2. Low and two or more on you: Phantasm (level 8), else Color Flash, then back off.
+      if(B.hp()<0.35&&on.length>=2){if(B.can('phantasm')){B.use('phantasm');return}if(B.can('flash')&&on.some(m=>dist(m,player)<=30)){B.use('flash');return}}
+      // 3. Charm an extra your level or lower and send it at the target.
+      if(fight.length>=2&&!(pet&&pet.charm)&&B.can('charm')){const c=fight.find(m=>m!==main&&m.lv<=player.lvl&&!m.def.boss&&!m.def.named&&dist(m,player)<=60);
+        if(c){B.stop();B.use('charm',c);player.target=main;return}}
+      // Keep away from anything hitting you while the pet works.
+      const th=on.filter(m=>!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player))[0];
+      if(th&&dist(th,player)<26)B.kite(th);else if(dist(player,main)>75)B.near(main,75);else B.stop();
+      // 4. Slow Mind. 5. Mind Rot.
+      if(!(main.aslow>0)&&B.can('slow')&&dist(player,main)<=80){B.use('slow',main);return}
+      if(!B.dot(main,'mrot')&&B.can('mrot')&&dist(player,main)<=80){B.use('mrot',main);return}
+      // 6. Sword gone and nothing on you: Animate Blade.
+      if(!pet&&!on.length&&B.can('blade')){B.stop();B.use('blade');return}
+      // 7. Otherwise let the pets work; sit if nothing is on you.
+      if(!on.length&&pet){B.stop();player.sit=true}
+    }
+  },
+  paladin:{
+    prep:()=>true,
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      // Pull: Smite Undead on undead, Taunt (level 5), or walk in.
+      if(!B.fighting().length){
+        if(isUndead(t)&&B.can('smiteu')){if(B.near(t,75))B.use('smiteu',t);return}
+        if(B.can('taunt')){if(B.near(t,38))B.use('taunt',t);return}
+        if(B.near(t,14)&&B.can('pstrike'))B.use('pstrike',t);return}
+      // Hold the line: once Consecrate is down, stay inside it and let mobs come.
+      const g=grounds[0],inG=g&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r-5;
+      if(g){if(!inG){player.tx=g.x;player.ty=g.y}else B.stop()}
+      else if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0))B.stop();else B.near(t,14);
+      const hitting=B.onMe().filter(m=>dist(m,player)<16&&!(m.stun>0));
+      // 1. Very low: Lay on Hands.
+      if(B.hp()<0.2&&B.can('loh')){B.use('loh');return}
+      // 2. Low: Holy Bash, then Mend while it's stunned.
+      if(B.hp()<0.35){if(dist(player,t)<=18&&B.can('hbash')){B.use('hbash',t);return}
+        if((!hitting.length||t.stun>0)&&B.can('pmend')){B.stop();B.use('pmend');return}}
+      // 3. Undead: Smite Undead.
+      if(isUndead(t)&&B.can('smiteu')&&dist(player,t)<=80){B.use('smiteu',t);return}
+      // 4. Consecrate where you stand when the mob is coming or in melee.
+      if(!g&&B.can('consec')&&dist(player,t)<40){B.stop();B.use('consec');return}
+      // 5. Two or more next to you: Divine Strike.
+      if(B.live().filter(m=>dist(m,player)<=24).length>=2&&B.can('dstrike')){B.use('dstrike');return}
+      if(dist(player,t)>18)return;
+      // 6. Holy Bash. 7. Strike.
+      if(B.can('hbash')){B.use('hbash',t);return}
+      if(B.can('pstrike'))B.use('pstrike',t);
+    }
+  },
+  shadowknight:{
+    prep(){if(player.cast)return false;if(player.lvl>=4&&!pet){if(B.can('minion'))B.use('minion');return false}return true},
+    think(st){
+      if(player.cast||player.fd>0)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      // Pull: Disease Cloud (level 2), then wait.
+      if(!fight.length){if(B.can('disease')){if(B.near(t,75))B.use('disease',t);return}if(B.near(t,14)&&B.can('sstrike'))B.use('sstrike',t);return}
+      if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0)&&!(t.fear>0))B.stop();else B.near(t,14);
+      // 1. Very low: Feign Death.
+      if(B.hp()<0.2&&B.can('sfeign')){B.stop();B.use('sfeign');return}
+      // 2. Three or more: Terror the one with the most health. Two is fine (Dark Cleave).
+      if(fight.length>=3){const big=fight.slice().sort((a,b)=>b.hp-a.hp)[0];if(!(big.fear>0)&&B.can('terror')){B.use('terror',big);player.target=fight.find(m=>m!==big)||t;return}}
+      // 3. Harm Touch while the mob is healthy and you can afford the blood.
+      if(t.hp/t.maxhp>0.5&&B.hp()>0.5&&B.can('harm')&&dist(player,t)<=30){B.use('harm',t);return}
+      // 4. Hurt: Siphon.
+      if(B.hp()<0.7&&B.can('siphon')&&dist(player,t)<=60){B.use('siphon',t);return}
+      // 5. Disease Cloud on the target.
+      if(!B.dot(t,'disease')&&B.can('disease')){B.use('disease',t);return}
+      // 6. Two or more next to you: Dark Cleave.
+      if(B.live().filter(m=>dist(m,player)<=24).length>=2&&B.can('dcleave')){B.use('dcleave');return}
+      if(dist(player,t)>18)return;
+      if(B.can('sstrike'))B.use('sstrike',t);
+    }
+  },
+  wizard:{
+    prep:()=>true,
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      // Pull: Fireball from max range (level 4), else Frost Bolt.
+      if(!fight.length){if(B.near(t,75)){if(B.can('fireball'))B.use('fireball',t);else if(B.can('frost'))B.use('frost',t)}return}
+      const on=B.onMe().filter(m=>!(m.root>0)&&!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
+      const th=on[0],d=th?dist(th,player):999;
+      // 1. Low and losing: Gate out (an escape, not a death).
+      if(B.hp()<0.35&&t.hp/t.maxhp>0.4&&B.can('gate')&&d>40){B.stop();B.use('gate');return}
+      // 2. Low: Mana Shield, Blink away, Freeze.
+      if(B.hp()<0.35){if(!(player.buffs.mshield>0)&&B.can('mshield')){B.use('mshield');return}
+        if(th&&d<20&&B.can('blink')){B.faceAway(th);B.use('blink');return}
+        if(th&&B.can('freeze')){B.use('freeze',th);return}}
+      // 3. Frozen and Shatter ready: Shatter.
+      if(t.root>0&&B.can('shatter')){B.use('shatter',t);return}
+      // 4. Close and Freeze ready: Freeze, step back, then Shatter.
+      if(th&&d<26&&B.can('freeze')){B.use('freeze',th);return}
+      // 5. Two or more close: Frost Nova, then Shatter the strongest.
+      if(B.live().filter(m=>dist(m,player)<=34).length>=2&&B.can('nova')){B.use('nova');player.target=fight.slice().sort((a,b)=>b.hp-a.hp)[0];return}
+      // Movement: kite whatever is close and free (Blink if it's on top of you); otherwise stay in range.
+      if(th&&d<14&&B.can('blink')){B.faceAway(th);B.use('blink');return}
+      if(th&&d<30)B.kite(th);else if(dist(player,t)>75)B.near(t,75);else B.stop();
+      // 6. Far away and Fireball ready: Fireball.
+      if(dist(player,t)>50&&!th&&B.can('fireball')){B.stop();B.use('fireball',t);return}
+      // 7. Frost Bolt.
+      if(B.can('frost')&&dist(player,t)<=80)B.use('frost',t);
+    }
   }
 };
 
@@ -174,7 +328,7 @@ const BOTS={
 function resetPlayer(L){
   player.lvl=L;player.xp=-1e9; // no level-ups mid-sim
   player.hp=maxHP(L);player.mp=maxMP(L);player.buffs={};player.cds={};player.gcd=0;player.cast=null;player.queued=null;
-  player.sit=false;player.fd=0;player.dead=0;player.target=null;player.tx=null;
+  player.sit=false;player.fd=0;player.dead=0;player.target=null;player.tx=null;player.hots=[];decoy=null;grounds.length=0;
 }
 // On a loss: how much health the mobs had left, all together (0.33 = a third).
 const hpLeft=()=>{const a=mobs.filter(m=>m.maxhp);return a.reduce((s,m)=>s+Math.max(0,m.dead?0:m.hp),0)/(a.reduce((s,m)=>s+m.maxhp,0)||1)};
@@ -193,10 +347,12 @@ function simFight(f,L,seed,mode){
     bot.think(st);update(SIM_DT);t+=SIM_DT;
     if(player.hp<hp0)dmg+=hp0-player.hp;if(player.mp<mp0)mana+=mp0-player.mp;
     if(hadPet&&!pet)petDied=true;
+    // Wizard's Gate left the arena: an escape, not a death or a win.
+    if(zoneId!=='arena')return{win:false,death:false,escape:true,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:0,left:hpLeft()};
     if(player.dead>0||player.hp<=0)return{win:false,death:true,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:0,left:hpLeft()};
-    if(mobs.every(m=>m.dead))break;
+    if(mobs.every(m=>m.dead)&&!(pet&&pet.charm))break;
   }
-  const win=mobs.every(m=>m.dead);
+  const win=mobs.every(m=>m.dead)&&!(pet&&pet.charm); // a charmed mob still counts as alive
   // Rest to 80% health and mana before the next pull (sitting).
   let rest=0;
   if(win){player.target=null;player.tx=null;player.buffs.hide=0;
@@ -224,7 +380,7 @@ function runSim(opts){
       if(i<jobs.length){const j=jobs[i++],rs=[];
         for(let s=0;s<seeds;s++)rs.push(simFight(j.f,j.L,1000+s,j.md.id));
         const w=rs.filter(r=>r.win),avg=(a,k)=>a.length?a.reduce((x,r)=>x+r[k],0)/a.length:0;
-        rows.push({mode:j.md.name,lvl:j.L,fight:j.f.name,runs:rs.length,wins:w.length,deaths:rs.filter(r=>r.death).length,timeouts:rs.filter(r=>r.timeout).length,
+        rows.push({mode:j.md.name,lvl:j.L,fight:j.f.name,runs:rs.length,wins:w.length,deaths:rs.filter(r=>r.death).length,timeouts:rs.filter(r=>r.timeout).length,escapes:rs.filter(r=>r.escape).length,
           kill:avg(w,'t'),dmg:avg(rs,'dmg'),mana:avg(rs,'mana'),rest:avg(w,'rest'),left:avg(rs.filter(r=>!r.win),'left'),petDied:rs.filter(r=>r.petDied).length});
         if(opts.onProgress)opts.onProgress(i,jobs.length);
         setTimeout(step,0);return}
@@ -244,7 +400,7 @@ function runSim(opts){
 // Results as a table: kill time, damage taken, mana used, rest time, deaths.
 function simTable(res,html){
   const n=v=>Math.round(v),head=['Lvl','Fight','Win','Deaths','Kill (s)','Rest (s)','Dmg taken','Mana used','Mob HP left (losses)'];
-  const body=res.rows.map(r=>[r.lvl,r.fight+(r.mode?' · '+r.mode:''),r.wins+'/'+r.runs,r.deaths,r.wins?n(r.kill):'–',r.wins?n(r.rest):'–',n(r.dmg),C.mana?n(r.mana):'–',r.wins<r.runs?n(r.left*100)+'%':'–']);
+  const body=res.rows.map(r=>[r.lvl,r.fight+(r.mode?' · '+r.mode:''),r.wins+'/'+r.runs,r.deaths+(r.escapes?' (+'+r.escapes+' gated)':''),r.wins?n(r.kill):'–',r.wins?n(r.rest):'–',n(r.dmg),C.mana?n(r.mana):'–',r.wins<r.runs?n(r.left*100)+'%':'–']);
   if(html)return '<table class="simtab"><tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+body.map(b=>'<tr>'+b.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>';
   return '| '+head.join(' | ')+' |\n|'+head.map(()=>' --- ').join('|')+'|\n'+body.map(b=>'| '+b.join(' | ')+' |').join('\n');
 }

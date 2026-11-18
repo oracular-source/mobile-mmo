@@ -9,7 +9,7 @@ const ABI={};AB.forEach(a=>ABI[a.id]=a);
 const at=(arr,a)=>arr[0]+arr[1]*Math.max(0,player.lvl-(a?a.lvl:0)); // value that grows each level
 const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl)):0;
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
-const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)}; // personal loot: only gear your class can use drops for you
+const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)}; // personal loot: only gear your class can use drops for you
 const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
 const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0);
 const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',cskel:'bone',boss1:'bone'};
@@ -29,6 +29,7 @@ const maxHP=L=>C.hp[0]+C.hp[1]*L+stat('sta')*3, maxMP=L=>C.mana?C.mana[0]+C.mana
 const meleeMult=()=>1+stat('str')*0.02; // STR: +2% melee damage and bandage healing per point
 const GCD=1.5, PSPEED=34;
 // Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.
+// Chill (Wizard's Frost Bolt) only slows mobs; nothing slows you yet.
 const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1);
 
 /* ---------- Saved progress, settings and loadout ---------- */

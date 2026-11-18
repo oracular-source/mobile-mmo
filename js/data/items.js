@@ -45,5 +45,20 @@ const ITEMS={
   nightleather:{name:'Nightveil Leathers',slot:'chest',rar:'rare',ac:5,sta:2,str:3,value:90,cls:'rogue'},
   b1dagger:{name:'Boss 1 Dagger',slot:'weapon',rar:'named',str:6,sta:1,value:120,cls:'rogue'},
   b1jerkin:{name:'Boss 1 Jerkin',slot:'chest',rar:'named',ac:6,sta:3,str:2,value:120,cls:'rogue'},
-  b1parry:{name:'Boss 1 Parrying Blade',slot:'offhand',rar:'named',ac:1,str:3,sta:2,value:110,cls:'rogue'}
+  b1parry:{name:'Boss 1 Parrying Blade',slot:'offhand',rar:'named',ac:1,str:3,sta:2,value:110,cls:'rogue'},
+  // Batch 1 (v0.17). cls 'cleric' = Cleric only; 'knight' = Paladin and Shadow Knight (they also wear Warrior plate).
+  imace:{name:'Iron Mace',slot:'weapon',rar:'common',str:1,wis:1,value:8,cls:'cleric'},
+  chainvest:{name:'Chain Vest',slot:'chest',rar:'common',ac:3,wis:1,value:10,cls:'cleric'},
+  bmace:{name:'Blessed Mace',slot:'weapon',rar:'uncommon',str:2,wis:2,value:40,cls:'cleric'},
+  wardstone:{name:'Wardstone Shield',slot:'offhand',rar:'uncommon',ac:3,wis:1,value:30,cls:'cleric'},
+  vigil:{name:'Vestments of the Vigil',slot:'chest',rar:'rare',ac:5,sta:2,wis:3,int:1,value:90,cls:'cleric'},
+  b1mace:{name:'Boss 1 Mace',slot:'weapon',rar:'named',str:3,wis:3,int:1,value:120,cls:'cleric'},
+  b1hauberk:{name:'Boss 1 Hauberk',slot:'chest',rar:'named',ac:6,sta:2,wis:3,value:120,cls:'cleric'},
+  b1relic:{name:'Boss 1 Reliquary',slot:'offhand',rar:'named',ac:3,wis:3,int:1,value:110,cls:'cleric'},
+  tabard:{name:"Squire's Tabard",slot:'chest',rar:'common',ac:3,wis:1,value:10,cls:'knight'},
+  oathhelm:{name:'Oathbound Helm',slot:'head',rar:'uncommon',ac:3,sta:1,wis:1,value:22,cls:'knight'},
+  greatsword:{name:'Grave-iron Greatsword',slot:'weapon',rar:'uncommon',str:3,wis:1,value:40,cls:'knight'},
+  b1great:{name:'Boss 1 Greatsword',slot:'weapon',rar:'named',str:5,wis:2,value:120,cls:'knight'},
+  b1helm:{name:'Boss 1 Helm',slot:'head',rar:'named',ac:4,sta:2,wis:2,value:110,cls:'knight'},
+  b1circlet:{name:'Boss 1 Circlet',slot:'head',rar:'named',ac:1,int:3,wis:2,value:110,cls:'caster'}
 };

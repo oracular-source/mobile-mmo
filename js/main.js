@@ -10,7 +10,7 @@ function loop(ts){
 }
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,simTable:simTable,seedRng:seedRng,zone:()=>zoneId};
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,simTable:simTable,seedRng:seedRng,zone:()=>zoneId,arenaMob:arenaMob,update:update,grounds:grounds,getDecoy:()=>decoy};
 // Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;

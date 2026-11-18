@@ -51,15 +51,15 @@ The full roster is 14 classic classes, each with one signature mechanic and a re
 | Class | Role | Signature | Strengths | Weaknesses | Launch |
 | --- | --- | --- | --- | --- | --- |
 | Warrior | Tank | Disciplines | Best mitigation and aggro | No spells; weak solo, needs potions or a healer | Yes |
-| Paladin | Tank | Lay on hands | Heals, stuns, bonus vs undead | Less durable than Warrior, lower damage | Later |
-| Shadow Knight | Tank | Lifetaps | Fear, small undead pet, solos well | Less durable than Warrior | Later |
-| Cleric | Healer | Resurrection | Best heals, the only full rez | Very low damage, slow solo | Yes |
+| Paladin | Tank | Lay on hands | Heals, stuns, bonus vs undead | Less durable than Warrior, lower damage | Later (playable in the prototype since v0.17) |
+| Shadow Knight | Tank | Lifetaps | Fear, small undead pet, solos well | Less durable than Warrior | Later (playable in the prototype since v0.17) |
+| Cleric | Healer | Resurrection | Best heals, the only full rez | Very low damage, slow solo | Yes (playable since v0.17) |
 | Druid | Healer | Root and kite | DoTs, snares, group teleports, great outdoor solo | Weaker heals, fragile, struggles indoors | Yes |
 | Shaman | Healer | Slow | Slows, buffs, DoTs | Low burst damage | Later |
-| Wizard | Caster | Burst nukes | Highest burst, emergency group teleport | Burns mana, pulls aggro, dies fast | Later |
+| Wizard | Caster | Burst nukes | Highest burst, emergency group teleport | Burns mana, pulls aggro, dies fast | Later (playable in the prototype since v0.17) |
 | Magician | Caster | Elemental pet | Strong pet, summons gear for the group | Helpless if the pet dies | Later |
 | Necromancer | Caster | Undead pet + feign death | Best soloer: DoTs, lifetaps, pet | Slow group damage, can't heal others | Yes |
-| Enchanter | Caster | Mez and charm | Crowd control, haste, mana regen | Fragile, hardest to play | Yes |
+| Enchanter | Caster | Mez and charm | Crowd control, haste, mana regen | Fragile, hardest to play | Yes (playable since v0.17) |
 | Rogue | Melee | Backstab | Top melee damage, stealth, traps, locks | Needs a tank, weak solo | Yes |
 | Monk | Melee | Feign death pulls | High damage, best puller | Light armor only | Later |
 | Ranger | Melee | Bow + tracking | Ranged damage, snares, can tank in a pinch | Best at nothing | Later |
@@ -67,7 +67,7 @@ The full roster is 14 classic classes, each with one signature mechanic and a re
 
 The launch six cover one tank (Warrior), two healers (Cleric, Druid), two damage dealers (Rogue, Necromancer) and crowd control (Enchanter), and spread out for solo play: Necromancer strong; Druid and Enchanter medium; Warrior, Cleric and Rogue weak and rewarded for grouping. Enchanter replaced Wizard at launch (Nov 17, 2026) because it plays more differently from the existing casters.
 
-Enchanter crowd control needs a touch-friendly way to mez (put a mob to sleep until it's hit) and charm (borrow a mob as a temporary pet), designed when the class is built. Bard songs need their own touch controls, such as a song playlist that cycles automatically; that's one reason Bard comes after launch.
+Enchanter touch controls (v0.17): the Mez button puts to sleep the closest awake mob coming at you that you are *not* fighting, so one tap handles the extra add and you keep hitting your target (with no extra around it uses your target). Sleeping mobs show **Zz** and the seconds left (orange near the end); tapping a sleeping mob only targets it, and auto-attack and pets leave it alone. Charm works on ordinary mobs your level or lower; while it lasts, the pet bar turns pink and shows the time left instead of health. Bard songs need their own touch controls, such as a song playlist that cycles automatically; that's one reason Bard comes after launch.
 
 ### Warrior (playable)
 
@@ -118,6 +118,22 @@ Dark caster with an undead pet. Low HP, mana like the Druid, and caster gear (sh
 **Threat:** every mob tracks threat from you and from your pet and attacks whoever has more. Damage adds threat; the pet's hits count triple, plus a bonus on its first hit, so it can tank.
 
 **All classes:** abilities grow a little stronger every level after you learn them: more damage and healing, and longer roots, snares and stuns. Each class keeps its own level, bags and loadout, and personal loot only drops gear your class can use.
+
+### Batch 1 classes (playable, v0.17): Cleric, Enchanter, Paladin, Shadow Knight, Wizard
+
+Built wide on the default skin; numbers are first drafts for the balance pass. Full ability tables (levels 1–8) and the "when X, do Y" playbooks are in `docs/playbooks.md`. Each has a signature twist so none plays like a recoloured Wizard:
+
+- **Cleric** (chain, mace and shield): every heal also sends holy damage into undead fighting within about 2.5 tiles, so in the crypt healing yourself is your damage. Renew heals every 2s for 12s (and pulses too). Turn Undead only works on undead. Divine Aura: 4s of no damage, but you can't attack.
+- **Enchanter** (caster gear): no bolts. Mind Rot (DoT), Mesmerize, a floating sword pet (2 minutes), Slow Mind (mob moves and attacks slower), Clarity (+50% mana regen until you die), Charm (20–40s, then the mob breaks free and always attacks you), Color Flash (stuns everything near you), Phantasm (a see-through copy of you that nearby mobs attack for ~5s).
+- **Paladin** (wears Warrior plate plus knight gear): Lay on Hands (full heal, ~3 min cooldown), Holy Bash, Mend, Smite Undead (undead only), Taunt, **Consecrate** (holy ground for 15s: you heal every second inside it, undead inside burn), Divine Strike (area, extra vs undead).
+- **Shadow Knight** (Warrior plate plus knight gear): Siphon (lifetap), Disease Cloud, Terror (short fear), a small skeleton minion, **Harm Touch** (huge hit that costs 20% of your max health), Feign Death, **Dark Cleave** (area hit that heals you per mob hit).
+- **Wizard** (caster gear): Frost Bolt stacks **chill** (−12% speed per stack, up to 4, fades 8s after the last bolt); Freeze roots; **Shatter** does full damage to a frozen mob and breaks the freeze, about a third on anything else. Blink (short teleport the way you last moved), Fireball (2.5s cast), Frost Nova (hits and freezes everything near you), Mana Shield (damage comes out of mana first for 10s), Gate (6s cast, home to the Gate Road guards; ends every fight, and leaves Dungeon 1).
+
+**Undead:** shambling corpses, crypt skeletons and Boss 1 are undead (rats, beetles and Old Gnawbone aren't). The target frame says "Undead". Boss 1 can't be mesmerized or charmed.
+
+**Buffs end when you die** (since v0.17), so Clarity "until you die" means exactly that; Barkskin and the rest clear on death too.
+
+**Gear:** Cleric has its own gear (maces, chain, shields, three Boss 1 drops). Paladin and Shadow Knight wear Warrior gear plus knight gear (two Boss 1 drops: greatsword and helm). Enchanter and Wizard share caster gear with the Druid and Necro; a new Boss 1 Circlet joins the caster drops.
 
 ### Prototype class: Druid
 

@@ -10,7 +10,7 @@ function mk(rows,pal,scale){
 const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
   guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),rogue:mk(SPR.rogue,PAL),
   necro:mk(SPR.necro,Object.assign({},PAL,{p:'#2e2338',P:'#1d1626',x:'#b8b4c4'})),
-  pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
+  pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),minion:mk(SPR.dead,Object.assign({},PAL,{z:'#9a9282',Z:'#6b6470',r:'#3a1418',e:'#ff3b30'})),blade:mk(SPR.blade,PAL),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
   gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
   crat:mk(SPR.rat,Object.assign({},PAL,{a:'#8a8494',A:'#b5b0bc'})),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
@@ -92,7 +92,9 @@ function render(){
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
   if(t&&!t.dead){for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}}
-  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],[player]).sort((a,b)=>a.y-b.y);
+  // Holy ground: a dotted gold ring on the floor that blinks out in its last 3 seconds.
+  grounds.forEach(g=>{if(g.t<3&&Math.floor(time*6)%2)return;lx.fillStyle=g.col;for(let a=0;a<48;a++){if((a+Math.floor(time*4))%4===0)continue;const an=a/48*Math.PI*2;lx.fillRect(Math.round(g.x+Math.cos(an)*g.r),Math.round(g.y+Math.sin(an)*g.r*0.6),1,1)}});
+  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],decoy?[decoy]:[],[player]).sort((a,b)=>a.y-b.y);
   ents.forEach(e=>{
     if(e===player){
       if(player.dead>0)return;
@@ -103,10 +105,17 @@ function render(){
       lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
+      if(player.buffs.aura>0){lx.fillStyle='#ffd27a';for(let a=0;a<16;a++){if((a+Math.floor(time*8))%2)continue;const an=a/16*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*8),Math.round(player.y-7+Math.sin(an)*10),1,1)}}
+      if(player.buffs.mshield>0&&Math.floor(time*4)%2===0){lx.fillStyle='#7dbbff';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-8,1,2);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-8,1,2)}
       if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
-    if(e===pet){shadow(e.x,e.y,4);drawSprite(IMG.pet,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);return}
+    if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
+    if(e===pet){const im=IMG[pet.img||'pet']||IMG.pet;
+      if(pet.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
+      shadow(e.x,e.y,Math.max(4,Math.round(im.w/2.4)));drawSprite(im,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);
+      if(pet.charm&&Math.floor(time*3)%2===0){lx.fillStyle='#ff9de2';const hy=Math.round(e.y-im.h-3);lx.fillRect(Math.round(e.x)-1,hy,1,1);lx.fillRect(Math.round(e.x)+1,hy,1,1);lx.fillRect(Math.round(e.x),hy+1,1,1)} // little heart over a charmed mob
+      return}
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
@@ -115,6 +124,7 @@ function render(){
     drawSprite(img,m.x,m.y+1,m.dir,m.root>0?0:bob,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
+    if(m.chill>0&&Math.floor(time*3+m.x)%2===0){lx.fillStyle='#bfe6ff';for(let i=0;i<m.chill;i++)lx.fillRect(Math.round(m.x)-4+i*3,Math.round(m.y)-1,1,1)}
     if(m.dots.length&&rng()<0.25)parts.push({x:m.x+rr(-4,4),y:m.y-rr(4,12),vx:0,vy:-10,t:0,life:0.5,col:'#6aa84f'});
   });
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
@@ -141,6 +151,8 @@ function render(){
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
+  // Sleeping (mesmerized) mobs: "Zz" and seconds left, so you know when to re-mez.
+  mobs.forEach(m=>{if(m.dead||!(m.mez>0))return;const sx=(m.x-camX)*S,sy=(m.y-IMG[m.def.img].h-(m===t?14:4)-camY)*S;cx.font='700 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';const s='Zz '+Math.ceil(m.mez);cx.strokeText(s,sx,sy);cx.fillStyle=m.mez<4?'#ffb37a':'#e0c3ff';cx.fillText(s,sx,sy)});
   floats.forEach(f=>{const a=1-f.t/1.1,sx=(f.x-camX)*S,sy=(f.y-camY-f.t*18)*S;cx.globalAlpha=Math.max(0,a);
     cx.font='700 '+Math.round((f.big?15:12)*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
   if(settings.move==='drag'&&settings.showJoy&&joy.active){
@@ -167,12 +179,14 @@ function ui(){
   $('plv').textContent='Lv '+L;
   $('php').style.width=(100*player.hp/maxHP(L))+'%';
   $('pmp').style.width=(100*player.mp/maxMP(L))+'%';
-  $('petrow').style.display=pet?'block':'none';if(pet)$('petbar').style.width=(100*pet.hp/pet.maxhp)+'%';
+  // Pet bar: health, except a charmed mob shows how long the charm has left (pink), so you can see it about to break.
+  $('petrow').style.display=pet?'block':'none';
+  if(pet){const pb=$('petbar');if(pet.charm){pb.style.width=(100*pet.charmT/pet.charmMax)+'%';pb.style.background=pet.charmT<5?'#ff4d4d':'#ff9de2'}else{pb.style.width=(100*pet.hp/pet.maxhp)+'%';pb.style.background='#cfc8b2'}}
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
-    const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push('Rot '+Math.ceil(d.t)+'s'));if(t.def.armor>=0.5)fx.push('Armored');
+    const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
     $('tfx').textContent=fx.join(' · ');}
   else tf.style.visibility='hidden';
   const cb=$('castbar');

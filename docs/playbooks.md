@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`, v0.16) plays the four current classes by these rules; batch 1 bots come with the batch 1 build.
+**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17).
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.
@@ -95,7 +95,7 @@ Things all classes share (from the game rules today):
 
 ---
 
-## Batch 1 (draft, Nov 17): Cleric, Enchanter, Paladin, Shadow Knight, Wizard
+## Batch 1 (built in v0.17): Cleric, Enchanter, Paladin, Shadow Knight, Wizard
 Built together with the default skin (one shared body, told apart by color and weapon). Each class gets its abilities from level 1 to 8, a rough kit and a playbook. Numbers come later from the sim.
 
 **Owner's direction (Nov 17):** flavor first, balance later. No class should feel like "a wizard with a different color." Each one gets a **signature twist** that changes how you play, not just bigger numbers. Only the Wizard is the bolt class.
@@ -164,7 +164,7 @@ New rules this batch needs (everything else reuses what the game already has):
 6. Blade expired and nothing on you → Animate Blade.
 7. Otherwise → stand back and let the pets work (sit if nothing is hitting you).
 **Between fights:** sit until mana is about 80%.
-**Touch control for mez (to design in the build):** idea: tap a mob, then the Mez button; sleeping mobs show "Zz" and a small timer so you know when to re-mez.
+**Touch control for mez (built, v0.17):** the Mez button sleeps the closest awake mob coming at you that you're not fighting (no extra around: your target). Sleeping mobs show "Zz" and the seconds left. Tapping a sleeping mob only targets it.
 
 ### Paladin: the holy anvil
 **Idea:** a Warrior that trades some toughness for heals and stuns. Very strong in the crypt (undead).

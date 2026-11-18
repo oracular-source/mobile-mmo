@@ -19,7 +19,7 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
 | 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Done (v0.11.1) |
-| 3b | All 14 classes at baseline, in two batches of 5, on one default skin + testing grounds | Every class plays like itself and the sim can run them all | Now |
+| 3b | All 14 classes at baseline, in two batches of 5, on one default skin + testing grounds | Every class plays like itself and the sim can run them all | Now (batch 1 done v0.17; batch 2 next) |
 | 3c | Balance (overnight sim runs) | All classes roughly even in the sim, anchored on Necro (top) and Cleric (bottom) | Next |
 | 3d | Art redo: mock-ups, lock one character, write the style guide, roll it out to every class and the world | Everything follows one look | Later |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
@@ -27,13 +27,13 @@ One place for the work: what's being built now, what's next, every idea, and wha
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-Plan changed Nov 17 (owner): build wide first, balance and art later. Classes ship **five at a time** on **one default skin**; the sim tunes numbers overnight; then the art gets redone from one locked character.
-1. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin (their colours are already in `SKINS`). New rules: undead tag, heal over time, mez, charm, holy ground, health as a cost, chill and Shatter, area nuke, small pets and a decoy, taunt, Blink/Gate, Divine Aura, Mana Shield. Each class also gets its playbook bot in `js/sim.js` so the sim can run it. One release.
+1. **Batch 2 playbooks** (M): Magician, Ranger, Monk, Shaman, Bard. Owner and Claude draft the kits and twists in `docs/playbooks.md` like batch 1, then build (L). Needs the buff bar (backlog) and Bard songs.
 Owner to decide: the Rogue's Evade playbook, A (as damage) or B (as escape). Sim numbers are in `docs/sim-results.md`.
-Done: testing grounds and sim (v0.16), default skin (v0.15), batch 1 playbooks second draft.
+Owner to play: the five batch 1 classes (v0.17) on the phone. Notes become cards.
+Done: batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
 ## Next
-1. **Batch 2 playbooks, then build:** Magician, Ranger, Monk, Shaman, Bard. Needs the buff bar (from the backlog) and Bard songs.
+1. **Batch 2 build:** the five classes on the default skin, with bots. One release.
 2. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here.
 3. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
 4. **Feel pass:** hit sparks, knockback, animations, sound.
@@ -87,11 +87,15 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | **Class passives:** a small always-on perk per class that adds flavor (travel tools could live here). Not written down yet; owner to describe | M | M | later |
 | ~~Class playbooks for the sim~~ (done v0.16 for the four current classes): tactics, not just a combo. Owner writes each class's process in plain words, saved as "when X, do Y" rules. Examples: Necro dreads (fears) the highest-HP mob while fighting the weaker one, sits for mana once nothing is on it, keeps plague on every mob in the fight; Rogue sprints to get around. The sim then kites and moves like a real player, so balance numbers match real play. First draft for review: `docs/playbooks.md` (Nov 17) | H | M | 2 (with the testing grounds) |
 | Fixed-step game rules for normal play too (the sim already runs fixed steps and seeded rolls), so fights play the same on any phone (from research) | L | S | later |
+| **Boss 1 throws a bone instead of a purple beam** (owner, Nov 17): keep attacks thematic. A skeleton boss lobs a spinning bone you can see fly, not a laser. Could become a dodgeable projectile later (ties to boss telegraphs) | M | S | 2 (with the feel pass) |
+| **Abilities rank up as you level** (owner, Nov 17): at set levels an ability gets a new step, not just bigger numbers. Example: Raise Bones gives the Necro a second skeleton, later a third. Every class gets a few of these milestones | H | M | 2–3 (after batch 2, with balance) |
 | **No XP loss on death; a repair shop instead.** Dying damages your gear; a classic repair NPC fixes it for copper. A money sink, not a power cost. Owner, Nov 17: put one in later | M | M | 2–3 (with Town 1 or milestone 4) |
 
 ## Known issues
-- **Sim bots play perfectly** (the Druid kites without ever getting hit from level 4 on). Real phone play is sloppier, so sim numbers are a best case; judge fun by playing.
-- **Melee classes can't solo Boss 1 yet.** Quick sim (perfect rotation, no gear): Rogue at level 8 gets Boss 1 to about a third of its health before dying; Warrior at level 8 to about half. Rogue has no self-heal. Sim (v0.16, playbook bots): Warrior leaves Boss 1 at about half health, Rogue at 42–64% depending on the Evade playbook. Fix in the balance pass (testing grounds), not one class at a time.
+- **Batch 1 numbers are first drafts:** Shadow Knight loses most two-mob fights before level 8; Enchanter kills are slow (30–45s a single mob). Tune in the balance pass.
+- New classes draw on the shared default body, and their pets reuse placeholder art (the minion is a dark recolour of the skeleton; the sword is a tiny sprite).
+- **Sim bots play perfectly** (the Druid kites without ever getting hit from level 4 on; the Wizard and Enchanter bots take no damage at all outside Boss 1). Real phone play is sloppier, so sim numbers are a best case; judge fun by playing.
+- **Melee classes can't solo Boss 1 yet.** Quick sim (perfect rotation, no gear): Rogue at level 8 gets Boss 1 to about a third of its health before dying; Warrior at level 8 to about half. Rogue has no self-heal. Sim (v0.16, playbook bots): Warrior leaves Boss 1 at about half health, Rogue at 42–64% depending on the Evade playbook. Fix in the balance pass (testing grounds), not one class at a time. Batch 1 (v0.17 sim, level 8): Cleric wins Boss 1 9/10, Paladin 5/10; Shadow Knight, Wizard and Enchanter never.
 - Boss 1 is the skeleton sprite scaled up 3x, so its pixels are chunkier than everything else. Placeholder until the art pass draws it at full size.
 - Lag and jitter reported on phone (v0.8): fixed in v0.8.1; confirm on device.
 - Sprites draw on top of tree canopies (no depth sorting with scenery).
@@ -99,6 +103,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.17** **Batch 1: five new classes**, each with 8 abilities (levels 1–8), its own gear and Boss 1 drops, on the shared default skin, and a sim bot. Pick them on the start screen. **Cleric:** hammer and heals; every heal also burns nearby undead; Renew (heal over time), Holy Light, Daze, Turn Undead, Greater Heal, Divine Aura (4s immune, can't attack). **Enchanter:** no bolts; Mind Rot, **Mesmerize** (sleeps the closest extra mob coming at you; sleeping mobs show Zz and a timer; any hit wakes them), a floating sword pet, Slow Mind (slower moving and attacking), Clarity, **Charm** (a mob fights for you, the pet bar turns pink and counts down, then it breaks free and comes for you), Color Flash (area stun), Phantasm (decoy). **Paladin:** Lay on Hands, Holy Bash, Mend, Smite Undead, Taunt, **Consecrate** (gold ring on the floor: heals you inside, burns undead), Divine Strike. **Shadow Knight:** Siphon, Disease Cloud, Terror, a small minion, **Harm Touch** (costs 20% of your health), Feign Death, **Dark Cleave** (heals per mob hit). **Wizard:** Frost Bolt **chills** (stacking slow), Freeze, **Shatter** (huge on a frozen mob), Blink, Fireball, Frost Nova, Mana Shield, Gate (home to the guards). Mobs now have an **undead** tag (corpses, skeletons, Boss 1), shown in the target frame. Buffs now end when you die. Target frame names each DoT. No save changes; existing characters are untouched. Sim results in `docs/sim-results.md`.
 - **v0.16** **Testing grounds and sim** (developer tools only; no gameplay or save changes). DEV panel → **Testing grounds**: **Go there** opens an empty walled arena (exit circle bottom left); **Rat / Beetle / Skeleton / Two skeletons / Boss 1** spawn a test fight at your level; **Bot plays me** lets the playbook bot play your character live in the arena; **Run sim** fights every scenario 10 times at levels 1, 4 and 8 for your class (about a minute) and shows kill time, rest time, damage taken, mana used, deaths and how much health the mobs had left when you lost. Bots for Druid, Warrior, Necromancer and Rogue (both Evade versions) follow `docs/playbooks.md`. The sim runs in fixed steps (30 per second) with seeded random rolls, so the same seed gives the same fight; your character, bags, journal and saves are put back afterward. First results: `docs/sim-results.md`.
 - **v0.15** **Default skin:** one shared body for every class, told apart by clothes colour, trim, hair and weapon (staff, sword, mace, dagger, shield). New classes get it automatically by having an entry in `SKINS` (`js/data/sprites.js`) and no own sprite; the four current classes keep their sprites until the art redo. Colours are ready for all nine classes so far (the four current ones plus Cleric, Enchanter, Paladin, Shadow Knight, Wizard). DEV panel → **Look**: a **Default skin** toggle shows your class on the shared body, and a gallery shows all nine side by side. No gameplay or save changes.
 - **v0.14.2** Removed the wide boss health bar across the top of the screen. Bosses now show only in the regular target frame (top right), like every other mob. Plan change on the board: all 14 classes in batches of 5 on a default skin, then balance, then an art redo. Batch 1 playbooks drafted.
