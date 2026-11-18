@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** first draft by Claude, Nov 17, for the owner to review. Nothing in the game uses this yet.
+**Status:** second draft, Nov 17, with the owner's answers to the first round of questions. Nothing in the game uses this yet.
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.
@@ -17,7 +17,9 @@ Things all classes share (from the game rules today):
 
 **Pull:** Creeping Rot from max range, then Tanglefoot (snare) as it comes in.
 
-**Fight, in order:**
+**Levels 1–2** (only Thornlash and Mend): stand and fight. Thornlash until it dies; Mend if health gets low.
+
+**Fight, level 3 and up, in order:**
 1. Health low → back off and cast Mending Touch once you have room (it takes 1.2s standing still).
 2. The mob is close and not snared → Tanglefoot. If Tanglefoot is on cooldown, Rootgrip (level 6) and step away.
 3. Rot not on the target → Creeping Rot.
@@ -45,7 +47,7 @@ Things all classes share (from the game rules today):
 5. Two or more mobs next to you and Cleave ready (level 8) → Cleave.
 6. Otherwise → Strike.
 
-**Losing the fight:** Hamstring the mob and run to the guards (there's no other escape).
+**Losing the fight:** keep fighting. In the sim a Warrior never runs; if it dies, that counts as a death in the results.
 
 **Between fights:** sit until health is about 80%. Warriors have no mana, so downtime is health only.
 
@@ -60,11 +62,11 @@ Things all classes share (from the game rules today):
 
 **Fight, in order:**
 1. Health very low and Feign Death ready (level 6) → Feign Death. Mobs forget you and the pet keeps fighting.
-2. Two or more mobs and one isn't feared → Dread the one with the **most health**. Fight the weaker one.
+2. Two or more mobs → Dread the one with the **most health** and fight the weaker one. When the Dread wears off and that mob starts walking back toward you, Dread it again.
 3. Plague not on a mob you're fighting → Siphon Plague (spread it to every mob in the fight).
 4. Pet below half health (level 8) → Mend Bones.
 5. Health below about 70% → Lifetap (heals you).
-6. Nothing is attacking you and the pet is tanking → **sit** for mana while the plague and pet work. Stand when something turns on you.
+6. Nothing is attacking you and the pet is tanking → **sit** for mana right away, while the plague and pet work. Stand when something turns on you.
 7. Otherwise → Lifetap.
 
 **Losing the pet mid-fight:** Dread the mob, back off, and recast Raise Bones if there's time. If not, Feign Death.
@@ -99,10 +101,18 @@ Things all classes share (from the game rules today):
 
 ---
 
-## Questions for you
-1. **Necro:** should Dread be recast on the big mob every time it wears off, or only when it's walking back toward you?
-2. **Necro:** sit as soon as nothing is on you, or only when mana is below a certain point?
-3. **Druid:** at level 1–2 (only Thornlash and Mend), stand and fight, or still back away between casts?
-4. **Warrior:** when should a Warrior give up and run to the guards: at a set health, or never in the sim?
-5. **Rogue:** after Evade, reset and re-open from Hide every time, or only when health is low?
-6. Rest target: 80% before the next pull feels right for all classes?
+## Open question
+**Rogue: what is Evade for?** One thing to know first: a mob that walks home heals to full. So an Evade reset throws away all the damage you've done to that mob.
+
+Example: a level 6 Rogue is fighting a crypt skeleton. The skeleton is at half health, the Rogue is at 60%, and Evade is ready.
+- **A. Evade as damage:** Evade, then Backstab right away (triple damage, can't miss). The skeleton turns back on you after ~3s, but it's now nearly dead. Evade becomes part of the combo, so it's usually on cooldown when you need to escape.
+- **B. Evade as escape:** save it. Keep going with Gouge → Backstab and Stab. Only when health drops low: Evade, Hide, let the skeleton walk home (healed), rest to 80%, and re-open from Hide.
+
+The sim can test both and show which kills faster and dies less.
+
+## Settled (Nov 17)
+- Necro re-Dreads the big mob when it starts walking back toward you.
+- Necro sits as soon as nothing is on it.
+- Druid stands and fights at levels 1–2.
+- Warrior never runs in the sim.
+- Every class rests to 80% before the next pull.
