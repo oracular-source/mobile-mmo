@@ -85,12 +85,12 @@ Armored tank with no mana: every skill runs on its own cooldown. High HP (60 + 1
 
 ### Rogue (playable)
 
-Sneaky melee damage with no mana: every skill runs on its own cooldown. HP 44 + 13 per level, light leather armor (AC 5), STR adds 2% melee damage per point. Hits harder than the Warrior but can't take hits, so solo play means picking fights carefully: open from Hide, stun, get behind, and Evade when it goes wrong. Best with a tank holding the mob.
+Sneaky melee damage with no mana: every skill runs on its own cooldown. HP 48 + 14 per level, leather armor (AC 8), STR adds 2% melee damage per point. Hits harder than the Warrior but can't take hits, so solo play means picking fights carefully: open from Hide, stun, get behind, and Evade when it goes wrong. Best with a tank holding the mob.
 
 | Level | Skill | Type | What it does |
 | --- | --- | --- | --- |
 | 1 | Stab | Melee | Main attack, global cooldown only (auto-cast). From Hide it becomes Backstab if that's ready |
-| 1 | Backstab | Backstab | Only from Hide (triple damage, can't miss) or from behind the target (double damage); 10s cooldown, down to 6s |
+| 1 | Backstab | Backstab | Triple damage that can't miss from Hide or on an Evaded mob; double from behind or on a stunned mob. From Hide it one-shots most mobs a level or two below you. 10s cooldown, down to 6s |
 | 1 | Hide | Stealth | Mobs don't notice you; you sneak at 70% speed. Using any skill or getting hit ends it. Can't hide while something is fighting you |
 | 1 | Throwing Knife | Pull | Ranged poke to pull mobs |
 | 2 | Gouge | Stun | Small hit plus a 2.5s stun: step behind the mob for a Backstab |
@@ -98,7 +98,9 @@ Sneaky melee damage with no mana: every skill runs on its own cooldown. HP 44 + 
 | 5 | Evade | Drop aggro | Mobs fighting you forget you and stand confused for about 3s (half on bosses). Hide during it and they walk home; hit them directly and they fight again. Bleed ticks don't wake them |
 | 7 | Sprint | Speed | +50% run speed for 8s |
 
-**Behind:** mobs face left or right; you're behind a mob when you're on the side its back faces. A stunned or Evaded mob doesn't turn, which is how a solo Rogue gets behind it.
+**Behind:** mobs face left or right; you're behind a mob when you're on the side its back faces. A stunned or Evaded mob isn't watching you, so Backstab works from any side (stepping behind in a 2s stun is too fiddly on a phone).
+
+**Solo combo:** Hide → walk up → tap the mob (Backstab ambush) → Gouge → Backstab → Rend, Stab → Evade → Backstab (ambush again).
 
 ### Necromancer (playable)
 
