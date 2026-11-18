@@ -54,10 +54,10 @@ Placeholder names stay until the setting is decided.
 | Area | Levels | Landmark | Named | What's there |
 | --- | --- | --- | --- | --- |
 | **Crossroads** (outside Town 1's gate) | 1–3 | The campfire and signpost | none | Guards, Marrow, rats and beetles; three roads out, each with its landmark in view |
-| **Sunken Graveyard** (west) | 3–5 | A broken bell tower | **Skeleton King** in the crypt (Dungeon 1) | Shambling corpses, dug graves, low fog; the crypt door at the back |
+| **Sunken Graveyard** (west) | 3–5 | A broken bell tower | **Skeleton King** in the crypt (shared, summonable) | Shambling corpses, dug graves, low fog; the crypt door at the back |
 | **Rat tunnel** (east) | 3–6 | A sinkhole with dust rising, squeaks you can hear | **Old Gnawbone** at the bottom | A short cave: easy rats at the mouth, bigger ones deeper; gnawed bones, collapsed carts |
 | **Wolfwood** (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop path with his pack | Wolves, a hunter's abandoned camp, the forest getting darker |
-| **Ruined Chapel** (deep wood, past Wolfwood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** (zone finale) | Fen cultists in camps of three; a shortcut path back to the crossroads |
+| **Ruined Chapel** (deep wood, past Wolfwood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** (zone finale, the first instanced dungeon) | Fen cultists in camps of three; a shortcut path back to the crossroads |
 
 Every boss and named gets one **look** that sets it apart and one **move** of its own:
 | Named | Look | Move |
@@ -78,10 +78,9 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 - **The Mire:** stays out of Zone 1 for now.
 
 ## Open questions for the owner
-- **Size:** about how long should a straight walk from the gate to the chapel take? (The Druid walks about 2 tiles a second.)
-- **Rat tunnel:** private like the crypt, or a shared cave other players can wander into later?
-- **Map:** a map that fills in as you explore, or no map at all (landmarks only)?
-- **Secrets:** how many per area, and what kind (hidden chest, rare spawn, lore note)?
+- **Summon limit:** how to stop summoning being farmed. Options: (a) each player can summon a named once per real-world interval (say 20–30 minutes); (b) the object needs a drop from that area's mobs (a severed paw from tunnel rats, a crown shard from crypt skeletons); (c) both.
+- **Malrec's dungeon:** what's inside the chapel (crypt below the altar, cult halls), and how long a run (15–20 minutes fits the session pillar).
+- **Rare spawns:** how often (for example, 1 in 20 spawns), and whether each area has one fixed rare with a name.
 
 ## Sources
 - Disney weenies: https://gamedeveloper.com/design/what-mario-learned-from-mickey-mouse---part-3-decision-making-and-weenies ; side paths: https://craphound.com/disneylandleveldesign.txt ; Erdtree as weenie: https://www.aol.com/articles/disneyland-wrote-video-game-rule-150000682.html
