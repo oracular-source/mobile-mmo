@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17).
+**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17). **Batch 2 (Magician, Ranger, Monk, Shaman, Bard) is on its first draft, for owner review (Nov 17).**
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.
@@ -35,7 +35,7 @@ Things all classes share (from the game rules today):
 ---
 
 ## Warrior: the anvil
-**Idea:** stand in it, use cooldowns well, and pull one mob at a time.
+**Idea:** stand in it, use cooldowns well, and pull one mob at a time. **Owner's direction (Nov 17): the Warrior is the ultimate tank,** the hardest class in the game to kill. How is open (see the Warrior card on the board); tuned in the balance pass.
 
 **Pull:** Throw Stone, then wait for the mob to come to you.
 
@@ -113,7 +113,7 @@ New rules this batch needs (everything else reuses what the game already has):
 - **Smaller ones:** taunt, short jumps and teleports (Blink, Gate), a can't-be-hurt bubble (Divine Aura), and damage hitting mana first (Mana Shield).
 
 ### Cleric: the slow grind (pure healer)
-**Idea:** hit things with a hammer and refuse to die. Kills are slow, but deaths almost never happen. The anchor at the bottom of the solo chart.
+**Idea:** hit things with a hammer and refuse to die. Kills are slow, but deaths almost never happen. **Owner (Nov 17): a Cleric that almost never dies is fine, because its kills are slow.** No nerf planned for that.
 **Twist: healing burns the dead.** Every heal you cast also sends a pulse of holy damage into undead standing near you. In the crypt, healing yourself *is* your damage, so a Cleric there fights by healing through hits instead of swinging.
 
 | Lvl | Ability | Kind | What it does |
@@ -252,9 +252,162 @@ New rules this batch needs (everything else reuses what the game already has):
 - Wizard gets Gate at level 8. Teleports are fine early; mounts may come later anyway.
 - Shadow Knight keeps Feign Death.
 
-## Batch 2 (later): Magician, Ranger, Monk, Shaman, Bard
-Archetypes only for now. Shaman and Bard need the buff bar first; Bard also needs songs.
-Flavor notes to carry in: Shaman is the **DoT and slow** class (stack several ticking effects and walk away, never casting bolts). Magician is the **summoner** (picks which elemental pet to bring). Monk fights with fists and **pulls by feigning death**. Ranger shoots while moving. Bard plays songs that run on their own.
+---
+
+## Batch 2 (first draft, Nov 17): Magician, Ranger, Monk, Shaman, Bard
+Same shape as batch 1: 8 abilities from level 1 to 8, one signature twist each, a playbook for the sim. Flavor first; numbers from the sim later. Still only the Wizard is the bolt class.
+
+New rules this batch needs:
+- **Buff bar** (backlog card, now needed): a buff hits you and everyone near you (Warriors: self only), no targeting, lasts until you die. Shown as small icons under your health. Shaman and Bard use it.
+- **Songs** (Bard): an always-on effect that pulses every 3s around you while you move and fight. Up to two at once. Tap to start, tap again to stop.
+- **Pet choice and pet swap** (Magician): several pets, one out at a time. Summoning a new one sends the old one away.
+- **Pet explode** (Magician): the pet blows up and does area damage.
+- **Ground traps** (Ranger): placed at your feet, wait up to 60s, go off on the first mob that steps in.
+- **Shoot while moving** (Ranger): the main attack fires without stopping.
+- **Totems** (Shaman): a small object on the ground that ticks on mobs near it for a while.
+- **Split with Feign Death** (Monk): the Monk's Feign Death drops every mob except your target.
+- **Health for mana** (Shaman's Cannibalize). Reuses the Shadow Knight's "spend health" rule.
+- **Dash to a target** (Monk's Flying Kick). Shares code with the Warrior's Charge card.
+
+### Magician: the summoner
+**Idea:** a pet class like the Necro, but instead of one skeleton you carry a toolbox of elementals and pick the right one for the fight.
+**Twist: pick your elemental.** Earth tanks, fire burns, air stuns, water heals you. Only one out at a time; swapping takes a 3s cast and mana, so you choose before the pull. When you're done with a pet, **Detonate** it for an area blast and summon the next.
+
+| Lvl | Ability | Kind | What it does |
+| --- | --- | --- | --- |
+| 1 | Elemental Lash | melee-range hit | Short-range lash (main attack); also heals your pet a little |
+| 1 | Summon Earth | pet | Slow, tough, holds the mob. The safe pick |
+| 2 | Summon Fire | pet | Fragile, hits hard, burns (DoT) what it hits |
+| 3 | Mend Elemental | pet heal | Heals your pet |
+| 4 | Summon Air | pet | Fast; every few hits knocks the mob back and stuns it briefly |
+| 5 | Detonate | area nuke | Your pet explodes: fire hits hardest, earth stuns, air knocks back, water heals you. Pet is gone |
+| 6 | Summon Water | pet | Weak hits, heals you every few seconds |
+| 8 | Elemental Link | buff | For 10s, your pet takes half the damage meant for you |
+
+**Before pulling:** pick the pet for the job. Single mob, safe: Earth. Fast kill: Fire. Two mobs: Air. Hurt or a long fight: Water.
+**Pull:** send the pet; Elemental Lash only if the mob comes to you.
+**Fight, in order:**
+1. Health low and Elemental Link ready (level 8) → Elemental Link.
+2. Health low and Water isn't out → back off; if the pet is about to die anyway, Detonate it, then Summon Water.
+3. Pet below half health → Mend Elemental.
+4. Mob below a quarter health, pet is Fire and Detonate ready → Detonate to finish it (then resummon after the fight).
+5. Two or more mobs next to the pet and Detonate ready → Detonate, then resummon.
+6. Nothing is attacking you → sit for mana (like the Necro).
+7. Otherwise → Elemental Lash.
+**Between fights:** sit until mana is about 80%; resummon if the pet died or was detonated.
+
+### Ranger: the moving archer
+**Idea:** never stop. Shoot while walking, lay traps, and drag the mob through them.
+**Twist: shoot on the move, fight on your ground.** Every other caster stops to cast; the Ranger's bow fires while walking. Traps go down before the pull, so a Ranger "builds" the fight: two traps, then pull the mob through them.
+
+| Lvl | Ability | Kind | What it does |
+| --- | --- | --- | --- |
+| 1 | Shoot | ranged | Bow shot (main attack); fires while you move |
+| 1 | Hunter's Mark | debuff | Your hits on the marked mob do 20% more; lasts until it dies (the pull) |
+| 2 | Ensnaring Shot | snare | Shot that slows the mob |
+| 3 | Spike Trap | trap | Ground trap: big hit plus a bleed on the first mob to step in |
+| 4 | Disengage | move | Hop backward out of melee |
+| 5 | Salve | heal | Small heal, 1.5s cast (the one thing that makes you stop) |
+| 6 | Volley | area | Rain of arrows on the target's area for 4s |
+| 8 | Rapid Fire | buff | Shots fire twice as fast for 6s |
+
+**Before pulling:** Spike Trap between you and the mob (level 3).
+**Pull:** Hunter's Mark, then walk backward so the mob runs through the trap.
+**Fight, in order:**
+1. Health low and nothing in melee → Salve. If something is in melee → Disengage first.
+2. Mob in melee range and Disengage ready → Disengage.
+3. Mob not snared → Ensnaring Shot.
+4. Two or more mobs and Volley ready → Volley.
+5. Rapid Fire ready (level 8) → Rapid Fire.
+6. Mob in melee range → walk away while shooting (kite).
+7. Otherwise → Shoot.
+**Between fights:** sit until health and mana are about 80%; lay a new trap.
+
+### Monk: the split puller
+**Idea:** fast fists, great dodging, no armor. Fights one mob at a time because it **makes** it one at a time.
+**Twist: split with a fake death.** The Monk can pull a whole group, then drop with Feign Death: every mob forgets it and walks home, **except the one you're targeting**, which keeps coming. A pack becomes a single, every time. (EverQuest's classic Monk pull.)
+
+| Lvl | Ability | Kind | What it does |
+| --- | --- | --- | --- |
+| 1 | Palm Strike | melee | Fast punch (main attack) |
+| 1 | Feign Death | feign | Mobs forget you and walk home, except your target. Short cooldown |
+| 2 | Flying Kick | dash | Leap to the target and kick it (also a pull) |
+| 3 | Mend | heal | Instant self-heal, long cooldown |
+| 4 | Leg Sweep | stun | Short stun |
+| 5 | Flurry | melee | Five quick punches |
+| 6 | Deflect | buff | Dodge every melee hit for 3s |
+| 8 | Dragon Strike | melee | Big hit that knocks the mob back |
+
+**Pull:** Flying Kick the target. If more than one comes, Feign Death right away, stand when the others have walked off, and fight the one that stayed.
+**Fight, in order:**
+1. Two or more mobs on you and Feign Death ready → Feign Death (splits the target off).
+2. Health low and Mend ready → Mend.
+3. Health low and Deflect ready (level 6) → Deflect.
+4. Leg Sweep ready → Leg Sweep.
+5. Flurry ready (level 5) → Flurry.
+6. Dragon Strike ready (level 8) → Dragon Strike.
+7. Otherwise → Palm Strike.
+**Losing the fight:** Feign Death and rest (counts as an escape, not a death). Like the Rogue, the Monk has a way out the Warrior doesn't.
+**Between fights:** sit until health is about 80%.
+
+### Shaman: the stacker
+**Idea:** never cast a bolt. Stack ticking effects, slow the mob's attacks, and walk away while it rots.
+**Twist: the more that ticks, the harder it ticks.** Each different damage-over-time effect on a mob makes all of them tick 15% harder. One DoT is weak; Sicken plus Swarm plus a Venom Totem is strong. Drowsy (attack slow) keeps you alive while it works.
+
+| Lvl | Ability | Kind | What it does |
+| --- | --- | --- | --- |
+| 1 | Sicken | dot | Poison over time (main attack) |
+| 1 | Minor Healing | heal | Medium heal, 1.5s cast |
+| 2 | Drowsy | slow | Mob attacks 30% slower (not a snare: it still runs at full speed) |
+| 3 | Spirit of the Wolf | buff | Faster run speed for you and anyone nearby, until you die |
+| 4 | Swarm | dot | Second DoT (insects), stacks with Sicken |
+| 5 | Venom Totem | totem | A totem on the ground poisons mobs near it for 20s |
+| 6 | Spirit Ward | buff | More armor and health for you and anyone nearby, until you die |
+| 8 | Cannibalize | health for mana | Trade 15% of your health for mana, instant |
+
+**Before pulling:** Spirit of the Wolf and Spirit Ward up (buff bar).
+**Pull:** Sicken from max range, then Drowsy as it arrives.
+**Fight, in order:**
+1. Health low → Minor Healing (back off first if you can).
+2. Drowsy not on the target → Drowsy.
+3. Sicken not on the target → Sicken.
+4. Swarm not on the target (level 4) → Swarm.
+5. Totem not down and the mob is close (level 5) → Venom Totem at your feet, then walk away so the mob follows through it.
+6. Mana low, health above 70% (level 8) → Cannibalize.
+7. Everything is ticking → walk away (kite) and let it rot.
+**Two mobs:** Drowsy both, DoTs on both, kite.
+**Between fights:** sit until mana is about 80% (Cannibalize and heal back to save sitting time).
+
+### Bard: the songbird
+**Idea:** a light melee class that's always playing something. Songs run on their own while you fight, walk, and kite.
+**Twist: two songs always on.** You pick two songs and they keep pulsing around you every 3s, no recasting. Swap songs mid-fight to change what you are: a healer, a damage aura you drag mobs around in, or the fastest runner in the game.
+
+| Lvl | Ability | Kind | What it does |
+| --- | --- | --- | --- |
+| 1 | Slash | melee | Blade swing (main attack) |
+| 1 | Song of Mending | song | Heals you and anyone nearby a little every pulse |
+| 2 | Dirge | song | Hurts every mob near you a little every pulse |
+| 3 | Song of Travel | song | Much faster run speed while it plays |
+| 4 | Lullaby | mez | Puts a mob to sleep (shorter than the Enchanter's) |
+| 5 | Chant of Blades | song | Your swings are 25% faster |
+| 6 | Discord | song | Mobs near you attack 20% slower |
+| 8 | Crescendo | burst | Ends both songs for one big pulse of whatever they were (big heal, big hit, etc.) |
+
+**Before pulling:** Song of Mending plus Dirge (levels 2–4), Chant of Blades plus Discord (level 6+).
+**Pull:** walk in and Slash; Dirge is already hitting it.
+**Fight, in order:**
+1. Health low → swap a song to Song of Mending; level 8: Crescendo with Mending playing.
+2. A second mob is coming and Lullaby ready → Lullaby it.
+3. Two or more mobs and Dirge playing → kite them in circles inside the Dirge (keep moving).
+4. Otherwise → Slash.
+**Getting around:** Song of Travel between fights.
+**Between fights:** sit with Song of Mending playing until health and mana are about 80%.
+
+### Open questions for batch 2 (owner)
+1. Magician: four pets at levels 1–6 too many this early? Option: Earth and Fire by 8, Air and Water later.
+2. Monk Feign Death at level 1, or level 3 so new players learn to fight first?
+3. Bard: two songs at once, or one song to keep it simple on a phone?
+4. Shaman: does "each DoT makes the others hit harder" feel right, or keep the twist to Drowsy plus totems?
 
 ---
 
@@ -274,3 +427,4 @@ Example: a level 6 Rogue is fighting a crypt skeleton. The skeleton is at half h
 - Warrior never runs in the sim.
 - Every class rests to 80% before the next pull.
 - Rogue uses Evade as damage (A), not as an escape.
+- Cleric that almost never dies but kills slowly is fine (owner). Warrior should become the ultimate tank (balance pass).
