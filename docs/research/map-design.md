@@ -76,7 +76,7 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 - **Map:** fills in as you explore.
 - **Secrets:** a hidden chest here and there that rolls gear for your class. **Rare spawns:** tougher, more XP, a better drop. **Lore:** later, once the setting is decided.
 - **The Mire:** stays out of Zone 1 for now.
-- **Follow-up (owner):** 2 minutes end to end to start (about 128 × 128 tiles), then judge it on the phone. Summoning needs **both** a key dropped by that area's mobs and a per-player cooldown (20–30 minutes). Rares are **1 in 100** spawns. Malrec's dungeon: **a crypt under the chapel altar plus cult halls**, a 15–20 minute run.
+- **Follow-up (owner):** 2 minutes end to end to start (about 128 × 128 tiles), then judge it on the phone. Summoning needs **only** a key dropped by that area's mobs; the key is used up, no cooldown. Rares are **1 in 100** spawns. Malrec's dungeon: **a crypt under the chapel altar plus cult halls**, a 15–20 minute run.
 
 ## Open questions for the owner
 - **Named rares:** should each area also have one fixed rare with its own name (like "the Pale Rat" in the tunnel), or keep rares as random tougher versions only?

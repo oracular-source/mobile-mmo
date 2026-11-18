@@ -275,7 +275,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 | Greyfang | 7 | Wanders Wolfwood | Silver coat, glowing eyes, leads the pack | Howls to call the pack back, never flees | none (wanders on a timer) |
 | Brother Malrec | 10 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
 
-**Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs the area's key item **and** each player waits 20–30 minutes before summoning the same named again.
+**Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs only the area's key item, which is used up (no cooldown).
 
 **Named rares.** About 1 in 100 spawns in an area is that area's named rare: tougher, more XP, a better drop, and its own name and look. Placeholder names and looks:
 
