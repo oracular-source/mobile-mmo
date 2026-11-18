@@ -31,7 +31,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Developer panel for manual testing: open the game with `?dev` (DEV button: levels, heal, god mode, loot, teleports). `?dev=0` turns it off.
 - Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
-- Game numbers live in `js/data/`: `classes.js` (`CLASSES`: stats, abilities, loadouts), `mobs.js` (`TYPES`, `NEED` XP), `items.js` (`ITEMS`), `sprites.js` (`SPR`, `PAL`). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
+- Game numbers live in `js/data/`: `classes.js` (`CLASSES`: stats, abilities, loadouts), `mobs.js` (`TYPES`, `NEED` XP), `items.js` (`ITEMS`), `sprites.js` (`SPR`, `PAL`, and `SKINS` for the default skin: a class with no own `sprite` draws on the shared body in its `SKINS` colours). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
 
 ## Game rules to protect
 These come from the design pillars. Flag any feature that breaks one.

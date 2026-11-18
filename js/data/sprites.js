@@ -19,3 +19,29 @@ const SPR={
   rogue:["....kkkk....","...kffffk...","..kffffffk..","..kfskskfk..","..kfssssfk..","...kfrrfk...","..krrrrrrk..",".krkrrrrkrk.",".krkryyrkrk.",".kskooooksk.",".lkkrrrrkkl.",".l.krrrrk.l.","...krk.krk..","...krk.krk..","...kDk.kDk..","...kkk.kkk.."],
   warrior:["...kkkkk....","..kGGGGGk...","..kGkkkGk...","..kGsksGk..l","..kGssssk..l",".kkgRRRRgk.l","kbbkRyyRgkkl","kbybRyyRgksk","kyyybRRRgk..","kbybkRRRgk..",".kbkoooook..","..kgg.ggk...","..kgk.kgk...","..kgk.kgk...","..kDk.kDk...","..kkk.kkk..."]
 };
+
+/* ---------- Default skin (v0.15) ----------
+   One shared body for every class, told apart by colours and weapon. New classes use it until the art redo.
+   Body keys: k outline, s skin, h hair or hood, b clothes, B clothes shadow, t trim and belt, u boots.
+   Weapons are overlays on the same 12x16 grid ('.' = see-through). Keys: o wood, l steel, y gold, v glow, q shield face. */
+const BASE_BODY=["....kkkk....","...khhhhk...","..khhhhhhk..","..khskskhk..","...kssssk...","..kkbttbkk..",".kbbbbbbbbk.",".kBkbbbbkBk.",".kBkbbbbkBk.",".kskttttksk.","..kbbbbbbk..","..kbbBBbbk..","...kbk.kbk..","...kBk.kBk..","...kuk.kuk..","...kkk.kkk.."];
+const WEAPONS={
+  staff:["..........v.",".........vov","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o.","..........o."],
+  sword:["............","............","..........l.","..........l.","..........l.","..........l.","..........l.","..........l.",".........yyy","..........o."],
+  mace:["............","............","............","............","..........l.",".........lll","..........l.","..........o.","..........o.","..........o."],
+  dagger:["............","............","............","............","............","............","..........l.","..........l.","..........y.","..........o."],
+  shield:["","","","","","","kkkk........","kqyk........","kyyk........","kqyk........","kqqk........",".kk........."]
+};
+// Colours per class. body/shade = clothes, trim = belt and collar, hair = hair or hood, boots, glow = staff tip, shield = shield face.
+// Batch 1 classes are listed ahead of time so their look is ready when they land.
+const SKINS={
+  druid:{body:'#3f6b3a',shade:'#2a4a28',trim:'#c9a227',hair:'#2a4a28',boots:'#6e4a2a',glow:'#7dffa6',weapons:['staff']},
+  warrior:{body:'#8f2630',shade:'#5e1a20',trim:'#c9a227',hair:'#6e4a2a',boots:'#24272e',shield:'#6a82b0',weapons:['sword','shield']},
+  rogue:{body:'#4a3b33',shade:'#2e2420',trim:'#8d8692',hair:'#1a1820',boots:'#24272e',weapons:['dagger']},
+  necro:{body:'#2e2338',shade:'#1d1626',trim:'#b8b4c4',hair:'#1d1626',boots:'#1d1626',glow:'#b48cff',weapons:['staff']},
+  cleric:{body:'#cfc8b2',shade:'#9a9282',trim:'#c9a227',hair:'#6e4a2a',boots:'#6e4a2a',shield:'#c9a227',weapons:['mace','shield']},
+  enchanter:{body:'#6a4fa3',shade:'#45336e',trim:'#e0c3ff',hair:'#c9a227',boots:'#45336e',glow:'#e0c3ff',weapons:['staff']},
+  paladin:{body:'#cfd6e0',shade:'#8d96a6',trim:'#c9a227',hair:'#c9a227',boots:'#8d96a6',shield:'#3b6fd1',weapons:['sword','shield']},
+  shadowknight:{body:'#24272e',shade:'#15161b',trim:'#a3252f',hair:'#3a3442',boots:'#15161b',shield:'#3a3442',weapons:['sword','shield']},
+  wizard:{body:'#3b4a6b',shade:'#2c3a58',trim:'#c9a227',hair:'#cfc8b2',boots:'#2c3a58',glow:'#7dbbff',weapons:['staff']}
+};

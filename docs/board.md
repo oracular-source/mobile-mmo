@@ -28,17 +28,16 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Now
 Plan changed Nov 17 (owner): build wide first, balance and art later. Classes ship **five at a time** on **one default skin**; the sim tunes numbers overnight; then the art gets redone from one locked character.
-1. **Default skin** (S): one shared body for every class, told apart by color and weapon. New classes use it; existing sprites can stay until the art redo.
-2. ~~**Batch 1 playbooks**~~ Second draft Nov 17 (`docs/playbooks.md`): owner's answers in, and each class got a signature twist so none feels like a reskinned wizard. Ready to build after the default skin and testing grounds.
+1. **Testing grounds** (M): dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Follows the playbooks (when X, do Y). Includes fixed-step rules and seeded randomness so runs repeat. Built before batch 1 so new classes get tested as they land.
+Done: default skin (v0.15). Batch 1 playbooks second draft (`docs/playbooks.md`), ready to build after the testing grounds.
 
 ## Next
-1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Follows the playbooks (when X, do Y). Includes fixed-step rules and seeded randomness so runs repeat. Built before batch 1 so new classes get tested as they land.
-2. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin. New rules: undead tag, heal over time, mez, charm, holy ground, health as a cost, chill and Shatter, area nuke, small pets and a decoy, taunt, Blink/Gate, Divine Aura, Mana Shield. One release.
-3. **Batch 2 playbooks, then build:** Magician, Ranger, Monk, Shaman, Bard. Needs the buff bar (from the backlog) and Bard songs.
-4. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here.
-5. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
-6. **Feel pass:** hit sparks, knockback, animations, sound.
-7. Milestone 4: start screen polish, fix anything clearly broken.
+1. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin (their colours are already in `SKINS`). New rules: undead tag, heal over time, mez, charm, holy ground, health as a cost, chill and Shatter, area nuke, small pets and a decoy, taunt, Blink/Gate, Divine Aura, Mana Shield. One release.
+2. **Batch 2 playbooks, then build:** Magician, Ranger, Monk, Shaman, Bard. Needs the buff bar (from the backlog) and Bard songs.
+3. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here.
+4. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
+5. **Feel pass:** hit sparks, knockback, animations, sound.
+6. Milestone 4: start screen polish, fix anything clearly broken.
 
 Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), versioned saves (v0.14.1), Rogue (v0.13, v0.13.1).
 
@@ -98,6 +97,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.15** **Default skin:** one shared body for every class, told apart by clothes colour, trim, hair and weapon (staff, sword, mace, dagger, shield). New classes get it automatically by having an entry in `SKINS` (`js/data/sprites.js`) and no own sprite; the four current classes keep their sprites until the art redo. Colours are ready for all nine classes so far (the four current ones plus Cleric, Enchanter, Paladin, Shadow Knight, Wizard). DEV panel → **Look**: a **Default skin** toggle shows your class on the shared body, and a gallery shows all nine side by side. No gameplay or save changes.
 - **v0.14.2** Removed the wide boss health bar across the top of the screen. Bosses now show only in the regular target frame (top right), like every other mob. Plan change on the board: all 14 classes in batches of 5 on a default skin, then balance, then an art redo. Batch 1 playbooks drafted.
 - **v0.14.1** Safer saves (no gameplay change): all saving goes through one place (`js/save.js`). The save now carries a **version number**, and future changes come with an upgrade step so old characters carry over instead of breaking. Before upgrading, a backup copy of the old save is kept. Half-written or corrupted save entries are cleared instead of lingering. If the phone blocks storage (private browsing) or it's full, the game still runs and keeps progress for that session. Existing characters, levels, bags and settings carry over unchanged.
 - **v0.14** Same game, new insides: `index.html` is split into `css/game.css` and 18 small `js/` files by job (data, map, state, combat, input, UI, world, update, render, dev, main). Game numbers now live in `js/data/` (classes, mobs, items, sprites). Every gameplay random roll goes through one `rng()` so the testing grounds can replay fights later. Headless test: all four classes load, cast every spell, enter Dungeon 1 and loot with no errors, same stats and loadouts as v0.13.1.

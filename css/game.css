@@ -70,3 +70,9 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .jrow .q{color:#9aa}
 .seg button{flex:1;height:34px;font-size:11.5px}
 #ghost{position:absolute;pointer-events:none;z-index:9;opacity:.9;display:none}
+
+/* DEV: default skin gallery */
+.skingal{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
+.skingal figure{margin:0;width:60px;text-align:center}
+.skingal img{width:48px;height:64px;image-rendering:pixelated;background:#242c20;border-radius:4px}
+.skingal figcaption{font-size:10px;opacity:.8}

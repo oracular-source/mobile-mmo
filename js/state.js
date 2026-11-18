@@ -49,7 +49,7 @@ let loadout=store.get(KEY('loadout'),null);
 if(!Array.isArray(loadout)||!ABI[loadout[0]])loadout=C.loadout.slice();
 loadout=fillLoadout(loadout);
 // Developer tools: open the game once with ?dev in the address to turn them on (?dev=0 turns them off).
-const dev={on:(function(){const m=/[?&]dev(=(\d))?/.exec(location.search);if(m)store.set('ashfen-dev',m[2]!=='0');return !!store.get('ashfen-dev',false)})(),god:false};
+const dev={on:(function(){const m=/[?&]dev(=(\d))?/.exec(location.search);if(m)store.set('ashfen-dev',m[2]!=='0');return !!store.get('ashfen-dev',false)})(),god:false,skin:false}; // skin: DEV preview of the default skin (not saved)
 const kills=store.get('ashfen-kills',{});
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set(KEY('loadout'),loadout);
 

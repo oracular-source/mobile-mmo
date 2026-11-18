@@ -16,6 +16,20 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),bee
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
 
+// Default skin: lay each weapon over the shared body, then colour it from the class's SKINS entry.
+function mkSkin(id){
+  const sk=SKINS[id];if(!sk)return null;
+  const rows=BASE_BODY.map(r=>r.split(''));
+  (sk.weapons||[]).forEach(w=>(WEAPONS[w]||[]).forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.')rows[j][i]=r[i]}));
+  return mk(rows.map(r=>r.join('')),Object.assign({},PAL,{h:sk.hair,b:sk.body,B:sk.shade,t:sk.trim,u:sk.boots,v:sk.glow||'#ffffff',q:sk.shield||'#6a82b0'}));
+}
+// The player's picture: a class's own sprite if it has one, otherwise the default skin.
+// DEV "Default skin" forces the shared body so it can be judged next to the old sprites.
+function playerImg(){
+  if(C.sprite&&!dev.skin)return IMG[C.sprite];
+  const k='skin_'+CLS;if(!IMG[k])IMG[k]=mkSkin(CLS)||IMG.druid;return IMG[k];
+}
+
 /* ---------- Render ---------- */
 let S=3,VW=160,VH=200,camX=0,camY=0,dpr=1;
 // Zoom: settings.zoom is how many game pixels wide the view should be (bigger = see more).
@@ -85,7 +99,7 @@ function render(){
       shadow(player.x,player.y,5);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
-      drawSprite(IMG[C.sprite],player.x,player.y+1,player.dir,bob,player.sit||player.fd>0);
+      drawSprite(playerImg(),player.x,player.y+1,player.dir,bob,player.sit||player.fd>0);
       lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
