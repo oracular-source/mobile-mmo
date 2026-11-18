@@ -76,11 +76,11 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 - **Map:** fills in as you explore.
 - **Secrets:** a hidden chest here and there that rolls gear for your class. **Rare spawns:** tougher, more XP, a better drop. **Lore:** later, once the setting is decided.
 - **The Mire:** stays out of Zone 1 for now.
+- **Follow-up (owner):** 2 minutes end to end to start (about 128 × 128 tiles), then judge it on the phone. Summoning needs **both** a key dropped by that area's mobs and a per-player cooldown (20–30 minutes). Rares are **1 in 100** spawns. Malrec's dungeon: **a crypt under the chapel altar plus cult halls**, a 15–20 minute run.
 
 ## Open questions for the owner
-- **Summon limit:** how to stop summoning being farmed. Options: (a) each player can summon a named once per real-world interval (say 20–30 minutes); (b) the object needs a drop from that area's mobs (a severed paw from tunnel rats, a crown shard from crypt skeletons); (c) both.
-- **Malrec's dungeon:** what's inside the chapel (crypt below the altar, cult halls), and how long a run (15–20 minutes fits the session pillar).
-- **Rare spawns:** how often (for example, 1 in 20 spawns), and whether each area has one fixed rare with a name.
+- **Named rares:** should each area also have one fixed rare with its own name (like "the Pale Rat" in the tunnel), or keep rares as random tougher versions only?
+- **Malrec's dungeon layout:** how many rooms, which mobs (cultists, the crypt's dead), and what Malrec's chest drops.
 
 ## Sources
 - Disney weenies: https://gamedeveloper.com/design/what-mario-learned-from-mickey-mouse---part-3-decision-making-and-weenies ; side paths: https://craphound.com/disneylandleveldesign.txt ; Erdtree as weenie: https://www.aol.com/articles/disneyland-wrote-video-game-rule-150000682.html
