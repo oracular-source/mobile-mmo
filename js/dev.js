@@ -7,6 +7,7 @@ function devAct(a){
   else if(a==='heal'){player.hp=maxHP(L);player.mp=maxMP(L);if(pet)pet.hp=pet.maxhp;log('Dev: full health and mana.','#ff8a80')}
   else if(a==='cds'){player.cds={};player.gcd=0;log('Dev: cooldowns reset.','#ff8a80')}
   else if(a==='skin'){dev.skin=!dev.skin;log('Dev: default skin '+(dev.skin?'on':'off')+'.','#ff8a80')}
+  else if(a==='old'){dev.old=!dev.old;log('Dev: old look '+(dev.old?'on':'off')+'.','#ff8a80')}
   else if(a==='god'){dev.god=!dev.god;log('Dev: god mode '+(dev.god?'on':'off')+'.','#ff8a80')}
   else if(a==='kill'){const t=player.target;if(t&&!t.dead)hitMob(t,t.hp+999,'direct','dev strike');else log('Dev: no target.','#ff8a80')}
   else if(a==='gear'){giveItem(pick(UNCOMMONS));saveInv()}
@@ -29,16 +30,18 @@ function devAct(a){
   devAct.armed=false;renderDev();
 }
 function renderDev(){
-  const b=(a,t)=>'<button data-dev="'+a+'"'+((a==='god'&&dev.god)||(a==='skin'&&dev.skin)||(a==='watch'&&simWatch.on)?' class="active"':'')+'>'+t+'</button>';
+  const b=(a,t)=>'<button data-dev="'+a+'"'+((a==='god'&&dev.god)||(a==='skin'&&dev.skin)||(a==='old'&&dev.old)||(a==='watch'&&simWatch.on)?' class="active"':'')+'>'+t+'</button>';
   $('devbox').innerHTML='<h2>Character</h2><div class="seg">'+b('lvldn','Level −')+b('lvlup','Level +')+'</div><div class="seg">'+b('heal','Full heal')+b('cds','Reset cooldowns')+'</div><div class="seg">'+b('god','God mode')+b('kill','Kill target')+'</div>'+
     '<h2>Loot</h2><div class="seg">'+b('gear','Uncommon')+b('rare','Rare')+b('boss','Boss 1 item')+'</div><div class="seg">'+b('copper','+500 copper')+'</div>'+
     '<h2>Teleport</h2><div class="seg">'+b('gate','Gate')+b('door','Crypt door')+'</div><div class="seg">'+b('dun','Dungeon start')+b('bossroom','Boss room')+'</div>'+
-    '<h2>Look</h2><div class="seg">'+b('skin','Default skin')+'</div><div id="skingal" class="skingal"></div>'+
+    '<h2>Look</h2><div class="seg">'+b('old','Old look')+b('skin','Default skin')+'</div><div id="skingal" class="skingal"></div><h2>Monsters</h2><div id="mobgal" class="skingal"></div>'+
     '<h2>Testing grounds</h2><div class="seg">'+b('arena','Go there')+b('clear','Clear mobs')+'</div><div class="seg">'+SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))).join('')+'</div>'+
     '<div class="seg">'+b('watch','Bot plays me')+b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')')+'</div>'+
     '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>'+
     '<h2>World</h2><div class="seg">'+b('gnaw','Spawn Gnawbone')+b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')+'</div>';
-  // Every class on the default skin side by side, so colours can be compared on the phone.
-  $('skingal').innerHTML=Object.keys(SKINS).map(id=>{const im=mkSkin(id);return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+(CLASSES[id]?CLASSES[id].name:id[0].toUpperCase()+id.slice(1).replace('knight',' Knight'))+'</figcaption></figure>'}).join('');
+  // Every class in rags (gear tier 0) side by side, so colours can be compared on the phone.
+  $('skingal').innerHTML=Object.keys(RAGS).map(id=>{const im=mkRags(id);return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+(CLASSES[id]?CLASSES[id].name:id[0].toUpperCase()+id.slice(1).replace('knight',' Knight'))+'</figcaption></figure>'}).join('');
+  // Every monster type as it draws in the game (list and status in docs/monsters.md).
+  $('mobgal').innerHTML=Object.keys(TYPES).map(k=>{const im=IMG[TYPES[k].img];return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+TYPES[k].name.replace(/^an? /,'')+'</figcaption></figure>'}).join('');
 }
 if(dev.on){$('devbtn').style.display='block';$('devbtn').addEventListener('click',()=>{renderDev();openModal('devUI')});$('devbox').addEventListener('click',e=>{const b=e.target.closest('button[data-dev]');if(b)devAct(b.dataset.dev)});}

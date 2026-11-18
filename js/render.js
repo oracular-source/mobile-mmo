@@ -7,13 +7,15 @@ function mk(rows,pal,scale){
   const f=document.createElement('canvas');f.width=c.width;f.height=c.height;const fg=f.getContext('2d');fg.translate(c.width,0);fg.scale(-1,1);fg.drawImage(c,0,0);
   return{c:c,f:f,w:c.width,h:c.height};
 }
-const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mk(SPR.rat,PAL),beetle:mk(SPR.beetle,PAL),
+// A picture with step frames (walk cycle: stand, step, stand, step). One step frame is used for both steps.
+function mkWalk(rows,step,pal,scale){const im=mk(rows,pal,scale),st=mk(step,pal,scale);im.steps=[st,st];return im}
+const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.rat)),beetle:mk(SPR.beetle,PAL),
   guard:mk(SPR.guard,PAL),warrior:mk(SPR.warrior,PAL),rogue:mk(SPR.rogue,PAL),
   necro:mk(SPR.necro,Object.assign({},PAL,{p:'#2e2338',P:'#1d1626',x:'#b8b4c4'})),
   pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),minion:mk(SPR.dead,Object.assign({},PAL,{z:'#9a9282',Z:'#6b6470',r:'#3a1418',e:'#ff3b30'})),blade:mk(SPR.blade,PAL),
   earth:mk(SPR.elem,Object.assign({},PAL,{A:'#8a6a48',a:'#5e4630',e:'#ffd27a'})),fire:mk(SPR.elem,Object.assign({},PAL,{A:'#ff9a4a',a:'#c4471f',e:'#fff3c4'})),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
-  gnaw:mk(SPR.rat,Object.assign({},PAL,{a:'#4a3536',A:'#7a5555'}),2),
-  crat:mk(SPR.rat,Object.assign({},PAL,{a:'#8a8494',A:'#b5b0bc'})),
+  gnaw:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.gnaw),2),
+  crat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.crat)),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
 
@@ -24,11 +26,29 @@ function mkSkin(id){
   (sk.weapons||[]).forEach(w=>(WEAPONS[w]||[]).forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.')rows[j][i]=r[i]}));
   return mk(rows.map(r=>r.join('')),Object.assign({},PAL,{h:sk.hair,b:sk.body,B:sk.shade,t:sk.trim,u:sk.boots,v:sk.glow||'#ffffff',q:sk.shield||'#6a82b0'}));
 }
-// The player's picture: a class's own sprite if it has one, otherwise the default skin.
-// DEV "Default skin" forces the shared body so it can be judged next to the old sprites.
+// Rags (gear tier 0): head + body + starter weapon, coloured from RAGS. Also makes two walk frames
+// where one foot lifts a pixel (feet are columns 4-6 and 8-10), so legs move instead of the whole body bobbing.
+function mkRags(id){
+  const c=RAGS[id];if(!c)return null;
+  const g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>r.split(''));
+  c.w.forEach(w=>RAG_WEAPONS[w].forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.')g[j][i]=r[i]}));
+  const pal=Object.assign({},RAG_COMMON,c.c),H=g.length;
+  const step=(a,b)=>{const n=g.map(r=>r.slice());for(let x=a;x<=b;x++){n[H-3][x]=g[H-2][x];n[H-2][x]=g[H-1][x];n[H-1][x]='.'}return n.map(r=>r.join(''))};
+  const im=mk(g.map(r=>r.join('')),pal);im.steps=[mk(step(4,6),pal),mk(step(8,10),pal)];return im;
+}
+// The player's picture: the rags look by default. DEV "Old look" shows the class's previous sprite
+// (or the v0.15 default skin), and "Default skin" forces the shared 12x16 body, for comparing.
 function playerImg(){
-  if(C.sprite&&!dev.skin)return IMG[C.sprite];
-  const k='skin_'+CLS;if(!IMG[k])IMG[k]=mkSkin(CLS)||IMG.druid;return IMG[k];
+  if(dev.skin||(dev.old&&!C.sprite)){const k='skin_'+CLS;if(!IMG[k])IMG[k]=mkSkin(CLS)||IMG.druid;return IMG[k]}
+  if(dev.old)return IMG[C.sprite];
+  const k='rags_'+CLS;if(!IMG[k])IMG[k]=mkRags(CLS)||IMG.druid;return IMG[k];
+}
+// Walk cycle for pictures that have step frames: stand, left foot up, stand, right foot up (body rises on steps).
+function walkFrame(img,walk,moving){
+  if(!moving)return{im:img,bob:0};
+  const f=Math.floor(walk*8)%4;
+  if(!img.steps)return{im:img,bob:f%2};
+  return{im:f===1?img.steps[0]:f===3?img.steps[1]:img,bob:f%2?-1:0};
 }
 
 /* ---------- Render ---------- */
@@ -103,9 +123,10 @@ function render(){
     if(e===player){
       if(player.dead>0)return;
       shadow(player.x,player.y,5);
-      const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d,bob=moving?(Math.floor(player.walk*8)%2):0;
+      const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
+      const wf=walkFrame(playerImg(),player.walk,moving&&!player.sit);
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
-      drawSprite(playerImg(),player.x,player.y+1,player.dir,bob,player.sit||player.fd>0);
+      drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);
       lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
@@ -124,8 +145,9 @@ function render(){
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
-    const bob=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)?(Math.floor(m.walk*6)%2):0;
-    drawSprite(img,m.x,m.y+1,m.dir,m.root>0?0:bob,false);
+    const mmv=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)&&!(m.root>0);
+    if(img.steps){const wf=walkFrame(img,m.walk,mmv);drawSprite(wf.im,m.x,m.y+1,m.dir,0,false)} // new monsters animate their legs
+    else drawSprite(img,m.x,m.y+1,m.dir,mmv?(Math.floor(m.walk*6)%2):0,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark
