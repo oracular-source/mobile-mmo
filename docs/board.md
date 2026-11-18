@@ -32,6 +32,7 @@ One place for the work: what's being built now, what's next, every idea, and wha
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
+0. **Owner notes, Nov 18 (play-test of v0.20):** first fix the Spirit of the Wolf bug (Known issues; waiting on a screenshot). Then from the backlog: Enchanter and Shaman early levels, the mob chase cap, Paladin's first skill, appearance tiers. Owner to pick the order after the bug.
 1. **Owner play-test:** the ten default-skin classes on the phone (batch 1 from v0.17, batch 2 from v0.18). Notes become cards; bugs get fixed before balance starts.
 2. **Balance** (milestone 3c, L): overnight sim runs across all 14 classes, anchors first (Necro, Cleric), owner plays to judge fun. Yardstick (owner, Nov 17): beating the level-7 Boss 1 at level 6–8 is fine, 9 is borderline, **10 or never needs a look**; losing two skeletons at level 1 is fine. The sim now runs every level 1–10 (v0.18.1). Agreed order, one at a time:
    1. ~~**Warrior ultimate-tank pass**~~ (v0.18.2): Hold the Line + Last Stand built. Two skeletons 10/10 from level 1 (was never); Boss 1 at level 9 (was never; 4/10 at 8). Kills still slow. Owner to play-test; nudge further only if the full rerun says so.
@@ -80,6 +81,10 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 | Idea | Value | Effort | Phase |
 | --- | --- | --- | --- |
+| **Mob chase cap:** at most 3–4 mobs can chase one player; extra mobs give up and go home. Stops one player getting overrun and stops kiting whole camps away from others (owner, Nov 18, after Bard dragged many mobs in the open world) | H | M | 2 |
+| **Appearance tier on items:** every item that drops has a look tier, and that tier decides what the character wears on screen (owner, Nov 18; ties into the gear-look ladder) | H | M | 2 |
+| **Enchanter and Shaman too weak at level 1–3:** they kill too slowly to level at a fair pace, especially next to the Bard. Classes should differ, but not by this much (owner, Nov 18). Look at early damage or early spells; part of balance 3c | H | S | 2 |
+| **Paladin's first skill:** Lay on Hands at level 1 feels silly; give it a normal starter (stun, small heal or holy strike) and move Lay on Hands later (owner, Nov 18) | M | S | 2 |
 | ~~Buff spells and a buff bar~~ (built v0.18). Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
 | Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room (no separate boss bar) | M | S | 2 (with the feel pass) |
@@ -145,6 +150,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | **Gear shows on the character, by tier** (character chat, Nov 17; recommendation, owner to confirm): what you wear changes how you look, but cheaply: each armour group (cloth, leather, chain, plate) gets ~5 visual tiers per slot that shows (body, head, weapon, back): **0 rags and sticks**, 1 worn, 2 crafted, 3 fine (take 1's full gold trim), 4 named and raid (each its own look, glows, capes; wings only at the very top). An item draws its tier's look; named items draw their own. Higher tiers change the **silhouette** (mantles, taller hats, bigger weapons, capes) and carry light. Prestige cosmetics (card above) are earned looks you can wear over gear, added later; the top looks only come from top content | H | L | layer system with 3d; tiers grow with zones |
 
 ## Known issues
+- **Spirit of the Wolf (Shaman) bug, owner report Nov 18:** spams lots of numbers in the chat box, and "the slow" may not be working. Waiting on a screenshot and whether "slow" means the speed boost or the Shaman's slow spell. Fix before any feature work.
 - **Most humanoid monsters are one recoloured sprite:** the crypt skeleton, the Necromancer's skeleton, the Shadow Knight's minion and Boss 1 all reuse the shambling corpse body, so skeletons look like zombies. Being fixed one monster at a time (`docs/monsters.md`). Old Gnawbone is the new rat drawn 2× (chunky pixels) until he gets his own sprite.
 - **Rags look (v0.19):** everyone wears tier 0 whatever gear is equipped (gear doesn't show yet). Paladin and Warrior look alike apart from the head. The DEV monster gallery scales every picture to fit, so sizes there aren't true.
 - **Boss 1 by level (v0.18.4 sim):** fine by 8: Bard, Shaman 6; Cleric, Enchanter, Magician, Necro 7; Paladin, Ranger, Shadow Knight, Warrior, Wizard 8; borderline: Druid, Monk, Rogue 9. Fight lengths vary: ~35s (Paladin, Rogue) to ~2.5 min (Enchanter) and ~4 min (Bard's kite). Enchanter kills are slow everywhere (30–45s a single mob).
