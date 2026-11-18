@@ -36,7 +36,7 @@ function renderDev(){
     '<h2>Look</h2><div class="seg">'+b('skin','Default skin')+'</div><div id="skingal" class="skingal"></div>'+
     '<h2>Testing grounds</h2><div class="seg">'+b('arena','Go there')+b('clear','Clear mobs')+'</div><div class="seg">'+SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))).join('')+'</div>'+
     '<div class="seg">'+b('watch','Bot plays me')+b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')')+'</div>'+
-    '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at levels 1, 4 and 8 (about a minute).')+'</div>'+
+    '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>'+
     '<h2>World</h2><div class="seg">'+b('gnaw','Spawn Gnawbone')+b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')+'</div>';
   // Every class on the default skin side by side, so colours can be compared on the phone.
   $('skingal').innerHTML=Object.keys(SKINS).map(id=>{const im=mkSkin(id);return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+(CLASSES[id]?CLASSES[id].name:id[0].toUpperCase()+id.slice(1).replace('knight',' Knight'))+'</figcaption></figure>'}).join('');

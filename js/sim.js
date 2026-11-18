@@ -3,7 +3,8 @@
 'use strict';
 /* ---------- Sim setup ---------- */
 const SIM_DT=1/30;            // fixed step: 30 game ticks per second, the same on any phone
-const SIM_LEVELS=[1,4,8];
+// Every level up to the cap, so you can see where a class turns the corner (and the first level it beats Boss 1).
+const SIM_LEVELS=[1,2,3,4,5,6,7,8,9,10];
 const SIM_SEEDS=10;           // fights per scenario; results are averages
 // Every class fights the same mobs, set to its own level (even con) so levels compare fairly.
 const SIM_FIGHTS=[
@@ -11,7 +12,7 @@ const SIM_FIGHTS=[
   {id:'beetle',name:'Beetle (armored)',mobs:['beetle']},
   {id:'skel',name:'Skeleton',mobs:['cskel']},
   {id:'pair',name:'Two skeletons',mobs:['cskel','cskel']},
-  {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:8,lv:7}
+  {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:6,lv:7} // tried from level 6 up to find the first level that beats it
 ];
 // Classes with more than one playbook to compare. Empty for now: the Rogue's Evade was settled as damage (A) on Nov 17.
 // To compare again, add e.g. rogue:[{id:'A',name:'Evade as damage'},{id:'B',name:'Evade as escape'}].
@@ -524,7 +525,8 @@ function runSim(opts){
   const realSet=store.set;store.set=function(){};
   logMute=true;settings.autoCast=false;dev.god=false;inv.equip={}; // the main loop skips its own updates while simState.busy
   const seeds=opts.seeds||SIM_SEEDS,modes=SIM_MODES[CLS]||[{id:'',name:''}],jobs=[];
-  modes.forEach(md=>SIM_LEVELS.forEach(L=>SIM_FIGHTS.forEach(f=>{if(!f.minL||L>=f.minL)jobs.push({md:md,L:L,f:f})})));
+  const levels=opts.levels||SIM_LEVELS;
+  modes.forEach(md=>levels.forEach(L=>SIM_FIGHTS.forEach(f=>{if(!f.minL||L>=f.minL)jobs.push({md:md,L:L,f:f})})));
   const rows=[];let i=0;
   return new Promise(resolve=>{
     const step=()=>{
@@ -554,6 +556,14 @@ function simTable(res,html){
   const body=res.rows.map(r=>[r.lvl,r.fight+(r.mode?' · '+r.mode:''),r.wins+'/'+r.runs,r.deaths+(r.escapes?' (+'+r.escapes+' escaped)':''),r.wins?n(r.kill):'–',r.wins?n(r.rest):'–',n(r.dmg),C.mana?n(r.mana):'–',r.wins<r.runs?n(r.left*100)+'%':'–']);
   if(html)return '<table class="simtab"><tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+body.map(b=>'<tr>'+b.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>';
   return '| '+head.join(' | ')+' |\n|'+head.map(()=>' --- ').join('|')+'|\n'+body.map(b=>'| '+b.join(' | ')+' |').join('\n');
+}
+
+// Short summary: the first level that wins each fight at least half the time ("beats it": a retry or two gets it done).
+function simFirst(res,fightName,need){need=need||0.5;
+  const r=res.rows.filter(x=>x.fight===fightName&&x.wins/x.runs>=need).sort((a,b)=>a.lvl-b.lvl)[0];return r?r.lvl:null}
+function simSummary(res){
+  const b=simFirst(res,'Boss 1 (lvl 7)'),p=simFirst(res,'Two skeletons',0.8);
+  return 'Boss 1 first beaten (5+ wins in 10): '+(b?'level '+b:'never (by level 10)')+' · Two skeletons (8+ in 10): '+(p?'from level '+p:'never');
 }
 
 /* ---------- Watch the bot: it plays your character live in the arena ---------- */
