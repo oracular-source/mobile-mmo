@@ -40,6 +40,8 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
    4. Per-class touches: Enchanter and Bard can't hurt Boss 1 enough (never by 10); Shaman (level 6) and Ranger (7) too safe; Shadow Knight two skeletons only from level 8.
 Done: Warrior pass (v0.18.2), batch 2 build (v0.18), batch 2 playbooks (Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
+**Map chat (world design, runs alongside the build):** Zone 1 rework is designed in `design.md` (Zone 1, Dungeon 1) and `docs/research/map-design.md`; rough layout in the "Mobile MMO — Zone 1 layout (rough)" sketch. Next for the map chat: owner reacts to the sketch on the phone, then a second layout pass (areas, roads, camps, chest and rare spots). Malrec's dungeon rooms come from the design chat. No game changes until the owner says build.
+
 ## Next
 1. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
 2. **Feel pass:** hit sparks, knockback, animations, sound.
