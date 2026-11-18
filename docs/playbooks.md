@@ -81,7 +81,7 @@ Things all classes share (from the game rules today):
 **Pull:** Hide, sneak up, and open with Backstab (triple damage, can't miss). Throwing Knife only to split one mob off a group.
 
 **Fight, in order:**
-1. Evade (level 5): two versions, both tested by the sim (see "Rogue: Evade, tested both ways" at the bottom).
+1. Something is fighting you and Evade is ready (level 5) → Evade, then Backstab right away (triple damage, can't miss). **Evade is damage, not an escape** (owner's call, Nov 17).
 2. Mob stunned or Evaded and Backstab ready → Backstab (double or triple damage from any side).
 3. Gouge ready → Gouge (stun), then Backstab.
 4. Rend not on the target → Rend.
@@ -259,7 +259,7 @@ Flavor notes to carry in: Shaman is the **DoT and slow** class (stack several ti
 ---
 
 ## Rogue: Evade, tested both ways
-Owner's call (Nov 17): the sim runs the Rogue both ways below and reports which kills faster and dies less. The winner becomes the Rogue's playbook.
+**Decided Nov 17: A (Evade as damage).** Most players would use it that way. The sim showed A clears pairs faster (19s vs 30s) and gets Boss 1 lower (42% left vs 64%); B died less. The sim now runs A only; B stays in the bot code for comparison runs.
 
 **What is Evade for?** One thing to know first: a mob that walks home heals to full. So an Evade reset throws away all the damage you've done to that mob.
 
@@ -273,3 +273,4 @@ Example: a level 6 Rogue is fighting a crypt skeleton. The skeleton is at half h
 - Druid stands and fights at levels 1–2.
 - Warrior never runs in the sim.
 - Every class rests to 80% before the next pull.
+- Rogue uses Evade as damage (A), not as an escape.

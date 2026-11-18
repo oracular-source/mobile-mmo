@@ -21,7 +21,7 @@ First numbers for the five new classes (same mobs, seeds and rules; tables at th
 - **Necro is the safest:** never dies outside Boss 1 and barely takes damage, as planned (top anchor).
 - **Druid takes no damage from level 4 on:** the bot kites perfectly. A real thumb on a phone won't, so treat Druid numbers as a best case.
 - **Boss 1 at level 8:** Druid wins half, Necro 4 in 10, Warrior and Rogue never.
-- **Rogue Evade, both ways:** "as damage" (A) clears pairs faster (19s vs 30s) and gets Boss 1 lower (42% left vs 64%), but died once in 10 pair fights; "as escape" (B) never died outside Boss 1. Owner to pick.
+- **Rogue Evade, both ways:** "as damage" (A) clears pairs faster (19s vs 30s) and gets Boss 1 lower (42% left vs 64%), but died once in 10 pair fights; "as escape" (B) never died outside Boss 1. **Owner picked A (Nov 17);** later sim runs show only A.
 
 ## Tables
 ### Druid

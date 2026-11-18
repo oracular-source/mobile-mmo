@@ -28,7 +28,6 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Now
 1. **Batch 2 playbooks** (M): Magician, Ranger, Monk, Shaman, Bard. Owner and Claude draft the kits and twists in `docs/playbooks.md` like batch 1, then build (L). Needs the buff bar (backlog) and Bard songs.
-Owner to decide: the Rogue's Evade playbook, A (as damage) or B (as escape). Sim numbers are in `docs/sim-results.md`.
 Owner to play: the five batch 1 classes (v0.17) on the phone. Notes become cards.
 Done: batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
@@ -49,6 +48,7 @@ Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), v
 - **One boss health bar:** bosses use the normal target frame (top right). The separate wide boss bar was removed in v0.14.2 as redundant.
 - **Launch six (Nov 17):** Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. Enchanter replaces Wizard (more unique); Wizard moves to later.
 - **Balancing waits** until most launch classes exist. Until then, only fix obvious outliers.
+- **Rogue Evade is damage (Nov 17):** Evade, then Backstab right away. Most players would use it that way; the sim now runs only this version.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
 ## Idea backlog
@@ -103,6 +103,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Rogue's Evade settled as damage (A): playbook updated, the sim runs only that version. No game changes for players.
 - **v0.17** **Batch 1: five new classes**, each with 8 abilities (levels 1–8), its own gear and Boss 1 drops, on the shared default skin, and a sim bot. Pick them on the start screen. **Cleric:** hammer and heals; every heal also burns nearby undead; Renew (heal over time), Holy Light, Daze, Turn Undead, Greater Heal, Divine Aura (4s immune, can't attack). **Enchanter:** no bolts; Mind Rot, **Mesmerize** (sleeps the closest extra mob coming at you; sleeping mobs show Zz and a timer; any hit wakes them), a floating sword pet, Slow Mind (slower moving and attacking), Clarity, **Charm** (a mob fights for you, the pet bar turns pink and counts down, then it breaks free and comes for you), Color Flash (area stun), Phantasm (decoy). **Paladin:** Lay on Hands, Holy Bash, Mend, Smite Undead, Taunt, **Consecrate** (gold ring on the floor: heals you inside, burns undead), Divine Strike. **Shadow Knight:** Siphon, Disease Cloud, Terror, a small minion, **Harm Touch** (costs 20% of your health), Feign Death, **Dark Cleave** (heals per mob hit). **Wizard:** Frost Bolt **chills** (stacking slow), Freeze, **Shatter** (huge on a frozen mob), Blink, Fireball, Frost Nova, Mana Shield, Gate (home to the guards). Mobs now have an **undead** tag (corpses, skeletons, Boss 1), shown in the target frame. Buffs now end when you die. Target frame names each DoT. No save changes; existing characters are untouched. Sim results in `docs/sim-results.md`.
 - **v0.16** **Testing grounds and sim** (developer tools only; no gameplay or save changes). DEV panel → **Testing grounds**: **Go there** opens an empty walled arena (exit circle bottom left); **Rat / Beetle / Skeleton / Two skeletons / Boss 1** spawn a test fight at your level; **Bot plays me** lets the playbook bot play your character live in the arena; **Run sim** fights every scenario 10 times at levels 1, 4 and 8 for your class (about a minute) and shows kill time, rest time, damage taken, mana used, deaths and how much health the mobs had left when you lost. Bots for Druid, Warrior, Necromancer and Rogue (both Evade versions) follow `docs/playbooks.md`. The sim runs in fixed steps (30 per second) with seeded random rolls, so the same seed gives the same fight; your character, bags, journal and saves are put back afterward. First results: `docs/sim-results.md`.
 - **v0.15** **Default skin:** one shared body for every class, told apart by clothes colour, trim, hair and weapon (staff, sword, mace, dagger, shield). New classes get it automatically by having an entry in `SKINS` (`js/data/sprites.js`) and no own sprite; the four current classes keep their sprites until the art redo. Colours are ready for all nine classes so far (the four current ones plus Cleric, Enchanter, Paladin, Shadow Knight, Wizard). DEV panel → **Look**: a **Default skin** toggle shows your class on the shared body, and a gallery shows all nine side by side. No gameplay or save changes.

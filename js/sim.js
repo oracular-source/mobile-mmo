@@ -13,8 +13,9 @@ const SIM_FIGHTS=[
   {id:'pair',name:'Two skeletons',mobs:['cskel','cskel']},
   {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:8,lv:7}
 ];
-// Classes with more than one playbook to compare (owner's call: the Rogue's Evade, tested both ways).
-const SIM_MODES={rogue:[{id:'A',name:'Evade as damage'},{id:'B',name:'Evade as escape'}]};
+// Classes with more than one playbook to compare. Empty for now: the Rogue's Evade was settled as damage (A) on Nov 17.
+// To compare again, add e.g. rogue:[{id:'A',name:'Evade as damage'},{id:'B',name:'Evade as escape'}].
+const SIM_MODES={};
 
 // Puts a test mob in the arena at a given level. Two mobs share a group, so pulling one brings both.
 function arenaMob(type,lv,x,y,group){
@@ -157,8 +158,8 @@ const BOTS={
       // Version B: after Evade, Hide right away so the mob walks home.
       if(st.escape){if(B.can('hide')){B.use('hide');st.escape=false;st.reset=true}return}
       B.near(t,14);
-      // 1. Evade, two ways.
-      if(st.mode==='A'&&on.length&&B.can('evade')){B.use('evade');return}
+      // 1. Evade as damage (owner's call): Evade, then Backstab right away. Version B (escape) is kept for comparison runs.
+      if(st.mode!=='B'&&on.length&&B.can('evade')){B.use('evade');return}
       if(st.mode==='B'&&B.hp()<0.35&&on.length&&B.can('evade')){B.use('evade');st.escape=true;return}
       if(dist(player,t)>18)return;
       // 2. Stunned or Evaded: Backstab from any side.
