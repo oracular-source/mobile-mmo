@@ -80,8 +80,15 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 
 - **Malrec's dungeon (owner, Nov 17):** a little shorter to start, since many more dungeons will go big: **4 rooms** (chapel nave, flooded catacomb, cult halls, Malrec's sanctum), about 16 mobs, a **10–15 minute run**. The catacomb's **slowing water stays**. **Malrec is level 11.** Full layout in `design.md` (Dungeon 1).
 
+## Layout pass 2 (Nov 17, sketch: "Mobile MMO — Zone 1 layout (pass 2)")
+Owner called pass 1 a good start. Pass 2 adds, for discussion:
+- **Camps by level:** crossroads rats 1–2 and beetles 2–3; graveyard corpses 3–5 (crypt below 4–6); rat tunnel 3–4 at the mouth to 5–6 at the bottom; Wolfwood wolf packs 4–7, toughest farthest in; chapel grounds cultists in threes, 7–10.
+- **A creek** across the zone that drains into the graveyard (one flooded corner, why it's "sunken"). The **old bridge** on the main road is the doorway to Wolfwood, where the safe part ends; stepping stones carry the shortcut over it.
+- **Rest spots** with no mobs: the crossroads campfire and a **hunter's camp** in Wolfwood, a base for levels 5–7.
+- **Three loops:** (1) crossroads → graveyard → a forest path north into Wolfwood → main road home; (2) down the sinkhole → Old Gnawbone → climb out a **back hole** → shortcut south; (3) chapel → shortcut down the east side.
+
 ## Open questions for the owner
-- None open right now. Next: the owner reacts to the Zone 1 layout sketch, then a second layout pass.
+- Reactions to pass 2.
 
 ## Sources
 - Disney weenies: https://gamedeveloper.com/design/what-mario-learned-from-mickey-mouse---part-3-decision-making-and-weenies ; side paths: https://craphound.com/disneylandleveldesign.txt ; Erdtree as weenie: https://www.aol.com/articles/disneyland-wrote-video-game-rule-150000682.html
