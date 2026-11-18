@@ -14,9 +14,10 @@ Launch classes (later phases): Warrior, Cleric, Druid, Enchanter, Rogue, Necroma
 Don't add multiplayer, accounts or server code until I say we're in phase 3.
 
 ## Tech stack (prototype)
-- The whole game is one file: `index.html` (HTML, CSS and plain JavaScript, drawn on a canvas). No build step, no frameworks.
-- It runs in any phone browser and is hosted on GitHub Pages from the `main` branch.
-- Keep it working as a single file unless I agree to split it. If it grows past ~3,000 lines, propose a split into `js/` files.
+- Plain HTML, CSS and JavaScript drawn on a canvas, split by job (since v0.14): `index.html` (page and buttons), `css/game.css`, and `js/` files. No build step, no frameworks.
+- The `js/` files are plain scripts (not modules) that share one scope, loaded in the order listed at the bottom of `index.html`. A new file must be added to that list in the right spot, and top-level names must be unique across files. Code that runs at load time can only use things from files above it; code inside functions can use anything.
+- Split rules: `js/data/` holds numbers only, no logic. Game rules (`combat.js`, `update.js`, `world.js`) don't draw or read touch input. Every gameplay random roll uses `rng()` (`js/rng.js`); `rnd()` is the seeded one for the map and spawn spots. Each file starts with a one-line note on what it does.
+- It runs in any phone browser (or opened straight from disk) and is hosted on GitHub Pages from the `main` branch.
 - Later options: Phaser + Capacitor (stay on web, ship to app stores) or Godot 4. Server: Nakama. Decide after the prototype.
 
 ## How we work
@@ -30,7 +31,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Developer panel for manual testing: open the game with `?dev` (DEV button: levels, heal, god mode, loot, teleports). `?dev=0` turns it off.
 - Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
-- Game numbers live in data tables near the top of the script: `CLASSES` (stats, abilities, loadouts), `TYPES` (mobs), `ITEMS`, `NEED` (XP). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
+- Game numbers live in `js/data/`: `classes.js` (`CLASSES`: stats, abilities, loadouts), `mobs.js` (`TYPES`, `NEED` XP), `items.js` (`ITEMS`), `sprites.js` (`SPR`, `PAL`). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
 
 ## Game rules to protect
 These come from the design pillars. Flag any feature that breaks one.
@@ -46,11 +47,14 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 - Only original assets (made by us) or CC0 / public domain assets. Nothing that needs a paid license or comes from another game.
 - Log every asset in `docs/credits.md`: file, who made it or where it came from, and its license.
 - Art style: dark 2D pixel art, 3/4 top-down view (Dreadmyst meets Diablo 2 and Vampire Survivors). Characters are 12x16 pixel sprites with a black outline. Use the palette in `art/palette.md`.
-- Sprites are currently stored as text grids in `index.html` (one character per pixel, see `SPR` and `PAL`).
+- Sprites are currently stored as text grids in `js/data/sprites.js` (one character per pixel, see `SPR` and `PAL`).
 - Render at low resolution and scale up with nearest-neighbor (no smoothing) so pixels stay crisp.
 
 ## Folder layout
-- `index.html` the game
+- `index.html` the page (HUD and menu markup) and the list of scripts
+- `css/game.css` styles
+- `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `dev` (DEV panel), `main` (loop, start screen; loads last)
+- `js/data/` numbers only: classes, mobs, items, sprites
 - `docs/` design doc, progress notes, credits
 - `art/` palette, and sprite sheets once we export them
 - `audio/` sound effects and music (empty for now)

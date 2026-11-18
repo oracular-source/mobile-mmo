@@ -301,7 +301,7 @@ Use off-the-shelf tools wherever possible. Writing a custom engine like Dreadmys
 
 | Layer | Choice | Why |
 | --- | --- | --- |
-| Prototype | Single-file HTML5 canvas game (`index.html`) | Plays on any phone browser, no installs; hosted free on GitHub Pages |
+| Prototype | HTML5 canvas game, plain JS files with no build step (`index.html`, `css/`, `js/`) | Plays on any phone browser, no installs; hosted free on GitHub Pages |
 | Long-term engine | Stay on web (Phaser + Capacitor for app stores) or move to Godot 4 | Decide after the prototype proves the combat is fun |
 | Game server | Nakama (or Colyseus) | Open source; handles accounts, chat, groups and server-authoritative logic |
 | Database | PostgreSQL | Built into Nakama's standard setup |

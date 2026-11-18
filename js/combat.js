@@ -1,0 +1,220 @@
+// Game rules for fighting: threat, hits, deaths, the pet, loot and casting.
+// No drawing or touch input here.
+'use strict';
+/* ---------- Combat ---------- */
+let pet=null; // Necromancer's skeleton
+const victim=m=>(pet&&m.threat.pet>m.threat.p)?pet:player;
+// Rogue helpers. "Behind" = on the side the mob's back faces (mobs face left or right).
+const hidden=()=>player.buffs.hide>0;
+const behind=m=>(player.x-m.x)*(m.dir||1)<-2;
+// A stunned or Evaded mob isn't watching you, so Backstab works from any side (stepping behind in 2s is fiddly on a phone).
+const openTo=m=>m.stun>0||m.lost>0;
+const unhide=msg=>{if(player.buffs.hide>0){player.buffs.hide=0;if(msg)log(msg,'#9aa')}};
+// Mobs actively fighting you (Evade's confusion doesn't count).
+const fightingMe=()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.lost>0));
+function engage(m,byPet){
+  if(m.dead||player.dead)return;
+  if(byPet)m.threat.pet+=1;else m.threat.p+=1;
+  if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
+  if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&dist(o,m)<70){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
+}
+// src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
+function hitMob(m,dmg,kind,label,src){
+  if(m.dead)return;
+  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
+  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
+  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*3+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(rng()<0.35)log('Your skeleton hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
+  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
+  if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
+  if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
+  if(m.hp<=0)killMob(m);
+}
+function killMob(m){
+  m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:(m.type==='gnaw'?30:24);m.sp.mob=null;
+  burst(m.x,m.y-6,'#cfc8b2',10,false);
+  log('You have slain '+m.def.name+'!','#ffd27a');
+  const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
+  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.boss?6:m.def.named?3:1)*XP_MULT);
+  const credit=m.pdmg>=m.odmg;
+  if(player.lvl>=10)xp=0;
+  if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
+  if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
+  if(zoneId==='dun'){run.kills++;run.xp+=credit?xp:0;}
+  if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
+    run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
+  if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
+    if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
+  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227')}rollLoot(m);saveInv();}
+  if(player.target===m)player.target=null;
+  while(player.lvl<10&&player.xp>=need(player.lvl)){
+    player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
+    floatText(player.x,player.y-26,'LEVEL '+player.lvl+'!','#ffd27a',true);burst(player.x,player.y-8,'#ffd27a',24,true);
+    log('You have reached level '+player.lvl+'!','#ffd27a');
+    AB.forEach(a=>{if(a.lvl===player.lvl)log('You have learned '+a.name+'! Check your Spells.','#7dffa6')});
+    buildControls();
+  }
+  save();
+  setTimeout(()=>{const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1)},800);
+}
+function hurtPlayer(m){
+  let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25);
+  // Higher-level mobs hit much harder; lower-level ones a little softer.
+  const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
+  if(player.buffs.bark>0)dmg*=0.75;
+  if(player.buffs.stance>0)dmg*=0.5;
+  dmg*=100/(100+(stat('ac')+C.ac)*4); // AC from gear (and Warrior plate) softens every hit
+  if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
+  dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;player.hp-=dmg;
+  floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
+  log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
+  unhide('You are no longer hidden.');
+  if(player.cast&&rng()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
+  if(player.hp<=0)playerDie(m);
+}
+function playerDie(m){
+  player.hp=0;player.dead=3;player.cast=null;player.tx=null;player.target=null;player.sit=false;
+  log('You have been slain by '+m.def.name+'!','#ff4d4d');
+  const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
+  // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
+  mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
+  if(pet){log('Your skeleton crumbles to dust.','#9aa');pet=null;}
+}
+function hurtPet(m){
+  let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25)*100/(100+pet.ac*4);
+  dmg=Math.max(1,Math.round(dmg));pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a');
+  if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);log('Your skeleton crumbles to dust. Cast Raise Bones for another.','#ffb37a');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
+}
+function raisePet(){
+  const L=player.lvl,hp=30+14*L;
+  pet={kind:'pet',x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:3+1.6*L,ac:6+L,atk:0,target:null};
+  if(blocked(pet.x,pet.y)){pet.x=player.x;pet.y=player.y}
+  burst(pet.x,pet.y-6,'#7dffa6',16,true);log('A skeleton claws its way out of the ground to serve you.','#b48cff');
+}
+// The skeleton follows you, attacks whatever you're fighting, and holds aggro: its hits count triple for threat, plus a bonus on its first hit.
+function updatePet(dt){
+  if(!pet)return;
+  pet.atk=Math.max(0,pet.atk-dt);
+  if(pet.target&&pet.target.dead)pet.target=null;
+  if(!pet.target){const pt=player.target;
+    if(pt&&!pt.dead&&pt.state==='chase')pet.target=pt;
+    else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
+  const t=pet.target;
+  if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=1.8;burst(t.x,t.y-6,'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee','skeleton','pet')}}}
+  // Follow with a dead zone: start walking past 30px, stop once close to its spot. One threshold made it stop and start every frame (the jitter).
+  else{const d=dist(pet,player);if(d>30)pet.follow=true;
+    if(pet.follow){const fx=player.x-12*player.dir,fy=player.y+4;if(moveToward(pet,fx,fy,d>60?52:40,dt)||Math.hypot(pet.x-fx,pet.y-fy)<6)pet.follow=false;}
+    pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
+  if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
+}
+function respawnPlayer(){if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
+
+const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
+
+/* ---------- Loot ---------- */
+// Drop chances grow a little with mob level. Gear: ~11-15% common, ~3-5% uncommon, 1% rare from level 4+ mobs.
+function rollLoot(m){
+  const got=[];
+  if(rng()<0.6)got.push(JUNK[m.type]);
+  if(m.type==='dead'&&rng()<0.3)got.push('rag');
+  const lb=m.lv*0.01,r=rng(),dun=zoneId==='dun';
+  if(r<0.10+lb)got.push(pick(COMMONS));
+  else if(r<0.10+lb+(0.025+lb*0.5)*(dun?2:1))got.push(pick(UNCOMMONS));
+  if(m.lv>=4&&rng()<(dun?0.03:0.01))got.push(pick(RARES));
+  // Boss 1's loot waits in its chest: one named item and one uncommon, every time, plus a small rare chance.
+  if(m.type==='boss1'){const c=[pick(BOSS1),pick(UNCOMMONS)];if(rng()<0.15)c.push(pick(RARES));if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
+  if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
+  got.forEach((id,i)=>giveItem(id,1,i));
+}
+function giveItem(id,n,k){
+  const it=ITEMS[id];n=n||1;
+  let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
+  if(i>=0)inv.bags[i].n+=n;
+  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
+  if(zoneId==='dun')run.loot.push(it.name);
+  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar]);
+  floatText(player.x,player.y-30-(k||0)*8,it.name,RAR[it.rar]);
+  return true;
+}
+
+/* ---------- Casting ---------- */
+// Returns true if the spell started. "quiet" skips spam messages during hold-to-repeat.
+function cast(a,quiet){
+  if(!a||player.dead)return false;
+  if(player.lvl<a.lvl){if(!quiet)log(a.name+' unlocks at level '+a.lvl+'.','#9aa');return false}
+  const own=player.cds[a.id]||0;
+  if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
+  if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
+  if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
+  let t=null;
+  if(player.fd>0&&a.kind!=='feign'){if(!quiet)log('You are playing dead. Move to get up.','#9aa');return false}
+  // Rogue: attacking from Hide with your main attack opens with Backstab when it's ready.
+  if(hidden()&&a===ABI[loadout[0]]&&ABI.backstab&&a.melee&&!(player.cds.backstab>0)&&player.lvl>=ABI.backstab.lvl)a=ABI.backstab;
+  if(a.kind==='stealth'&&hidden()){if(!quiet)log('You are already hidden.','#9aa');return false}
+  if(a.kind==='stealth'&&fightingMe().length){if(!quiet)log("You can't hide while something is fighting you. Try Evade first.",'#9aa');return false}
+  if(a.kind==='evade'&&!fightingMe().length){if(!quiet)log('Nothing is fighting you.','#9aa');return false}
+  if(a.kind==='petheal'&&!pet){if(!quiet)log('You have no skeleton to mend.','#9aa');return false}
+  if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
+  if(a.tgt){
+    t=player.target;
+    // Smart targeting: no target means the nearest enemy, preferring one already in range.
+    if(!t||t.dead){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
+    if(!t){if(!quiet)log('No enemy nearby.','#9aa');return false}
+    if(dist(player,t)>a.range){if(!quiet){log('Out of range. Move closer.','#ff8a80');floatText(player.x,player.y-24,'Out of range','#ff8a80')}rangeShow=0.8;rangeR=a.range;return false}
+    if(a.kind==='backstab'&&!hidden()&&!behind(t)&&!openTo(t)){if(!quiet){log('Backstab needs you hidden, behind the target, or the target stunned or Evaded.','#ff8a80');floatText(player.x,player.y-24,'Get behind it','#ff8a80')}return false}
+    if(t.x!==player.x)player.dir=t.x>player.x?1:-1;
+  }
+  if(player.sit)player.sit=false;
+  player.gcd=GCD;
+  // Using anything but Hide brings you out of hiding (Backstab still gets its stealth bonus).
+  const fromHide=hidden();if(a.kind!=='stealth')unhide();
+  if(a.cast<=0){player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t,fromHide);return true}
+  player.tx=null; // cast-time spells stop a tap-to-move walk
+  player.cast={a:a,t:t,time:0};
+  return true;
+}
+const castSlot=(i,quiet)=>{const a=ABI[loadout[i]];return a?cast(a,quiet):false}; // empty slots do nothing
+// Every targeted spell can be resisted. Even-level mobs resist 5% of the time, +10% per level above you,
+// down to 2% for much lower mobs. A resist still costs the mana. There are no fizzles.
+function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0.9,0.05+(d>0?d*0.10:d*0.015)))}
+// Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
+const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
+function applyAbility(a,t,fromHide){
+  const L=player.lvl,mult=a.melee?meleeMult():spellMult();
+  // A Backstab from Hide never misses: they didn't see you coming.
+  // An Evaded mob counts as an ambush too: Evade, then Backstab.
+  if(a.kind==='backstab'&&t&&t.lost>0)fromHide=true;
+  if(a.tgt&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
+    floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
+    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff');engage(t);return;}
+  if(a.kind==='nuke'||a.kind==='stun'){
+    if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});
+    burst(t.x,t.y-6,a.beam||a.col,6);
+    hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult,'direct',a.name);
+    if(a.kind==='stun'&&!t.dead){t.stun=at(a.dur,a)*durMult(t);log(cap(t.def.name)+' is stunned ('+t.stun.toFixed(1)+'s).','#9fb8e0')}
+  }else if(a.kind==='heal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6');}
+  else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
+  else if(a.kind==='snare'){t.snare=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
+  else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
+  else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you ('+Math.round(player.buffs[a.buff])+'s).','#c8b07a');}
+  else if(a.kind==='lifetap'){
+    beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
+    const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
+    const h=Math.max(1,Math.round(dmg*LIFETAP_HEAL));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff');}
+  else if(a.kind==='backstab'){
+    // x3 damage from Hide, x2 from behind.
+    const x=fromHide?3:2;burst(t.x,t.y-6,a.col,fromHide?14:9);
+    if(fromHide){floatText(t.x,t.y-28,'AMBUSH!','#ffd27a')}
+    hitMob(t,at(a.dmg)*x*rr(0.9,1.1)*(1-t.def.armor)*mult,'direct',a.name+(fromHide?' (from hiding)':''));}
+  else if(a.kind==='stealth'){player.buffs.hide=9999;burst(player.x,player.y-6,a.col,10,true);log('You melt into the shadows. Mobs won\'t notice you; attacking or getting hit ends it.','#bdbdbd');}
+  else if(a.kind==='evade'){let n=0;const d=at(a.dur,a);
+    fightingMe().forEach(m=>{m.threat.p=0;m.lost=m.def.boss?d*0.5:d;n++});
+    burst(player.x,player.y-6,a.col,10,true);
+    log('You slip away. '+n+(n===1?' foe loses':' foes lose')+' track of you for a moment: Hide now to escape, or get behind to Backstab.','#bdbdbd');}
+  else if(a.kind==='pet'){raisePet();}
+  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your skeleton for '+h+'.','#7dffa6');}
+  else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
+  else if(a.kind==='feign'){player.fd=4;player.cast=null;player.tx=null;let n=0;mobs.forEach(m=>{if(!m.dead&&m.state==='chase'){m.threat.p=0;n++}});
+    log('You fall to the ground, feigning death.'+(n?' Your foes lose interest in you.':''),'#bdbdbd');}
+  else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);
+    hits.forEach(m=>{if(rng()<resistChance(m)){floatText(m.x,m.y-18,'MISS','#cfd6e0');engage(m)}else hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name)});}
+}

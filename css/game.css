@@ -1,0 +1,74 @@
+/* All the game's styles: HUD, buttons, menus. */
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden;touch-action:none}
+#app{position:fixed;inset:0;display:flex;flex-direction:column;padding-bottom:env(safe-area-inset-bottom)}
+#view{position:relative;flex:1;min-height:0;overflow:hidden}
+#c{position:absolute;inset:0;width:100%;height:100%;image-rendering:pixelated;image-rendering:crisp-edges;touch-action:none}
+#hud{position:absolute;left:6px;right:6px;top:calc(6px + env(safe-area-inset-top));display:flex;gap:6px;pointer-events:none}
+.frame{flex:1;background:rgba(10,9,14,.8);border:1px solid #3a3343;border-radius:6px;padding:5px 7px;font-size:11px;min-width:0}
+.bar{height:7px;background:#1a171f;border-radius:2px;margin-top:3px;overflow:hidden}
+.bar>i{display:block;height:100%;width:100%}
+.hp>i{background:#b3302f}.mp>i{background:#3b6fd1}.xp>i{background:#c9a227}
+.row{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}
+.row span:first-child{overflow:hidden;text-overflow:ellipsis}
+#tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
+/* Chat box: fixed height so the side column can sit right above it. Newest line at the bottom; old lines clip off the top. */
+#log{position:absolute;bottom:8px;height:96px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
+#toggles{position:absolute;left:6px;top:calc(62px + env(safe-area-inset-top));display:flex;gap:6px}
+/* Boss health bar: wide, across the top, only while a boss is fighting you */
+#bossbar{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));display:none;pointer-events:none;background:rgba(10,9,14,.85);border:1px solid #6b4a8f;border-radius:6px;padding:4px 8px;font-size:11px;color:#ffd27a}
+#bossbar .bar{height:9px}
+#castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(132px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}
+#castbar .bar{height:9px;border:1px solid #3a3343}
+#castbar .bar>i{background:#7dffa6}
+#castname{font-size:10px;text-align:center;text-shadow:0 1px 0 #000}
+button{font:inherit;color:#e8e2cf;background:#1c1922;border:1px solid #3a3343;border-radius:6px;padding:0;touch-action:manipulation;cursor:pointer}
+button.active{border-color:#c9a227;color:#ffd27a}
+/* Spell pad */
+#pad{position:absolute;border-radius:50%;background:rgba(10,9,14,.38);border:1px solid rgba(201,162,39,.35);touch-action:none}
+.pi{position:absolute;border-radius:50%;background:rgba(20,18,26,.88);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;pointer-events:auto}
+.pi .ic,.fb .ic,.chip .ic{width:12px;height:12px;border-radius:3px;border:1px solid #0b0a0f;margin-bottom:2px;flex:none}
+.pi.flash,.fb.flash,#nexttgt.flash{border-color:#ffd27a;background:rgba(80,70,30,.9)}
+.lock{opacity:.35}
+.nomana .nm{color:#ff6b6b}
+.cd{position:absolute;left:0;right:0;bottom:0;background:rgba(0,0,0,.6);height:0;pointer-events:none}
+.cdt{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);font-size:15px;font-weight:700;color:#fff;text-shadow:0 0 3px #000,0 0 2px #000;pointer-events:none;text-align:center}
+#padc{position:absolute;border-radius:50%;background:rgba(20,18,26,.92);border:2px solid #c9a227;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:10px;line-height:1.15;overflow:hidden;text-align:center}
+#controls.arrange .pi,#controls.arrange #padc,#controls.arrange .fb{outline:2px dashed #ffd27a;outline-offset:1px}
+#controls .sel{background:rgba(80,70,30,.95);border-color:#ffd27a}
+/* Classic buttons */
+.fb{position:absolute;border-radius:50%;background:rgba(20,18,26,.9);border:1px solid #3a3343;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:9px;line-height:1.1;overflow:hidden;text-align:center;touch-action:none}
+.fb.main{border:2px solid #c9a227;font-size:9.5px}
+.fb.empty{border-style:dashed;background:rgba(20,18,26,.5)}
+#menuUI .go{background:#1c1922;border-color:#3a3343;margin-top:8px}
+/* Modals */
+.modal{position:absolute;inset:0;background:rgba(5,5,7,.9);display:none;align-items:center;justify-content:center;padding:14px;z-index:6;touch-action:none}
+.modal.show{display:flex}
+.card{width:100%;max-width:380px;max-height:100%;overflow:auto;background:#14121a;border:1px solid #3a3343;border-radius:10px;padding:16px;font-size:13px;line-height:1.45;touch-action:pan-y}
+.card h1{font-size:18px;margin:0 0 6px;color:#c9a227;font-weight:600}
+.card h2{font-size:13px;margin:14px 0 6px;color:#c9a227;font-weight:600}
+.card ul{padding-left:18px;margin:8px 0 12px}
+.card li{margin-bottom:3px}
+.card .go{width:100%;height:44px;font-size:14px;background:#2b5239;border-color:#3f8f5a;margin-top:12px}
+.hint{color:#9aa;font-size:11.5px;margin:0 0 8px}
+#book{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+#slots{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.chip{display:flex;align-items:center;gap:6px;padding:7px;border:1px solid #3a3343;border-radius:6px;background:#1c1922;font-size:11px;touch-action:none}
+.chip .ic{margin:0}
+.chip.sel{border-color:#ffd27a;background:#2a2516}
+.chip small{color:#9aa;display:block;font-size:9.5px}
+.slot{border:1px dashed #4a4354;border-radius:6px;padding:5px;min-height:52px}
+.slot .lbl{font-size:9.5px;color:#c9a227;margin-bottom:3px}
+.slot.over{border-color:#ffd27a;background:#221f14}
+.seg{display:flex;gap:5px;margin-bottom:4px}
+.bagg{display:grid;grid-template-columns:repeat(4,1fr);gap:5px}
+.bc{border:1px solid #3a3343;border-radius:6px;min-height:46px;padding:4px;font-size:9.5px;line-height:1.2;background:#1c1922;text-align:center;display:flex;flex-direction:column;justify-content:center}
+.bc.sel{border-color:#ffd27a;background:#2a2516}
+.bc small{color:#9aa}
+.idet{margin-top:8px;padding:8px;border:1px solid #3a3343;border-radius:6px;background:#1a1720;font-size:11.5px}
+.idet .acts{display:flex;gap:6px;margin-top:8px}.idet .acts button{flex:1;height:34px;font-size:11.5px}
+.up{color:#5fdf6f}.down{color:#ff6b6b}
+.jrow{display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #2a2531;font-size:12px}
+.jrow .q{color:#9aa}
+.seg button{flex:1;height:34px;font-size:11.5px}
+#ghost{position:absolute;pointer-events:none;z-index:9;opacity:.9;display:none}
