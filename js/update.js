@@ -79,6 +79,7 @@ function update(dt){
     if(m.discord>0)m.discord-=dt;
     if(m.calm>0)m.calm-=dt;
     if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
+    if(m.casting&&(m.mez>0||m.stun>0||m.fear>0||m.lost>0||m.state!=='chase'||player.dead))interruptCast(m);
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1)*(1-0.12*(m.chill||0)); // each chill stack: -12% speed
@@ -95,7 +96,7 @@ function update(dt){
       const v=victim(m);
       if(v===player&&player.fd>0&&m!==player.fdKeep){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
       const d=dist(m,v);
-      if(m.def.boss)bossThink(m,dt);if(m.dead||player.dead)return;
+      if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet)hurtPet(m);else hurtPlayer(m)}}

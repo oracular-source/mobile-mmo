@@ -158,6 +158,9 @@ function render(){
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
   // Sleeping (mesmerized) mobs: "Zz" and seconds left, so you know when to re-mez.
   mobs.forEach(m=>{if(m.dead||!(m.mez>0))return;const sx=(m.x-camX)*S,sy=(m.y-IMG[m.def.img].h-(m===t?14:4)-camY)*S;cx.font='700 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';const s='Zz '+Math.ceil(m.mez);cx.strokeText(s,sx,sy);cx.fillStyle=m.mez<4?'#ffb37a':'#e0c3ff';cx.fillText(s,sx,sy)});
+  // A boss casting its big spell: a purple bar over its head that fills up, so you can see it coming and stun it or step away.
+  mobs.forEach(m=>{if(m.dead||!m.casting)return;const w=40*dpr,h=5*dpr,sx=(m.x-camX)*S-w/2,sy=(m.y-IMG[m.def.img].h-(m===t?22:10)-camY)*S;
+    cx.fillStyle='#000';cx.fillRect(sx-dpr,sy-dpr,w+2*dpr,h+2*dpr);cx.fillStyle='#2a2033';cx.fillRect(sx,sy,w,h);cx.fillStyle=Math.floor(time*8)%2?'#d8b8ff':'#b48cff';cx.fillRect(sx,sy,w*Math.min(1,m.casting.t/m.casting.dur),h)});
   floats.forEach(f=>{const a=1-f.t/1.1,sx=(f.x-camX)*S,sy=(f.y-camY-f.t*18)*S;cx.globalAlpha=Math.max(0,a);
     cx.font='700 '+Math.round((f.big?15:12)*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
   if(settings.move==='drag'&&settings.showJoy&&joy.active){
@@ -194,7 +197,8 @@ function ui(){
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
     const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
-    $('tfx').textContent=fx.join(' · ');}
+    $('tfx').textContent=fx.join(' · ');
+    const tc=$('tcast');if(t.casting){tc.style.display='block';$('tcastname').textContent='Casting '+t.casting.name;$('tcastfill').style.width=(100*t.casting.t/t.casting.dur)+'%'}else tc.style.display='none';}
   else tf.style.visibility='hidden';
   const cb=$('castbar');
   if(player.cast){cb.style.display='block';$('castname').textContent=player.cast.a.name;$('castfill').style.width=(100*player.cast.time/player.cast.a.cast)+'%'}else cb.style.display='none';

@@ -9,6 +9,7 @@ Things all classes share (from the game rules today):
 - Mobs don't leash: once they chase you, they chase until someone dies.
 - Sitting regenerates mana 4x and health about 4x faster (doubled again by the campfire). Getting hit while sitting does +25% damage and stands you up.
 - "Low health" below means about 35%; "low mana" means about 20%.
+- **Boss casts (every class, checked before the class rules, v0.18.3):** when Boss 1 starts its 2s Shadow Bolt cast (purple bar), use a stun or fear that reaches to interrupt it. If none is ready and you are below 60% health, step out of range (110) if you can get there before it lands, and wait there until it falls short.
 
 ---
 

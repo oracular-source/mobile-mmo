@@ -132,11 +132,25 @@ function checkPortals(){
     else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));}
   }
 }
-// Boss 1: a shadow bolt every 8 seconds at range, and it calls two skeletons at half health.
+// Boss 1: casts a shadow bolt (a 2s cast you can see coming) and calls two skeletons at half health.
+// Counters: stun or fear it mid-cast (Evade and Feign Death also break it off), or be out of range,
+// Deflecting or inside Divine Aura when it lands. While casting it stands still. Returns true while casting.
+const BOLT={first:3,every:5,cast:2,range:110}; // first cast after 3s, then 5s between casts: one bolt about every 7s
+// A stun, fear, sleep, Evade or Feign Death (or the fight ending) breaks off a boss's cast.
+function interruptCast(m){if(!m.casting)return;m.casting=null;m.bolt=BOLT.every;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
 function bossThink(m,dt){
-  m.bolt=(m.bolt===undefined?5:m.bolt)-dt;
-  if(m.bolt<=0&&dist(m,player)<110){m.bolt=7;beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
-    let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('Boss 1 hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m)}
+  if(m.casting){m.casting.t+=dt;
+    if(m.casting.t<m.casting.dur)return true;
+    m.casting=null;m.bolt=BOLT.every;
+    if(dist(m,player)>BOLT.range){floatText(player.x,player.y-20,'MISS','#c8a0ff');log('The shadow bolt falls short. You were out of range.','#9fb8e0');return false}
+    beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
+    if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the shadow bolt.','#9fb8e0');return false}
+    let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('Boss 1 hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m);
+    return false}
+  m.bolt=(m.bolt===undefined?BOLT.first:m.bolt)-dt;
+  if(m.bolt<=0&&dist(m,player)<BOLT.range){m.casting={name:'Shadow Bolt',t:0,dur:BOLT.cast};floatText(m.x,m.y-34,'Shadow Bolt!','#c8a0ff');
+    log('Boss 1 begins casting Shadow Bolt! Stun or fear it, or get out of range.','#c8a0ff');return true}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('Boss 1 calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
+  return false;
 }

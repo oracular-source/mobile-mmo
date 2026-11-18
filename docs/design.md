@@ -299,7 +299,7 @@ The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shar
 
 - **Shape:** a crypt under the altar, then the cult halls, ending at Brother Malrec. A run takes 15–20 minutes.
 - **Details to design later:** rooms, mobs, Malrec's fight and his chest.
-- **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a bolt every 7 seconds and two skeletons at half health, a chest and an exit with a run summary.
+- **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a shadow bolt about every 7 seconds and two skeletons at half health. The bolt is a **telegraphed 2s cast** (v0.18.3): a purple cast bar shows in the target frame and over its head, and Boss 1 stands still while casting. A stun or fear interrupts it (Evade and Feign Death too); being out of range (110), Deflect or Divine Aura makes it miss. Every boss's big move should follow this rule: seen coming, with a counter, a chest and an exit with a run summary.
 - **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
 
 ## Solo vs group

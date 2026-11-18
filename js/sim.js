@@ -58,6 +58,19 @@ const B={
     if(blocked(px,py)){px=player.x+tx*24;py=player.y+ty*24}
     player.tx=px;player.ty=py;
   },
+  // Boss telegraph (any class, checked before the playbook): when a boss starts its big cast, a player taps a stun or fear
+  // that reaches; failing that, steps out of range if there's time to make it. Returns true if it acted this tick.
+  counter:()=>{
+    const m=B.live().find(x=>x.casting&&victim(x)===player);if(!m)return false;
+    const left=m.casting.dur-m.casting.t,d=dist(player,m);
+    const a=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='fear'&&(!a.undeadOnly||isUndead(m)))||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&d<=(a.radius||a.range||18));
+    if(a&&B.use(a.id,m))return true;
+    const need=BOLT.range+4-d;
+    if(m.casting.fled&&need<=0){B.stop();return true} // made it out: wait there until the bolt falls short
+    if(need>0&&(m.casting.fled||(B.hp()<0.6&&need/pSpeed()<left-0.1))){ // only worth giving up the attack when you are getting low
+      m.casting.fled=true;B.kite(m);return true}
+    return false;
+  },
   // Who to hit: the current target if it's alive, else whatever is fighting you, else the nearest mob.
   target:()=>{const t=player.target;if(t&&!t.dead)return t;const f=B.fighting();return f[0]||nearestMob(999)}
 };
@@ -496,7 +509,7 @@ function simFight(f,L,seed,mode){
   let t=0,dmg=0,mana=0,hadPet=!!pet,petDied=false;
   while(t<maxT){
     const hp0=player.hp,mp0=player.mp;
-    bot.think(st);update(SIM_DT);t+=SIM_DT;
+    if(!B.counter())bot.think(st);update(SIM_DT);t+=SIM_DT;
     if(player.hp<hp0)dmg+=hp0-player.hp;if(player.mp<mp0)mana+=mp0-player.mp;
     if(hadPet&&!pet)petDied=true;
     // Wizard's Gate left the arena: an escape, not a death or a win.
@@ -570,4 +583,4 @@ function simSummary(res){
 
 /* ---------- Watch the bot: it plays your character live in the arena ---------- */
 const simWatch={on:false,st:{mode:'A'}};
-function botTick(){if(!simWatch.on||zoneId!=='arena'||player.dead>0||!BOTS[CLS])return;const b=BOTS[CLS];if(!B.fighting().length&&!b.prep(simWatch.st))return;b.think(simWatch.st)}
+function botTick(){if(!simWatch.on||zoneId!=='arena'||player.dead>0||!BOTS[CLS])return;const b=BOTS[CLS];if(!B.fighting().length&&!b.prep(simWatch.st))return;if(!B.counter())b.think(simWatch.st)}

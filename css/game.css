@@ -11,6 +11,10 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .hp>i{background:#b3302f}.mp>i{background:#3b6fd1}.xp>i{background:#c9a227}
 .row{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
+/* Enemy cast bar in the target frame: a boss's big spell you can see coming (stun or fear it, or step out of range). */
+#tcast{margin-top:3px;font-size:10px;color:#e0c8ff}
+#tcast .bar{height:6px;border:1px solid #6a4fa3;margin-top:1px}
+#tcast .bar>i{background:#b48cff}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
 /* Chat box: fixed height so the side column can sit right above it. Newest line at the bottom; old lines clip off the top. */
 #log{position:absolute;bottom:8px;height:96px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
