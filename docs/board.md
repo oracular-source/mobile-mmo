@@ -29,7 +29,7 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 ## Now
 Plan changed Nov 17 (owner): build wide first, balance and art later. Classes ship **five at a time** on **one default skin**; the sim tunes numbers overnight; then the art gets redone from one locked character.
 1. **Default skin** (S): one shared body for every class, told apart by color and weapon. New classes use it; existing sprites can stay until the art redo.
-2. **Batch 1 playbooks** (first draft written Nov 17, `docs/playbooks.md`): Cleric, Enchanter, Paladin, Shadow Knight, Wizard. Owner reviews and answers the four questions at the bottom.
+2. ~~**Batch 1 playbooks**~~ Second draft Nov 17 (`docs/playbooks.md`): owner's answers in, and each class got a signature twist so none feels like a reskinned wizard. Ready to build after the default skin and testing grounds.
 
 ## Next
 1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Follows the playbooks (when X, do Y). Includes fixed-step rules and seeded randomness so runs repeat. Built before batch 1 so new classes get tested as they land.
@@ -83,6 +83,9 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
+| **Boss telegraphs:** a cast bar or timer pops up before a boss's big ability so players see it coming and can counter it (step out, stun, Divine Aura, Feign Death). Adds depth to boss fights | H | M | 2 (with the balance or feel pass) |
+| **Short teleports for everyone:** walking less in general. Some classes get fun travel tools as flavor (Wizard Blink and Gate, Druid circles), not as big unlocks; may live in class passives. Mounts possibly later | M | M | 2–3 |
+| **Class passives:** a small always-on perk per class that adds flavor (travel tools could live here). Not written down yet; owner to describe | M | M | later |
 | Class playbooks for the sim: tactics, not just a combo. Owner writes each class's process in plain words, saved as "when X, do Y" rules. Examples: Necro dreads (fears) the highest-HP mob while fighting the weaker one, sits for mana once nothing is on it, keeps plague on every mob in the fight; Rogue sprints to get around. The sim then kites and moves like a real player, so balance numbers match real play. First draft for review: `docs/playbooks.md` (Nov 17) | H | M | 2 (with the testing grounds) |
 | Fixed-step game rules and seeded randomness, so fights play the same on any phone and the sim gives repeatable numbers (from research) | M | S | 2 (with the testing grounds) |
 
