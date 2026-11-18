@@ -69,6 +69,13 @@ Every boss and named gets one **look** that sets it apart and one **move** of it
 
 The Mire from the old design stays out for now ("small and finished"); it can come back as part of Zone 2 or a later corner of Zone 1.
 
+## Owner decisions (Nov 17)
+- **Size:** about 2–3 minutes for a straight walk from the gate to the far end. Recommendation: about **128 × 128 tiles** (today's map is 40 × 30), a winding road of roughly 250 tiles to the chapel (about 2 minutes at the Druid's ~2 tiles a second), and each area's entrance about 30 seconds from the crossroads.
+- **Shared, summonable named:** the rat tunnel and the crypt are open, shared areas. At the named's spot, touching an object (bones, a severed paw, the throne) summons it if it isn't up.
+- **First instanced dungeon:** Brother Malrec's chapel, not the crypt.
+- **Map:** fills in as you explore.
+- **Secrets:** a hidden chest here and there that rolls gear for your class. **Rare spawns:** tougher, more XP, a better drop. **Lore:** later, once the setting is decided.
+
 ## Open questions for the owner
 - **Size:** about how long should a straight walk from the gate to the chapel take? (The Druid walks about 2 tiles a second.)
 - **Rat tunnel:** private like the crypt, or a shared cave other players can wander into later?
