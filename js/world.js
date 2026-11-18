@@ -84,7 +84,7 @@ function drawCritters(){
 function drawGlows(){
   const flame=(x,y,big)=>{const k=Math.floor(time*8)%3;lx.fillStyle='#e0611f';lx.fillRect(x-1,y-4-(k===1?1:0),3,4);if(big){lx.fillRect(x-2,y-2,5,2)}lx.fillStyle='#ffb347';lx.fillRect(x,y-3,1,2);if(k!==2){lx.fillStyle='#ffe9a8';lx.fillRect(x,y-2,1,1)}};
   lx.save();lx.translate(-camX,-camY);
-  if(zoneId==='dun'){DUN.braziers.forEach(b=>flame(b.x,b.y-1,true));lx.restore();return}
+  if(zoneId!=='over'){(zoneId==='arena'?ARENA:DUN).braziers.forEach(b=>flame(b.x,b.y-1,true));lx.restore();return}
   flame(CAMPFIRE.x,CAMPFIRE.y,true);
   TORCHES.forEach(t=>flame(t.x,t.y,false));
   if(rng()<0.3)parts.push({x:CAMPFIRE.x+rr(-2,2),y:CAMPFIRE.y-5,vx:rr(-3,3),vy:-rr(10,18),t:0,life:0.8,col:'#ffb347'});
@@ -107,11 +107,13 @@ $('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');r
 function enterZone(id){
   zoneId=id;
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
+  else if(id==='arena'){map=ARENA.map;MW=ARENA.w;MH=ARENA.h;world=ARENA.world;spawns=[];}
   else{map=overMap;MW=40;MH=30;world=overWorld;spawns=overSpawns;}
   WW=MW*T;WH=MH*T;
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;sp.timer=0;spawn(sp)});
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
+  else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   player.onTile=tileAt(player.x,player.y);
@@ -124,7 +126,8 @@ function checkPortals(){
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
     if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
-    if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));}
+    if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the Gate Road.','Leave',()=>enterZone('over'));}
+    else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));}
   }
 }
 // Boss 1: a shadow bolt every 8 seconds at range, and it calls two skeletons at half health.

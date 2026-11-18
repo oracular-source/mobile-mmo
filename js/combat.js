@@ -106,7 +106,7 @@ function updatePet(dt){
     pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
-function respawnPlayer(){if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
+function respawnPlayer(){if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
 
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 

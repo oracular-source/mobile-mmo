@@ -18,16 +18,25 @@ function devAct(a){
   else if(a==='dun'){enterZone('dun')}
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='gnaw'){if(zoneId!=='over'){log('Dev: Old Gnawbone lives outside.','#ff8a80');return}const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
+  else if(a==='arena'){enterZone('arena')}
+  else if(a.indexOf('sp-')===0){if(zoneId!=='arena')enterZone('arena');const f=SIM_FIGHTS.find(f=>f.id===a.slice(3));arenaSpawn(f,player.lvl);log('Dev: '+f.name+' at level '+(f.lv||player.lvl)+'.','#ff8a80')}
+  else if(a==='clear'){if(zoneId==='arena'){mobs.length=0;spawns.length=0;log('Dev: arena cleared.','#ff8a80')}}
+  else if(a==='watch'){simWatch.on=!simWatch.on;simWatch.st={mode:'A'};if(simWatch.on&&zoneId!=='arena')enterZone('arena');log('Dev: bot '+(simWatch.on?'plays your character (testing grounds only).':'off.'),'#ff8a80')}
+  else if(a==='sim'){if(simState.busy||!BOTS[CLS])return;
+    runSim({onProgress:(i,n)=>{const o=$('simout');if(o)o.textContent='Running fight set '+i+' of '+n+'…'}}).then(()=>{log('Dev: sim finished.','#ff8a80');renderDev()});renderDev();return}
   else if(a==='wipe'){if(!devAct.armed){devAct.armed=true;log('Dev: tap Wipe again to erase all saves for every class.','#ff8a80');renderDev();return}
     store.keys().filter(k=>k!=='ashfen-dev').forEach(k=>store.del(k));location.reload();return}
   devAct.armed=false;renderDev();
 }
 function renderDev(){
-  const b=(a,t)=>'<button data-dev="'+a+'"'+((a==='god'&&dev.god)||(a==='skin'&&dev.skin)?' class="active"':'')+'>'+t+'</button>';
+  const b=(a,t)=>'<button data-dev="'+a+'"'+((a==='god'&&dev.god)||(a==='skin'&&dev.skin)||(a==='watch'&&simWatch.on)?' class="active"':'')+'>'+t+'</button>';
   $('devbox').innerHTML='<h2>Character</h2><div class="seg">'+b('lvldn','Level −')+b('lvlup','Level +')+'</div><div class="seg">'+b('heal','Full heal')+b('cds','Reset cooldowns')+'</div><div class="seg">'+b('god','God mode')+b('kill','Kill target')+'</div>'+
     '<h2>Loot</h2><div class="seg">'+b('gear','Uncommon')+b('rare','Rare')+b('boss','Boss 1 item')+'</div><div class="seg">'+b('copper','+500 copper')+'</div>'+
     '<h2>Teleport</h2><div class="seg">'+b('gate','Gate')+b('door','Crypt door')+'</div><div class="seg">'+b('dun','Dungeon start')+b('bossroom','Boss room')+'</div>'+
     '<h2>Look</h2><div class="seg">'+b('skin','Default skin')+'</div><div id="skingal" class="skingal"></div>'+
+    '<h2>Testing grounds</h2><div class="seg">'+b('arena','Go there')+b('clear','Clear mobs')+'</div><div class="seg">'+SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))).join('')+'</div>'+
+    '<div class="seg">'+b('watch','Bot plays me')+b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')')+'</div>'+
+    '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at levels 1, 4 and 8 (about a minute).')+'</div>'+
     '<h2>World</h2><div class="seg">'+b('gnaw','Spawn Gnawbone')+b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')+'</div>';
   // Every class on the default skin side by side, so colours can be compared on the phone.
   $('skingal').innerHTML=Object.keys(SKINS).map(id=>{const im=mkSkin(id);return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+(CLASSES[id]?CLASSES[id].name:id[0].toUpperCase()+id.slice(1).replace('knight',' Knight'))+'</figcaption></figure>'}).join('');

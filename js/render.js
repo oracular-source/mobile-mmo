@@ -123,7 +123,7 @@ function render(){
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const amb=zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):DUN.braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const zl=zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
     .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*fl),w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
   if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}

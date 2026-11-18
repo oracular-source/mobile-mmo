@@ -89,6 +89,16 @@ const DUN=(function(){
   const sm=map,sw=MW,sh=MH,swW=WW,swH=WH;map=m;MW=w;MH=h;WW=w*T;WH=h*T;d.world=renderWorld();map=sm;MW=sw;MH=sh;WW=swW;WH=swH;
   return d;
 })();
+/* ---------- Testing grounds (DEV only): one open walled room for test fights ---------- */
+// Big enough for a Druid to kite in circles. No spawns of its own: the DEV panel and the sim place mobs.
+const ARENA=(function(){
+  const w=26,h=20,m=[];for(let y=0;y<h;y++){m[y]=[];for(let x=0;x<w;x++)m[y][x]=(x<1||y<1||x>=w-1||y>=h-1)?7:6}
+  const braziers=[[1,1],[w-2,1],[1,h-2],[w-2,h-2],[13,1],[13,h-2]].map(p=>{m[p[1]][p[0]]=9;return{x:p[0]*T+8,y:p[1]*T+10}});
+  m[h-3][2]=8; // exit circle back to the Gate Road
+  const d={w:w,h:h,map:m,start:{x:7*T+8,y:10*T+8},braziers:braziers};
+  const sm=map,sw=MW,sh=MH,swW=WW,swH=WH;map=m;MW=w;MH=h;WW=w*T;WH=h*T;d.world=renderWorld();map=sm;MW=sw;MH=sh;WW=swW;WH=swH;
+  return d;
+})();
 // A fresh instance every time you enter: nothing respawns inside.
 function dunSpawns(){
   const L=[],add=(type,tx,ty,lv,group)=>L.push({type:type,x:tx*T+8,y:ty*T+10,timer:0,mob:null,group:group||null,lv:[lv,lv],noRespawn:true});

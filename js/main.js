@@ -4,13 +4,13 @@
 let last=0,uiT=0;
 function loop(ts){
   const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
-  if(running&&!document.hidden){time+=dt;update(dt);}
+  if(running&&!document.hidden&&!simState.busy){time+=dt;botTick();update(dt);} // the sim runs its own fixed steps
   render();uiT+=dt;if(uiT>0.1){ui();uiT=0}
   requestAnimationFrame(loop);
 }
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout};
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,simTable:simTable,seedRng:seedRng,zone:()=>zoneId};
 // Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;

@@ -76,3 +76,6 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .skingal figure{margin:0;width:60px;text-align:center}
 .skingal img{width:48px;height:64px;image-rendering:pixelated;background:#242c20;border-radius:4px}
 .skingal figcaption{font-size:10px;opacity:.8}
+.simout{font-size:11px;opacity:.9;margin:6px 0;overflow-x:auto}
+.simtab{border-collapse:collapse;width:100%}
+.simtab th,.simtab td{padding:2px 4px;border-bottom:1px solid #333;text-align:left;white-space:nowrap}

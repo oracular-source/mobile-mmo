@@ -31,6 +31,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Developer panel for manual testing: open the game with `?dev` (DEV button: levels, heal, god mode, loot, teleports). `?dev=0` turns it off.
 - Automated checks: open `index.html?debug` to get `window.__game` (enterZone, player, mobs, inv) for headless tests.
+- Testing grounds and sim (`js/sim.js`): each class has a playbook bot in `BOTS` that follows `docs/playbooks.md` (when X, do Y). A new class needs a bot there too. `__game.runSim({seeds:10})` runs the current class's scenarios headless (fixed steps, `seedRng`) and resolves with the results; `__game.simTable(res)` turns them into a markdown table. To run every class, set `localStorage['ashfen-class']` and reload between runs. Save results to `docs/sim-results.md`.
 - Game numbers live in `js/data/`: `classes.js` (`CLASSES`: stats, abilities, loadouts), `mobs.js` (`TYPES`, `NEED` XP), `items.js` (`ITEMS`), `sprites.js` (`SPR`, `PAL`, and `SKINS` for the default skin: a class with no own `sprite` draws on the shared body in its `SKINS` colours). Add a class by adding data, not new code paths; abilities use generic kinds (nuke, heal, dot, root, snare, buff, stun, cleave, lifetap, pet, petheal, fear, feign, backstab, stealth, evade). Mobs pick targets by threat (player vs pet).
 
 ## Game rules to protect
@@ -53,7 +54,7 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 ## Folder layout
 - `index.html` the page (HUD and menu markup) and the list of scripts
 - `css/game.css` styles
-- `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `save` (safe storage, save version, upgrade steps for old saves), `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `dev` (DEV panel), `main` (loop, start screen; loads last)
+- `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `save` (safe storage, save version, upgrade steps for old saves), `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `sim` (testing grounds: arena test fights, playbook bots and the sim), `dev` (DEV panel), `main` (loop, start screen; loads last)
 - `js/data/` numbers only: classes, mobs, items, sprites
 - `docs/` design doc, progress notes, credits
 - `art/` palette, and sprite sheets once we export them
