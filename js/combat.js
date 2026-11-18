@@ -76,6 +76,8 @@ function killMob(m){
 function hurtPlayer(m){
   // Monk's Deflect: every melee hit misses for a few seconds.
   if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');return}
+  // Class passive dodge (Rogue): a chance for any melee hit to miss outright.
+  if(C.dodge&&rng()<C.dodge){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge '+m.def.name+"'s attack.",'#9aa');return}
   let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25);
   // Higher-level mobs hit much harder; lower-level ones a little softer.
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
@@ -141,7 +143,7 @@ function raisePet(def){
   if(pet&&pet.charm)releaseCharm();
   else if(pet&&pet.name!==def.name)log('Your '+petName()+' returns to where it came from.','#9aa'); // Magician: one elemental at a time
   const hp=Math.round(def.hp[0]+def.hp[1]*L);
-  pet={kind:'pet',name:def.name,img:def.img,x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:def.dmg[0]+def.dmg[1]*L,ac:def.ac+L,atk:0,rate:def.atk||1.8,life:def.life||0,target:null,threat:def.threat||3,burn:def.burn?def.burn[0]+def.burn[1]*L:0,boom:def.boom||1,boomStun:def.boomStun||0};
+  pet={kind:'pet',name:def.name,img:def.img,x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:def.dmg[0]+def.dmg[1]*L,ac:def.ac+L,atk:0,rate:def.atk||1.8,life:def.life||0,target:null,threat:def.threat||3,burn:def.burn?def.burn[0]+def.burn[1]*L:0,boom:def.boom||1,boomStun:def.boomStun||0,bash:def.bash||null,bashT:0};
   if(blocked(pet.x,pet.y)){pet.x=player.x;pet.y=player.y}
   burst(pet.x,pet.y-6,'#7dffa6',16,true);
   log(def.say||(def.img==='blade'?'A sword lifts into the air and floats beside you.':'A '+def.name+' claws its way out of the ground to serve you.'),'#b48cff');
@@ -170,6 +172,10 @@ function releaseCharm(quiet){
 function updatePet(dt){
   if(!pet)return;
   pet.atk=Math.max(0,pet.atk-dt);
+  // Pet bash (Earth elemental's Stone Fist): saved for a cast. When the mob it's fighting starts casting, the pet slams it
+  // (a short stun breaks the spell), then waits out its cooldown. Works like a player's stun, on its own timer.
+  if(pet.bash){pet.bashT=Math.max(0,pet.bashT-dt);const bt=pet.target;
+    if(bt&&!bt.dead&&bt.casting&&pet.bashT<=0&&dist(pet,bt)<=14){pet.bashT=pet.bash.cd;bt.stun=Math.max(bt.stun||0,pet.bash.dur);burst(bt.x,bt.y-8,'#8a6a48',8,true);log('Your '+petName()+' slams '+bt.def.name+' with a stone fist!','#cfc8b2')}}
   if(pet.charm){pet.charmT-=dt;if(pet.charmT<=0){releaseCharm();return}}
   if(pet.life){pet.life-=dt;if(pet.life<=0){burst(pet.x,pet.y-6,'#cfd6e0',8);log('Your '+petName()+' falls to the ground.','#9aa');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});return}}
   if(pet.target&&(pet.target.dead||pet.target.mez>0||mobs.indexOf(pet.target)<0))pet.target=null; // never wake a sleeping mob

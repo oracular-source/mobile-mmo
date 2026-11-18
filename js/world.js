@@ -135,10 +135,13 @@ function checkPortals(){
 // Boss 1: casts a shadow bolt (a 2s cast you can see coming) and calls two skeletons at half health.
 // Counters: stun or fear it mid-cast (Evade and Feign Death also break it off), or be out of range,
 // Deflecting or inside Divine Aura when it lands. While casting it stands still. Returns true while casting.
+// An attack slow on it slows the casting too (cast bar fills slower, longer wait between bolts).
 const BOLT={first:3,every:5,cast:2,range:110}; // first cast after 3s, then 5s between casts: one bolt about every 7s
 // A stun, fear, sleep, Evade or Feign Death (or the fight ending) breaks off a boss's cast.
 function interruptCast(m){if(!m.casting)return;m.casting=null;m.bolt=BOLT.every;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
 function bossThink(m,dt){
+  // Attack slows (Enchanter's Slow Mind, Shaman's Drowsy) slow its spellcasting too: longer casts, longer gaps.
+  if(m.aslow>0)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;
     if(m.casting.t<m.casting.dur)return true;
     m.casting=null;m.bolt=BOLT.every;

@@ -206,9 +206,9 @@ New rules this batch needs (everything else reuses what the game already has):
 | 2 | Disease Cloud | dot | Weak DoT, also the pull |
 | 3 | Terror | fear | Mob runs away (shorter than the Necro's Dread) |
 | 4 | Raise Minion | pet | Small skeleton: low HP, doesn't tank long |
-| 5 | Harm Touch | nuke | Huge hit, costs 20% of your own health, long cooldown |
+| 5 | Dark Cleave | cleave | Hits all mobs in front of you and heals a bit per mob (level 5 since v0.18.4, was 8) |
 | 6 | Feign Death | feign | Same as the Necro's |
-| 8 | Dark Cleave | cleave | Hits all mobs in front of you and heals a bit per mob |
+| 8 | Harm Touch | nuke | Huge hit, costs 20% of your own health, long cooldown (level 8 since v0.18.4, was 5) |
 
 **Before pulling:** minion up (level 4).
 **Pull:** Disease Cloud, then wait.
@@ -218,7 +218,7 @@ New rules this batch needs (everything else reuses what the game already has):
 3. Mob above half health, your health above half, and Harm Touch ready → Harm Touch.
 4. Health below about 70% → Siphon.
 5. Disease Cloud not on the target → Disease Cloud.
-6. Two or more next to you and Dark Cleave ready (level 8) → Dark Cleave (it heals per mob).
+6. Two or more next to you and Dark Cleave ready (level 5) → Dark Cleave (it heals per mob).
 7. Otherwise → Strike.
 **Between fights:** sit until health and mana are about 80%; re-raise the minion if it died.
 
@@ -279,7 +279,7 @@ New rules this batch needs:
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
 | 1 | Elemental Lash | melee-range hit | Short-range lash (main attack); also heals your pet a little |
-| 1 | Summon Earth | pet | Slow, tough, holds the mob. The safe pick |
+| 1 | Summon Earth | pet | Slow, tough, holds the mob. The safe pick. **Stone Fist** (v0.18.4): when the mob it's fighting starts a spell, it slams it and breaks the cast (once every 10s, on its own) |
 | 2 | Summon Fire | pet | Fragile, hits hard, burns (DoT) what it hits |
 | 3 | Mend Elemental | pet heal | Heals your pet |
 | 4 | Burnout | pet buff | Your pet attacks 30% faster for 20s |
@@ -405,6 +405,7 @@ New rules this batch needs:
 1. Health low → swap a song to Song of Mending; level 8: Crescendo with Mending playing.
 2. A second mob is coming and Lullaby ready → Lullaby it.
 3. Two or more mobs and Dirge playing → kite them in circles inside the Dirge (keep moving).
+**Bosses (owner, Nov 17, v0.18.4): kite, slow but safe.** From level 3, play Song of Travel and Dirge and drag Boss 1 around just inside Dirge's reach so it never catches you; when it starts casting, run out of range. Takes a few minutes, almost no risk.
 4. Otherwise → Slash.
 **Getting around:** Song of Travel between fights.
 **Between fights:** sit with Song of Mending playing until health and mana are about 80%.

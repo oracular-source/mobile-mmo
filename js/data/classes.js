@@ -22,7 +22,7 @@ const CLASSES={
     {id:'ham',name:'Hamstring',short:'Hamstr',lvl:3,mana:0,cast:0,cd:[18,10,1],range:18,col:'#a3252f',tgt:1,tag:'Snare',kind:'snare',dur:[16,1],melee:1},
     {id:'stance',name:'Defensive Stance',short:'Stance',lvl:6,mana:0,cast:0,cd:[45,30,1.5],col:'#c9a227',tgt:0,tag:'Defense',kind:'buff',buff:'stance',dur:[10,0.5]},
     {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]},
-  rogue:{name:'Rogue',sprite:'rogue',hp:[48,14],mana:null,ac:8,regen:1.2,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Fragile and weak solo: best with a tank.',
+  rogue:{name:'Rogue',sprite:'rogue',hp:[48,14],mana:null,ac:8,regen:1.2,dodge:0.25,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Dodges a quarter of melee hits, but has no heal: best with a tank.',
     loadout:['stab','backstab','hide','gouge','evade','rend','knife','sprint'],abilities:[
     {id:'stab',name:'Stab',short:'Stab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#d8dde6',tgt:1,tag:'Melee',kind:'nuke',dmg:[10,4],melee:1},
     {id:'backstab',name:'Backstab',short:'Backst',lvl:1,mana:0,cast:0,cd:[10,6,0.4],range:18,col:'#e05a5a',tgt:1,tag:'Backstab',kind:'backstab',dmg:[20,7],melee:1},
@@ -74,15 +74,15 @@ const CLASSES={
     {id:'consec',name:'Consecrate',short:'Consec',lvl:6,mana:14,cast:0,cd:[30,20,1],col:'#ffd27a',tgt:0,tag:'Holy ground',kind:'ground',radius:26,dur:[15,0],heal:[2,0.8],dmg:[3,1.2]},
     {id:'dstrike',name:'Divine Strike',short:'Divine',lvl:8,mana:6,cast:0,cd:[10,6,0.5],col:'#ffe9a8',tgt:0,tag:'Area',kind:'cleave',dmg:[7,2.8],undead:1.6,radius:24,melee:1}]},
   shadowknight:{name:'Shadow Knight',hp:[52,14],mana:[26,7],ac:10,regen:1.2,gear:['warrior','knight'],desc:'Dark tank. Lifetaps, a small skeleton, fear, and a Harm Touch paid for in blood. Likes two mobs at once: Dark Cleave heals per mob. Solo: good.',
-    loadout:['sstrike','siphon','disease','terror','minion','harm','sfeign','dcleave'],abilities:[
+    loadout:['sstrike','siphon','disease','terror','minion','dcleave','sfeign','harm'],abilities:[
     {id:'sstrike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#a3252f',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'siphon',name:'Siphon',short:'Siphon',lvl:1,mana:6,cast:0,cd:[6,4,0.25],range:60,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[5,2],beam:'#a3252f'},
     {id:'disease',name:'Disease Cloud',short:'Cloud',lvl:2,mana:6,cast:0,cd:[10,6,0.4],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[3,1.4],dur:[18,0.5]},
     {id:'terror',name:'Terror',short:'Terror',lvl:3,mana:7,cast:0,cd:[20,12,0.8],range:80,col:'#6a4fa3',tgt:1,tag:'Fear',kind:'fear',dur:[4,0.2]},
     {id:'minion',name:'Raise Minion',short:'Minion',lvl:4,mana:14,cast:3,cd:[30,15,1.5],col:'#cfc8b2',tgt:0,tag:'Pet',kind:'pet',pet:{name:'minion',img:'minion',hp:[18,8],dmg:[2,1],ac:3}},
-    {id:'harm',name:'Harm Touch',short:'Harm',lvl:5,mana:0,cast:0,cd:[90,60,2],range:30,col:'#a3252f',tgt:1,tag:'Big hit',kind:'nuke',dmg:[40,14],hpCost:0.2,beam:'#a3252f'},
+    {id:'dcleave',name:'Dark Cleave',short:'DCleave',lvl:5,mana:6,cast:0,cd:[10,6,0.5],col:'#a3252f',tgt:0,tag:'Area lifetap',kind:'cleave',dmg:[6,2.4],tapPer:[4,1.5],radius:24,melee:1},
     {id:'sfeign',name:'Feign Death',short:'Feign',lvl:6,mana:5,cast:0,cd:[60,35,2.5],col:'#9a9a9a',tgt:0,tag:'Escape',kind:'feign'},
-    {id:'dcleave',name:'Dark Cleave',short:'DCleave',lvl:8,mana:6,cast:0,cd:[10,6,0.5],col:'#a3252f',tgt:0,tag:'Area lifetap',kind:'cleave',dmg:[6,2.4],tapPer:[4,1.5],radius:24,melee:1}]},
+    {id:'harm',name:'Harm Touch',short:'Harm',lvl:8,mana:0,cast:0,cd:[90,60,2],range:30,col:'#a3252f',tgt:1,tag:'Big hit',kind:'nuke',dmg:[40,14],hpCost:0.2,beam:'#a3252f'}]},
   wizard:{name:'Wizard',hp:[32,10],mana:[50,13],ac:0,regen:1,caster:1,desc:'Glass cannon. Frost Bolt chills, Freeze holds, Shatter hits huge. Blink to get around, Gate home. Solo: strong on one mob, weak on two.',
     loadout:['frost','blink','freeze','shatter','fireball','nova','mshield','gate'],abilities:[
     {id:'frost',name:'Frost Bolt',short:'Frost',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#9fd8ff',tgt:1,tag:'Nuke + chill',kind:'nuke',dmg:[8,3.2],chill:1,beam:'#9fd8ff'},
@@ -100,7 +100,7 @@ const CLASSES={
   magician:{name:'Magician',hp:[34,10],mana:[48,12],ac:0,regen:1,caster:1,desc:'Summoner. Pick an elemental for the fight (Earth tanks, Fire burns), then blow it up with Detonate and call the next. Solo: strong, like the Necro.',
     loadout:['lash','earth','fire','mende','burnout','detonate','fshield','elink'],abilities:[
     {id:'lash',name:'Elemental Lash',short:'Lash',lvl:1,mana:4,cast:0,cd:null,range:40,col:'#ff9a4a',tgt:1,tag:'Short-range hit, heals pet',kind:'nuke',dmg:[5,2],petHeal:[2,1],beam:'#ffb37a'},
-    {id:'earth',name:'Summon Earth',short:'Earth',lvl:1,mana:15,cast:3,cd:[8,5,0.3],col:'#8a6a48',tgt:0,tag:'Pet: tank',kind:'pet',pet:{name:'earth elemental',img:'earth',hp:[34,15],dmg:[2.5,1.3],ac:10,atk:2,threat:5,boom:0.5,boomStun:2.5,say:'An earth elemental heaves itself up out of the ground.'}},
+    {id:'earth',name:'Summon Earth',short:'Earth',lvl:1,mana:15,cast:3,cd:[8,5,0.3],col:'#8a6a48',tgt:0,tag:'Pet: tank, stone fist',kind:'pet',pet:{name:'earth elemental',img:'earth',hp:[34,15],dmg:[2.5,1.3],ac:10,atk:2,threat:5,boom:0.5,boomStun:2.5,bash:{cd:10,dur:0.5},say:'An earth elemental heaves itself up out of the ground.'}},
     {id:'fire',name:'Summon Fire',short:'Fire',lvl:2,mana:15,cast:3,cd:[8,5,0.3],col:'#ff9a4a',tgt:0,tag:'Pet: damage',kind:'pet',pet:{name:'fire elemental',img:'fire',hp:[18,8],dmg:[4,2],ac:2,atk:1.6,threat:2,burn:[1.5,0.7],boom:1.3,say:'A fire elemental flares into being beside you.'}},
     {id:'mende',name:'Mend Elemental',short:'MendE',lvl:3,mana:9,cast:1,cd:[8,5,0.3],col:'#7dffa6',tgt:0,tag:'Pet heal',kind:'petheal',heal:[16,7]},
     {id:'burnout',name:'Burnout',short:'Burn',lvl:4,mana:8,cast:0,cd:[30,20,1],col:'#ffb37a',tgt:0,tag:'Pet attacks faster',kind:'petbuff',buff:'burnout',dur:[20,0]},
@@ -141,7 +141,7 @@ const CLASSES={
     loadout:['slash','smend','dirge','travel','lullaby','chant','discord','crescendo'],abilities:[
     {id:'slash',name:'Slash',short:'Slash',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'smend',name:'Song of Mending',short:'Mending',lvl:1,mana:5,cast:0,cd:[2,2,0],col:'#7dffa6',tgt:0,tag:'Song: heal',kind:'song',song:'heal',heal:[3,1.2]},
-    {id:'dirge',name:'Dirge',short:'Dirge',lvl:2,mana:5,cast:0,cd:[2,2,0],col:'#c8506a',tgt:0,tag:'Song: hurt mobs near you',kind:'song',song:'dmg',dmg:[2,1],radius:32},
+    {id:'dirge',name:'Dirge',short:'Dirge',lvl:2,mana:5,cast:0,cd:[2,2,0],col:'#c8506a',tgt:0,tag:'Song: hurt mobs near you',kind:'song',song:'dmg',dmg:[4,2],radius:32},
     {id:'travel',name:'Song of Travel',short:'Travel',lvl:3,mana:3,cast:0,cd:[2,2,0],col:'#7dbbd0',tgt:0,tag:'Song: run faster',kind:'song',song:'speed'},
     {id:'lullaby',name:'Lullaby',short:'Lullaby',lvl:4,mana:8,cast:0,cd:[10,7,0.3],range:70,col:'#e0c3ff',tgt:1,tag:'Sleep',kind:'mez',dur:[9,0.2]},
     {id:'chant',name:'Chant of Blades',short:'Chant',lvl:5,mana:5,cast:0,cd:[2,2,0],col:'#cfd6e0',tgt:0,tag:'Song: swing faster',kind:'song',song:'haste'},

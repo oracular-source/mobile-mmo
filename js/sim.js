@@ -475,6 +475,15 @@ const BOTS={
       const fight=B.fighting(),on=B.onMe();
       // Pull: walk in and Slash; Dirge is already hitting.
       if(!fight.length){if(B.near(t,14)&&B.can('slash'))B.use('slash',t);return}
+      // Boss: kite it (EverQuest bard style). Song of Travel + Dirge, staying just inside Dirge's reach so it keeps
+      // pulsing while Boss 1 never catches you; when it starts casting, run out of range.
+      if(fight.some(m=>m.def.boss)&&player.lvl>=3){
+        for(const id of ['travel','dirge'])if(!songOn(id)){if(B.can(id)){B.use(id);return}}
+        const boss=fight.find(m=>m.def.boss);
+        if(boss.casting){B.kite(boss);return}
+        const near=fight.filter(m=>dist(m,player)<22);
+        if(near.length)B.kite(near[0]);else if(dist(player,boss)>28)B.near(boss,24);else B.kite(boss);
+        return}
       // 1. Low: swap to Mending; level 8: Crescendo with Mending playing.
       if(B.hp()<0.35){if(!songOn('smend')&&B.can('smend')){B.use('smend');return}if(songOn('smend')&&B.can('crescendo')){B.use('crescendo');return}}
       // Back to the fight songs once healthy again.
