@@ -75,6 +75,7 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 - **First instanced dungeon:** Brother Malrec's chapel, not the crypt.
 - **Map:** fills in as you explore.
 - **Secrets:** a hidden chest here and there that rolls gear for your class. **Rare spawns:** tougher, more XP, a better drop. **Lore:** later, once the setting is decided.
+- **The Mire:** stays out of Zone 1 for now.
 
 ## Open questions for the owner
 - **Size:** about how long should a straight walk from the gate to the chapel take? (The Druid walks about 2 tiles a second.)

@@ -60,7 +60,7 @@ Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), v
 - **Art direction (Nov 17, owner):** characters go with **style B** from the mock-ups (top-left light, hue-shifted shading, black outline). **Low ground fog** is the signature effect, and it changes by area. Zone 1 for now: a town, critters in the forest, a crypt nearby. Monsters get the same template treatment **before** any art rollout.
 - **Monsters and combat feel (Nov 17, owner):** **gore on** for now (blood, bodies that stay; an off switch later for age ratings). Rats **mid-size** (a bit bigger than today, not huge). **No hit-stop.** Boss 1 becomes the **Skeleton King** (with a crown). Every boss and named gets one look and one move that set it apart from the mobs around it.
 - **Zone 1 named (Nov 17, owner):** Greyfang wanders, Old Gnawbone at the bottom of the rat tunnel, the Skeleton King in the crypt; Brother Malrec moves to his own part of the forest (the chapel). Zone 1 gets a full layout rework, not just more mobs on the sandbox.
-- **Zone 1 shape (Nov 17, owner):** a straight walk from the gate to the far end takes about **2–3 minutes** (exploring takes longer). The **rat tunnel and the crypt are shared, open areas**, not instances. If a named isn't up when you reach its spot, you **touch something there** (a pile of bones, a severed paw, the King's throne) to **summon it**, so a trip is never wasted. The **first instanced dungeon becomes Brother Malrec's** (the chapel), not the crypt. The **map fills in as you explore**. **Chests** here and there roll a piece of gear for your class. **Rare spawns**: tougher, more XP, a better drop. **Lore waits** until the setting is decided.
+- **Zone 1 shape (Nov 17, owner):** a straight walk from the gate to the far end takes about **2–3 minutes** (exploring takes longer). The **rat tunnel and the crypt are shared, open areas**, not instances. If a named isn't up when you reach its spot, you **touch something there** (a pile of bones, a severed paw, the King's throne) to **summon it**, so a trip is never wasted. The **first instanced dungeon becomes Brother Malrec's** (the chapel), not the crypt. The **map fills in as you explore**. **Chests** here and there roll a piece of gear for your class. **Rare spawns**: tougher, more XP, a better drop. **Lore waits** until the setting is decided. **The Mire stays out** of Zone 1 for now.
 
 ## Idea backlog
 Value: H/M/L. Effort: S/M/L. Phase: when it fits.
@@ -84,7 +84,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | ~~Simple minimap~~ (replaced by the map that fills in as you explore) | M | M | 2 |
 | Free-form HUD editor (place every button anywhere) | L | L | later |
 | Level design: the Gate Road is a rough sandbox. Design a real starting area that feels lively and detailed | H | L | after UI and classes |
-| Rest of Zone 1: Wolfwood Edge, the Mire, Ruined Chapel, Greyfang, Brother Malrec | H | L | after classes |
+| ~~Rest of Zone 1~~ (folded into the Zone 1 layout rework; the Mire is out for now) | H | L | after classes |
 | Quests and a hub city (Town 1) | M | L | after classes |
 | NPC companion to fill a missing role | M | L | phase 3 |
 | Personal loot for everyone, no rolling | H | S | phase 3 (already personal in solo) |
