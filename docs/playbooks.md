@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17). **Batch 2 (Magician, Ranger, Monk, Shaman, Bard) is on its second draft (owner's answers in, Nov 17), ready to build.**
+**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17). **Batch 2 (Magician, Ranger, Monk, Shaman, Bard) is built (v0.18) and the sim plays all five by these rules.** All 14 classes now have a bot.
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.
@@ -254,7 +254,7 @@ New rules this batch needs (everything else reuses what the game already has):
 
 ---
 
-## Batch 2 (second draft, Nov 17): Magician, Ranger, Monk, Shaman, Bard
+## Batch 2 (built in v0.18): Magician, Ranger, Monk, Shaman, Bard
 Same shape as batch 1: 8 abilities from level 1 to 8, one signature twist each, a playbook for the sim. Flavor first; numbers from the sim later. Still only the Wizard is the bolt class.
 
 New rules this batch needs:
@@ -351,11 +351,12 @@ New rules this batch needs:
 6. Dragon Strike ready (level 8) → Dragon Strike.
 7. Otherwise → Palm Strike.
 **Losing the fight:** Feign Death and rest (counts as an escape, not a death). Like the Rogue, the Monk has a way out the Warrior doesn't.
+**After a split (built, v0.18):** the mobs sent home ignore you for 10s. Walk back to where you pulled from so the one that stayed follows you away from the others' home spot, then fight it there. (Fighting right next to their spawn means they notice you again once the 10s run out.)
 **Between fights:** sit until health is about 80%.
 
 ### Shaman: the stacker
 **Idea:** never cast a bolt. Stack ticking effects, slow the mob's attacks, and walk away while it rots.
-**Twist: slow it, drop a totem, walk away.** Drowsy slows the mob's attacks so it barely hurts, and Venom Totem lets you set a spot on the ground that poisons whatever follows you through it. No damage bonus for stacking DoTs (owner, Nov 17: keep it simple).
+**Twist: slow it, drop a totem, walk away.** Drowsy slows the mob's attacks so it barely hurts, and Venom Totem lets you set a spot on the ground that poisons whatever follows you through it. **Small DoT stacking bonus** (owner changed his mind, Nov 17: "a small one to start"): each Shaman DoT ticks 10% harder for every other DoT on the same mob, so Sicken + Swarm together tick 10% harder each.
 
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
@@ -410,7 +411,7 @@ New rules this batch needs:
 - Magician gets Earth (level 1) and Fire (level 2) now; Air and Water come at later levels (past 8). Burnout and Flame Shield fill levels 4 and 6.
 - Monk's Feign Death comes at level 3, so new players learn to fight first. Mend moves to level 1.
 - Bard plays two songs at once.
-- Shaman's twist is the attack slow (Drowsy) plus totems. No bonus for stacking DoTs.
+- Shaman's twist is the attack slow (Drowsy) plus totems, **plus a small DoT stacking bonus** (10% per other DoT on the mob; owner reversed "no bonus" on Nov 17, starting small).
 
 ---
 

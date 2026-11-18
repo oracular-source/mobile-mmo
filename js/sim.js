@@ -322,6 +322,154 @@ const BOTS={
       // 7. Frost Bolt.
       if(B.can('frost')&&dist(player,t)<=80)B.use('frost',t);
     }
+  },
+  // ---- Batch 2 (v0.18) ----
+  magician:{
+    // Pick the pet for the job: Earth for two mobs or Boss 1 (or below level 2), Fire for a quick single. Flame Shield up first.
+    prep(st){if(player.cast)return false;
+      if(player.lvl>=6&&!(player.buffs.fshield>0)&&B.can('fshield')){B.use('fshield');return false}
+      const want=(player.lvl<2||st.fight==='pair'||st.fight==='boss'||!st.fight)?'earth':'fire';
+      if(!pet||pet.img!==want){if(B.can(want))B.use(want);return false}
+      return true},
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting(),on=B.onMe();
+      // Pull: send the pet (Lash from range so it gets going).
+      if(!fight.length){if(B.near(t,38)&&B.can('lash'))B.use('lash',t);return}
+      // Lost the pet: back off and call Earth.
+      if(!pet){const th=on.sort((a,b)=>dist(a,player)-dist(b,player))[0];
+        if((!th||dist(th,player)>40)&&B.can('earth')){B.stop();B.use('earth');return}
+        if(th&&dist(th,player)<30)B.kite(th);
+        if(th&&B.can('lash')&&dist(th,player)<=40)B.use('lash',th);return}
+      // 1. Low: Elemental Link. 2. Low with a Fire pet: back off; Detonate it if it's dying anyway, then Earth.
+      if(B.hp()<0.35&&B.can('elink')){B.use('elink');return}
+      if(B.hp()<0.35&&pet.img==='fire'){if(pet.hp<pet.maxhp*0.3&&B.can('detonate')){B.use('detonate');return}
+        const th=on[0];if(th&&dist(th,player)<30){B.kite(th);return}}
+      // 3. Pet below half: Mend Elemental.
+      if(pet.hp<pet.maxhp/2&&B.can('mende')){B.stop();B.use('mende');return}
+      // 4. Burnout while the mob is healthy.
+      if(t.hp/t.maxhp>0.5&&B.can('burnout')){B.use('burnout');return}
+      // 5. Finish a low mob with a Fire Detonate. 6. Two or more next to the pet: Detonate.
+      const nearPet=B.live().filter(m=>dist(m,pet)<=30).length;
+      // (An Earth pet that's holding a pair is worth more alive: only blow it up if it's about to die anyway.)
+      if(B.can('detonate')&&((pet.img==='fire'&&t.hp/t.maxhp<0.25&&dist(t,pet)<=30)||(nearPet>=2&&(pet.img==='fire'||pet.hp<pet.maxhp*0.25)))){B.use('detonate');return}
+      // 7. Nothing on you: sit for mana. 8. Otherwise Lash.
+      if(!on.length){if(B.mp()<0.9){B.stop();player.sit=true}else if(B.near(t,38)&&B.can('lash'))B.use('lash',t);return}
+      const th=on[0];if(th&&dist(th,player)<20)B.kite(th);else B.near(t,38);
+      if(B.can('lash')&&dist(player,t)<=40)B.use('lash',t);
+    }
+  },
+  ranger:{
+    // Before the pull: a Spike Trap between you and the mob (the mob comes from the right in the arena).
+    prep(st){if(player.lvl>=3&&!traps.length){if(B.can('trap'))B.use('trap');return false}return true},
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      // Pull: Hunter's Mark, then back up so the mob runs over the trap.
+      if(!fight.length){if(B.near(t,75)){if(B.can('mark'))B.use('mark',t);else if(B.can('shoot'))B.use('shoot',t)}return}
+      const on=B.onMe().filter(m=>!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
+      const th=on[0],d=th?dist(th,player):999;
+      // Keep moving: kite anything close, otherwise stay in range. Shots go off while walking.
+      if(th&&d<34)B.kite(th);else if(dist(player,t)>75)B.near(t,75);else B.stop();
+      // 1. Low: Salve with nothing in melee; Disengage first if something is.
+      if(B.hp()<0.35){if(th&&d<18&&B.can('disengage')){B.faceAway(th);B.use('disengage');return}if(d>30&&B.can('salve')){B.stop();B.use('salve');return}}
+      // 2. In melee: Disengage.
+      if(th&&d<14&&B.can('disengage')){B.use('disengage');return}
+      // Mark the target if it isn't.
+      if(!(t.mark>0)&&B.can('mark')&&dist(player,t)<=80){B.use('mark',t);return}
+      // 3. Not snared: Ensnaring Shot.
+      if(th&&!(th.snare>0)&&B.can('ensnare')){B.use('ensnare',th);return}
+      // 4. Two or more: Volley. 5. Rapid Fire.
+      if(fight.length>=2&&B.can('volley')&&dist(player,t)<=80){B.use('volley',t);return}
+      if(B.can('rapid')){B.use('rapid');return}
+      // Set a fresh trap at your feet while kiting (the mob walks through it).
+      if(th&&d<40&&!traps.length&&B.can('trap')){B.use('trap');return}
+      // 7. Shoot.
+      if(B.can('shoot')&&dist(player,t)<=80)B.use('shoot',t);
+    }
+  },
+  monk:{
+    prep:()=>true,
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      if(player.fd>0)return; // lying down: let the split happen
+      if(!st.camp)st.camp={x:player.x,y:player.y}; // where you pulled from: fight there, away from the others' home spot
+      // After a split, walk back to camp so the one that stayed follows you away from the rest.
+      if(st.split&&fight.length===1&&Math.hypot(player.x-st.camp.x,player.y-st.camp.y)>8){player.tx=st.camp.x;player.ty=st.camp.y;return}
+      st.split=false;
+      // Pull: Flying Kick (level 2), else walk in.
+      if(!fight.length){if(B.can('fkick')){if(B.near(t,55))B.use('fkick',t);return}if(B.near(t,14)&&B.can('palm'))B.use('palm',t);return}
+      // 1. Two or more on you: Feign Death splits your target off.
+      const on=B.onMe();
+      if(fight.length>=2&&B.can('mfeign')){B.stop();B.use('mfeign');st.split=true;return}
+      // Losing: Feign Death with one mob drops it too (an escape, not a death).
+      if(B.hp()<0.15&&fight.length===1&&t.hp/t.maxhp>0.3&&B.can('mfeign')){B.stop();B.use('mfeign');st.escaped=true;return}
+      if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0))B.stop();else B.near(t,14);
+      // 2. Low: Mend. 3. Low: Deflect.
+      if(B.hp()<0.35&&B.can('mmend')){B.use('mmend');return}
+      if(B.hp()<0.35&&on.length&&B.can('deflect')){B.use('deflect');return}
+      if(dist(player,t)>18)return;
+      // 4. Leg Sweep. 5. Flurry. 6. Dragon Strike. 7. Palm Strike.
+      if(B.can('sweep')){B.use('sweep',t);return}
+      if(B.can('flurry')){B.use('flurry',t);return}
+      if(B.can('dragon')){B.use('dragon',t);return}
+      if(B.can('palm'))B.use('palm',t);
+    }
+  },
+  shaman:{
+    prep(){if(player.cast)return false;
+      if(player.lvl>=3&&!(player.buffs.wolf>0)&&B.can('wolf')){B.use('wolf');return false}
+      if(player.lvl>=6&&!(player.buffs.ward>0)&&B.can('ward')){B.use('ward');return false}
+      return true},
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting();
+      // Pull: Sicken from max range.
+      if(!fight.length){if(B.near(t,75)&&B.can('sicken'))B.use('sicken',t);return}
+      const on=B.onMe().filter(m=>!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
+      const th=on[0],d=th?dist(th,player):999;
+      // 1. Low: back off, then Minor Healing.
+      if(B.hp()<0.4){if(d>30&&B.can('sheal')){B.stop();B.use('sheal');return}if(th)B.kite(th);}
+      // 2-4. Drowsy, Sicken, Swarm on every mob in the fight.
+      const inR=fight.filter(m=>dist(player,m)<=80);
+      const sl=inR.find(m=>!(m.aslow>0));if(sl&&B.can('drowsy')){B.use('drowsy',sl);player.target=t;return}
+      const s1=inR.find(m=>!B.dot(m,'sicken'));if(s1&&B.can('sicken')){B.use('sicken',s1);player.target=t;return}
+      const s2=inR.find(m=>!B.dot(m,'swarm'));if(s2&&B.can('swarm')){B.use('swarm',s2);player.target=t;return}
+      // 5. Mob close and no totem: Venom Totem at your feet, then walk away so it follows through.
+      if(th&&d<30&&!grounds.length&&B.can('totem')){B.use('totem');return}
+      // 6. Mana low and health fine: Cannibalize.
+      if(B.mp()<0.25&&B.hp()>0.7&&B.can('canni')){B.use('canni');return}
+      // 7. Everything ticking: kite and let it rot. Out of reach of the mobs, top up with a heal.
+      if(th&&d<34)B.kite(th);else if(dist(player,t)>75)B.near(t,75);else B.stop();
+      if(B.hp()<0.7&&d>40&&B.can('sheal')){B.stop();B.use('sheal')}
+    }
+  },
+  bard:{
+    // Before the pull: Mending + Dirge (levels 2-5), Chant of Blades + Discord (level 6+). Level 1: Mending only.
+    prep(){const want=player.lvl>=6?['chant','discord']:player.lvl>=2?['smend','dirge']:['smend'];
+      for(const id of want){if(!songOn(id)){if(B.can(id))B.use(id);return false}}return true},
+    think(st){
+      if(player.cast)return;
+      const t=B.target();if(!t)return;
+      const fight=B.fighting(),on=B.onMe();
+      // Pull: walk in and Slash; Dirge is already hitting.
+      if(!fight.length){if(B.near(t,14)&&B.can('slash'))B.use('slash',t);return}
+      // 1. Low: swap to Mending; level 8: Crescendo with Mending playing.
+      if(B.hp()<0.35){if(!songOn('smend')&&B.can('smend')){B.use('smend');return}if(songOn('smend')&&B.can('crescendo')){B.use('crescendo');return}}
+      // Back to the fight songs once healthy again.
+      if(B.hp()>0.7&&player.lvl>=6&&songOn('smend')){const want=['chant','discord'].find(id=>!songOn(id));if(want&&B.can(want)){B.use(want);return}}
+      // 2. A second mob coming: Lullaby it.
+      const extra=fight.filter(m=>m!==t&&!(m.mez>0)&&!m.def.boss);
+      if(extra.length&&B.can('lullaby')&&dist(extra[0],player)<=70){B.use('lullaby');player.target=t;return}
+      if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0))B.stop();else B.near(t,14);
+      if(dist(player,t)>18)return;
+      if(B.can('slash'))B.use('slash',t);
+    }
   }
 };
 
@@ -329,14 +477,14 @@ const BOTS={
 function resetPlayer(L){
   player.lvl=L;player.xp=-1e9; // no level-ups mid-sim
   player.hp=maxHP(L);player.mp=maxMP(L);player.buffs={};player.cds={};player.gcd=0;player.cast=null;player.queued=null;
-  player.sit=false;player.fd=0;player.dead=0;player.target=null;player.tx=null;player.hots=[];decoy=null;grounds.length=0;
+  player.sit=false;player.fd=0;player.dead=0;player.target=null;player.tx=null;player.hots=[];player.songs=[];player.bval={};player.fdKeep=null;decoy=null;grounds.length=0;traps.length=0;
 }
 // On a loss: how much health the mobs had left, all together (0.33 = a third).
 const hpLeft=()=>{const a=mobs.filter(m=>m.maxhp);return a.reduce((s,m)=>s+Math.max(0,m.dead?0:m.hp),0)/(a.reduce((s,m)=>s+m.maxhp,0)||1)};
 function simFight(f,L,seed,mode){
   seedRng(seed);
   pet=null;enterZone('arena');resetPlayer(L);
-  const bot=BOTS[CLS],st={mode:mode};
+  const bot=BOTS[CLS],st={mode:mode,fight:f.id};
   // Before the pull: raise the pet, hide. Then top up, as if you'd rested.
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
   player.hp=maxHP(L);player.mp=maxMP(L);player.sit=false;
@@ -349,6 +497,8 @@ function simFight(f,L,seed,mode){
     if(player.hp<hp0)dmg+=hp0-player.hp;if(player.mp<mp0)mana+=mp0-player.mp;
     if(hadPet&&!pet)petDied=true;
     // Wizard's Gate left the arena: an escape, not a death or a win.
+    // Monk's Feign Death on a lost fight counts as an escape too, once nothing is chasing it.
+    if(st.escaped&&!mobs.some(m=>!m.dead&&m.state==='chase'))return{win:false,death:false,escape:true,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:0,left:hpLeft()};
     if(zoneId!=='arena')return{win:false,death:false,escape:true,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:0,left:hpLeft()};
     if(player.dead>0||player.hp<=0)return{win:false,death:true,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:0,left:hpLeft()};
     if(mobs.every(m=>m.dead)&&!(pet&&pet.charm))break;
@@ -401,7 +551,7 @@ function runSim(opts){
 // Results as a table: kill time, damage taken, mana used, rest time, deaths.
 function simTable(res,html){
   const n=v=>Math.round(v),head=['Lvl','Fight','Win','Deaths','Kill (s)','Rest (s)','Dmg taken','Mana used','Mob HP left (losses)'];
-  const body=res.rows.map(r=>[r.lvl,r.fight+(r.mode?' · '+r.mode:''),r.wins+'/'+r.runs,r.deaths+(r.escapes?' (+'+r.escapes+' gated)':''),r.wins?n(r.kill):'–',r.wins?n(r.rest):'–',n(r.dmg),C.mana?n(r.mana):'–',r.wins<r.runs?n(r.left*100)+'%':'–']);
+  const body=res.rows.map(r=>[r.lvl,r.fight+(r.mode?' · '+r.mode:''),r.wins+'/'+r.runs,r.deaths+(r.escapes?' (+'+r.escapes+' escaped)':''),r.wins?n(r.kill):'–',r.wins?n(r.rest):'–',n(r.dmg),C.mana?n(r.mana):'–',r.wins<r.runs?n(r.left*100)+'%':'–']);
   if(html)return '<table class="simtab"><tr>'+head.map(h=>'<th>'+h+'</th>').join('')+'</tr>'+body.map(b=>'<tr>'+b.map(c=>'<td>'+c+'</td>').join('')+'</tr>').join('')+'</table>';
   return '| '+head.join(' | ')+' |\n|'+head.map(()=>' --- ').join('|')+'|\n'+body.map(b=>'| '+b.join(' | ')+' |').join('\n');
 }

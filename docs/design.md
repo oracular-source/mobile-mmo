@@ -55,15 +55,15 @@ The full roster is 14 classic classes, each with one signature mechanic and a re
 | Shadow Knight | Tank | Lifetaps | Fear, small undead pet, solos well | Less durable than Warrior | Later (playable in the prototype since v0.17) |
 | Cleric | Healer | Resurrection | Best heals, the only full rez | Very low damage, slow solo | Yes (playable since v0.17) |
 | Druid | Healer | Root and kite | DoTs, snares, group teleports, great outdoor solo | Weaker heals, fragile, struggles indoors | Yes |
-| Shaman | Healer | Slow | Slows, buffs, DoTs | Low burst damage | Later |
+| Shaman | Healer | Slow | Slows, buffs, DoTs | Low burst damage | Later (playable in the prototype since v0.18) |
 | Wizard | Caster | Burst nukes | Highest burst, emergency group teleport | Burns mana, pulls aggro, dies fast | Later (playable in the prototype since v0.17) |
-| Magician | Caster | Elemental pet | Strong pet, summons gear for the group | Helpless if the pet dies | Later |
+| Magician | Caster | Elemental pet | Strong pet, summons gear for the group | Helpless if the pet dies | Later (playable in the prototype since v0.18) |
 | Necromancer | Caster | Undead pet + feign death | Best soloer: DoTs, lifetaps, pet | Slow group damage, can't heal others | Yes |
 | Enchanter | Caster | Mez and charm | Crowd control, haste, mana regen | Fragile, hardest to play | Yes (playable since v0.17) |
 | Rogue | Melee | Backstab | Top melee damage, stealth, traps, locks | Needs a tank, weak solo | Yes |
-| Monk | Melee | Feign death pulls | High damage, best puller | Light armor only | Later |
-| Ranger | Melee | Bow + tracking | Ranged damage, snares, can tank in a pinch | Best at nothing | Later |
-| Bard | Support | Songs | Group buffs, crowd control, run speed | Low personal power | Later |
+| Monk | Melee | Feign death pulls | High damage, best puller | Light armor only | Later (playable in the prototype since v0.18) |
+| Ranger | Melee | Bow + tracking | Ranged damage, snares, can tank in a pinch | Best at nothing | Later (playable in the prototype since v0.18) |
+| Bard | Support | Songs | Group buffs, crowd control, run speed | Low personal power | Later (playable in the prototype since v0.18) |
 
 The launch six cover one tank (Warrior), two healers (Cleric, Druid), two damage dealers (Rogue, Necromancer) and crowd control (Enchanter), and spread out for solo play: Necromancer strong; Druid and Enchanter medium; Warrior, Cleric and Rogue weak and rewarded for grouping. Enchanter replaced Wizard at launch (Nov 17, 2026) because it plays more differently from the existing casters.
 
@@ -128,6 +128,18 @@ Built wide on the default skin; numbers are first drafts for the balance pass. F
 - **Paladin** (wears Warrior plate plus knight gear): Lay on Hands (full heal, ~3 min cooldown), Holy Bash, Mend, Smite Undead (undead only), Taunt, **Consecrate** (holy ground for 15s: you heal every second inside it, undead inside burn), Divine Strike (area, extra vs undead).
 - **Shadow Knight** (Warrior plate plus knight gear): Siphon (lifetap), Disease Cloud, Terror (short fear), a small skeleton minion, **Harm Touch** (huge hit that costs 20% of your max health), Feign Death, **Dark Cleave** (area hit that heals you per mob hit).
 - **Wizard** (caster gear): Frost Bolt stacks **chill** (−12% speed per stack, up to 4, fades 8s after the last bolt); Freeze roots; **Shatter** does full damage to a frozen mob and breaks the freeze, about a third on anything else. Blink (short teleport the way you last moved), Fireball (2.5s cast), Frost Nova (hits and freezes everything near you), Mana Shield (damage comes out of mana first for 10s), Gate (6s cast, home to the Gate Road guards; ends every fight, and leaves Dungeon 1).
+
+### Batch 2 classes (playable, v0.18): Magician, Ranger, Monk, Shaman, Bard
+
+Same approach as batch 1: default skin, first-draft numbers, full tables and playbooks in `docs/playbooks.md`.
+
+- **Magician** (caster gear): Elemental Lash (short-range hit that also heals your pet a little). **Pick your elemental:** Summon Earth (slow, tough, holds aggro) or Summon Fire (fragile, hits hard, every hit sets the mob burning). One pet at a time; summoning the other sends the first away. Mend Elemental, Burnout (pet attacks 30% faster for 20s), **Detonate** (the pet explodes: Fire hits hardest, Earth hits less but stuns), Flame Shield (mobs that hit you take fire damage back, until you die), Elemental Link (10s: the pet takes half the damage meant for you). Air and Water come past level 8.
+- **Ranger** (own gear: bows, leathers, quivers): Shoot, Hunter's Mark (your hits on it do 20% more until it dies), Ensnaring Shot (hit + snare), **Spike Trap** (set at your feet, up to two at once, each waits 60s; the first mob within about a tile takes a big hit and bleeds), Disengage (hop backward away from what's on you), Salve (the only cast that makes you stop), Volley (arrows rain on the target's area for 4s), Rapid Fire (Shoot twice as fast for 6s). Every instant ability already works while walking, and the Ranger's whole kit is instant except Salve, which is what "shoots on the move" means here.
+- **Monk** (own gear: wraps, gi): Palm Strike, Mend (instant heal, long cooldown), Flying Kick (leaps to the target), **Feign Death that splits** (level 3, 12–20s cooldown): every mob walks home except your target, and the ones sent home ignore you for 10s so you can drag the one that stayed back to your camp. With only one mob on you it drops that one too (an escape). Leg Sweep (stun), Flurry (five quick punches), Deflect (3s of dodging every melee hit), Dragon Strike (big hit, knocks the mob back).
+- **Shaman** (caster gear plus own spears and fetishes): Sicken and Swarm (two DoTs), **a small stacking bonus: each Shaman DoT ticks 10% harder for every other DoT on the same mob** (owner, Nov 17), Minor Healing, **Drowsy** (mob attacks about 40% slower but still runs at full speed), Spirit of the Wolf (+30% run speed, until you die), **Venom Totem** (a post on the ground for 20s that poisons mobs fighting you near it), Spirit Ward (+8 armor and +10% max health, until you die), Cannibalize (15% of your health for mana).
+- **Bard** (own gear: rapiers, lutes, doublets): Slash plus **songs**. Tap a song to start it, tap again to stop; two play at once (a third replaces the oldest). Each pulses every 3s on its own while you walk, fight or sit: Song of Mending (heals you and your pet), Dirge (hurts mobs fighting you within about 2 tiles), Song of Travel (+60% run speed; doesn't add to Wolf, the faster one counts), Chant of Blades (melee 25% faster), Discord (mobs near you attack 25% slower). Lullaby (a short Mesmerize). **Crescendo** ends both songs in one big pulse: 4x heal or damage, a stun from Discord, a 6s sprint from Travel, a triple-damage swing from Chant. Playing songs glow on their buttons.
+
+**Buff bar (v0.18):** a row of small tags under your health shows every buff and song on you, with seconds left on short ones. Buffs hit only you for now; "you and everyone nearby" waits for groups (phase 3).
 
 **Undead:** shambling corpses, crypt skeletons and Boss 1 are undead (rats, beetles and Old Gnawbone aren't). The target frame says "Undead". Boss 1 can't be mesmerized or charmed.
 

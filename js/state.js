@@ -25,12 +25,14 @@ const stat=k=>Object.values(inv.equip).reduce((t,id)=>t+(ITEMS[id][k]||0),0);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
 const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
 // STA: +3 HP per point. WIS: +3 mana per point.
-const maxHP=L=>C.hp[0]+C.hp[1]*L+stat('sta')*3, maxMP=L=>C.mana?C.mana[0]+C.mana[1]*L+stat('wis')*3:0;
+// Spirit Ward (Shaman buff): +10% max health.
+const maxHP=L=>Math.round((C.hp[0]+C.hp[1]*L+stat('sta')*3)*(player.buffs&&player.buffs.ward>0?1.1:1)), maxMP=L=>C.mana?C.mana[0]+C.mana[1]*L+stat('wis')*3:0;
 const meleeMult=()=>1+stat('str')*0.02; // STR: +2% melee damage and bandage healing per point
 const GCD=1.5, PSPEED=34;
 // Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.
 // Chill (Wizard's Frost Bolt) only slows mobs; nothing slows you yet.
-const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1);
+// Shaman's Spirit of the Wolf +30%; the Bard's Song of Travel +60% (they don't add up: the faster one counts).
+const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1)*Math.max(player.buffs.wolf>0?1.3:1,songKind('speed')?1.6:1);
 
 /* ---------- Saved progress, settings and loadout ---------- */
 // Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.
@@ -54,7 +56,7 @@ const dev={on:(function(){const m=/[?&]dev(=(\d))?/.exec(location.search);if(m)s
 const kills=store.get('ashfen-kills',{});
 const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>store.set(KEY('loadout'),loadout);
 
-const player={buffs:{},cds:{},x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
+const player={buffs:{},bval:{},songs:[],songNext:0,cds:{},x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
 const PROGKEY=CLS==='druid'?'ashfen-druid':'ashfen-prog-'+CLS;
 const prog=store.get(PROGKEY,null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
 // Test shortcut: open the game with ?level=7 in the address to jump to that level (1-10). Prototype only.

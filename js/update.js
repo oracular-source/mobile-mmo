@@ -41,14 +41,25 @@ function update(dt){
       if(o.t<=0)player.hots.splice(i,1);}
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*C.regen*dt);
     for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
+    // Bard songs pulse every 3s while they play: walking, fighting or sitting.
+    if(player.songs&&player.songs.length){player.songNext-=dt;if(player.songNext<=0){player.songNext+=3;player.songs.forEach(id=>songPulse(ABI[id],1))}}
   }
   rangeShow=Math.max(0,rangeShow-dt);
   // Holy ground (Paladin's Consecrate): once a second, heals you if you stand in it and burns undead inside.
+  // Venom Totem and Volley ("all") hurt any mob that's fighting you inside them; idle mobs aren't pulled.
   for(let i=grounds.length-1;i>=0;i--){const g=grounds[i];g.t-=dt;g.next-=dt;
-    if(g.next<=0){g.next+=1;
-      if(!player.dead&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r){const h=Math.max(1,Math.round(g.heal));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#ffd27a')}
-      mobs.forEach(m=>{if(!m.dead&&isUndead(m)&&m.state==='chase'&&Math.hypot(m.x-g.x,m.y-g.y)<=g.r)hitMob(m,g.dmg*rr(0.9,1.1),'holy',g.name)});}
-    if(g.t<=0){grounds.splice(i,1);log('The holy ground fades.','#9aa')}}
+    if(g.next<=0){g.next+=g.every||1;
+      if(g.heal&&!player.dead&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r){const h=Math.max(1,Math.round(g.heal));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#ffd27a')}
+      mobs.forEach(m=>{if(m.dead||m.state!=='chase'||Math.hypot(m.x-g.x,m.y-g.y)>g.r)return;
+        if(g.all)hitMob(m,g.dmg*rr(0.9,1.1)*(1-m.def.armor),'dot',g.name);else if(isUndead(m))hitMob(m,g.dmg*rr(0.9,1.1),'holy',g.name)});}
+    if(g.t<=0){grounds.splice(i,1);log((g.name==='Consecrate'?'The holy ground':'Your '+g.name)+' fades.','#9aa')}}
+  // Spike Traps: the first mob to step in sets it off.
+  for(let i=traps.length-1;i>=0;i--){const tr=traps[i];tr.t-=dt;
+    const m=mobs.find(m=>!m.dead&&Math.hypot(m.x-tr.x,m.y-tr.y)<=12); // 12: mobs stop about 11px from you to swing, so a trap at your feet still catches them
+    if(m){traps.splice(i,1);burst(tr.x,tr.y-2,'#cfc8b2',10,true);floatText(m.x,m.y-28,'SNAP!','#ffd27a');
+      hitMob(m,tr.dmg*rr(0.9,1.1)*(1-m.def.armor),'direct',tr.name);
+      if(!m.dead){m.dots=m.dots.filter(d=>d.id!=='bleed');m.dots.push({id:'bleed',name:'Bleed',t:12,next:3,dmg:tr.bleed})}}
+    else if(tr.t<=0){traps.splice(i,1);log('Your '+tr.name+' rusts away.','#9aa')}}
   if(decoy){decoy.t-=dt;if(decoy.t<=0){burst(decoy.x,decoy.y-6,'#c8a0ff',8);decoy=null;log('Your Phantasm fades.','#9aa')}}
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
   if(!player.dead)checkPortals();
@@ -57,11 +68,15 @@ function update(dt){
   mobs.forEach(m=>{
     if(m.dead)return;
     for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
-      if(d.next<=0){d.next+=3;hitMob(m,d.dmg*rr(0.9,1.1),'dot',d.name||'Creeping Rot');if(m.dead)return;}
+      // Shaman's small stacking bonus: each DoT ticks 10% harder for every other DoT on the same mob.
+      if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).length-1):1;
+        hitMob(m,d.dmg*sx*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return;}
       if(d.t<=0){m.dots.splice(i,1);log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
     if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
     if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('The snare on '+m.def.name+' wears off.','#9aa')}
     if(m.aslow>0)m.aslow-=dt;
+    if(m.discord>0)m.discord-=dt;
+    if(m.calm>0)m.calm-=dt;
     if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
@@ -69,7 +84,7 @@ function update(dt){
     if(m.state==='idle'){
       m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);
-      if(!player.dead&&!(player.fd>0)&&!hidden()&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      if(!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
       else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
@@ -77,14 +92,14 @@ function update(dt){
       // Evaded: stands confused, doesn't turn or attack. If you Hide meanwhile, it gives up and walks home.
       if(m.lost>0){m.lost-=dt;if(hidden()){m.lost=0;m.state='return';m.threat.p=0;log(cap(m.def.name)+' loses track of you.','#9aa')}return}
       const v=victim(m);
-      if(v===player&&player.fd>0){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
+      if(v===player&&player.fd>0&&m!==player.fdKeep){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
       const d=dist(m,v);
       if(m.def.boss)bossThink(m,dt);if(m.dead||player.dead)return;
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
-      else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=m.aslow>0?3.2:2; // Slow Mind: attacks 60% slower
+      else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet)hurtPet(m);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0}
+      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0}
     }
   });
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>1.1)floats.splice(i,1)}

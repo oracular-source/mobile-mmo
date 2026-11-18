@@ -19,23 +19,22 @@ One place for the work: what's being built now, what's next, every idea, and wha
 | 1 | Basic loot | Kills feel rewarding between dings | Done (v0.7) |
 | 2 | First dungeon | A run is fun enough to repeat | Done (v0.9) |
 | 3 | Two more classes (Warrior, Necromancer) + real class system | Each class plays differently on the road and in the dungeon | Done (v0.11.1) |
-| 3b | All 14 classes at baseline, in two batches of 5, on one default skin + testing grounds | Every class plays like itself and the sim can run them all | Now (batch 1 done v0.17; batch 2 next) |
-| 3c | Balance (overnight sim runs) | All classes roughly even in the sim, anchored on Necro (easiest solo). Cleric may stay near-unkillable but slow; Warrior becomes the ultimate tank | Next |
+| 3b | All 14 classes at baseline, in two batches of 5, on one default skin + testing grounds | Every class plays like itself and the sim can run them all | Done (v0.18), pending owner play-test |
+| 3c | Balance (overnight sim runs) | All classes roughly even in the sim, anchored on Necro (easiest solo). Cleric may stay near-unkillable but slow; Warrior becomes the ultimate tank | Now (after the play-test) |
 | 3d | Art redo: mock-ups, lock one character, write the style guide, roll it out to every class and the world | Everything follows one look | Later |
 | 4 | Polish and gate review | A friend can play from a link without help | Later |
 
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-1. **Batch 2 build** (L): Magician, Ranger, Monk, Shaman, Bard on the default skin, with sim bots, from the second draft in `docs/playbooks.md`. Also builds the new rules they need: the buff bar, songs (two at once), pet choice, pet explode, ground traps, shooting while moving, totems, damage shield, Monk's split Feign Death, dash to a target. One release.
-Owner to play: the five batch 1 classes (v0.17) on the phone. Notes become cards.
-Done: batch 2 playbooks (second draft, Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
+1. **Owner play-test:** the ten default-skin classes on the phone (batch 1 from v0.17, batch 2 from v0.18). Notes become cards; bugs get fixed before balance starts.
+2. **Balance** (milestone 3c, L): overnight sim runs across all 14 classes, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here. Warrior gets its ultimate-tank pass here (card in the backlog). Early targets from the sim: Shaman and Ranger too safe on Boss 1, Magician has no answer to Boss 1's bolts, Monk pairs at level 4.
+Done: batch 2 build (v0.18), batch 2 playbooks (Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
 ## Next
-1. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here. Warrior gets its ultimate-tank pass here (card in the backlog).
-2. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
-3. **Feel pass:** hit sparks, knockback, animations, sound.
-4. Milestone 4: start screen polish, fix anything clearly broken.
+1. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
+2. **Feel pass:** hit sparks, knockback, animations, sound.
+3. Milestone 4: start screen polish, fix anything clearly broken.
 
 Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), versioned saves (v0.14.1), Rogue (v0.13, v0.13.1).
 
@@ -50,6 +49,7 @@ Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), v
 - **Rogue Evade is damage (Nov 17):** Evade, then Backstab right away. Most players would use it that way; the sim now runs only this version.
 - **Soloable, at different difficulty by class:** everything can be soloed, but pet classes (Necro) solo comfortably while tanks (Warrior) find it harder and are rewarded for grouping. Tell players this when they pick a class.
 
+- **Shaman DoTs get a small stacking bonus (Nov 17):** owner reversed "no bonus": each Shaman DoT ticks 10% harder for every other DoT on the same mob. Starting small; the balance pass can raise it.
 - **Cleric stays tough, Warrior gets tougher (Nov 17):** a Cleric that almost never dies is fine because its kills are slow. The Warrior should be the ultimate tank: the hardest class in the game to kill. Fixed in the balance pass, not now.
 
 ## Idea backlog
@@ -57,7 +57,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 | Idea | Value | Effort | Phase |
 | --- | --- | --- | --- |
-| ~~Buff spells and a buff bar~~ (moved into the batch 2 build). Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
+| ~~Buff spells and a buff bar~~ (built v0.18). Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
 | Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room (no separate boss bar) | M | S | 2 (with the feel pass) |
 | **Warrior = ultimate tank** (owner, Nov 17): hardest class to kill, ahead of the Cleric. Options to pick from: (a) clearly the most health and armor in the game; (b) **Last Stand:** once a fight, a killing blow leaves you at 1 HP with big damage reduction for 5s; (c) **Shield Block:** a chance to block a hit outright, higher with a shield; (d) **Hold the Line:** takes less damage for each mob on it (the opposite of the Shadow Knight healing per mob). Sim target: Warrior survives longest of all classes, kills stay slow | H | S–M | 2 (milestone 3c, balance) |
@@ -109,10 +109,12 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | **No XP loss on death; a repair shop instead.** Dying damages your gear; a classic repair NPC fixes it for copper. A money sink, not a power cost. Owner, Nov 17: put one in later | M | M | 2–3 (with Town 1 or milestone 4) |
 
 ## Known issues
-- **Batch 1 numbers are first drafts:** Shadow Knight loses most two-mob fights before level 8; Enchanter kills are slow (30–45s a single mob). Tune in the balance pass.
+- **Batch 1 and 2 numbers are first drafts:** Shadow Knight loses most two-mob fights before level 8; Enchanter kills are slow (30–45s a single mob); Shaman and Ranger win Boss 1 almost every time without taking hits outside it; Magician never beats Boss 1. Tune in the balance pass.
+- **Buffs only hit you for now.** "You and everyone nearby" waits for groups; your pet doesn't get them either (Song of Mending does heal the pet).
+- New pets (earth and fire elementals) are one placeholder shape in two colours; Monk fights bare-handed on the default body; Ranger's bow and Bard's lute are tiny overlays.
 - New classes draw on the shared default body, and their pets reuse placeholder art (the minion is a dark recolour of the skeleton; the sword is a tiny sprite).
 - **Sim bots play perfectly** (the Druid kites without ever getting hit from level 4 on; the Wizard and Enchanter bots take no damage at all outside Boss 1). Real phone play is sloppier, so sim numbers are a best case; judge fun by playing.
-- **Melee classes can't solo Boss 1 yet.** Quick sim (perfect rotation, no gear): Rogue at level 8 gets Boss 1 to about a third of its health before dying; Warrior at level 8 to about half. Rogue has no self-heal. Sim (v0.16, playbook bots): Warrior leaves Boss 1 at about half health, Rogue at 42–64% depending on the Evade playbook. Fix in the balance pass (testing grounds), not one class at a time. Batch 1 (v0.17 sim, level 8): Cleric wins Boss 1 9/10, Paladin 5/10; Shadow Knight, Wizard and Enchanter never.
+- **Melee classes can't solo Boss 1 yet.** Quick sim (perfect rotation, no gear): Rogue at level 8 gets Boss 1 to about a third of its health before dying; Warrior at level 8 to about half. Rogue has no self-heal. Sim (v0.16, playbook bots): Warrior leaves Boss 1 at about half health, Rogue at 42–64% depending on the Evade playbook. Fix in the balance pass (testing grounds), not one class at a time. Batch 1 (v0.17 sim, level 8): Cleric wins Boss 1 9/10, Paladin 5/10; Shadow Knight, Wizard and Enchanter never. Batch 2 (v0.18): Monk and Bard never.
 - Boss 1 is the skeleton sprite scaled up 3x, so its pixels are chunkier than everything else. Placeholder until the art pass draws it at full size.
 - Lag and jitter reported on phone (v0.8): fixed in v0.8.1; confirm on device.
 - Sprites draw on top of tree canopies (no depth sorting with scenery).
@@ -120,6 +122,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **v0.18** **Batch 2: five more classes, all 14 now playable** (default skin, 8 abilities each from level 1 to 8, own gear and Boss 1 drops, a sim bot). Pick them on the start screen. **Magician:** Elemental Lash (heals your pet a bit), **pick your elemental** (Earth tanks, Fire burns what it hits; one out at a time), Mend Elemental, Burnout, **Detonate** (pet explodes; Earth's blast stuns), Flame Shield (burns whatever hits you), Elemental Link (pet takes half your damage for 10s). **Ranger:** Shoot, Hunter's Mark (+20% damage on it), Ensnaring Shot, **Spike Trap** (two at most, at your feet; the first mob to step in takes a big hit and bleeds), Disengage (hop back), Salve, Volley (arrows on an area for 4s), Rapid Fire. **Monk:** Palm Strike, instant Mend, Flying Kick (leap to the target), **Feign Death that splits a pull** (everything walks home except your target and ignores you for 10s), Leg Sweep, Flurry (five punches), Deflect (dodge every hit for 3s), Dragon Strike (knockback). **Shaman:** Sicken and Swarm (DoTs; **each ticks 10% harder for every other DoT on the mob**), Minor Healing, **Drowsy** (attack slow, not a snare), Spirit of the Wolf (run faster), **Venom Totem** (poison post on the ground), Spirit Ward (armor and health), Cannibalize (health for mana). **Bard:** Slash and **songs**: tap to start, tap to stop, two at once, pulsing every 3s on their own (Mending, Dirge, Travel, Chant of Blades, Discord); Lullaby (short sleep); **Crescendo** (both songs end in one big pulse). **Buff bar:** small tags under your health show every buff and song on you (with seconds left on short ones); songs that are playing glow on their buttons; the 1st hit / Auto toggles move down when the bar wraps. Target frame also shows Marked and Discord. No save changes; existing characters are untouched. Sim results in `docs/sim-results.md`.
 - **Docs (Nov 17)** Pixel art deep dive: `docs/research/pixel-world-alive.md` (what makes small pixel worlds feel alive: Stardew Valley, Hyper Light Drifter, Eastward, Graveyard Keeper, Sea of Stars, Kingdom; a cheap-first toolkit; phone rules; what the mock-ups test) and a draft mock-up canvas with three Druid takes, the launch six in the shaded style, and an animated Gate Road scene with every effect switchable. New backlog cards: Living world pass, Area tint, Signature effect. No game changes.
 - **Docs (Nov 17)** Batch 2 second draft (owner's answers): Magician starts with Earth and Fire (Air and Water later), Monk's Feign Death at level 3, Bard plays two songs, Shaman's twist is attack slow plus totems with no DoT stacking bonus. Batch 2 build is now the Now card. No game changes.
 - **Docs (Nov 17)** Batch 2 first draft in `docs/playbooks.md`: Magician (pick your elemental, Detonate), Ranger (shoots while moving, traps), Monk (Feign Death splits pulls), Shaman (stacking DoTs, Drowsy, totems, Cannibalize), Bard (two songs always on). Owner notes logged: Cleric staying near-unkillable is fine; Warrior should be the ultimate tank (backlog card, balance pass). No game changes.

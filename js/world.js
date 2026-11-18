@@ -117,7 +117,7 @@ function enterZone(id){
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
-  decoy=null;grounds.length=0;
+  decoy=null;grounds.length=0;traps.length=0;
   player.onTile=tileAt(player.x,player.y);
 }
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
