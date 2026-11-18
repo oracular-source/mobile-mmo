@@ -101,6 +101,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | First-hit tagging: the first player or group to hit a mob owns it | M | S | phase 3 |
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
+| **Solo vs group tuning, plus difficulty tiers** (owner, Nov 17): a dungeon run alone is tuned for one player; a group run is tuned harder and pays more XP. Later maybe set difficulty steps per dungeon (D1, D2, D3), like EverQuest's AA-style progression. Today's design is the solo version | H | M | phase 3 (with groups) |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
 | **Leveling plan (leaning, Nov 17):** plan for level 50, launch at 30; about 60–80 hours to 30; something new every ~3 sessions; 10–12 abilities by 30 and 13–15 by 50. Details: `docs/research/progression-and-retention.md` | H | S | 2 (revisit once real leveling times are known) |
 | **Skill tree from level 5:** 1 point per level, about 30 upgrades per class in 3 branches, pick-one spots, cheap respec. Replaces stat points (stats from gear). Upgrades as generic data kinds (cooldown cut, charge, duration, area, spread). Launch six first | H | L | 2–3 (when levels past 10 exist) |
@@ -152,6 +153,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Backlog card: solo vs group tuning for dungeons, plus difficulty tiers (phase 3). No game changes.
 - **Docs (Nov 17)** Map chat: Brother Malrec's dungeon designed (owner): kept short, 4 rooms (chapel nave, flooded catacomb with water that slows everyone, cult halls with healer camps, Malrec's sanctum), about 16 mobs, a 10–15 minute run; Malrec is level 11; his chest works like Boss 1's. In `design.md` (Dungeon 1) and the map note. No game changes.
 - **v0.18.3** **Boss 1 telegraphs its shadow bolt** (balance pass, step 3). The bolt is now a **2-second cast**: a purple bar fills in the target frame ("Casting Shadow Bolt") and over Boss 1's head, and it stands still while casting. **Counter it:** a stun or fear in that window interrupts it ("Interrupted!"); Evade and Feign Death break it off too; if you're out of range (110) when it lands it falls short ("MISS"); Deflect dodges it and Divine Aura still blocks it. One bolt about every 7s and the same damage as before. Sim bots interrupt with their stun or fear, or step out of range when low. Sim rerun for all 14 in `docs/sim-results.md`: Necro 9 → 7, Cleric 8 → 7, Warrior 9 → 8, Shadow Knight 10 → 8, Wizard 10 → 8, Monk 10 → 9, Enchanter never → 10; Ranger 7 → 8 and Druid 8 → 9 slipped a little. No save changes.
 - **Docs (Nov 17)** Summoning a named now needs only the key item (no per-player cooldown); the key is used up. `design.md` and the map note updated. No game changes.
