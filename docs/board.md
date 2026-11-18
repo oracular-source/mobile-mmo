@@ -36,10 +36,10 @@ Owner asked for these Nov 17, before the rest of the class baseline (Cleric, Enc
 1. ~~**Research notes**~~ Done Nov 17: `docs/research/` (coding practices, MMO lessons). Art and assets research comes later, before the art pass.
 2. ~~**Split `index.html` into files**~~ Done in v0.14: `css/game.css`, `js/` by job, `js/data/` for numbers. Plain scripts sharing one scope instead of ES modules (simpler, and still opens straight from disk). Versioned saves followed in v0.14.1.
 3. ~~**Versioned saves**~~ Done in v0.14.1: one save version number, upgrade steps for old saves, storage problems never crash the game.
-4. **Class combos saved as data:** each class gets a `rotation` (its solo combo) next to its abilities, so the sim plays every class the same way it's meant to be played, and the design doc lists them.
+4. ~~**Class combos saved as data**~~ Moved into the testing grounds (card 7), Nov 17: combos get built with the sim that uses them.
 5. Continue Now: Cleric, then Enchanter.
 6. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
-7. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
+7. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun. Includes each class's `rotation` (solo combo) saved as data next to its abilities, listed in the design doc.
 8. **Balance pass** on all six launch classes using the testing grounds.
 9. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
 10. Milestone 4: start screen polish, fix anything clearly broken.
@@ -84,6 +84,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
+| Class playbooks for the sim: tactics, not just a combo. Owner writes each class's process in plain words, saved as "when X, do Y" rules. Examples: Necro dreads (fears) the highest-HP mob while fighting the weaker one, sits for mana once nothing is on it, keeps plague on every mob in the fight; Rogue sprints to get around. The sim then kites and moves like a real player, so balance numbers match real play | H | M | 2 (with the testing grounds) |
 | Fixed-step game rules and seeded randomness, so fights play the same on any phone and the sim gives repeatable numbers (from research) | M | S | 2 (with the testing grounds) |
 
 ## Known issues
