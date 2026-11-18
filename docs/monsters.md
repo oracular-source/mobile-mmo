@@ -16,7 +16,7 @@ Rules for every new monster: black outline, faces right, its own family colours 
 | 4 | Crypt skeleton | Crypt | Skeleton | 12×16 | Recoloured corpse (looks like a zombie) | To do: its own skeleton body |
 | 5 | Necromancer's skeleton, Shadow Knight's minion | Pets | Skeleton | 12×16 | Recoloured corpse | To do: skeleton variants (clean bone + green eyes; dark bone + red eyes) |
 | 6 | Boss 1 → **Skeleton King** | Crypt | Skeleton (boss) | about 24×32, full size | Corpse at 3× | To do: crown, drawn at full size |
-| 7 | Old Gnawbone | Gate Road graveyard | Rat (named) | about 24×12 | New rat, dark, at 2× (chunky) | To do: own sprite, scarred, torn ear |
+| 7 | Old Gnawbone | Gate Road graveyard | Rat (named) | about 24×12 | New rat, dark, at 2× (chunky) | To do: own sprite, scarred, torn ear. **Owner (Nov 18): must look clearly different from a recoloured rat** (shape, not just colour) |
 | 8 | Earth and fire elementals | Magician pets | Elemental | 12×12 | One shape in two colours | To do |
 | 9 | Floating sword | Enchanter pet | Object | 5×10 | Tiny sprite | To do (low) |
 
