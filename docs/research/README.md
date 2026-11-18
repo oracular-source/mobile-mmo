@@ -9,6 +9,7 @@ Short notes on how games (and MMOs especially) are usually built, so our choices
 | [progression-and-retention.md](progression-and-retention.md) | The leveling plan so far (cap 30 now, 50 planned, skill tree from 5, 10–12 abilities by 30) and the research behind it: ability pacing, kits that change, retention (Nov 17) |
 | [art-direction.md](art-direction.md) | How to decide the look as a non-artist: visual pillars, mood board, the six style-guide rules, readability tests (Nov 17) |
 | [pixel-world-alive.md](pixel-world-alive.md) | What makes a small pixel world feel alive (Stardew Valley, Hyper Light Drifter, Eastward, Graveyard Keeper, Sea of Stars, Kingdom): ambient life, light, colour, readability, cheap-first effects, phone rules (Nov 17) |
+| [monsters-weapons-spells.md](monsters-weapons-spells.md) | Monsters, weapon swings and spells from older dark games (Diablo 1 and 2, Tibia, Ragnarok, Darkest Dungeon, Blasphemous, Loop Hero, Noita): monster families and size tiers, 4-beat swings, readable spell colours, crowd clutter (Nov 17) |
 
 ## The short version
 1. **Split by job, keep it simple.** Modern phone browsers load JavaScript files directly ("ES modules"), so we can split `index.html` into `css/` and `js/` files with no build tools, and GitHub Pages keeps serving it from the same link.
