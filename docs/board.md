@@ -33,15 +33,15 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 
 ## Next
 Owner asked for these Nov 17, before the rest of the class baseline (Cleric, Enchanter):
-1. **Research notes** (S): game/MMO development and coding best practices, saved in `docs/research/`. Art and assets research comes later, before the art pass.
-2. **Split `index.html` into files** (M), using the research. Plan in the Nov 17 chat: `index.html` (page only) + `css/game.css` + `js/` split by job (data: classes, mobs, items; then combat, world, input, UI, render, main). Still no build step; still plays from the same link. Owner confirms the plan first.
+1. ~~**Research notes**~~ Done Nov 17: `docs/research/` (coding practices, MMO lessons). Art and assets research comes later, before the art pass.
+2. **Split `index.html` into files** (M), using the research. Plan in the Nov 17 chat: `index.html` (page only) + `css/game.css` + `js/` split by job (data: classes, mobs, items; then combat, world, input, UI, render, main). Still no build step (native ES modules); still plays from the same link. From the research: data files hold no logic; game rules never call drawing or read the joystick directly; all random rolls go through one `rng()` function (seedable later for the sim); a short header comment in each file. Owner confirms the plan first.
 3. **Class combos saved as data:** each class gets a `rotation` (its solo combo) next to its abilities, so the sim plays every class the same way it's meant to be played, and the design doc lists them.
 4. Continue Now: Cleric, then Enchanter.
 5. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
 6. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
-2. **Balance pass** on all six launch classes using the testing grounds.
-3. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
-4. Milestone 4: start screen polish, fix anything clearly broken.
+7. **Balance pass** on all six launch classes using the testing grounds.
+8. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
+9. Milestone 4: start screen polish, fix anything clearly broken.
 
 ## Decisions
 - **Portrait (phone held upright).** Fits short sessions, playing in bed, and one-thumb targeting. Seeing more of the world comes from zooming out, not turning the phone.
@@ -83,6 +83,8 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
+| Versioned saves: saves carry a version number and old saves get upgraded instead of breaking; storage errors never crash the game (from research) | H | S | 2 (right after the split) |
+| Fixed-step game rules and seeded randomness, so fights play the same on any phone and the sim gives repeatable numbers (from research) | M | S | 2 (with the testing grounds) |
 
 ## Known issues
 - **Melee classes can't solo Boss 1 yet.** Quick sim (perfect rotation, no gear): Rogue at level 8 gets Boss 1 to about a third of its health before dying; Warrior at level 8 to about half. Rogue has no self-heal. Fix in the balance pass (testing grounds), not one class at a time.
@@ -93,6 +95,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Research notes in `docs/research/`: coding practices for a no-build browser game (file split, data vs. code, game loop, saves, seeded randomness, phone performance, testing) and MMO lessons (authoritative server, instancing, Koster's laws). No game changes.
 - **v0.13.1** Rogue buff from play-test: **Backstab from Hide one-shots most mobs a level or two below you** (damage 12+4.5/level → 20+7/level). Backstab now also works from any side on a **stunned** mob (double damage) or an **Evaded** one (triple, can't miss, like an ambush), so the combo is Gouge → Backstab and Evade → Backstab with no fiddly stepping around. Stab, Rend and Gouge's cooldown a bit better; Rogue HP 48 + 14/level (was 44 + 13) and AC 8 (was 5).
 - **v0.13** **Rogue** added (no mana, skills on cooldowns, leather armor). **Stab** (main attack), **Backstab** (only from Hide for triple damage that can't miss, or from behind for double), **Hide** (mobs don't notice you, you sneak at 70% speed and show see-through; using a skill or getting hit ends it), **Throwing Knife** (pull), **Gouge** (stun, lvl 2), **Rend** (bleed, lvl 3), **Evade** (lvl 5: mobs fighting you lose track for ~3s; Hide during it and they walk home), **Sprint** (lvl 7, +50% speed). Tapping an enemy from Hide opens with Backstab. Rogue gear (daggers, leathers) and three Boss 1 drops: Boss 1 Dagger, Jerkin and Parrying Blade. Auto-cast no longer swings at an Evaded mob. Start screen tip says "main attack" instead of "Tap spell".
 - **v0.12.1** Layout from play-test: the **bottom bar is gone** (more room for the map). Slots 7–8 and **Sit** now stack on the left, right above the chat box, instead of squeezed beside it. **Menu** moved to the top right; the **1st hit / Auto** toggles moved to the top left under your portrait. The Character button is gone; tap your portrait instead. The chat box keeps a fixed height so it never runs up under the buttons.
