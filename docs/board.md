@@ -84,7 +84,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | Extra spawns or zone copies when an area gets crowded | M | M | phase 3 |
 | Dungeon lockouts or loot timers for bosses | L | S | phase 3 |
 | Longer dungeons (later ones grow past the short first one) | H | M | after classes |
-| Class playbooks for the sim: tactics, not just a combo. Owner writes each class's process in plain words, saved as "when X, do Y" rules. Examples: Necro dreads (fears) the highest-HP mob while fighting the weaker one, sits for mana once nothing is on it, keeps plague on every mob in the fight; Rogue sprints to get around. The sim then kites and moves like a real player, so balance numbers match real play | H | M | 2 (with the testing grounds) |
+| Class playbooks for the sim: tactics, not just a combo. Owner writes each class's process in plain words, saved as "when X, do Y" rules. Examples: Necro dreads (fears) the highest-HP mob while fighting the weaker one, sits for mana once nothing is on it, keeps plague on every mob in the fight; Rogue sprints to get around. The sim then kites and moves like a real player, so balance numbers match real play. First draft for review: `docs/playbooks.md` (Nov 17) | H | M | 2 (with the testing grounds) |
 | Fixed-step game rules and seeded randomness, so fights play the same on any phone and the sim gives repeatable numbers (from research) | M | S | 2 (with the testing grounds) |
 
 ## Known issues
