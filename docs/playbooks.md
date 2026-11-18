@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is a first draft, Nov 17. Nothing in the game uses this yet.
+**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. Nothing in the game uses this yet.
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.

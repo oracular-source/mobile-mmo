@@ -33,7 +33,7 @@ Plan changed Nov 17 (owner): build wide first, balance and art later. Classes sh
 
 ## Next
 1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Follows the playbooks (when X, do Y). Includes fixed-step rules and seeded randomness so runs repeat. Built before batch 1 so new classes get tested as they land.
-2. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin. New rules: undead tag, heal over time, mez, charm, area nuke, small pet, taunt, Tash, Blink/Gate, Divine Aura, Mana Shield. One release.
+2. **Batch 1 build** (L): the five classes with their abilities (levels 1–8), class gear and Boss 1 drops, on the default skin. New rules: undead tag, heal over time, mez, charm, holy ground, health as a cost, chill and Shatter, area nuke, small pets and a decoy, taunt, Blink/Gate, Divine Aura, Mana Shield. One release.
 3. **Batch 2 playbooks, then build:** Magician, Ranger, Monk, Shaman, Bard. Needs the buff bar (from the backlog) and Bard songs.
 4. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here.
 5. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
