@@ -81,7 +81,7 @@ Things all classes share (from the game rules today):
 **Pull:** Hide, sneak up, and open with Backstab (triple damage, can't miss). Throwing Knife only to split one mob off a group.
 
 **Fight, in order:**
-1. Health low and Evade ready (level 5) → Evade, then Hide. The mob walks home; let it go and rest.
+1. Evade (level 5): two versions, both tested by the sim (see "Rogue: Evade, tested both ways" at the bottom).
 2. Mob stunned or Evaded and Backstab ready → Backstab (double or triple damage from any side).
 3. Gouge ready → Gouge (stun), then Backstab.
 4. Rend not on the target → Rend.
@@ -101,14 +101,14 @@ Things all classes share (from the game rules today):
 
 ---
 
-## Open question
-**Rogue: what is Evade for?** One thing to know first: a mob that walks home heals to full. So an Evade reset throws away all the damage you've done to that mob.
+## Rogue: Evade, tested both ways
+Owner's call (Nov 17): the sim runs the Rogue both ways below and reports which kills faster and dies less. The winner becomes the Rogue's playbook.
+
+**What is Evade for?** One thing to know first: a mob that walks home heals to full. So an Evade reset throws away all the damage you've done to that mob.
 
 Example: a level 6 Rogue is fighting a crypt skeleton. The skeleton is at half health, the Rogue is at 60%, and Evade is ready.
 - **A. Evade as damage:** Evade, then Backstab right away (triple damage, can't miss). The skeleton turns back on you after ~3s, but it's now nearly dead. Evade becomes part of the combo, so it's usually on cooldown when you need to escape.
 - **B. Evade as escape:** save it. Keep going with Gouge → Backstab and Stab. Only when health drops low: Evade, Hide, let the skeleton walk home (healed), rest to 80%, and re-open from Hide.
-
-The sim can test both and show which kills faster and dies less.
 
 ## Settled (Nov 17)
 - Necro re-Dreads the big mob when it starts walking back toward you.
