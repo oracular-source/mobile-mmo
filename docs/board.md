@@ -32,7 +32,13 @@ Gate review after milestone 4: 5–10 friends play, then decide whether the core
 - Finished: UI and controls pass (v0.11.3–v0.12.1), layout approved on phone.
 
 ## Next
-1. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
+Owner asked for these Nov 17, before the rest of the class baseline (Cleric, Enchanter):
+1. **Research notes** (S): game/MMO development and coding best practices, saved in `docs/research/`. Art and assets research comes later, before the art pass.
+2. **Split `index.html` into files** (M), using the research. Plan in the Nov 17 chat: `index.html` (page only) + `css/game.css` + `js/` split by job (data: classes, mobs, items; then combat, world, input, UI, render, main). Still no build step; still plays from the same link. Owner confirms the plan first.
+3. **Class combos saved as data:** each class gets a `rotation` (its solo combo) next to its abilities, so the sim plays every class the same way it's meant to be played, and the design doc lists them.
+4. Continue Now: Cleric, then Enchanter.
+5. **Balance by anchors** (owner's idea): tune the best soloer (Necromancer) and the worst (Cleric) first, then fit everyone else between them, using the testing grounds below.
+6. **Testing grounds:** dev-only arena plus a headless sim where every class fights the same mobs at levels 1, 4 and 8; reports kill time, damage taken, mana used, deaths. Claude tunes numbers from it; the owner plays to judge fun.
 2. **Balance pass** on all six launch classes using the testing grounds.
 3. **Feel pass**, class by class: melee feel (hit sparks, knockback, swing), animations, sound.
 4. Milestone 4: start screen polish, fix anything clearly broken.
