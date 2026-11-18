@@ -2,7 +2,7 @@
 
 How each class is meant to be played solo, written as rules: **when X, do Y.** The testing-grounds sim will follow these so its balance numbers match real play. Rules are in priority order: the sim checks from the top and does the first one that fits.
 
-**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17). **Batch 2 (Magician, Ranger, Monk, Shaman, Bard) is on its first draft, for owner review (Nov 17).**
+**Status:** Druid, Warrior, Necromancer and Rogue are on their second draft (owner's answers in). Batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) is on its second draft (owner's answers and signature twists in), Nov 17. The sim (`js/sim.js`) plays all nine classes by these rules (batch 1 bots since v0.17). **Batch 2 (Magician, Ranger, Monk, Shaman, Bard) is on its second draft (owner's answers in, Nov 17), ready to build.**
 
 Things all classes share (from the game rules today):
 - You run at 34. Mobs run 24–31, so you can outrun most of them, but not by much. A snare halves their speed; a root stops them.
@@ -254,7 +254,7 @@ New rules this batch needs (everything else reuses what the game already has):
 
 ---
 
-## Batch 2 (first draft, Nov 17): Magician, Ranger, Monk, Shaman, Bard
+## Batch 2 (second draft, Nov 17): Magician, Ranger, Monk, Shaman, Bard
 Same shape as batch 1: 8 abilities from level 1 to 8, one signature twist each, a playbook for the sim. Flavor first; numbers from the sim later. Still only the Wizard is the bolt class.
 
 New rules this batch needs:
@@ -266,12 +266,13 @@ New rules this batch needs:
 - **Shoot while moving** (Ranger): the main attack fires without stopping.
 - **Totems** (Shaman): a small object on the ground that ticks on mobs near it for a while.
 - **Split with Feign Death** (Monk): the Monk's Feign Death drops every mob except your target.
+- **Damage shield** (Magician's Flame Shield): mobs that hit you take damage back.
 - **Health for mana** (Shaman's Cannibalize). Reuses the Shadow Knight's "spend health" rule.
 - **Dash to a target** (Monk's Flying Kick). Shares code with the Warrior's Charge card.
 
 ### Magician: the summoner
 **Idea:** a pet class like the Necro, but instead of one skeleton you carry a toolbox of elementals and pick the right one for the fight.
-**Twist: pick your elemental.** Earth tanks, fire burns, air stuns, water heals you. Only one out at a time; swapping takes a 3s cast and mana, so you choose before the pull. When you're done with a pet, **Detonate** it for an area blast and summon the next.
+**Twist: pick your elemental.** Earth tanks, Fire burns. (Air and Water come at later levels, past 8; owner, Nov 17.) Only one out at a time; swapping takes a 3s cast and mana, so you choose before the pull. When you're done with a pet, **Detonate** it for an area blast and summon the next.
 
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
@@ -279,21 +280,22 @@ New rules this batch needs:
 | 1 | Summon Earth | pet | Slow, tough, holds the mob. The safe pick |
 | 2 | Summon Fire | pet | Fragile, hits hard, burns (DoT) what it hits |
 | 3 | Mend Elemental | pet heal | Heals your pet |
-| 4 | Summon Air | pet | Fast; every few hits knocks the mob back and stuns it briefly |
-| 5 | Detonate | area nuke | Your pet explodes: fire hits hardest, earth stuns, air knocks back, water heals you. Pet is gone |
-| 6 | Summon Water | pet | Weak hits, heals you every few seconds |
+| 4 | Burnout | pet buff | Your pet attacks 30% faster for 20s |
+| 5 | Detonate | area nuke | Your pet explodes: Fire hits hardest, Earth hits less but stuns. Pet is gone |
+| 6 | Flame Shield | buff | Mobs that hit you take fire damage back, until you die (buff bar) |
 | 8 | Elemental Link | buff | For 10s, your pet takes half the damage meant for you |
 
-**Before pulling:** pick the pet for the job. Single mob, safe: Earth. Fast kill: Fire. Two mobs: Air. Hurt or a long fight: Water.
+**Before pulling:** Flame Shield up (level 6). Pick the pet for the job: Earth for a safe fight, two mobs or Boss 1; Fire for a fast kill on a single.
 **Pull:** send the pet; Elemental Lash only if the mob comes to you.
 **Fight, in order:**
 1. Health low and Elemental Link ready (level 8) → Elemental Link.
-2. Health low and Water isn't out → back off; if the pet is about to die anyway, Detonate it, then Summon Water.
+2. Health low and the pet is Fire → back off; if Fire is about to die anyway, Detonate it, then Summon Earth.
 3. Pet below half health → Mend Elemental.
-4. Mob below a quarter health, pet is Fire and Detonate ready → Detonate to finish it (then resummon after the fight).
-5. Two or more mobs next to the pet and Detonate ready → Detonate, then resummon.
-6. Nothing is attacking you → sit for mana (like the Necro).
-7. Otherwise → Elemental Lash.
+4. Burnout ready (level 4) and the mob above half health → Burnout.
+5. Mob below a quarter health, pet is Fire and Detonate ready → Detonate to finish it (then resummon after the fight).
+6. Two or more mobs next to the pet and Detonate ready → Detonate, then resummon.
+7. Nothing is attacking you → sit for mana (like the Necro).
+8. Otherwise → Elemental Lash.
 **Between fights:** sit until mana is about 80%; resummon if the pet died or was detonated.
 
 ### Ranger: the moving archer
@@ -330,17 +332,18 @@ New rules this batch needs:
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
 | 1 | Palm Strike | melee | Fast punch (main attack) |
-| 1 | Feign Death | feign | Mobs forget you and walk home, except your target. Short cooldown |
+| 1 | Mend | heal | Instant self-heal, long cooldown |
 | 2 | Flying Kick | dash | Leap to the target and kick it (also a pull) |
-| 3 | Mend | heal | Instant self-heal, long cooldown |
+| 3 | Feign Death | feign | Mobs forget you and walk home, except your target. Short cooldown. Level 3 so new players learn to fight first (owner, Nov 17) |
 | 4 | Leg Sweep | stun | Short stun |
 | 5 | Flurry | melee | Five quick punches |
 | 6 | Deflect | buff | Dodge every melee hit for 3s |
 | 8 | Dragon Strike | melee | Big hit that knocks the mob back |
 
-**Pull:** Flying Kick the target. If more than one comes, Feign Death right away, stand when the others have walked off, and fight the one that stayed.
+**Levels 1–2:** pull singles only and fight them out.
+**Pull:** Flying Kick the target (level 2). Level 3+: if more than one comes, Feign Death right away, stand when the others have walked off, and fight the one that stayed.
 **Fight, in order:**
-1. Two or more mobs on you and Feign Death ready → Feign Death (splits the target off).
+1. Two or more mobs on you and Feign Death ready (level 3) → Feign Death (splits the target off).
 2. Health low and Mend ready → Mend.
 3. Health low and Deflect ready (level 6) → Deflect.
 4. Leg Sweep ready → Leg Sweep.
@@ -352,7 +355,7 @@ New rules this batch needs:
 
 ### Shaman: the stacker
 **Idea:** never cast a bolt. Stack ticking effects, slow the mob's attacks, and walk away while it rots.
-**Twist: the more that ticks, the harder it ticks.** Each different damage-over-time effect on a mob makes all of them tick 15% harder. One DoT is weak; Sicken plus Swarm plus a Venom Totem is strong. Drowsy (attack slow) keeps you alive while it works.
+**Twist: slow it, drop a totem, walk away.** Drowsy slows the mob's attacks so it barely hurts, and Venom Totem lets you set a spot on the ground that poisons whatever follows you through it. No damage bonus for stacking DoTs (owner, Nov 17: keep it simple).
 
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
@@ -360,7 +363,7 @@ New rules this batch needs:
 | 1 | Minor Healing | heal | Medium heal, 1.5s cast |
 | 2 | Drowsy | slow | Mob attacks 30% slower (not a snare: it still runs at full speed) |
 | 3 | Spirit of the Wolf | buff | Faster run speed for you and anyone nearby, until you die |
-| 4 | Swarm | dot | Second DoT (insects), stacks with Sicken |
+| 4 | Swarm | dot | Second DoT (insects); runs alongside Sicken |
 | 5 | Venom Totem | totem | A totem on the ground poisons mobs near it for 20s |
 | 6 | Spirit Ward | buff | More armor and health for you and anyone nearby, until you die |
 | 8 | Cannibalize | health for mana | Trade 15% of your health for mana, instant |
@@ -403,11 +406,11 @@ New rules this batch needs:
 **Getting around:** Song of Travel between fights.
 **Between fights:** sit with Song of Mending playing until health and mana are about 80%.
 
-### Open questions for batch 2 (owner)
-1. Magician: four pets at levels 1–6 too many this early? Option: Earth and Fire by 8, Air and Water later.
-2. Monk Feign Death at level 1, or level 3 so new players learn to fight first?
-3. Bard: two songs at once, or one song to keep it simple on a phone?
-4. Shaman: does "each DoT makes the others hit harder" feel right, or keep the twist to Drowsy plus totems?
+### Settled for batch 2 (Nov 17)
+- Magician gets Earth (level 1) and Fire (level 2) now; Air and Water come at later levels (past 8). Burnout and Flame Shield fill levels 4 and 6.
+- Monk's Feign Death comes at level 3, so new players learn to fight first. Mend moves to level 1.
+- Bard plays two songs at once.
+- Shaman's twist is the attack slow (Drowsy) plus totems. No bonus for stacking DoTs.
 
 ---
 

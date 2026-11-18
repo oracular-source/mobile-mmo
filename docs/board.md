@@ -27,16 +27,15 @@ One place for the work: what's being built now, what's next, every idea, and wha
 Gate review after milestone 4: 5–10 friends play, then decide whether the core is fun, web vs Godot, and whether to start phase 3 (multiplayer).
 
 ## Now
-1. **Batch 2 playbooks** (M): Magician, Ranger, Monk, Shaman, Bard. Owner and Claude draft the kits and twists in `docs/playbooks.md` like batch 1, then build (L). Needs the buff bar (backlog) and Bard songs. **First draft written (Nov 17):** kits, twists and bot rules for all five. Waiting on owner answers to 4 open questions at the end of the batch 2 section.
+1. **Batch 2 build** (L): Magician, Ranger, Monk, Shaman, Bard on the default skin, with sim bots, from the second draft in `docs/playbooks.md`. Also builds the new rules they need: the buff bar, songs (two at once), pet choice, pet explode, ground traps, shooting while moving, totems, damage shield, Monk's split Feign Death, dash to a target. One release.
 Owner to play: the five batch 1 classes (v0.17) on the phone. Notes become cards.
-Done: batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
+Done: batch 2 playbooks (second draft, Nov 17), batch 1 build (v0.17), testing grounds and sim (v0.16), default skin (v0.15).
 
 ## Next
-1. **Batch 2 build:** the five classes on the default skin, with bots. One release.
-2. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here. Warrior gets its ultimate-tank pass here (card in the backlog).
-3. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
-4. **Feel pass:** hit sparks, knockback, animations, sound.
-5. Milestone 4: start screen polish, fix anything clearly broken.
+1. **Balance** (milestone 3c): overnight sim runs, anchors first (Necro, Cleric), owner plays to judge fun. Melee classes soloing Boss 1 gets fixed here. Warrior gets its ultimate-tank pass here (card in the backlog).
+2. **Art redo** (milestone 3d): mock-ups to compare on the phone, lock one character (likely the Druid), write the rules in `art/palette.md` as a style guide (sprite size, outline, shading, palette, animation frames), then the same for one tree, one ground tile and one wall before rolling out.
+3. **Feel pass:** hit sparks, knockback, animations, sound.
+4. Milestone 4: start screen polish, fix anything clearly broken.
 
 Done earlier on Nov 17: research notes (`docs/research/`), file split (v0.14), versioned saves (v0.14.1), Rogue (v0.13, v0.13.1).
 
@@ -58,10 +57,11 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 
 | Idea | Value | Effort | Phase |
 | --- | --- | --- | --- |
-| Buff spells and a buff bar. Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
+| ~~Buff spells and a buff bar~~ (moved into the batch 2 build). Rules: a buff hits you and everyone nearby (Warriors: self only), no targeting; lasts until you die | M | M | 2 |
 | Animations: walking, casting, attacking, pet movement | H | L | 2 (milestone 4, with the art pass) |
 | Boss feel: slight screen shake on big boss attacks, and the camera pulls back when you enter a boss room (no separate boss bar) | M | S | 2 (with the feel pass) |
 | **Warrior = ultimate tank** (owner, Nov 17): hardest class to kill, ahead of the Cleric. Options to pick from: (a) clearly the most health and armor in the game; (b) **Last Stand:** once a fight, a killing blow leaves you at 1 HP with big damage reduction for 5s; (c) **Shield Block:** a chance to block a hit outright, higher with a shield; (d) **Hold the Line:** takes less damage for each mob on it (the opposite of the Shadow Knight healing per mob). Sim target: Warrior survives longest of all classes, kills stay slow | H | S–M | 2 (milestone 3c, balance) |
+| Magician Air and Water elementals (Air: fast, knocks back and stuns; Water: weak hits, heals you) at levels past 8 | M | S | 2–3 (when levels past 10 exist) |
 | Warrior group tools: Charge (rush to a target) and a big-radius taunt shout | H | S | 2 |
 | Short fight buffs (10–15 min) saved for hard fights or raids | M | M | later |
 | Raids | M | L | phase 4+ |
@@ -117,6 +117,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Batch 2 second draft (owner's answers): Magician starts with Earth and Fire (Air and Water later), Monk's Feign Death at level 3, Bard plays two songs, Shaman's twist is attack slow plus totems with no DoT stacking bonus. Batch 2 build is now the Now card. No game changes.
 - **Docs (Nov 17)** Batch 2 first draft in `docs/playbooks.md`: Magician (pick your elemental, Detonate), Ranger (shoots while moving, traps), Monk (Feign Death splits pulls), Shaman (stacking DoTs, Drowsy, totems, Cannibalize), Bard (two songs always on). Owner notes logged: Cleric staying near-unkillable is fine; Warrior should be the ultimate tank (backlog card, balance pass). No game changes.
 - **Docs (Nov 17)** Rogue's Evade settled as damage (A): playbook updated, the sim runs only that version. No game changes for players.
 - **Docs (Nov 17)** Research notes `docs/research/progression-and-retention.md` (leveling plan: cap 30 now and 50 planned, skill tree from level 5, 10–12 abilities by 30) and `docs/research/art-direction.md` (how to decide the look). design.md progression updated as "leaning"; backlog cards added. No game changes.
