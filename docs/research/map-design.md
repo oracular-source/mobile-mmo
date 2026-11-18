@@ -76,10 +76,12 @@ The Mire from the old design stays out for now ("small and finished"); it can co
 - **Map:** fills in as you explore.
 - **Secrets:** a hidden chest here and there that rolls gear for your class. **Rare spawns:** tougher, more XP, a better drop. **Lore:** later, once the setting is decided.
 - **The Mire:** stays out of Zone 1 for now.
-- **Follow-up (owner):** 2 minutes end to end to start (about 128 × 128 tiles), then judge it on the phone. Summoning needs **only** a key dropped by that area's mobs; the key is used up, no cooldown. Rares are **1 in 100** spawns, and each area's rare has its own name and look (placeholders in `design.md`). Malrec's dungeon: **a crypt under the chapel altar plus cult halls**, a 15–20 minute run.
+- **Follow-up (owner):** 2 minutes end to end to start (about 128 × 128 tiles), then judge it on the phone. Summoning needs **only** a key dropped by that area's mobs; the key is used up, no cooldown. Rares are **1 in 100** spawns, and each area's rare has its own name and look (placeholders in `design.md`). Malrec's dungeon: **a crypt under the chapel altar plus cult halls** (rooms below).
+
+- **Malrec's dungeon (owner, Nov 17):** a little shorter to start, since many more dungeons will go big: **4 rooms** (chapel nave, flooded catacomb, cult halls, Malrec's sanctum), about 16 mobs, a **10–15 minute run**. The catacomb's **slowing water stays**. **Malrec is level 11.** Full layout in `design.md` (Dungeon 1).
 
 ## Open questions for the owner
-- **Malrec's dungeon layout:** how many rooms, which mobs (cultists, the crypt's dead), and what Malrec's chest drops.
+- None open right now. Next: the owner reacts to the Zone 1 layout sketch, then a second layout pass.
 
 ## Sources
 - Disney weenies: https://gamedeveloper.com/design/what-mario-learned-from-mickey-mouse---part-3-decision-making-and-weenies ; side paths: https://craphound.com/disneylandleveldesign.txt ; Erdtree as weenie: https://www.aol.com/articles/disneyland-wrote-video-game-rule-150000682.html

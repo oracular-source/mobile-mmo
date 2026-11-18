@@ -224,7 +224,7 @@ Start small: one hub city, three outdoor zones and two dungeons, covering levels
 | --- | --- | --- | --- |
 | Hub city | All | Safe zone | Bank, vendors, trainers, group finder |
 | Zone 1 | 1–10 | Outdoor, shared | Crossroads, graveyard and crypt, rat tunnel, Wolfwood, Ruined Chapel (see Zone 1 below) |
-| Dungeon 1 (Malrec's chapel) | 8–10 | Instanced, 1–5 players | Inside Zone 1; 15–20 minute run |
+| Dungeon 1 (Malrec's chapel) | 8–11 | Instanced, 1–5 players | Inside Zone 1; 10–15 minute run (4 rooms) |
 | Zone 2 | 10–20 | Outdoor, shared | First named mobs and rare spawns |
 | Zone 3 | 20–30 | Outdoor, shared | Dangerous roamers, group-only named camp |
 | Dungeon A | 12–18 | Instanced, 1–5 players | 15–20 minute run, scales to party size |
@@ -273,7 +273,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 | Skeleton King | 7 | Crypt throne (shared) | Crown, bigger than the skeletons, gold glint in the dark | Throws a spinning bone, calls two skeletons at half health | Crown shard (crypt skeletons) |
 | Old Gnawbone | 5 | Bottom of the rat tunnel (shared) | Huge and scarred, torn ear | Squeals and rats pour out of the walls | Severed paw (tunnel rats) |
 | Greyfang | 7 | Wanders Wolfwood | Silver coat, glowing eyes, leads the pack | Howls to call the pack back, never flees | none (wanders on a timer) |
-| Brother Malrec | 10 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
+| Brother Malrec | 11 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
 
 **Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs only the area's key item, which is used up (no cooldown).
 
@@ -297,8 +297,15 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
 The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shared area in the graveyard). Entered from under the ruined chapel's altar, for about levels 8–10, scaled for one player until multiplayer exists.
 
-- **Shape:** a crypt under the altar, then the cult halls, ending at Brother Malrec. A run takes 15–20 minutes.
-- **Details to design later:** rooms, mobs, Malrec's fight and his chest.
+- **Shape (owner, Nov 17):** a crypt under the altar, then the cult halls, ending at Brother Malrec. Kept short on purpose (later dungeons go bigger): **4 rooms, about 16 mobs plus Malrec, a 10–15 minute run.**
+- **Rooms:**
+  1. **Chapel nave** (above ground): one camp of three fen cultists by a lit altar. Touching the altar opens the stairs down.
+  2. **Flooded catacomb:** the crypt's dead (skeletons and shambling corpses, levels 8–9) in knee-deep water that **slows everyone, you and the mobs**, so kiting still works but takes more care. A side passage hides a chest.
+  3. **Cult halls:** two camps of three cultists (levels 9–10), each with a **healer**. Kill or root the healer first: the warm-up for Malrec.
+  4. **Malrec's sanctum:** Brother Malrec (**level 11**, one above today's level cap, so he's a stretch fight) with two acolytes at his side. Candles light up one by one as the fight goes on; censer smoke trails behind him.
+- **Malrec's fight:** he heals his acolytes, so deal with them first (kill, root, mez or fear). His big move follows the telegraph rule (seen coming, with a counter); details when it's built.
+- **Malrec's chest:** like Boss 1's: one named item for your class and one uncommon every time, plus a small rare chance. Then the exit with a run summary.
+- **Solo check:** level 11 against a level-10 cap must still be soloable (pillar 2). When it's built, the sim checks that most classes can beat him at 10; if not, tune him, not the level.
 - **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a shadow bolt about every 7 seconds and two skeletons at half health. The bolt is a **telegraphed 2s cast** (v0.18.3): a purple cast bar shows in the target frame and over its head, and Boss 1 stands still while casting. A stun or fear interrupts it (Evade and Feign Death too); being out of range (110), Deflect or Divine Aura makes it miss. Every boss's big move should follow this rule: seen coming, with a counter, a chest and an exit with a run summary.
 - **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
 
