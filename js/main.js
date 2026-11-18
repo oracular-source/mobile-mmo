@@ -14,7 +14,7 @@ if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player
 // Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
-  $('clspick').innerHTML=Object.keys(CLASSES).map(k=>{const pg=store.get(k==='druid'?'ashfen-druid':'ashfen-prog-'+k,null);return '<button data-cls="'+k+'" class="'+(k===CLS?'active':'')+'">'+CLASSES[k].name+(pg&&pg.v===2?' · Lv '+pg.lvl:'')+'</button>'}).join('');
+  $('clspick').innerHTML=Object.keys(CLASSES).map(k=>{const pg=store.get(k==='druid'?'ashfen-druid':'ashfen-prog-'+k,null);return '<button data-cls="'+k+'" class="'+(k===CLS?'active':'')+'">'+CLASSES[k].name+(pg&&pg.v===2?'<br><small style="color:#9aa">Lv '+pg.lvl+'</small>':'')+'</button>'}).join('');
   $('clsdesc').textContent=C.desc;
   $('clspick').addEventListener('click',e=>{const b=e.target.closest('button[data-cls]');if(!b||b.dataset.cls===CLS)return;store.set('ashfen-class',b.dataset.cls);location.reload()});
   $('start').textContent='Play '+C.name;

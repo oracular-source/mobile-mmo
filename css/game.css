@@ -75,6 +75,19 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .seg button{flex:1;height:34px;font-size:11.5px}
 #ghost{position:absolute;pointer-events:none;z-index:9;opacity:.9;display:none}
 
+/* DEV panel: fold-away sections with buttons in a wrapping grid */
+#devbox details{border:1px solid #2a2531;border-radius:8px;margin-bottom:6px;background:#17151d}
+#devbox summary{padding:10px 12px;color:#c9a227;font-weight:600;font-size:13px;cursor:pointer;list-style:none}
+#devbox summary::-webkit-details-marker{display:none}
+#devbox summary::before{content:'▸ ';color:#7a6a3a}
+#devbox details[open] summary::before{content:'▾ '}
+#devbox details>*:not(summary){margin-left:10px;margin-right:10px}
+#devbox details>*:last-child{margin-bottom:10px}
+.dgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.dgrid button{min-height:38px;font-size:12px;padding:4px 6px;line-height:1.2}
+/* Start screen class picker: 14 classes in a 3-wide grid so every name fits and is easy to tap */
+#clspick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+#clspick button{min-height:40px;font-size:11.5px;padding:4px 2px;line-height:1.2}
 /* DEV: default skin gallery */
 .skingal{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 .skingal figure{margin:0;width:60px;text-align:center}
