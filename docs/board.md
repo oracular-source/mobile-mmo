@@ -91,7 +91,10 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 | "Next unlock" preview on level-up and the character screen | M | S | 2 |
 | Collection log for named drops (extends the dungeon journal card) | M | S | 2 |
 | Post-cap side perks (capped, catch-up friendly), harder dungeon tiers | M | L | later |
-| **Pixel art deep dive** (owner, Nov 17): what makes a 2D pixel world feel alive and well designed, looking well beyond MMOs (Stardew Valley and others): ambient life, animation, light, color, readability. Research note in `docs/research/`, then draft character mock-ups as artifacts (no game changes) | H | M | next art step, before 3d |
+| ~~**Pixel art deep dive**~~ (done Nov 17): research note `docs/research/pixel-world-alive.md` and draft mock-ups in the "Mobile MMO — Pixel mock-ups (draft 1)" canvas (Druid three takes, launch six in the shaded style, a living Gate Road scene with each effect switchable). Owner to judge on the phone and answer the open questions in the note | H | M | next art step, before 3d |
+| **Living world pass** (from the deep dive): torch and campfire flicker, hit flash, ground fog in the graveyard, more critters that react (rats, bats, moths), idle breathing on every sprite. All cheap, no rule changes; try each in the Gate Road mock-up first | H | M | 2 (with the feel pass) |
+| **Area tint:** each zone gets its own light colour (Gate Road warm dusk, graveyard cold green, crypt blue-black); a full day/night cycle later, when Bog wisps exist | M | S | 2 (with the feel pass) |
+| **Signature effect:** one thing the world always has (proposal: low ground fog plus embers and fireflies near warm light). Owner's call | M | S | 3d |
 | Owner mood board (10–20 references + 3–5 "not this"), see `docs/research/art-direction.md` | H | S | before 3d |
 | Visual pillars agreed and written at the top of `art/palette.md` (draft in the art note) | H | S | before 3d |
 | Palette rebuilt as hue-shifted ramps | M | S | 3d |
@@ -117,6 +120,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 17)** Pixel art deep dive: `docs/research/pixel-world-alive.md` (what makes small pixel worlds feel alive: Stardew Valley, Hyper Light Drifter, Eastward, Graveyard Keeper, Sea of Stars, Kingdom; a cheap-first toolkit; phone rules; what the mock-ups test) and a draft mock-up canvas with three Druid takes, the launch six in the shaded style, and an animated Gate Road scene with every effect switchable. New backlog cards: Living world pass, Area tint, Signature effect. No game changes.
 - **Docs (Nov 17)** Batch 2 second draft (owner's answers): Magician starts with Earth and Fire (Air and Water later), Monk's Feign Death at level 3, Bard plays two songs, Shaman's twist is attack slow plus totems with no DoT stacking bonus. Batch 2 build is now the Now card. No game changes.
 - **Docs (Nov 17)** Batch 2 first draft in `docs/playbooks.md`: Magician (pick your elemental, Detonate), Ranger (shoots while moving, traps), Monk (Feign Death splits pulls), Shaman (stacking DoTs, Drowsy, totems, Cannibalize), Bard (two songs always on). Owner notes logged: Cleric staying near-unkillable is fine; Warrior should be the ultimate tank (backlog card, balance pass). No game changes.
 - **Docs (Nov 17)** Rogue's Evade settled as damage (A): playbook updated, the sim runs only that version. No game changes for players.
