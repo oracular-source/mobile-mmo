@@ -223,7 +223,8 @@ Start small: one hub city, three outdoor zones and two dungeons, covering levels
 | Area | Levels | Type | Notes |
 | --- | --- | --- | --- |
 | Hub city | All | Safe zone | Bank, vendors, trainers, group finder |
-| Zone 1 | 1–10 | Outdoor, shared | Tutorial camps, few roaming threats |
+| Zone 1 | 1–10 | Outdoor, shared | Crossroads, graveyard and crypt, rat tunnel, Wolfwood, Ruined Chapel (see Zone 1 below) |
+| Dungeon 1 (Malrec's chapel) | 8–10 | Instanced, 1–5 players | Inside Zone 1; 15–20 minute run |
 | Zone 2 | 10–20 | Outdoor, shared | First named mobs and rare spawns |
 | Zone 3 | 20–30 | Outdoor, shared | Dangerous roamers, group-only named camp |
 | Dungeon A | 12–18 | Instanced, 1–5 players | 15–20 minute run, scales to party size |
@@ -242,40 +243,63 @@ Raids come after the MVP, once group dungeons are proven fun.
 
 ## Zone 1: Ashfen Hollow (levels 1–10)
 
-A blighted marsh-wood just outside the hub city. Each mob teaches one part of the Druid's kit, so the zone doubles as the tutorial. The name is a placeholder until the setting is decided.
+A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyard, a rat-infested sinkhole and a darkening forest that ends at a ruined chapel. Reworked Nov 17, 2026 from the Gate Road sandbox; research and reasoning in `docs/research/map-design.md`, rough layout in the "Mobile MMO — Zone 1 layout (rough)" sketch. The name is a placeholder until the setting is decided. **Status: design only; the game still has the old Gate Road, Sunken Graveyard and instanced crypt.**
 
-Mobs are spread out by level: only level 1–2 near the gate, 2–3 further down the road, 3–5 in the graveyard. The gate camp has two guards, Marrow the Peddler with a campfire that doubles resting speed, wall torches, a signpost, and ambient life (crows, frogs, fireflies).
+**Size:** about 128 × 128 tiles. A straight walk from the town gate to the chapel is about 2 minutes on a winding road (about 250 tiles); each area's entrance is about 30 seconds from the crossroads. Judge it on the phone and adjust.
 
-Layout: Hub city → Gate Road (1–3) → either Sunken Graveyard (3–5) or Wolfwood Edge (4–7) → The Mire (6–9) → Ruined Chapel (7–10, zone finale).
+**Layout rules**
+- Hub and spokes: the crossroads sits outside the gate, with a road to each area and the landmark at its end in view.
+- One theme, one landmark, one named and one named rare per area, plus a few things to find (camps, story props, a hidden chest).
+- Loops, not dead ends: a shortcut path runs from the chapel down the east side back to the crossroads.
+- Difficulty grows with distance and depth, never with locked doors.
+- Areas blend into each other (dead grass near the graveyard, dirt and bones near the sinkhole, trees closing in toward the chapel).
+- Low ground fog is the signature effect; it changes by area.
+- A map that fills in as you explore. No quest arrows.
 
-| Mob | Level | Area | Behavior | What it teaches | Drops |
-| --- | --- | --- | --- | --- | --- |
-| Grave rat | 1–2 | Gate Road | Aggressive, weak | Basic targeting and nukes | Rat whiskers (vendor) |
-| Mire beetle | 2–3 | Gate Road | Slow, heavily armored | DoTs beat armor | Beetle shell (crafting later) |
-| Shambling dead | 3–5 | Sunken Graveyard | Very slow; social in pairs | Kiting: root, DoT, walk away | Bone charms, coin |
-| Blight wolf | 4–7 | Wolfwood Edge | Fast, packs of 2–3, flee at low health | Snare and root, or they run and bring friends | Pelts, fangs |
-| Bog wisp | 5–7 | The Mire | Floats, so roots don't hold; ranged shadow bolt; night only | Adapting when your main tool fails | Wisp essence |
-| Bog lurker | 8–10 | The Mire, roaming | Hits hard, regenerates unless a DoT is ticking | Keep DoTs up; respect roamers | Lurker hide, rare gear |
-| Fen cultist | 6–10 | Ruined Chapel | Camps of 3; casters and melee; call for help | Pulling one at a time | Coin, robes, cult notes (quest) |
-
-**Named mobs** (soloable, first taste of rare spawns)
-
-| Named | Level | Spawn | Fight | Drop |
+| Area | Levels | Landmark | Named | What's there |
 | --- | --- | --- | --- | --- |
-| Old Gnawbone | 4 | Replaces a graveyard rat, about 20-minute timer | Big rat, summons 2 rats at half health | Gnawed Ring (+STA) |
-| Greyfang | 7 | Leads a wolf pack, about 30-minute timer | Never flees; howls to call the pack back | Greyfang Cloak (+AGI, small run speed) |
-| Brother Malrec | 10 | Chapel altar, about 45-minute timer | Heals his cultists; kill or root his guards first | Malrec's Censer (off-hand, +WIS) |
+| Crossroads (outside Town 1's gate) | 1–3 | Campfire and signpost | none | Guards, Marrow the Peddler, rats and beetles, critters |
+| Sunken Graveyard (west) | 3–5 | A broken bell tower | **Skeleton King** at the crypt throne | Shambling corpses, crypt skeletons, dug graves, low fog; the crypt is an open, shared area at the back |
+| Rat tunnel (east) | 3–6 | A sinkhole with dust rising and squeaks you can hear | **Old Gnawbone** at the bottom | A shared cave: easier rats at the mouth, bigger ones deeper; gnawed bones, collapsed carts |
+| Wolfwood (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop with his pack | Blight wolves, a hunter's abandoned camp, the forest getting darker |
+| Ruined Chapel (deep wood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** inside his dungeon (Dungeon 1) | Fen cultists in camps of three outside; the dungeon entrance under the altar |
 
-## Dungeon 1 (placeholder name)
+The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
-A crypt behind a door at the back of the Sunken Graveyard, for levels 4–7, scaled for one player until multiplayer exists.
+**Named mobs.** Every named has one look and one move that set it apart from the mobs around it.
 
-- **Layout:** five rooms in a line: entry (with the exit circle), crypt rats, skeleton pairs, a quiet passage, then the boss room with two skeleton guards. The first dungeon is deliberately short (13 mobs); later dungeons get longer.
-- **Mobs:** crypt rats and crypt skeletons, levels 4–6, many in social groups, so pulls matter. Nothing respawns inside. Mobs never leash: once pulled, they chase until you or they die.
-- **Boss 1 (level 7):** melee hits hard, throws a shadow bolt every 7 seconds at range, and calls two skeletons at half health. Always drops one named item: Boss 1 Staff, Boss 1 Robe or Boss 1 Charm.
-- **Loot:** trash drops uncommon gear twice as often as outside, and rare gear more often.
-- **Ending:** Boss 1 leaves a chest (copper and an uncommon item) and a way out. Stepping into it shows a run summary (time, kills, XP, gear) and returns you to the graveyard.
-- **Death:** you wake at the crypt entrance; cleared rooms stay cleared.
+| Named | Level | Where | Look | Move | Summon key |
+| --- | --- | --- | --- | --- | --- |
+| Skeleton King | 7 | Crypt throne (shared) | Crown, bigger than the skeletons, gold glint in the dark | Throws a spinning bone, calls two skeletons at half health | Crown shard (crypt skeletons) |
+| Old Gnawbone | 5 | Bottom of the rat tunnel (shared) | Huge and scarred, torn ear | Squeals and rats pour out of the walls | Severed paw (tunnel rats) |
+| Greyfang | 7 | Wanders Wolfwood | Silver coat, glowing eyes, leads the pack | Howls to call the pack back, never flees | none (wanders on a timer) |
+| Brother Malrec | 10 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
+
+**Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs the area's key item **and** each player waits 20–30 minutes before summoning the same named again.
+
+**Named rares.** About 1 in 100 spawns in an area is that area's named rare: tougher, more XP, a better drop, and its own name and look. Placeholder names and looks:
+
+| Area | Rare | Look | Twist |
+| --- | --- | --- | --- |
+| Crossroads | Ironshell | A mire beetle twice the size, with a cracked, mossy shell | Hard shell: DoTs work best |
+| Sunken Graveyard | The Weeping Bride | A shambling corpse in a torn veil, pale glow | Her wail makes nearby corpses rise |
+| Rat tunnel | The Pale Rat | A white rat with red eyes, bigger than the rest | Fast; runs to call friends at low health |
+| Wolfwood | Old Scar | A one-eyed grey wolf with a torn ear | Hits hard, never part of a pack |
+| Ruined Chapel | The Ashen Acolyte | A cultist in grey robes trailing smoke | Casts a shadow bolt; flees to Malrec's door |
+
+**Hidden chests.** A few per area, off the main road; each rolls a piece of gear your class can use, then refills after a while.
+
+**Lore** waits until the setting is decided.
+
+**Mobs from the old design** (rework to the new areas as they're built): grave rat (1–2), mire beetle (2–3), shambling dead (3–5), crypt rat and crypt skeleton (4–6), blight wolf (4–7, packs of 2–3, flee at low health), fen cultist (6–10, camps of three, call for help). Each still teaches one part of the kit (targeting, DoTs vs armor, kiting, snares, pulling one at a time).
+
+## Dungeon 1: Brother Malrec's chapel (placeholder name)
+
+The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shared area in the graveyard). Entered from under the ruined chapel's altar, for about levels 8–10, scaled for one player until multiplayer exists.
+
+- **Shape:** a crypt under the altar, then the cult halls, ending at Brother Malrec. A run takes 15–20 minutes.
+- **Details to design later:** rooms, mobs, Malrec's fight and his chest.
+- **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a bolt every 7 seconds and two skeletons at half health, a chest and an exit with a run summary.
 - **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
 
 ## Solo vs group
