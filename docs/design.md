@@ -253,7 +253,7 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 - One theme, one landmark, one named and one named rare per area, plus a few things to find (camps, story props, a hidden chest).
 - Loops, not dead ends: a shortcut path runs from the chapel down the east side back to the crossroads.
 - Difficulty grows with distance and depth, never with locked doors.
-- Hard borders between areas (owner, Nov 18): crossing a gate, fence, cave mouth or tree line changes the look all at once (ground, plants, light, fog), so you know you've entered somewhere new. Rules for building areas: `area-rules.md`.
+- Borders fit the place (owner, Nov 18): a hard cut where something physical marks the line (the graveyard gate, a cave mouth), a gradual blend where open land meets open land (the forest thinning toward the chapel). Rules for building areas: `area-rules.md`.
 - Low ground fog is the signature effect; it changes by area.
 - A map that fills in as you explore. No quest arrows.
 

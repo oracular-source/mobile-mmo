@@ -14,7 +14,7 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 - **Dead areas are dead all the way, inside their border.** A graveyard gets dead trees, dead grass and bare branches behind its gate; the forest outside can stay green right up to it. Plants, trees and ground always match the area you're standing in.
 - **New setting, new assets.** Draw new props, trees and tiles that fit the area instead of recolouring the last area's. Reuse is fine only when it truly belongs (the same road, the same fence where two areas meet, rats in more than one cave). It should be hard to spot repeats.
 - **One landmark you can see (or hear, or see lit up) from the area's entrance.**
-- **Hard borders are good (owner, Nov 18).** Where you cross into a new area (a gate, a fence, a cave mouth, a tree line), the look can change all at once: ground, plants, light, fog. Crossing the line should feel like entering somewhere new. No need for slow blends.
+- **Borders fit the place (owner, Nov 18).** Pick the transition that makes sense. **Hard cut** where there's a real boundary: a gate, a wall, a fence, a cave mouth (walk through the graveyard gate and now you're in a graveyard: dead trees, dead grass, new light, all at once). **Gradual blend** where open land meets open land, and in bigger areas: the forest thins out, grass dries, the light shifts over a stretch of road so it flows naturally. Default to the blend outdoors; use the hard cut when something physical marks the line.
 
 ## Natural placement, no mistakes
 - Everything looks like it would really be there. Nothing overlaps what it shouldn't: no gravestones on a tower, no props in walls, holes or each other, no mobs standing in scenery.

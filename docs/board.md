@@ -167,6 +167,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - The game pauses while menus are open (fine for single-player; an MMO wouldn't pause).
 
 ## Changelog
+- **Docs (Nov 18)** Area borders refined: hard cut where something physical marks the line (gate, wall, cave mouth), gradual blend where open land meets open land and in bigger areas. `area-rules.md` and `design.md` updated. No game changes.
 - **Docs (Nov 18)** Graveyard style picked: **A · Moonlit**. Area borders are now hard lines, not blends (living forest up to the graveyard gate, dead trees only inside). `area-rules.md` and `design.md` updated. No game changes.
 - **Docs (Nov 18)** New `docs/area-rules.md`: how every new area gets made (brief, style takes, full area mock-up, owner notes, build) and the baseline rules (own look per area, dead areas fully dead, new setting = new assets, natural placement, loops, phone readability). Graveyard mock-up now has four style takes to pick from. No game changes.
 - **Docs (Nov 18)** World design lane: Sunken Graveyard mock-up drafted (in-game view from the gate plus a top-down layout of the graveyard and shared crypt, with a back tunnel from the crypt up to the Wolfwood edge so it loops). New art rule in `CLAUDE.md`: natural placement, nothing overlapping. New backlog card: meaningful named loot (back burner). Summoning stays key only. No game changes.
