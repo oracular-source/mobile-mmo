@@ -50,6 +50,7 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 - Art style: dark 2D pixel art, 3/4 top-down view (Dreadmyst meets Diablo 2 and Vampire Survivors). Characters are 16x18 pixel sprites (the A+B take 1 look, v0.19: 6-row head, 12-row body) with a black outline; monsters follow the size tiers in `docs/research/monsters-weapons-spells.md`, list in `docs/monsters.md`. Use the palette in `art/palette.md`.
 - Sprites are currently stored as text grids in `js/data/sprites.js` (one character per pixel, see `SPR` and `PAL`).
 - Render at low resolution and scale up with nearest-neighbor (no smoothing) so pixels stay crisp.
+- **New areas:** follow `docs/area-rules.md` (one area per pass: brief, style takes, full area mock-up, owner notes, build). Add new rules there as we learn them.
 - **Natural placement, no mistakes (owner, Nov 18):** every scene, map and mock-up must look like a real place. Nothing overlaps something it shouldn't: no gravestones on a bell tower, no props inside walls, holes or other props, no mobs standing in scenery. Give every object a footprint, keep a tile of clearance around buildings and paths, and check placements for overlaps before showing or shipping. Things sit where they would really be (graves in rows on open ground, rubble at the foot of what it fell from, paths worn where people walk).
 
 ## Folder layout
