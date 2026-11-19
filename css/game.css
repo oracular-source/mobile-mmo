@@ -171,3 +171,14 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 #petrow .row{font-size:10px;line-height:12px}#petrow #petnm{color:#ddd;font-weight:700}#petrow #pettg{color:#aaa}
 #pframe .pbar{height:6px;margin-top:1px;background:#111;border:1px solid #555;border-radius:2px;box-shadow:none}#pframe .pbar>i{box-shadow:none}
 .gb.petcmd{font-size:10px;line-height:1.05}.gb.held{border-color:#c9a227;color:#ffd27a} /* Back off turns gold while the pet is held */
+/* v0.35 Menu window: header with ✕, two square tabs (plain grey, like the spell grid), grouped settings */
+.mhead{display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #3a3020;margin-bottom:8px}
+.mhead h1{border:0!important;margin:0;padding:0 0 6px}
+.mhead .mx{width:36px;height:32px;font-size:15px;margin-bottom:4px}
+.tabs{display:flex;gap:5px;margin-bottom:8px}
+.tabs button{flex:1;height:38px;font-size:13px;border-radius:0;background:#2a2a2e;border:1px solid #55555c;color:#ccc}
+.tabs button.active{background:#46464c;border-color:#c9a227;color:#fff}
+#paneSpells .go#barr{margin-top:0;background:#1c1922;border-color:#3a3343}
+.sgrp{border-bottom:1px solid #2a2531;padding-bottom:3px}
+.srow{margin-bottom:7px}
+.slbl{font-size:11.5px;color:#bbb;margin-bottom:3px}

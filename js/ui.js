@@ -209,7 +209,7 @@ function assign(id,i){
   if(j>=0)loadout[j]=loadout[i]; else {/* spell not loaded: replace */}
   loadout[i]=id;saveLoadout();buildControls();
 }
-$('spellsUI').addEventListener('pointerdown',e=>{
+$('paneSpells').addEventListener('pointerdown',e=>{
   const chip=e.target.closest('.chip');
   if(chip){e.preventDefault();drag={id:chip.dataset.id,sx:e.clientX,sy:e.clientY,moved:false,pid:e.pointerId,el:chip};return}
   const slot=e.target.closest('.slot');
@@ -237,27 +237,34 @@ window.addEventListener('pointerup',e=>{
 /* ---------- Settings ---------- */
 function renderSettings(){
   const box=$('setbox');
-  const seg=(label,key,opts)=>'<h2>'+label+'</h2><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div>';
+  // v0.35: four groups (Controls, Combat, Display, Game), short labels. Rows that only matter
+  // for one choice (grid size, pad rows, drag stick) still show only when that choice is picked.
+  const seg=(label,key,opts)=>'<div class="srow"><div class="slbl">'+label+'</div><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div></div>';
+  const grp=t=>'<h2 class="sgrp">'+t+'</h2>';
   box.innerHTML=
-    '<button class="go" id="chgcls" style="margin:0 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
-    seg('Controls','scheme',[['grid','Grid'],['pad','Spell pad']])+
+    grp('Controls')+
+    seg('Layout','scheme',[['grid','Grid'],['pad','Spell pad']])+
     (settings.scheme==='grid'?seg('Grid size','gridSize',[['S','Small'],['M','Medium'],['L','Large']]):'')+
-    seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
-    seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
-    seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
-    seg('Zoom (or pinch the screen)','zoom',[[160,'Near'],[999,'Far']])+
-    seg('Minimap (tap it for the full map)','minimap',[['true','On'],['false','Off']])+
-    seg('Movement','move',[['drag','Tap + drag stick'],['hold','Hold to move']])+
-    (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?
       seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
       seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'')+
+    seg('Hand','left',[['false','Right'],['true','Left']])+
+    seg('Movement','move',[['drag','Tap + drag'],['hold','Hold to move']])+
+    (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
+    grp('Combat')+
+    seg('Tap an enemy (1st hit)','tapCast',[['true','Target + cast'],['false','Target only']])+
+    seg('Keep casting (Auto)','autoCast',[['true','On'],['false','Off']])+
+    grp('Display')+
+    seg('Zoom (or pinch)','zoom',[[160,'Near'],[999,'Far']])+
+    seg('Minimap','minimap',[['true','On'],['false','Off']])+
+    grp('Game')+
+    '<button class="go" id="chgcls" style="margin:2px 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
     // Prototype only: lets the home-screen app (which can't use ?dev) turn developer tools on.
-    '<h2>Developer tools (prototype)</h2><div class="seg"><button id="devoff" class="'+(dev.on?'':'active')+'">Off</button><button id="devon" class="'+(dev.on?'active':'')+'">On</button></div>';
+    '<div class="srow"><div class="slbl">Developer tools</div><div class="seg"><button id="devoff" class="'+(dev.on?'':'active')+'">Off</button><button id="devon" class="'+(dev.on?'active':'')+'">On</button></div></div>';
 }
 $('setbox').addEventListener('click',e=>{
   if(e.target.id==='devon'||e.target.id==='devoff'){const on=e.target.id==='devon';if(on!==dev.on){store.set('ashfen-dev',on);location.reload()}return}
-  if(e.target.id==='chgcls'){$('settingsUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
+  if(e.target.id==='chgcls'){$('menuUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
   settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();if(b.dataset.k==='zoom')applyZoom();
@@ -265,12 +272,17 @@ $('setbox').addEventListener('click',e=>{
 
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
-function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='spellsUI')renderBook();if(id==='settingsUI')renderSettings()}
+// Menu tab: remembered for this session so the Menu reopens where you left it.
+let menuTab='spells';
+function setMenuTab(t){menuTab=t;
+  document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
+  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';
+  selected=null;if(t==='spells')renderBook();else renderSettings();
+  $('menuUI').querySelector('.card').scrollTop=0}
+function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='menuUI')setMenuTab(menuTab)}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
-const closeMenu=()=>$('menuUI').classList.remove('show');
-$('bspells').addEventListener('click',()=>{closeMenu();openModal('spellsUI')});
-$('barr').addEventListener('click',()=>{closeMenu();setArranging(true)});
-$('bset').addEventListener('click',()=>{closeMenu();openModal('settingsUI')});
+document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.addEventListener('click',()=>setMenuTab(b.dataset.tab)));
+$('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');setArranging(true)});
 
 $('pframe').addEventListener('click',()=>{charTab='gear';openModal('charUI')});
 let charTab='gear',bagSel=null;

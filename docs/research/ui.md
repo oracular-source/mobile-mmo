@@ -21,7 +21,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 5. Slots 7–8 and Sit (done v0.30.2; slots 7–8 already moved into the grid in v0.28)
 6. Floating text over heads (done v0.33)
 7. Pet bar (done v0.34)
-8. Menu screens (Spells, Arrange, Settings)
+8. Menu screens (Spells, Arrange, Settings) (done v0.35)
 9. Character screen (Gear, Bags, Journal)
 10. Moments (level up, death, loot, run summary)
 11. Start screen and class picker
@@ -68,3 +68,8 @@ Now (before v0.34): a 4px unlabeled line under the XP bar, easy to mistake for i
 Options: **A** pet frame under yours (name, health, what it's hitting), no buttons; **B** A plus two orders, **Attack** and **Back off**, on the left above Sit at Sit's size; **C** pet health and orders together bottom left.
 **Owner picked B** (Nov 19), with: the pet's health bar **thinner than yours but the same length**; **Back off holds** the pet until you press Attack again; the frame names the pet (**Earth elemental**, **Fire elemental**, Skeleton, Minion, Floating sword, Charmed rat).
 **Built v0.34:** a thin row at the bottom of your frame (name left, what it's hitting or **held** right, 6px bar). Timed pets show seconds left (Floating sword 84s, Charmed rat 6s), red under 5s. Attack and Back off show only while a pet is out; Back off turns gold while held. Attack works on a mob that isn't fighting you yet (so the pet can pull), never on a sleeping one; with no target it just ends the hold. Guard, Hold, Taunt (EverQuest's other orders) wait for groups.
+
+## 8. Menu screens (Spells, Arrange, Settings)
+Now (before v0.35): Menu opened a small list (Spells, Arrange buttons, Settings, Back to game), each opening its own window, so every change took two taps. Settings was one long list of 13 rows in no order: Change class at the top, Developer tools mixed in, long labels, pad-only rows appearing in the middle.
+Options: **A** one window with two tabs (Spells, Settings), Arrange as a button on the Spells tab, Settings in four groups; **B** Settings in folding sections; **C** Settings as sub-pages.
+**Owner picked A** (Nov 19). **Built v0.35:** Menu opens straight into one window with a ✕ and square grey tabs **Spells | Settings** (remembers the last tab for the session). Spells tab: **Arrange buttons on screen** at the top, then the spellbook and loadout as before. Settings in four groups with short labels: **Controls** (Layout, Grid size or Pad size + Flick distance, Hand, Movement, Drag stick), **Combat** (Tap an enemy (1st hit), Keep casting (Auto)), **Display** (Zoom, Minimap), **Game** (Change class, Developer tools). Same settings, same saves. Classic fan layout stays parked.
