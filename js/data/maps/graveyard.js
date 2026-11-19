@@ -1,4 +1,4 @@
-// Sunken Graveyard (surface), levels 3-5. West spoke of Zone 1. Format: docs/map-format.md
+// Sunken Graveyard (surface), levels 3-8. West spoke of Zone 1. Format: docs/map-format.md
 // Check and draw it: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.graveyard = {
@@ -79,11 +79,11 @@ spawn corpse 4 35 22
 spawn corpse 4 29 24
 spawn corpse 4 36 24
 rare weeping_bride 33 22
-# back graves under the fog: pairs, pull one at a time
-spawn corpse 4-5 12 27
-spawn corpse 4-5 16 27
-spawn corpse 4-5 13 31
-spawn corpse 4-5 17 33
+# back graves under the fog: pairs, pull one at a time (ladder draft 2: 7-8, the top of the graveyard band)
+spawn corpse 7-8 12 27
+spawn corpse 7-8 16 27
+spawn corpse 7-8 13 31
+spawn corpse 7-8 17 33
 # round the crypt and the tower
 spawn corpse 5 19 13
 spawn corpse 5 21 19

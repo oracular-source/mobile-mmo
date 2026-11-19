@@ -260,24 +260,24 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 | Area | Levels | Landmark | Named | What's there |
 | --- | --- | --- | --- | --- |
 | Crossroads (outside Town 1's gate; where the game starts, v0.29) | 1–3 | Campfire and signpost | none | Guards, Marrow the Peddler (not in yet), rats and beetles, critters |
-| Sunken Graveyard (west) | 3–5 | A broken bell tower | **Skeleton King** at the crypt throne | Shambling corpses, crypt skeletons, dug graves, low fog; the crypt is an open, shared area at the back |
-| Rat tunnel (east) | 2–5 | A sinkhole with dust rising and squeaks you can hear | **Old Gnawbone** (6) at the bottom | The first stop after the crossroads (easier than the crypt). A damp earth tunnel, not a mine: tunnel rats at the mouth, big tunnel rats deeper, holes in the walls, dirt piles, bones, roots, daylight through cracks, a pool cavern, a squeeze passage; a back hole climbs out north-east of the crossroads |
+| Sunken Graveyard (west) | 3–8 | A broken bell tower | **Skeleton King** at the crypt throne | Shambling corpses, crypt skeletons, dug graves, low fog; the crypt is an open, shared area at the back |
+| Rat tunnel (east) | 2–6 | A sinkhole with dust rising and squeaks you can hear | **Old Gnawbone** (6) at the bottom | The first stop after the crossroads (easier than the crypt). A damp earth tunnel, not a mine: tunnel rats at the mouth, big tunnel rats deeper, holes in the walls, dirt piles, bones, roots, daylight through cracks, a pool cavern, a squeeze passage; a back hole climbs out north-east of the crossroads |
 | Wolfwood (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop with his pack | Blight wolves, a hunter's abandoned camp, the forest getting darker |
 | Ruined Chapel (deep wood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** inside his dungeon (Dungeon 1) | Fen cultists in camps of three outside; the dungeon entrance under the altar |
 
-**Level ladder (draft 2, Nov 18, for owner review): Dungeon 1 at 15.** Owner: spread the levels out, worried there are too many mobs and too much to explore for a short climb, so the zone stretches to 15 and the bands widen. Bands overlap from the graveyard on (a choice of where to level, EverQuest-style), each area's top end still climbs, and inside each area it's easy at the entrance and hard at the far end. A named is the tough fight for the top of its band: most classes should beat it there in the sim, whatever its own level number. Rules in `area-rules.md` (Levels).
+**Level ladder (draft 2, approved by the owner Nov 18): Dungeon 1 at 15.** Owner: spread the levels out, worried there are too many mobs and too much to explore for a short climb, so the zone stretches to 15 and the bands widen. Bands overlap from the graveyard on (a choice of where to level, EverQuest-style), each area's top end still climbs, and inside each area it's easy at the entrance and hard at the far end. A named is the tough fight for the top of its band: most classes should beat it there in the sim, whatever its own level number. Rules in `area-rules.md` (Levels).
 
 | Step | Area | Band | Named (beaten at) | Change from today |
 | --- | --- | --- | --- | --- |
 | 1 | Crossroads | 1–3 | Ironshell rare 3 | none |
-| 2 | Rat tunnel | 3–6 | Old Gnawbone 6 (5–6) | big tunnel rats deep in go to 5–6 (now 4–5) |
-| 3 | Sunken Graveyard | 5–8 | the Weeping Bride rare 8 | back graves to 7–8 (now up to 5) |
+| 2 | Rat tunnel | 3–6 | Old Gnawbone 6 (5–6) | done v0.30.3: big tunnel rats 5 in the pool cavern, 5–6 in the den (were 4–5) |
+| 3 | Sunken Graveyard | 5–8 | the Weeping Bride rare 8 | done v0.30.3: back graves 7–8 (were 4–5) |
 | 4 | Crypt (shared) | 6–9 | Skeleton King 7 (6–9 in the sims) | none |
 | 5 | Wolfwood | 8–11 | Greyfang (11–12) | not built |
 | 6 | Ruined Chapel grounds | 10–14 | the Ashen Acolyte rare 14 | not built |
 | 7 | Dungeon 1 (Malrec's chapel) | 14–15 | Brother Malrec (15) | not built (was 12–13, Malrec 11) |
 
-What it needs: the level cap goes from 10 to 15 (XP table to 15), every class gets abilities or ability ranks for levels 9–15 (balance chat), and the built areas get the small re-levels in the last column. Owner to confirm, then a new chat applies it. **The "first big step at level 10" (owner, Nov 18) is the first skill point:** the skill tree opens at 10, so levels 10–15 pay out in skill points (6 by 15) and a class doesn't need a new ability at every one of those levels; the balance chat fills 9–15 with a mix of points, ability ranks and the odd new ability. The tree (or a first slice of it) has to exist before the cap goes past 10, or those levels are empty dings.
+What it needs: the level cap goes from 10 to 15 (XP table to 15), every class gets abilities or ability ranks for levels 9–15 (balance chat), and the built areas get the small re-levels in the last column (done v0.30.3). The cap stays at 10 until the skill tree exists. **The "first big step at level 10" (owner, Nov 18) is the first skill point:** the skill tree opens at 10, so levels 10–15 pay out in skill points (6 by 15) and a class doesn't need a new ability at every one of those levels; the balance chat fills 9–15 with a mix of points, ability ranks and the odd new ability. The tree (or a first slice of it) has to exist before the cap goes past 10, or those levels are empty dings.
 
 The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 

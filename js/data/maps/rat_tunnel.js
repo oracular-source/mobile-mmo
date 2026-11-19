@@ -66,13 +66,13 @@ spawn tunnel_rat 3 19 15
 # pool cavern: the first big rats
 spawn tunnel_rat 3 18 20
 spawn tunnel_rat 3 10 19
-spawn big_rat 4 20 25
-spawn big_rat 4 12 27
-spawn big_rat 4 23 27
-# Gnawbone's den: big rats, all below him
-spawn big_rat 4-5 28 29
-spawn big_rat 4-5 31 32
-spawn big_rat 5 39 31
+spawn big_rat 5 20 25
+spawn big_rat 5 12 27
+spawn big_rat 5 23 27
+# Gnawbone's den: big rats up to his level (ladder draft 2: deep big rats 5-6)
+spawn big_rat 5-6 28 29
+spawn big_rat 5-6 31 32
+spawn big_rat 6 39 31
 named old_gnawbone 6 34 29 summon=gnaw_pile key=severed_paw
 # secrets: the side burrow with a dead adventurer, and the Pale Rat
 chest 32 4
