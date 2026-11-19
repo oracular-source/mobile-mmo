@@ -26,6 +26,22 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 - **Bone Knight:** one skeleton with about 150% health, more armor and slightly less damage. **Taunts every 8s**, pulling back any mob that turned on you, so sitting mid-fight is safer. With two mobs one still comes for you unless you Dread it. For long single fights and named.
 - **Sim check:** both against rat, skeleton, two skeletons, Boss 1 and Gnawbone, with DPS tracked. Target: Bone Pair wins two skeletons, Bone Knight wins the bosses; if either wins everywhere, redesign. Watch for exploits (taunt stacking, two pets splitting threat oddly).
 
+### Level 10 forks, the other 13 classes (draft Nov 19, owner reviewing)
+Owner notes (Nov 19): no fork option that only works on undead (too narrow); escape options are fine for some classes, but death here is cheap, so a pure escape rarely gets picked; give it a second use.
+- **Druid · Tanglefoot:** *Thornsnare* (snared mob takes thorn damage while it walks) / *Tangle Field* (weaker snare on every mob near the target).
+- **Warrior · Shield Bash:** *Shield Slam* (longer stun, always breaks a cast) / *Shield Sweep* (shorter stun on every mob in front).
+- **Rogue · Evade:** *Ambush* (Evade stuns 2s and the next Backstab crits) / *Feint* (Evade also dazes every mob around you for 2s, so a Rogue can handle two).
+- **Cleric · Renew:** *Warding Renew* (also blocks the next big hit) / *Radiant Renew* (each tick burns any mob near you, extra on undead).
+- **Enchanter · Mesmerize:** *Deep Sleep* (one mob, much longer, first hit doesn't wake it) / *Mass Mez* (up to 3 mobs, shorter).
+- **Paladin · Consecrate:** *Sanctuary* (smaller circle, stronger heal, less damage taken inside) / *Wide Consecrate* (bigger circle, burns any mob, weaker).
+- **Shadow Knight · Dark Cleave:** *Reaping Cleave* (heals more per mob, needs 2+) / *Rending Blow* (one big hit, solid heal).
+- **Wizard · Shatter:** *Deep Shatter* (bigger single hit) / *Shatter Burst* (splashes and chills nearby mobs).
+- **Magician · Detonate:** *Volatile* (bigger blast) / *Rebirth* (smaller blast, next summon instant and free).
+- **Ranger · Spike Trap:** *Barbed Trap* (bigger hit and long bleed on one) / *Blast Trap* (hits and knocks back everything nearby).
+- **Monk · Feign Death:** *Perfect Split* (target stunned 2s when you stand) / *Still Water* (you regenerate fast while feigned, a mid-fight rest).
+- **Shaman · Drowsy:** *Torpor* (stronger attack slow on one) / *Drowsy Cloud* (weaker slow on every mob near the target).
+- **Bard · Crescendo:** *Finale* (bigger pulse, songs end) / *Encore* (smaller pulse, songs keep playing).
+
 ### Example: Necromancer (draft)
 - **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
 - **Major at 20, "what kind of necro":** *Bone Lord* (skeletons cleave, the main one taunts: solo pet build) / *Plaguebringer* (DoTs spread to every mob near your target: group pulls) / *Blood Pact* (lifetaps heal your group a little: group support).
