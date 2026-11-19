@@ -1,6 +1,8 @@
 // Game rules for fighting: threat, hits, deaths, the pet, loot and casting.
 // No drawing or touch input here.
 'use strict';
+// Buff length for the chat line. Long-lasting buffs (Spirit of the Wolf, Spirit Ward) last until you die, so no number is shown.
+const durTxt=d=>d>=9999?'':' ('+Math.round(d)+'s)';
 /* ---------- Combat ---------- */
 let pet=null; // your one pet: Necro skeleton, Shadow Knight minion, Enchanter sword, or a charmed mob
 let decoy=null; // Enchanter's Phantasm: a see-through copy of you that nearby mobs attack for a few seconds
@@ -310,10 +312,10 @@ function applyAbility(a,t,fromHide){
     t.snare=at(a.dur,a)*durMult(t);if(a.aslow){t.aslow=t.snare;t.aslowX=1.6}burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
   else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   // Attack slow (Shaman's Drowsy): the mob swings slower but still runs at full speed.
-  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks slower ('+Math.round(t.aslow)+'s).','#9fd0d0');engage(t);}
+  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks '+Math.round((1-1/t.aslowX)*100)+'% slower for '+Math.round(t.aslow)+'s (it still runs at full speed).','#9fd0d0');engage(t);}
   // Ranger's Hunter's Mark: your hits on it do more until it dies.
   else if(a.kind==='mark'){t.mark=a.mark||1.2;burst(t.x,t.y-10,a.col,8);floatText(t.x,t.y-26,'MARKED','#ffb37a');log(cap(t.def.name)+' is marked. Your hits on it do '+Math.round((t.mark-1)*100)+'% more.','#ffb37a');engage(t);}
-  else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you ('+Math.round(player.buffs[a.buff])+'s).','#c8b07a');}
+  else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');}
   else if(a.kind==='lifetap'){
     beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
     const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
@@ -344,7 +346,7 @@ function applyAbility(a,t,fromHide){
     pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});burst(px,py-6,'#ff9a4a',22,true);log('Your '+nm+' explodes!','#ff9a4a');
     mobs.filter(m=>!m.dead&&Math.hypot(m.x-px,m.y-py)<=a.radius).forEach(m=>{hitMob(m,at(a.dmg)*boom*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name);if(!m.dead&&st){m.stun=st*durMult(m);m.mez=0}});}
   // Magician's Burnout: a short pet buff (the pet attacks faster).
-  else if(a.kind==='petbuff'){player.buffs[a.buff]=at(a.dur,a);burst(pet.x,pet.y-6,a.col,12,true);log('Your '+petName()+' surges with '+a.name+' ('+Math.round(player.buffs[a.buff])+'s).',a.col);}
+  else if(a.kind==='petbuff'){player.buffs[a.buff]=at(a.dur,a);burst(pet.x,pet.y-6,a.col,12,true);log('Your '+petName()+' surges with '+a.name+durTxt(player.buffs[a.buff])+'.',a.col);}
   // Shaman's Cannibalize: health for mana (the health was already paid above, through hpCost).
   else if(a.kind==='canni'){const g=Math.round(maxHP(L)*a.hpCost*(a.ratio||1.2));player.mp=Math.min(maxMP(L),player.mp+g);floatText(player.x+6,player.y-24,'+'+g+' mana','#7dbbff');burst(player.x,player.y-6,a.col,10,true);}
   // Bard songs: start playing. Two at once; a third replaces the oldest. They pulse every 3s on their own.

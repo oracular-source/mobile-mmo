@@ -218,7 +218,7 @@ function ui(){
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
-    const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
+    const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed '+Math.ceil(t.aslow)+'s');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
     $('tfx').textContent=fx.join(' · ');
     const tc=$('tcast');if(t.casting){tc.style.display='block';$('tcastname').textContent='Casting '+t.casting.name;$('tcastfill').style.width=(100*t.casting.t/t.casting.dur)+'%'}else tc.style.display='none';}
   else tf.style.visibility='hidden';
