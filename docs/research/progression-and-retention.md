@@ -14,12 +14,17 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 7. **Majors at 20 and 30** (40 and 50 in the expansions). A major is class-wide, has **three** options, and changes the class's signature mechanic. Level 20 = *how you play* (solo or group, pet or self); level 30 = *your big moment* (a flashy new effect or a once-a-fight power). A major takes that even level's slot, so by 30: **9 ability forks (10, 12, 14, 16, 18, 22, 24, 26, 28) + 2 majors**.
 8. **Odd levels:** new abilities, rank-ups, and the 7th and 8th loadout slots (15 and 25). Every level still brings something.
 9. **Power comes from your level, not your picks.** Both sides of a fork are a bit stronger than the base ability and about equal to each other; they differ by situation (solo vs group, one mob vs many). Mobs are tuned assuming "has a fork at this level", whichever side. Abilities still grow a little every level on their own. No "+5%" options. Sim each side (solo, group, boss); if one wins everywhere, redesign it.
-10. **Swapping is free in town.**
+10. **Swapping is free in town.** Until Town 1 exists: you pick at the ding (a "pick your new toy" card), then swap for free at any campfire (owner, Nov 19).
 11. **No skill points;** forks replace the old stat points, and stats come from gear.
 
 ### Example: Druid, 18 abilities folded into 11
 - **Kept as abilities:** Thornlash, Mending Touch, Creeping Rot, Tanglefoot, Rootgrip, Barkskin, Thorn Aura (the core 7), plus Stormcall, Mending Rain, Wolf Form and Circle Port (quest).
 - **Became fork options:** Mending Touch (Cleanse *or* Wild Regrowth heal over time), Creeping Rot (Sap Strength), Wolf Form (Pack Run for the group), Rootgrip (Briar Wall, roots an area). Nature's Sight becomes a passive. Heart of the Grove becomes a level 30 major option.
+
+### Necromancer level 10 fork: Raise Bones (approved Nov 19)
+- **Bone Pair:** one cast raises two skeletons, each about 60% of today's health and damage (a bit stronger together). The second skeleton picks up any extra mob that hits you, so each holds its own mob. Weaker on Boss 1 and Gnawbone (they die one at a time; Mend Bones heals one). For camps and big pulls.
+- **Bone Knight:** one skeleton with about 150% health, more armor and slightly less damage. **Taunts every 8s**, pulling back any mob that turned on you, so sitting mid-fight is safer. With two mobs one still comes for you unless you Dread it. For long single fights and named.
+- **Sim check:** both against rat, skeleton, two skeletons, Boss 1 and Gnawbone, with DPS tracked. Target: Bone Pair wins two skeletons, Bone Knight wins the bosses; if either wins everywhere, redesign. Watch for exploits (taunt stacking, two pets splitting threat oddly).
 
 ### Example: Necromancer (draft)
 - **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
