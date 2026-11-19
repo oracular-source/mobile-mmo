@@ -237,7 +237,10 @@ function ui(){
     const own=player.cds[a.id]||0,full=cdFor(a)||1,pct=L<a.lvl?0:Math.max(cdPct,100*own/full);
     const cd=el.querySelector('.cd');if(cd)cd.style.height=pct+'%';
     const ct=el.querySelector('.cdt');if(ct)ct.textContent=own>0.05?Math.ceil(own):'';
+    el.classList.toggle('queued',!!(player.queued&&player.queued.a===a));
   });
+  // Queued spell: a gold "Next" chip under the cast bar (your thumb covers the button itself).
+  const qc=$('qchip');if(qc){const q=player.queued&&player.queued.a;const h=q?'<i style="background:'+q.col+'"></i>Next: '+q.name:'';if(qc.dataset.h!==h){qc.dataset.h=h;qc.innerHTML=h;qc.style.display=q?'flex':'none'}}
   // Buff bar: one small tag per buff and song on you (seconds left on short ones).
   const bb=$('buffbar');if(bb){const tags=[];
     for(const k in player.buffs){const v=player.buffs[k];if(!(v>0)||k==='hide')continue;const d=BUFFS[k]||{short:k,col:'#cfc8b2'};tags.push('<span style="background:'+d.col+'">'+d.short+(v<100?' '+Math.ceil(v):'')+'</span>')}

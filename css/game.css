@@ -125,3 +125,9 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 #mapbox{overflow:auto;max-height:58vh;text-align:center;touch-action:pan-x pan-y}
 .mapz{display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:8px}
 .mapz button{width:44px;height:36px;font-size:20px}.mapz span{min-width:30px;text-align:center;color:#c9a227}
+/* v0.27.5 queued spell: spinning gold ring on the button + "Next" chip under the cast bar */
+@keyframes qspin{to{transform:rotate(360deg)}}
+.queued{border-color:#ffd35a !important}
+.queued::after{content:"";position:absolute;inset:2px;border-radius:50%;border:2px dashed #ffd35a;animation:qspin 2.4s linear infinite;pointer-events:none;z-index:2}
+#qchip{position:absolute;left:50%;transform:translateX(-50%);top:calc(162px + env(safe-area-inset-top));display:none;align-items:center;gap:5px;background:rgba(28,25,21,.92);border:1px solid #ffd35a;border-radius:4px;padding:2px 7px;font-size:10.5px;color:#ffd35a;white-space:nowrap;pointer-events:none;text-shadow:0 1px 0 #000}
+#qchip i{width:10px;height:10px;border-radius:2px;border:1px solid #0b0a0f;display:inline-block}

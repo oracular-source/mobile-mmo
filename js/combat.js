@@ -232,6 +232,8 @@ function cast(a,quiet){
   // Bard: tapping a song that's playing stops it right away (no cost, no wait).
   if(a.kind==='song'&&songOn(a.id)){player.songs=player.songs.filter(id=>id!==a.id);log('You stop playing '+a.name+'.','#9aa');return true}
   const own=player.cds[a.id]||0;
+  // Tapping the spell that's already queued cancels it (a different spell just swaps in).
+  if(!quiet&&player.queued&&player.queued.a===a&&(own>0||player.cast||player.gcd>0)){player.queued=null;log(a.name+' unqueued.','#9aa');return false}
   if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
   if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
   if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
