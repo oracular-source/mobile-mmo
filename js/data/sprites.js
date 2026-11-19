@@ -27,6 +27,10 @@ const SPR={
   frog:[".n.n.","nnnnn","n...n"],
   // Magician's elementals: one shape, recoloured per element in render.js (earth, fire).
   elem:["...kkkk...","..kAAAAk..",".kAeAAeAk.",".kAAAAAAk.","..kAaaAk..",".kAAaaAAk.","kAaAAAAaAk","kAaAAAAaAk",".kkAAAAkk.","..kAaaAk..","..kAk.kAk.","..kkk.kkk."],
+  // Named rares (v0.32): Ironshell = a mire beetle with a cracked, mossy shell (drawn at 2x, placeholder like Boss 1);
+  // the Weeping Bride = a shambling corpse in a torn veil and a long gown (she glides, no legs). The Pale Rat uses the big rat's shape.
+  ironshell:["...k..k...","..kkkkkk..",".kmCcmCck.","kccmkCmcck","kcCckccCmk",".kcmcccmk.",".k.k..k.k."],
+  bride:["...kvvvvk...","..kvzzzzvk..","..kvzezevk..",".kvvzZZzvvk.",".kv.kzzk.vk.",".kvkrrrrkvk.",".kzkrrrrkzk.",".kzkrrrrkzk.","..vkrrrrkv..","..kkrrrrkk..","..krrrrrrk..","..krrrrrrk..","..krrrrrrk..",".krrrrrrrrk.",".krrrrrrrrk.",".kkkkkkkkkk."],
   blade:["..k..",".klk.",".klk.",".klk.",".klk.",".klk.","kyyyk",".kok.",".kok.","..k.."], // Enchanter's floating sword
   necro:["....kkkk.ww.","...kPPPPkwkw","..kPPPPPPkw.","..kPmkkmPko.","..kPxxxxPko.","...kPxxPk.o.","..kpppppkxo.",".kpppwpppko.",".kppppwppko.",".kpppppwpko.",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","..kPk..kPk..","..kkk..kkk.."],
   rogue:["....kkkk....","...kffffk...","..kffffffk..","..kfskskfk..","..kfssssfk..","...kfrrfk...","..krrrrrrk..",".krkrrrrkrk.",".krkryyrkrk.",".kskooooksk.",".lkkrrrrkkl.",".l.krrrrk.l.","...krk.krk..","...krk.krk..","...kDk.kDk..","...kkk.kkk.."],
@@ -37,6 +41,10 @@ const SPR={
 const RAT_PAL={rat:{A:'#8a7a6e',a:'#6b5d52',d:'#463b34',p:'#c98a86',P:'#9a6a66'},crat:{A:'#c4bfc8',a:'#9a94a0',d:'#6b6672',p:'#c98a86',P:'#9a6a66'},
   trat:{A:'#8a6e56',a:'#6a5240',d:'#43342a',p:'#c98a86',P:'#9a6a66'},brat:{A:'#7a604c',a:'#5c4636',d:'#3a2c22',p:'#c08480',P:'#946462'},
   gnaw:{A:'#6e5c52',a:'#4f4038',d:'#2f2520',p:'#b07a76',P:'#8a5a56',S:'#a87a72',Y:'#e6d29a',e:'#ff3b30'}};
+
+// Named rare colourways (v0.32): a colour shift that says "rare" (the faint glow is added when drawn).
+const RARE_PAL={ironshell:{c:'#454b40',C:'#7d8670',m:'#55733d'},palerat:{A:'#ece6e0',a:'#cfc6be',d:'#958a82',p:'#f0a8a8',P:'#c88a8a',e:'#ff2a2a'},
+  bride:{v:'#d9d5e6',r:'#b8b1c4',z:'#97a68c',Z:'#6c7a63',e:'#b8f0ff'}};
 
 /* ---------- Default skin (v0.15) ----------
    One shared body for every class, told apart by colours and weapon. New classes use it until the art redo.

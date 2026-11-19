@@ -18,6 +18,8 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.
   trat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.trat)),
   brat:mkWalk(SPR.brat,SPR.bratstep,Object.assign({},PAL,RAT_PAL.brat)),
   crat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.crat)),
+  ironshell:mk(SPR.ironshell,Object.assign({},PAL,RARE_PAL.ironshell),2),palerat:mkWalk(SPR.brat,SPR.bratstep,Object.assign({},PAL,RARE_PAL.palerat)),
+  bride:mk(SPR.bride,Object.assign({},PAL,RARE_PAL.bride)),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
 
@@ -115,6 +117,9 @@ function render(){
   if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
   if(zoneId==='dun'&&run.portal){const p=run.portal;lx.fillStyle='#7dffa6';for(let a=0;a<24;a++){if((a+Math.floor(time*8))%3===0)continue;const an=a/24*Math.PI*2;lx.fillRect(Math.round(p.x+Math.cos(an)*7),Math.round(p.y+Math.sin(an)*4),1,1)}lx.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,2,2)}
+  const CHA=curArea();if(CHA)CHA.chests.forEach(ch=>{const x=Math.round(ch.x),y=Math.round(ch.y),f=(X,Y,w,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,h)};
+    if(ch.open){f(x-7,y-12,14,14,AP.out);f(x-6,y-11,12,3,AP.woodHi);f(x-6,y-8,12,1,AP.woodDk);f(x-6,y-7,12,8,AP.wood);f(x-5,y-7,10,3,'#120d0a');f(x-6,y-3,12,1,AP.bell)} // lid up, empty inside
+    else{f(x-7,y-8,14,10,AP.out);f(x-6,y-7,12,8,AP.wood);f(x-6,y-7,12,2,AP.woodHi);f(x-6,y-4,12,1,AP.bell);f(x-1,y-5,2,3,AP.bellHi)}});
   if(zoneId==='dun'&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
@@ -158,6 +163,8 @@ function render(){
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
+    if(m.def.rare){const pr=0.5+0.5*Math.sin(time*3),rw=Math.round(img.w/2)+2;lx.globalAlpha=0.09+0.08*pr;lx.fillStyle='#d8c8ff';lx.beginPath();lx.ellipse(Math.round(m.x),Math.round(m.y),rw,Math.max(2,Math.round(rw/3)),0,0,7);lx.fill();lx.globalAlpha=1;
+      if(Math.random()<0.12)parts.push({x:m.x+(Math.random()-0.5)*img.w,y:m.y-Math.random()*img.h,vx:0,vy:-8,t:0,life:0.7,col:'#e6dcff'})} // the faint glow that says "rare" (visual only, no game rolls)
     const mmv=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)&&!(m.root>0);
     if(img.steps){const wf=walkFrame(img,m.walk,mmv);drawSprite(wf.im,m.x,m.y+1,m.dir,0,false)} // new monsters animate their legs
     else drawSprite(img,m.x,m.y+1,m.dir,mmv?(Math.floor(m.walk*6)%2):0,false);
@@ -173,7 +180,7 @@ function render(){
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=curArea()?curArea().lights:zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
     .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
   if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}
@@ -232,7 +239,7 @@ function ui(){
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';
-    const fx=[];if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed '+Math.ceil(t.aslow)+'s');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
+    const fx=[];if(t.def.rare)fx.push('Rare');if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed '+Math.ceil(t.aslow)+'s');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
     $('tfx').textContent=fx.join(' · ');
     const tc=$('tcast');if(t.casting){tc.style.display='block';$('tcastname').textContent='Casting '+t.casting.name;$('tcastfill').style.width=(100*t.casting.t/t.casting.dur)+'%'}else tc.style.display='none';}
   else tf.style.visibility='hidden';

@@ -292,7 +292,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
 **Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs only the area's key item, which is used up (no cooldown). Keys drop from about 1 kill in 10 of that area's mobs, only inside the area (v0.31). Walking up offers a Summon prompt; the named comes out fighting at its usual spot; its normal 5-minute respawn still runs.
 
-**Named rares.** About 1 in 100 spawns in an area is that area's named rare: tougher, more XP, a better drop, and its own name and look. Placeholder names and looks:
+**Named rares.** About 1 in 100 spawns in an area is that area's named rare: tougher, more XP, a better drop, and its own name and look. **In the game since v0.32** for the crossroads, rat tunnel and graveyard: each respawn in the area rolls 1 in 100; the rare appears at its own spot on the map (only one at a time, a soft chat line hints it), stays up if you leave, gives 3x XP and always drops an uncommon for your class (25% a rare). Ironshell is level 3, the Pale Rat 5 (calls friends at 30%), the Weeping Bride 8 (two corpses rise at half health). Placeholder names and looks:
 
 | Area | Rare | Look | Twist |
 | --- | --- | --- | --- |
@@ -302,7 +302,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 | Wolfwood | Old Scar | A one-eyed grey wolf with a torn ear | Hits hard, never part of a pack |
 | Ruined Chapel | The Ashen Acolyte | A cultist in grey robes trailing smoke | Casts a shadow bolt; flees to Malrec's door |
 
-**Hidden chests.** A few per area, off the main road; each rolls a piece of gear your class can use, then refills after a while.
+**Hidden chests.** A few per area, off the main road; each rolls a piece of gear your class can use, then refills after a while. **In the game since v0.32:** one per built area (crossroads, rat tunnel, graveyard, crypt); walk up to open it for copper and one piece of gear, with better odds deeper in (`CHEST_ODDS` in `js/data/items.js`); it fills again after 10 minutes.
 
 **Lore** waits until the setting is decided.
 

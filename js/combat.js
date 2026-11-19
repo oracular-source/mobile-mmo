@@ -47,16 +47,18 @@ function hitMob(m,dmg,kind,label,src){
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
   // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
   if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
+  if(m.def.shell&&kind==='direct'&&!m.shellHint){m.shellHint=1;log('Your hit glances off '+m.def.name+"'s shell. Damage over time gets through.",'#c8b89a')}
   if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
 function killMob(m){
+  if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   burst(m.x,m.y-6,'#cfc8b2',10,false);
   log('You have slain '+m.def.name+'!','#ffd27a');
   const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
-  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.boss?6:m.def.named?3:1)*XP_MULT);
+  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.boss?6:(m.def.named||m.def.rare)?3:1)*XP_MULT);
   const credit=m.pdmg>=m.odmg;
   if(player.lvl>=10)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
@@ -64,7 +66,7 @@ function killMob(m){
   if(zoneId==='dun'){run.kills++;run.xp+=credit?xp:0;}
   if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
     run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
-  if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
+  if(credit){const k=kills[m.def.name]||{count:0,named:!!(m.def.named||m.def.rare),first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
     if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
   if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
@@ -215,6 +217,7 @@ function rollLoot(m){
   if(m.type==='boss1'){const c=[pick(BOSS1),pick(UNCOMMONS)];if(rng()<0.15)c.push(pick(RARES));if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
   // Summon keys: only from that area's mobs, in that area (the zone check comes first, so the arena sim rolls nothing extra).
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
+  if(m.def.rare){got.push(pick(UNCOMMONS));if(rng()<0.25&&RARES.length)got.push(pick(RARES));} // a rare always pays: an uncommon for your class, sometimes a rare
   if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }

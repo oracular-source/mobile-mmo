@@ -25,7 +25,8 @@ function mmPins(id){
     const NAMED={skeleton_king:'Skeleton King',old_gnawbone:'Old Gnawbone'};
     return A.exits.map(e=>({x:e.tx,y:e.ty,name:EX[e.name]||TO[e.to]||e.to,k:(e.to==='crypt'||e.to==='rat_tunnel')?'dun':'exit'}))
       .concat(A.objs.filter(o=>o.kind==='campfire').map(o=>({x:o.x,y:o.y,name:'Campfire',k:'camp'})))
-      .concat(A.named.map(n=>({x:n.x,y:n.y-2,name:NAMED[n.name]||n.name,k:'boss'})))}
+      .concat(A.named.map(n=>({x:n.x,y:n.y-2,name:NAMED[n.name]||n.name,k:'boss'})))
+      .concat(A.chests.map(c=>({x:c.tx,y:c.ty,name:'Hidden chest',k:'camp'})))}
   return[];
 }
 const MM_PIN_COL={exit:'#7dffa6',dun:'#c8a0ff',camp:'#ffd27a',boss:'#ff6b6b'};

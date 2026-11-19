@@ -22,6 +22,7 @@ function devAct(a){
   else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='den'){if(zoneId!=='tunnel')enterZone('tunnel');player.x=26*T+8;player.y=29*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='rarespawn'){const A=curArea();if(!A||!A.rare){log('Dev: this area has no rare.','#ff8a80')}else{const m=spawnRare(A),p=areaSpot(A,{tx:A.rare.x,ty:A.rare.y+3})||areaSpot(A,{tx:A.rare.x,ty:A.rare.y});if(p){player.x=p.x;player.y=p.y}log('Dev: '+m.def.name+' is up. You are next to its spot.','#ff8a80')}}
   else if(a==='keys'){giveItem('severed_paw',3);giveItem('crown_shard',3,1);saveInv()}
   else if(a==='gnaw'){const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
   else if(a==='arena'){enterZone('arena')}
@@ -49,7 +50,7 @@ function renderDev(){
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
       '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+
     sec('look','Look and galleries',g(b('old','Old look'),b('skin','Default skin'))+'<p class="hint" style="margin:8px 0 0">Classes</p><div id="skingal" class="skingal"></div><p class="hint" style="margin:8px 0 0">Monsters</p><div id="mobgal" class="skingal"></div>')+
-    sec('world','World',g(b('gnaw','Spawn Gnawbone'),b('keys','Summon keys'),b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')));
+    sec('world','World',g(b('gnaw','Spawn Gnawbone'),b('keys','Summon keys'),b('rarespawn','Rare here'),b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')));
   // Every class in rags (gear tier 0) side by side, so colours can be compared on the phone.
   $('skingal').innerHTML=Object.keys(RAGS).map(id=>{const im=mkRags(id);return '<figure><img src="'+im.c.toDataURL()+'" alt=""><figcaption>'+(CLASSES[id]?CLASSES[id].name:id[0].toUpperCase()+id.slice(1).replace('knight',' Knight'))+'</figcaption></figure>'}).join('');
   // Every monster type as it draws in the game (list and status in docs/monsters.md).

@@ -126,6 +126,7 @@ function enterZone(id,from,at){
   else{map=overMap;MW=40;MH=30;world=overWorld;spawns=overSpawns;}
   WW=MW*T;WH=MH*T;
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;sp.timer=0;spawn(sp)});
+  if(A&&A.rare){A.rare.sp.mob=null;if(A.rare.sp.up)spawn(A.rare.sp)} // a rare still out there waits for you (no reroll by walking in and out)
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
@@ -174,7 +175,7 @@ function checkPortals(){
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
-  if(A){checkSummon(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  if(A){checkSummon(A);checkChests(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     if(ex!==player.atExit){player.atExit=ex;if(ex){
       // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
       if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id,ex.at)}
@@ -221,8 +222,45 @@ function namedAdds(m){
   const list=m.def.adds;m.addsDone=m.addsDone||0;
   while(m.addsDone<list.length&&m.hp<=m.maxhp*list[m.addsDone].at){
     const a=list[m.addsDone++],A=curArea(),holes=(A?A.holes:[]).filter(h=>Math.hypot(h.x-m.x,h.y-m.y)<160).sort((p,q)=>Math.hypot(p.x-m.x,p.y-m.y)-Math.hypot(q.x-m.x,q.y-m.y));
-    floatText(m.x,m.y-26,'SQUEAL!','#ffb37a',true);log(cap(m.def.name)+' squeals, and rats pour out of the walls!','#ffb37a');
+    floatText(m.x,m.y-26,a.shout||'SQUEAL!','#ffb37a',true);log(cap(m.def.name)+' '+(a.say||'squeals, and rats pour out of the walls!'),'#ffb37a');
+    if(a.from==='ground')holes.length=0; // rising from the earth beside it, not out of wall holes
     for(let i=0;i<a.n;i++){const h=holes[i%Math.max(1,holes.length)],sp={type:a.type,x:h?h.x:m.x+(i?16:-16),y:h?h.y:m.y+6,timer:0,mob:null,group:null,lv:[a.lv,a.lv],noRespawn:true};
-      if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const r=spawn(sp);r.state='chase';burst(r.x,r.y-4,'#5a4836',10,true)}
+      if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const r=spawn(sp);r.state='chase';burst(r.x,r.y-4,a.col||'#5a4836',10,true)}
   }
 }
+
+/* ---------- Named rares (v0.32) ---------- */
+// About 1 in 100 spawns in an area brings out that area's rare, at its own spot off the main path (owner, Nov 17).
+// Rolled when a mob respawns, not when you walk in, so leaving and coming back can't fish for it. Only one out at a time.
+const RARE_CHANCE=0.01;
+const RARE_TEXT={ironshell:'Something big and heavy shifts in the marsh reeds.',palerat:'A thin, high squeak echoes from somewhere off the warren.',bride:'A woman\'s sobbing drifts across the graves.'};
+function rollRare(A){if(!A||!A.rare||A.rare.sp.up||rng()>=RARE_CHANCE)return;spawnRare(A)}
+function spawnRare(A){const sp=A.rare.sp;if(sp.mob&&!sp.mob.dead)return sp.mob;sp.up=true;const m=spawn(sp);
+  log(RARE_TEXT[sp.type]||'Something rare stirs nearby.',(AREA_TINT[A.tint]||{}).text||'#c8a0ff');return m}
+// The Pale Rat: at low health it runs for the nearest mob that isn't fighting yet and brings it, and anything idle around it, back with it.
+// Seen coming: it shouts and turns tail. A snare or root stops the run (it's fast, so slow it first). Returns true while running.
+function rareCall(m,dt,spd){
+  if(m.called||m.hp>m.maxhp*m.def.callAt)return false;
+  if(!m.friend){m.friend=mobs.filter(o=>o!==m&&!o.dead&&o.state==='idle'&&Math.hypot(o.x-m.x,o.y-m.y)<220).sort((p,q)=>Math.hypot(p.x-m.x,p.y-m.y)-Math.hypot(q.x-m.x,q.y-m.y))[0]||null;
+    if(!m.friend){m.called=true;return false}
+    floatText(m.x,m.y-20,'flees!','#ffb37a');log(cap(m.def.name)+' turns tail and runs, squeaking for help!','#ffb37a')}
+  const f=m.friend;
+  if(f.dead||f.state!=='idle'||Math.hypot(f.x-m.x,f.y-m.y)<20){m.called=true;
+    mobs.filter(o=>o!==m&&!o.dead&&o.state==='idle'&&Math.hypot(o.x-m.x,o.y-m.y)<48).forEach(o=>{engage(o);log(cap(o.def.name)+' answers the call!','#ffb37a')});
+    return false}
+  if(spd>0)moveToward(m,f.x,f.y,spd,dt);return true}
+
+/* ---------- Hidden chests (v0.32) ---------- */
+// Walk up to one to open it: some copper and one piece of gear your class can use (odds by area in CHEST_ODDS).
+// It fills again after CHEST_REFILL seconds of play (kept for this session only; a reload fills every chest).
+function checkChests(A){A.chests.forEach(ch=>{
+  if(ch.open&&time-ch.at>=CHEST_REFILL)ch.open=false;
+  const near=Math.hypot(player.x-ch.x,player.y-ch.y)<14;
+  if(near&&!ch.near){if(ch.open){const mins=Math.max(1,Math.ceil((CHEST_REFILL-(time-ch.at))/60));log('The chest is empty. It looks like someone refills it now and then (about '+mins+' min).','#9aa')}else openChest(A,ch)}
+  ch.near=near})}
+function openChest(A,ch){
+  const o=CHEST_ODDS[A.id]||CHEST_ODDS.crossroads,r=rng();
+  let pool=r<o.rare?RARES:r<o.rare+o.unc?UNCOMMONS:COMMONS;if(!pool.length)pool=UNCOMMONS.length?UNCOMMONS:COMMONS;
+  ch.open=true;ch.at=time;burst(ch.x,ch.y-4,'#ffd27a',16,true);
+  const c=Math.floor(rr(o.cu,o.cu*2));inv.copper+=c;log('You open a hidden chest: '+c+' copper.','#c9a227','loot');
+  if(pool.length)giveItem(pick(pool),1,0);saveInv()}
