@@ -91,7 +91,9 @@ function lightStamp(r,amb,kind){
 }
 function shadow(x,y,r){lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2,2);lx.fillRect(x-r+1,y+1,r*2-2,1)}
 function drawSprite(img,x,y,dir,bob,sit){
-  const im=dir<0?img.f:img.c,w=img.w,h=img.h;const dx=Math.round(x-w/2),dy=Math.round(y-h)+(bob||0);
+  const im=dir<0?img.f:img.c,w=img.w,h=img.h;
+  // Round the position first, then offset by whole pixels: with an odd width (15) Math.round(x-w/2) flipped a pixel out of step with the camera, so sprites shook while walking sideways (v0.27.4).
+  const dx=Math.round(x)-(w>>1),dy=Math.round(y)-h+(bob||0);
   if(sit){lx.drawImage(im,0,0,w,h-4,dx,dy+4,w,h-4)}else lx.drawImage(im,dx,dy);
 }
 function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
