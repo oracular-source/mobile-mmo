@@ -17,9 +17,9 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 1. Spell pad and Next ⟳ (done v0.28)
 2. Chat log (done v0.30.1)
 3. Your frame (name, level, health, mana, XP, buffs) (reviewed Nov 18: fine for now)
-4. Target frame and boss cast bar (back burner, Nov 18: not right yet, revisit later)
+4. Target frame and boss cast bar (owner unparked it Nov 18: proposals out; rudimentary debuffs now, icons later)
 5. Slots 7–8 and Sit (done v0.30.2; slots 7–8 already moved into the grid in v0.28)
-6. Floating text over heads (next)
+6. Floating text over heads (owner picked A; to build)
 7. Pet bar
 8. Menu screens (Spells, Arrange, Settings)
 9. Character screen (Gear, Bags, Journal)
@@ -48,3 +48,8 @@ Owner idea (Nov 18): the joystick doesn't need to be visible at all; the chat bo
 
 ## 5. Slots 7–8 and Sit
 Slots 7–8 already live in the 2 × 4 grid (v0.28), so only **Sit** was left: a round button on the left, the last bit of the old look. **Owner: keep it on the left, make it square to match the grid.** v0.30.2: Sit uses the grid's plain grey square style, **about 80% of a spell button's size** (owner: the left side has less on it, so it needn't be as big; **pet buttons later get this smaller size too**), and follows Settings → Grid size; it reads **Stand** with a gold border while you sit. The left side stays free for pet controls later.
+
+## 6. Floating text over heads
+Now: every number and word the same size (12px, a few 15px), rising straight up from one spot and fading from the first frame. DoT ticks, your hits and pet hits stack into one smear; they differ only by colour. Status words (Zz, MARKED, MISS) float away like damage.
+Options: **A** spread out and hold (your hits big and white, DoT ticks and pet hits small, each nudged a little sideways so they never stack; solid most of the way, then fade; status words sit still over the head); **B** dealt arcs right, taken arcs left (Diablo); **C** only your hits and hits on you float (DoT ticks and pet hits only in the Log).
+**Owner picked A** (Nov 18). Not built yet.
