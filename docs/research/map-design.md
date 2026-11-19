@@ -100,3 +100,20 @@ Owner called pass 1 a good start. Pass 2 adds, for discussion:
 - Hogger: https://giantbomb.com/wiki/Characters/Hogger , https://wowwiki.fandom.com/wiki/Hogger , https://wowpedia.fandom.com/wiki/Minion_of_Hogger ; Elwynn to Duskwood: https://lr.eu.psf.lt/r/MMORPG/comments/1d1zxo7/what_is_the_best_zoneregionmap_of_all_time/l5xbq43
 - Limgrave layout: https://dotesports.com/elden-ring/news/full-limgrave-map-zone-size-and-key-locations-in-elden-ring
 - OSRS Lumbridge: https://www.pcgamer.com/uk/touring-old-school-runescape-where-2007-never-ended and https://contra.com/p/FbNqqoWs-rune-scape-digital-garden-of-eden
+
+## Wolfwood brief (draft 1, Nov 19; owner answers below)
+Step 1 of `area-rules.md`. Nothing drawn or built yet.
+- **Levels:** 8–11 (draft 2 ladder). 8 at the doors, 10–11 deepest (north, toward the chapel). Greyfang is the fight for 11–12; Old Scar (rare) 11. The cap is still 10, so the top end can't be fully beaten until the skill tree raises it.
+- **Theme:** old dark forest going sick. Leafy dusk trees at the crossroads side turn into tall dark firs; grey blight creeps out from the dead giant tree.
+- **Mood words:** hunted, hushed, old.
+- **Landmark:** the dead giant tree, grey and bare above the canopy, seen from the crossroads bridge and the graveyard's north gate.
+- **Ways in (three, all already pointing here):** crossroads north road (main, blended border: the forest darkens over a stretch of road), graveyard north gate (hard cut: the fence), crypt back tunnel (comes up in a hillside, deep in). North exit to the chapel stays a stub until the chapel is built.
+- **Named:** Greyfang wanders a loop path round the middle of the wood with 2 pack wolves. Howls to call the pack back, never flees. No summon key (wanders on a timer). First wandering named in the game.
+- **Rare:** Old Scar, one-eyed grey wolf, torn ear. Alone, hits hard.
+- **Things to find:** the hunter's abandoned camp (rest spot, no mobs: cold firepit, lean-to, drying rack, sprung traps); the giant tree's hollow (hidden chest); Greyfang's den (bones, a gnawed hunter's bow); the crypt tunnel's mouth (loop back to the graveyard); a deer trail side path.
+- **Mobs:** blight wolves in packs of 2–3 that flee at low health (and can drag in more if you let them run); proposed second mob for variety: one solo puller between packs (owner to pick: forest spider that webs/roots you, or a thornback boar that charges).
+- **Look:** dim green-grey light, shafts of light in clearings, low fog between trunks, needles and moss on the ground, blight patches near the giant tree. Critters: crows, moths, a deer that bolts.
+- **New:** wolf body (blight wolf, Greyfang, Old Scar), fir trees and the dead giant tree, needle/moss/blight ground, hunter's camp and den props, a 'wood' tint, wandering named with a pack, wolves fleeing at low health.
+- **Reused:** road, creek and bridge at the edge, chest, rares, summoning code (not needed here), map/minimap, fog.
+- **Owner answers (Nov 19):** second mob is the **thornback boar** (solo, charges). Build to **8–11** anyway; some classes may beat the top end early, most only once the cap rises. **The map chat draws the wolves** (blight wolf, Greyfang, Old Scar) and the boar. XP pace check across all classes before Wolfwood numbers lock (`docs/sim-results.md`).
+- **Next:** style takes (new setting), then the full text map.
