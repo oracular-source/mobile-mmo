@@ -16,8 +16,8 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 ## Breakdown list (order)
 1. Spell pad and Next ⟳ (done v0.28)
 2. Chat log (done v0.30.1)
-3. Your frame (name, level, health, mana, XP, buffs) (next)
-4. Target frame and boss cast bar
+3. Your frame (name, level, health, mana, XP, buffs) (reviewed Nov 18: fine for now)
+4. Target frame and boss cast bar (next; debuff list parked, see 3)
 5. Slots 7–8 and Sit
 6. Floating text over heads
 7. Pet bar
@@ -39,3 +39,6 @@ Options: **A** quiet box (routine hits hidden, they float over heads anyway) plu
 **Owner picked A**, with one change: the chat box is **joystick space** (he moves by touching there), so it must never open anything; tapping, holding or triple-tapping it is out. The history opens from a **Log** button next to Menu, top right, away from both thumbs. Claude's call on the rest (owner OK'd): **4 lines, no fading** (EverQuest), and the Log panel **doesn't pause** the game, so you can keep moving while you read. Built v0.30.1.
 Rule for later: routine lines are logged with kind `'fight'` (Log panel only), drops and copper with `'loot'`; everything else shows in the box. A hit on you of a fifth of your health or more, and spell resists, stay in the box. The same line twice in a row shows once with ×2.
 Owner idea (Nov 18): the joystick doesn't need to be visible at all; the chat box area doubles as it, and spell and status cues can live elsewhere later.
+
+## 3. Your frame
+**Owner (Nov 18): clean enough for now, no changes.** The one problem he's seen is on the **target frame**: the debuffs on an enemy are a single line of names joined by dots (`tfx`), which gets hard to read once several are up (Rot · Rootgrip · Marked ...). Parked until spell icons exist; then buffs and debuffs become **small icons with a timer running down** (on your frame and the target's). Backlog card: "Buff and debuff icons with timers".
