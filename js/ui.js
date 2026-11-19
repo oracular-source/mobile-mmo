@@ -208,6 +208,7 @@ function renderSettings(){
     seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
     seg('Zoom (or pinch the screen)','zoom',[[160,'Near'],[999,'Far']])+
+    seg('Minimap (tap it for the full map)','minimap',[['true','On'],['false','Off']])+
     seg('Movement','move',[['drag','Tap + drag stick'],['hold','Hold to move']])+
     (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     (settings.scheme==='pad'?

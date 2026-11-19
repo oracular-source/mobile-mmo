@@ -209,6 +209,7 @@ function render(){
 const BUFFS={sprint:{short:'Sprint',col:'#7dbbd0'},laststand:{short:'Last Stand',col:'#ffd27a'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,col:a.col}});
 function ui(){
   const L=player.lvl;
+  mmReveal();drawMinimap();
   $('plv').textContent='Lv '+L;
   $('php').style.width=(100*player.hp/maxHP(L))+'%';
   $('pmp').style.width=(100*player.mp/maxMP(L))+'%';

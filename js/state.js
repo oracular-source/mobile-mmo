@@ -36,7 +36,7 @@ const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1
 
 /* ---------- Saved progress, settings and loadout ---------- */
 // Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.
-const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:999},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'pad',left:false,padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'drag',showJoy:false,zoom:999,minimap:true},store.get('ashfen-settings',{}));
 // 8 ability slots: 0-5 are the spell pad / classic buttons on the right, 6-7 are the small side bar on the left.
 // A slot can be empty (null) when a class has fewer than 8 abilities. Slot 0 (main attack) is never empty.
 const NSLOTS=8;

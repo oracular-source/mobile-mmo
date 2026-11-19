@@ -109,6 +109,7 @@ function finishRun(){
 function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;openModal('promptUI')}
 $('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');running=true;if(promptAction)promptAction();promptAction=null});
 function enterZone(id){
+  if(MM.dirty&&!simState.busy)mmSave(); // keep what you explored in the area you're leaving
   zoneId=id;
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
   else if(id==='arena'){map=ARENA.map;MW=ARENA.w;MH=ARENA.h;world=ARENA.world;spawns=[];}
