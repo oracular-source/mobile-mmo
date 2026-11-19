@@ -14,8 +14,8 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 - **Spell queue:** a common complaint in MMOs is not knowing whether the next spell got queued. WoW players add mods that mark the queue window on the cast bar. Built for us in v0.27.5 (spinning gold ring + "Next" chip under the cast bar).
 
 ## Breakdown list (order)
-1. Spell pad and Next ⟳ (in progress)
-2. Chat log
+1. Spell pad and Next ⟳ (done v0.28)
+2. Chat log (next)
 3. Your frame (name, level, health, mana, XP, buffs)
 4. Target frame and boss cast bar
 5. Slots 7–8 and Sit
@@ -30,4 +30,5 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
 Options: **A** EQ grid 2×3 (main bottom-right); **B** arc with a big main button in the corner and five square buttons around it; **C** keep the round pad, just bigger buttons and labels. Next ⟳: **1** a bar on the pad cluster, **2** tap the target frame to switch.
-Pick (Claude): B + Next 1 and 2. Owner to choose.
+Claude leaned B. **Owner picked A, EverQuest grid**, extended to **all 8 spells in one 2 × 4 block** (left side freed for pet controls later), with **◀ Back** and **Next ▶** target buttons. Reason: same-size buttons make every spell equally easy to hit, players arrange their own order, and Auto covers the main attack. Built v0.28. Tap-the-target-frame to switch is still open (not built).
+Note: on a phone the bottom row is nearest the thumb, so the most-used spells go at the bottom, not the top as on a PC hotbar.

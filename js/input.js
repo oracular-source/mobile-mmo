@@ -51,9 +51,9 @@ function tapWorld(clientX,clientY,targetOnly){
   if(zoneId==='over'&&Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
-  if(best){player.target=best;if(settings.tapCast&&!(best.mez>0))castSlot(0);return} // tapping a sleeping mob only targets it
+  if(best){switchTarget(best);if(settings.tapCast&&!(best.mez>0))castSlot(0);return} // tapping a sleeping mob only targets it
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
   player.tx=wx;player.ty=wy;player.sit=false;
 }
-window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();nextTarget()}});
+window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();if(e.shiftKey)backTarget();else nextTarget()}});
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});

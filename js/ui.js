@@ -3,7 +3,7 @@
 /* ---------- Input: spell pad and classic buttons ---------- */
 // Pad: tap the center for slot 1, or flick toward one of the five ring spells (or tap it).
 // Ring order is clockwise from straight up, 72 degrees apart.
-const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6','Side bar top','Side bar bottom']};
+const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],grid:['Row 1 corner (main)','Row 1 inner','Row 2 corner','Row 2 inner','Row 3 corner','Row 3 inner','Row 4 corner','Row 4 inner'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6','Side bar top','Side bar bottom']};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
 const ctrl=$('controls'),ghost=$('ghost');
@@ -19,7 +19,30 @@ function buildControls(){
   ctrl.classList.toggle('arrange',arranging);
   const side=settings.left?'left':'right';
   logEl.style.left=settings.left?'auto':'6px';logEl.style.right=settings.left?'6px':'auto';
-  if(settings.scheme==='pad'){
+  if(settings.scheme==='grid'){
+    // EverQuest-style grid (v0.28): all 8 spells in one 2 x 4 block of square buttons, all the same size, in the thumb corner.
+    // Slot 0 (main) sits in the bottom corner, nearest the thumb; Arrange moves anything anywhere.
+    // Above it: Back and Next target, so you can hop to a closer mob and back again.
+    const W=58,H=48,G=6,M=10;
+    for(let i=0;i<8;i++){
+      const col=i%2,row=Math.floor(i/2); // col 0 = screen edge, row 0 = bottom
+      const b=document.createElement('div');b.className='gb'+(i===0?' main':'');b.dataset.slot=i;
+      b.style.cssText='width:'+W+'px;height:'+H+'px;bottom:'+(M+row*(H+G))+'px;'+side+':'+(M+col*(W+G))+'px';
+      b.innerHTML=slotHTML(i,true);
+      b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
+      ctrl.appendChild(b);
+    }
+    const tb=M+4*(H+G),tw=W;
+    [['tgtback','◀ Back',backTarget,settings.left?0:W+G],['nexttgt','Next ▶',nextTarget,settings.left?W+G:0]] /* Back always on the left, Next on the right */.forEach(([id,label,fn,off])=>{
+      const t=document.createElement('button');t.id=id;t.className='gtb';t.textContent=label;
+      t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px';
+      t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;fn();flash(t)});
+      ctrl.appendChild(t);
+    });
+    autoPill(side,0,true);
+    sideBar(settings.left?'right':'left',true); // only Sit on the far side: room for pet controls later
+    ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));return;
+  }else if(settings.scheme==='pad'){
     const P=PAD_PX[settings.padSize]||160,ic=Math.round(P*0.27),cc=Math.round(P*0.34),R=P/2-ic/2-3;
     const pad=document.createElement('div');pad.id='pad';
     pad.style.cssText='width:'+P+'px;height:'+P+'px;bottom:12px;'+side+':12px';
@@ -58,13 +81,14 @@ function buildControls(){
 // above the chat box: slot 7, slot 8, then Sit. Shown in both joystick and tap-to-move.
 // Kept to 2 spells so the screen never shows more than 8 ability buttons (a design rule).
 // Sit lives here (not in a menu) because Necros sit a lot while the pet and DoTs do the work.
-function sideBar(side){
+function sideBar(side,sitOnly){
   const sz=48,gap=8,base=8+96+8+44; // chat box bottom + height + gap, lifted 44px (v0.27.1 play-test: was too low)
   const sit=document.createElement('button');sit.id='bsit';sit.className='fb';
   sit.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+base+'px;'+side+':8px;font-size:11px';
   sit.textContent=player.sit?'Stand':'Sit';
   sit.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleSit()});
   ctrl.appendChild(sit);
+  if(sitOnly)return;
   [6,7].forEach((i,k)=>{
     const b=document.createElement('div');b.className='fb side'+(loadout[i]?'':' empty');b.dataset.slot=i;
     b.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+(base+(2-k)*(sz+gap))+'px;'+side+':8px';
@@ -76,21 +100,22 @@ function sideBar(side){
 // Two quick toggles, top right under the target frame: "1st hit" = tapping an enemy casts your main attack once;
 // "Auto" = it keeps casting. They're set between fights, so they live out of the thumb's way.
 // Their old spot above the abilities now holds a Next target button, which IS needed mid-fight.
-function autoPill(side,bottom){
+function autoPill(side,bottom,noNext){
   // Top left, under your portrait: the two toggles. Top right, under the target: Menu.
   const pills=document.createElement('div');pills.id='toggles';ctrl.appendChild(pills);
   const mk=(key,label,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='autopill'+(settings[key]?' active':'');
     b.textContent=label+' '+(settings[key]?'on':'off');
     b.style.cssText='height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
-    b.addEventListener('click',()=>{settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
+    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
     pills.appendChild(b);};
   mk('tapCast','1st hit','Auto first attack','firstpill');
   mk('autoCast','Auto','Auto attack','autopill');
   // While arranging, Menu reads Done so there's always a way out.
   const m=document.createElement('button');m.id='bmenu';m.textContent=arranging?'Done':'Menu';if(arranging)m.className='active';
   m.style.cssText='position:absolute;top:calc(62px + env(safe-area-inset-top));right:6px;height:26px;padding:0 12px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
-  m.addEventListener('click',()=>{if(arranging)setArranging(false);else openModal('menuUI')});
+  m.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)setArranging(false);else openModal('menuUI')});
   ctrl.appendChild(m);
+  if(noNext)return;
   // Next target: thumb-reachable, just above the spells. (Tab on a keyboard does the same.)
   const t=document.createElement('button');t.id='nexttgt';t.textContent='Next ⟳';
   t.style.cssText='position:absolute;bottom:'+bottom+'px;'+side+':16px;height:34px;padding:0 12px;font-size:12px;border-radius:17px;background:rgba(20,18,26,.88);border-color:#7a6a3a';
@@ -203,7 +228,7 @@ function renderSettings(){
   const seg=(label,key,opts)=>'<h2>'+label+'</h2><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div>';
   box.innerHTML=
     '<button class="go" id="chgcls" style="margin:0 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
-    seg('Controls','scheme',[['pad','Spell pad'],['buttons','Classic buttons']])+
+    seg('Controls','scheme',[['grid','Grid'],['pad','Spell pad'],['buttons','Classic buttons']])+
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
@@ -290,6 +315,13 @@ $('cbox').addEventListener('click',e=>{
 function nextTarget(){
   const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
   if(!list.length){log('No targets nearby.','#9aa');return}
-  const i=list.indexOf(player.target);player.target=list[(i+1)%list.length];
+  const i=list.indexOf(player.target);switchTarget(list[(i+1)%list.length]);
+}
+// Remember the mob you just left, so Back can return to it (e.g. Next to grab a closer add, then Back).
+function switchTarget(m){if(!m||m===player.target)return;if(player.target&&!player.target.dead)player.prevTarget=player.target;player.target=m}
+function backTarget(){
+  const p=player.prevTarget;
+  if(!p||p.dead||mobs.indexOf(p)<0||dist(p,player)>160){player.prevTarget=null;log('No earlier target.','#9aa');return}
+  switchTarget(p);
 }
 function toggleSit(){if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')}
