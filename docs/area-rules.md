@@ -5,7 +5,7 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 ## How a new area gets made (one area per pass)
 1. **Brief** (in chat, short): levels, theme, three mood words, landmark, named, rare, 3–5 things to find, which mobs live there, and a list of what's new vs reused.
 2. **Style takes** (only when it's a new setting): 3–4 takes of the same scene in different looks. The owner picks one before anything else gets drawn.
-3. **Full area mock-up:** one big top-down map of the whole area (the owner zooms in instead of walking it), plus one in-game phone view. Big chunks are fine; one area at a time.
+3. **Full area mock-up:** one big top-down map of the whole area (the owner zooms in instead of walking it), plus one in-game phone view. Big chunks are fine; one area at a time. Since Nov 18 this is a text map in `js/data/maps/` that must pass `tools/mapcheck.py` before the owner sees it (`docs/map-format.md`); the checker draws both pictures.
 4. **Owner notes**, then fixes. New rules that come out of the notes go into this file.
 5. **Build it in the game**, then play-test on the phone.
 
@@ -21,7 +21,7 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 - Every object has a footprint (the space it takes up); buildings and paths keep about a tile of space around them.
 - Things sit where they'd really be: graves in rows on open ground, rubble at the foot of what it fell from, paths worn where people walk, puddles in low spots.
 - Buildings have believable openings: doors at ground level, windows only where a building would have them.
-- Every mock-up gets checked for overlaps before the owner sees it.
+- Every mock-up gets checked for overlaps before the owner sees it (`tools/mapcheck.py` does this for map files). When a new rule can be checked by a script, add it to the checker too.
 
 ## Layout
 - Main road plus small side paths that reward curiosity.
@@ -38,4 +38,4 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 Each area gets a short look sheet here once its style is picked.
 
 ### Sunken Graveyard
-Style: **A · Moonlit** (picked Nov 18; other takes kept in the "Mobile MMO — Sunken Graveyard mock-up" canvas). Cold green night tint, blue crypt light, warm torches at the gate. The iron fence and gate are the border: living forest up to it, dead trees only and dead grass inside, low fog, broken bell tower with a wooden door, crypt mouth with cold light and candles.
+Style: **A · Moonlit** (picked Nov 18; other takes kept in the "Mobile MMO — Sunken Graveyard mock-up" canvas). Cold green night tint, blue crypt light, warm torches at the gate. The iron fence and gate are the border: living forest up to it, dead trees only and dead grass inside, low fog, broken bell tower with a wooden door, crypt mouth with cold light and candles. Full map: `js/data/maps/graveyard.js` and `crypt.js` (Nov 18).

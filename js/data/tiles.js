@@ -1,0 +1,48 @@
+// Tile and object tables for text maps (js/data/maps/*.js). Numbers and names only. Format: docs/map-format.md
+'use strict';
+const MAPS={}; // each js/data/maps/*.js file adds one map here
+// One character per tile. walk: 1 = you can stand on it. tags group tiles for the rules the checker runs.
+const TILESET = `
+char name        walk color   tags
+,    grass        1   #2f3d26 living ground
+.    dead_grass   1   #3b3a2c dead ground
+:    dirt_path    1   #77623f path ground
+=    road         1   #8f7650 path ground
+m    mud          1   #2c2820 low ground
+w    marsh        1   #27403b low slow ground
+~    water        0   #1d3a4b water
+T    tree         0   #1f3a22 living tree
+t    dead_tree    0   #4a4036 dead tree
+b    bush         0   #25381f living
+x    dead_bush    0   #3e3428 dead
++    grave        0   #8d8692 grave
+o    dug_grave    0   #2a2018 grave
+#    iron_fence   0   #2b2a35 border
+G    gate         1   #6b5a3a border path ground
+/    broken_fence 1   #3b3a2c border ground
+g    fence_grate  0   #1d3a4b border water
+r    rubble       0   #6b6470 rubble
+X    rock         0   #15131a wall
+_    floor        1   #34303d floor ground
+B    bones        0   #b9b0a0 rubble
+C    coffin       0   #4a3c30 grave
+^    stairs       1   #0b0a0f exit ground floor
+`;
+// Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
+// clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
+// light: radius in tiles, for breadcrumb checks and the render.
+const OBJECTS = `
+kind         w h blocks on     clear door light
+bell_tower   3 3 1      ground 1     S    0
+crypt_mouth  5 3 1      ground 1     S    3
+shack        4 3 1      ground 1     S    0
+mausoleum    3 2 1      ground 1     S    0
+dead_oak     2 2 1      ground 1     -    0
+statue       1 1 1      ground 1     -    0
+torch        1 1 1      ground 0     -    4
+lantern      1 1 1      ground 0     -    3
+candle       1 1 0      ground 0     -    2
+cart         2 1 1      ground 0     -    0
+throne       3 2 1      floor  1     S    0
+brazier      1 1 1      floor  0     -    4
+`;

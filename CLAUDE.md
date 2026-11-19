@@ -57,7 +57,8 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 - `index.html` the page (HUD and menu markup) and the list of scripts
 - `css/game.css` styles
 - `js/` the game, one file per job: `core` (canvas, tile size), `rng`, `save` (safe storage, save version, upgrade steps for old saves), `map` (overworld, Dungeon 1 rooms), `state` (class, bags, saves, settings, loadout), `spawns`, `fx` (floating text, log, helpers), `combat` (threat, hits, pet, loot, casting), `input` (touch, joystick, pinch), `ui` (spell pad, menus, character screen), `world` (NPCs, critters, zones, boss AI), `update` (one game tick), `render` (drawing, lighting, zoom, HUD), `sim` (testing grounds: arena test fights, playbook bots and the sim), `dev` (DEV panel), `main` (loop, start screen; loads last)
-- `js/data/` numbers only: classes, mobs, items, sprites
+- `js/data/` numbers only: classes, mobs, items, sprites, `tiles.js` (tile and object tables) and `maps/` (area maps as text, one file per area; format in `docs/map-format.md`, not loaded by the game yet)
+- `tools/` helper scripts that aren't part of the game: `mapcheck.py` checks and draws map files (`python3 tools/mapcheck.py js/data/maps/*.js --out out/`)
 - `docs/` design doc, progress notes, credits
 - `art/` palette, and sprite sheets once we export them
 - `audio/` sound effects and music (empty for now)
