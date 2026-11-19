@@ -1,10 +1,11 @@
 # Map format: maps as text, checked by a script
 
-Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **Design only for now: the game doesn't load these files yet** (backlog card "Load areas from map files").
+Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`): the graveyard is playable from DEV → Teleport → New graveyard, or `?area=graveyard`. The crypt map is designed but not wired in yet.
 
 ## Where things live
 - `js/data/tiles.js`: the shared tables. `TILESET` (each tile character: name, walkable or not, colour, tags) and `OBJECTS` (buildings and props: size in tiles, how much open ground they need around them, which side the door is on, light radius). Add a tile or object here once and every map can use it.
 - `js/data/maps/<area>.js`: one file per area (`graveyard.js`, `crypt.js`). Plain data, game-ready: each adds itself to `MAPS`.
+- `js/area.js`: the game side. Reads a map file, paints its pixel-art ground once (tile and prop drawings in the moonlit palette), and builds its walk map, lights, spawns, fog and exits. A new tile or object needs a drawing here as well as a line in `tiles.js`.
 - `tools/mapcheck.py`: the checker. It checks every rule below, then draws two pictures: the whole map with a coordinate ruler, and one phone screen at game scale from the way in.
 
 ## A map file

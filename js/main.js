@@ -20,5 +20,5 @@ if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player
   $('start').textContent='Play '+C.name;
   if(!C.mana)document.querySelector('.bar.mp').style.display='none';
 })();
-$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa')});
+$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');if(/[?&]area=graveyard/.test(location.search))enterZone('gy')});
 requestAnimationFrame(t=>{last=t;loop(t)});
