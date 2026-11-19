@@ -142,7 +142,7 @@ function enterZone(id,from,at){
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
 function checkPortals(){
   if(zoneId==='dun'&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
-    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
+    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
   if(A){const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));

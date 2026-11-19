@@ -16,8 +16,16 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 #tcast .bar{height:6px;border:1px solid #6a4fa3;margin-top:1px}
 #tcast .bar>i{background:#b48cff}
 #tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
-/* Chat box: fixed height so the side column can sit right above it. Newest line at the bottom; old lines clip off the top. */
-#log{position:absolute;bottom:8px;height:96px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
+/* Chat box: 4 lines, newest at the bottom (v0.30.1). It only shows lines that matter; routine hits live in the Log panel.
+   pointer-events:none so the chat area stays joystick space. Its old 96px height is still used to place Sit (ui.js). */
+#log{position:absolute;bottom:8px;max-height:72px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
+#topbtns{position:absolute;top:calc(62px + env(safe-area-inset-top));right:6px;display:flex;gap:6px}
+/* Log panel: plain EverQuest-style window under the top bars; the game keeps running while it's open. */
+#logpanel{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));height:38%;display:none;flex-direction:column;background:rgba(14,13,18,.94);border:1px solid #6b6f78;border-radius:4px;z-index:4}
+#logtabs{display:flex;gap:4px;padding:4px;border-bottom:1px solid #3a3343}
+#logtabs button{height:30px;padding:0 12px;font-size:11px;border-radius:3px}
+#logtabs #logclose{margin-left:auto;width:36px;padding:0}
+#loglist{flex:1;overflow-y:auto;padding:4px 7px;font-size:11px;line-height:1.4;touch-action:pan-y;overscroll-behavior:contain}
 #toggles{position:absolute;left:6px;top:calc(62px + env(safe-area-inset-top));display:flex;gap:6px}
 /* Boss health bar: wide, across the top, only while a boss is fighting you */
 #castbar{position:absolute;left:50%;transform:translateX(-50%);top:calc(132px + env(safe-area-inset-top));width:160px;display:none;pointer-events:none}

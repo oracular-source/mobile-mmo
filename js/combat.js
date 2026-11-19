@@ -42,9 +42,9 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
-  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4');}
-  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');if(rng()<0.35)log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0');engage(m,true);}
-  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf');engage(m);}
+  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
+  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
+  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
   // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
   if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
   if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
@@ -66,7 +66,7 @@ function killMob(m){
     run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!m.def.named,first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
     if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
-  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227')}rollLoot(m);saveInv();}
+  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<10&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
@@ -82,7 +82,7 @@ function hurtPlayer(m){
   // Monk's Deflect: every melee hit misses for a few seconds.
   if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');return}
   // Class passive dodge (Rogue): a chance for any melee hit to miss outright.
-  if(C.dodge&&rng()<C.dodge){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge '+m.def.name+"'s attack.",'#9aa');return}
+  if(C.dodge&&rng()<C.dodge){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge '+m.def.name+"'s attack.",'#9aa','fight');return}
   let dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25);
   // Higher-level mobs hit much harder; lower-level ones a little softer.
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
@@ -98,7 +98,7 @@ function hurtPlayer(m){
   if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#ff5a5a');
   // Magician's Flame Shield: whatever hits you gets burned back.
   if(player.buffs.fshield>0&&player.bval&&player.bval.fshield&&!m.dead)hitMob(m,player.bval.fshield*rr(0.9,1.1)*(1-m.def.armor),'shield','Flame Shield');
-  log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80');
+  log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80',dmg>=maxHP(player.lvl)*0.2?'main':'fight'); // big hits (a fifth of your health) stay in the chat box
   unhide('You are no longer hidden.');
   if(player.cast&&rng()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}
   if(player.hp<=0&&!lastStand())playerDie(m);
@@ -220,9 +220,9 @@ function giveItem(id,n,k){
   const it=ITEMS[id];n=n||1;
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
   if(i>=0)inv.bags[i].n+=n;
-  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
+  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80','loot');return false}inv.bags[i]={id:id,n:n}}
   if(zoneId==='dun')run.loot.push(it.name);
-  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar]);
+  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar],'loot');
   floatText(player.x,player.y-30-(k||0)*8,it.name,RAR[it.rar]);
   return true;
 }
@@ -236,8 +236,8 @@ function cast(a,quiet){
   if(a.kind==='song'&&songOn(a.id)){player.songs=player.songs.filter(id=>id!==a.id);log('You stop playing '+a.name+'.','#9aa');return true}
   const own=player.cds[a.id]||0;
   // Tapping the spell that's already queued cancels it (a different spell just swaps in).
-  if(!quiet&&player.queued&&player.queued.a===a&&(own>0||player.cast||player.gcd>0)){player.queued=null;log(a.name+' unqueued.','#9aa');return false}
-  if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
+  if(!quiet&&player.queued&&player.queued.a===a&&(own>0||player.cast||player.gcd>0)){player.queued=null;log(a.name+' unqueued.','#9aa','fight');return false}
+  if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa','fight');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
   if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
   if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
@@ -294,7 +294,7 @@ function applyAbility(a,t,fromHide){
   if(a.kind==='backstab'&&t&&t.lost>0)fromHide=true;
   if(a.tgt&&a.kind!=='taunt'&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
     floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
-    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff');engage(t);return;}
+    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff',a.melee?'fight':'main');engage(t);return;}
   if(a.kind==='nuke'||a.kind==='stun'){
     if(a.dash)dashTo(t); // Monk's Flying Kick: leap in first
     if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});
@@ -309,7 +309,7 @@ function applyAbility(a,t,fromHide){
     // Chill: each Frost Bolt slows a bit more (up to 4 stacks), wearing off 8s after the last one.
     if(a.chill&&!t.dead){t.chill=Math.min(4,(t.chill||0)+1);t.chillT=8}
     if(a.kind==='stun'&&!t.dead){t.stun=at(a.dur,a)*durMult(t);log(cap(t.def.name)+' is stunned ('+t.stun.toFixed(1)+'s).','#9fb8e0')}
-  }else if(a.kind==='heal'){const h=a.full?maxHP(L)-player.hp:Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6');
+  }else if(a.kind==='heal'){const h=a.full?maxHP(L)-player.hp:Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6','fight');
     if(a.holy)holyPulse(Math.max(at(a.heal)*mult,h)*a.holy,a.name);}
   else if(a.kind==='hot'){player.hots=(player.hots||[]).filter(o=>o.id!==a.id);player.hots.push({id:a.id,name:a.name,t:at(a.dur,a),next:2,heal:at(a.heal,a)*mult,holy:a.holy||0});burst(player.x,player.y-6,a.col,10,true);log(a.name+' is on you ('+Math.round(at(a.dur,a))+'s).','#7dffa6');}
   else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
@@ -365,7 +365,7 @@ function applyAbility(a,t,fromHide){
     if(a.back){const m=fightingMe().sort((x,y)=>dist(x,player)-dist(y,player))[0]||player.target;if(m&&!m.dead){const dx=player.x-m.x,dy=player.y-m.y,d=Math.hypot(dx,dy)||1;player.fx=dx/d;player.fy=dy/d}}
     blink(a.range,a.back);burst(player.x,player.y-6,a.col,10,true);}
   else if(a.kind==='gate'){gateHome();}
-  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6');}
+  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight');}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
   // Feign Death. The Monk's version ("split") sends every mob home except your target, which keeps coming:
   // a pack becomes a single. With only one mob on you, it drops that one too (an escape).

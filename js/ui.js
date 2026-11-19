@@ -103,10 +103,16 @@ function autoPill(side,bottom,noNext){
   mk('tapCast','1st hit','Auto first attack','firstpill');
   mk('autoCast','Auto','Auto attack','autopill');
   // While arranging, Menu reads Done so there's always a way out.
+  // Top right: Log, then Menu (v0.30.1). Log sits up here, away from both thumbs, because the chat box is joystick space.
+  const tr=document.createElement('div');tr.id='topbtns';ctrl.appendChild(tr);
+  const pill='height:26px;padding:0 12px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+  const lg=document.createElement('button');lg.id='blog';lg.textContent='Log';if(logPanelOpen)lg.className='active';lg.style.cssText=pill;
+  lg.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleLogPanel()});
+  tr.appendChild(lg);
   const m=document.createElement('button');m.id='bmenu';m.textContent=arranging?'Done':'Menu';if(arranging)m.className='active';
-  m.style.cssText='position:absolute;top:calc(62px + env(safe-area-inset-top));right:6px;height:26px;padding:0 12px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+  m.style.cssText=pill;
   m.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)setArranging(false);else openModal('menuUI')});
-  ctrl.appendChild(m);
+  tr.appendChild(m);
   if(noNext)return;
   // Next target: thumb-reachable, just above the spells. (Tab on a keyboard does the same.)
   const t=document.createElement('button');t.id='nexttgt';t.textContent='Next ⟳';
@@ -298,8 +304,8 @@ $('cbox').addEventListener('click',e=>{
   else if(act==='equip'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],old=inv.equip[it.slot];
     inv.equip[it.slot]=b.id;inv.bags[bagSel]=old?{id:old,n:1}:null;log('You equip the '+it.name+'.',RAR[it.rar]);bagSel=old?bagSel:null}
   else if(act==='sell'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bagSel]=null;bagSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
-  else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}});bagSel=null;
-    log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227');inv.copper+=c}
+  else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}},'loot');bagSel=null;
+    log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227','loot');inv.copper+=c}
   else if(act==='destroy'&&bagSel!==null){log('You destroy the '+ITEMS[inv.bags[bagSel].id].name+'.','#9aa');inv.bags[bagSel]=null;bagSel=null}
   player.hp=Math.min(player.hp,maxHP(player.lvl));player.mp=Math.min(player.mp,maxMP(player.lvl));
   saveInv();renderChar();
@@ -318,3 +324,33 @@ function backTarget(){
 }
 function switchTarget(m){if(!m||m===player.target)return;player.target=m}
 function toggleSit(){if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')}
+
+/* ---------- Log panel (v0.30.1) ----------
+   The full chat history (last 150 lines) with All / Fight / Loot filters. It does NOT pause the game: you can keep
+   moving with the joystick while you read. Opened and closed with the Log button (top right) or its X. */
+let logFilter='all';
+const logOk=l=>logFilter==='all'||l.kind===logFilter;
+const logLine=l=>'<div style="color:'+l.col+'">'+l.msg+'</div>';
+function renderLogPanel(){
+  document.querySelectorAll('#logtabs button').forEach(b=>b.classList.toggle('active',b.dataset.f===logFilter));
+  const box=$('loglist'),shown=logHist.filter(logOk);
+  box.innerHTML=shown.length?shown.map(logLine).join(''):'<div style="color:#9aa">Nothing here yet.</div>';
+  box.dataset.empty=shown.length?'0':'1';
+  box.scrollTop=box.scrollHeight;
+}
+function logPanelAdd(l){
+  if(!logOk(l))return;const box=$('loglist');
+  const atEnd=box.scrollHeight-box.scrollTop-box.clientHeight<24; // only follow new lines if you haven't scrolled up to read
+  if(box.dataset.empty!=='0'){box.innerHTML='';box.dataset.empty='0'}
+  box.insertAdjacentHTML('beforeend',logLine(l));
+  while(box.childElementCount>150)box.firstChild.remove();
+  if(atEnd)box.scrollTop=box.scrollHeight;
+}
+function toggleLogPanel(open){
+  logPanelOpen=open===undefined?!logPanelOpen:open;
+  $('logpanel').style.display=logPanelOpen?'flex':'none';
+  const b=$('blog');if(b)b.classList.toggle('active',logPanelOpen);
+  if(logPanelOpen)renderLogPanel();
+}
+$('logtabs').addEventListener('pointerdown',e=>{const b=e.target.closest('button[data-f]');if(!b)return;e.preventDefault();logFilter=b.dataset.f;renderLogPanel()});
+$('logclose').addEventListener('pointerdown',e=>{e.preventDefault();toggleLogPanel(false)});

@@ -5,10 +5,23 @@ const floats=[],parts=[],beams=[];
 let rangeShow=0,rangeR=80;
 function floatText(x,y,txt,col,big){floats.push({x:x,y:y,txt:txt,col:col,t:0,big:!!big})}
 function burst(x,y,col,n,up){for(let i=0;i<n;i++)parts.push({x:x+rr(-4,4),y:y+rr(-4,2),vx:rr(-12,12),vy:up?rr(-28,-12):rr(-18,8),t:0,life:rr(0.4,0.9),col:col})}
-const logEl=$('log'),lines=[];
+const logEl=$('log'),lines=[],logHist=[];
 let logMute=false; // the sim runs thousands of fights; it mutes the chat box meanwhile
-function log(msg,col){if(logMute)return;lines.push({msg:msg,col:col||'#d8d2c0'});if(lines.length>5)lines.shift();
-  logEl.innerHTML=lines.map((l,i)=>'<div style="color:'+l.col+';opacity:'+(0.45+0.55*(i+1)/lines.length)+'">'+l.msg+'</div>').join('');}
+let logPanelOpen=false; // the Log panel (top right button) shows the full history; see ui.js
+// kind: 'fight' = routine hits, misses and heals (the numbers already float over heads), kept in the Log panel only;
+// 'loot' = copper, drops, selling; anything else = 'main'. v0.30.1 (owner): the chat box shows only lines that matter,
+// 4 at a time, all at full brightness like EverQuest.
+function log(msg,col,kind){if(logMute)return;const l={msg:msg,col:col||'#d8d2c0',kind:kind||'main'};
+  logHist.push(l);if(logHist.length>150)logHist.shift();
+  if(logPanelOpen)logPanelAdd(l);
+  if(l.kind==='fight')return;
+  const last=lines[lines.length-1];
+  if(last&&last.msg===l.msg)last.n=(last.n||1)+1; // the same line again shows as one line with ×2, ×3 (no "Out of range" wall)
+  else{lines.push({msg:l.msg,col:l.col});if(lines.length>4)lines.shift();}
+  logEl.innerHTML=lines.map(l=>'<div style="color:'+l.col+'">'+l.msg+(l.n>1?' <span style="color:#9aa">×'+l.n+'</span>':'')+'</div>').join('');
+  // Long lines wrap; drop whole old lines from the top rather than showing half a line.
+  // (Lines overflow upward here, which scrollHeight doesn't count, so measure the first line's top instead.)
+  while(logEl.childElementCount>1&&logEl.firstChild.getBoundingClientRect().top<logEl.getBoundingClientRect().top-1)logEl.firstChild.remove();}
 const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 
 /* ---------- Helpers ---------- */

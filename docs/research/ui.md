@@ -15,8 +15,8 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 
 ## Breakdown list (order)
 1. Spell pad and Next ⟳ (done v0.28)
-2. Chat log (next)
-3. Your frame (name, level, health, mana, XP, buffs)
+2. Chat log (done v0.30.1)
+3. Your frame (name, level, health, mana, XP, buffs) (next)
 4. Target frame and boss cast bar
 5. Slots 7–8 and Sit
 6. Floating text over heads
@@ -32,3 +32,10 @@ Now: a round pad, main attack in the middle, five round buttons around it (about
 Options: **A** EQ grid 2×3 (main bottom-right); **B** arc with a big main button in the corner and five square buttons around it; **C** keep the round pad, just bigger buttons and labels. Next ⟳: **1** a bar on the pad cluster, **2** tap the target frame to switch.
 Claude leaned B. **Owner picked A, EverQuest grid**, extended to **all 8 spells in one 2 × 4 block** (left side freed for pet controls later), with **◀ Back** and **Next ▶** target buttons. Reason: same-size buttons make every spell equally easy to hit, players arrange their own order, and Auto covers the main attack. Built v0.28. Tap-the-target-frame to switch is still open (not built).
 Note: we first put the most-used spells at the bottom (nearest the thumb). **v0.29.1, owner:** flipped: first spells on top, main top left, because on his phone the thumb rests a little high on the grid. Grid is smaller (Medium default) with Small / Medium / Large in Settings. Back now cycles like Next in reverse. Classic layout removed (parked in the backlog). Settings itself needs a cleanup (backlog card, breakdown 8).
+
+## 2. Chat log
+Now (before v0.30.1): 5 lines, bottom left, older lines faded, no scroll-back. Every hit you land or take wrote a line (and about a third of your pet's), so in a fight with DoTs ticking, "charm breaks!", "bags full" or a drop scrolled away in a second or two. Long tips wrapped to 2–3 lines.
+Options: **A** quiet box (routine hits hidden, they float over heads anyway) plus a full history window; **B** All / Fight / Loot tabs on the box itself; **C** same box, tap for history.
+**Owner picked A**, with one change: the chat box is **joystick space** (he moves by touching there), so it must never open anything; tapping, holding or triple-tapping it is out. The history opens from a **Log** button next to Menu, top right, away from both thumbs. Claude's call on the rest (owner OK'd): **4 lines, no fading** (EverQuest), and the Log panel **doesn't pause** the game, so you can keep moving while you read. Built v0.30.1.
+Rule for later: routine lines are logged with kind `'fight'` (Log panel only), drops and copper with `'loot'`; everything else shows in the box. A hit on you of a fifth of your health or more, and spell resists, stay in the box. The same line twice in a row shows once with ×2.
+Owner idea (Nov 18): the joystick doesn't need to be visible at all; the chat box area doubles as it, and spell and status cues can live elsewhere later.
