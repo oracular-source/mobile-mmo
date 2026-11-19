@@ -189,7 +189,8 @@ function updatePet(dt){
   if(pet.charm){pet.charmT-=dt;if(pet.charmT<=0){releaseCharm();return}}
   if(pet.life){pet.life-=dt;if(pet.life<=0){burst(pet.x,pet.y-6,'#cfd6e0',8);log('Your '+petName()+' falls to the ground.','#9aa');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});return}}
   if(pet.target&&(pet.target.dead||pet.target.mez>0||mobs.indexOf(pet.target)<0))pet.target=null; // never wake a sleeping mob
-  if(!pet.target){const pt=player.target;
+  // Held (Back off): picks nothing on its own until you press Attack.
+  if(!pet.target&&!pet.hold){const pt=player.target;
     if(pt&&!pt.dead&&pt.state==='chase'&&!(pt.mez>0))pet.target=pt;
     else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
   const t=pet.target;
@@ -204,6 +205,18 @@ function updatePet(dt){
 }
 function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':zoneId==='cross'?'You wake on the road by Town 1.':zoneId==='tunnel'?'You wake under the sinkhole.':'You return to the Gate Road.','#9aa')}
 
+// Pet orders (v0.34, owner): Attack sends the pet at your target, even one that isn't fighting you yet (so it can pull),
+// and lets it pick its own fights again. Back off pulls it out and keeps it out until you press Attack.
+function petAttack(){
+  if(!pet||player.dead)return;pet.hold=false;const t=player.target;
+  if(t&&!t.dead&&t.kind!=='pet'&&mobs.indexOf(t)>=0){
+    if(t.mez>0){log(cap(t.def.name)+' is asleep; your '+petName()+' leaves it be.','#9aa');return}
+    pet.target=t;pet.follow=false;log('Your '+petName()+' goes for '+t.def.name+'.','#cfc8b2');
+  }else log('Your '+petName()+' is ready to fight.','#cfc8b2');
+}
+function petBackOff(){
+  if(!pet||player.dead)return;pet.hold=true;pet.target=null;pet.follow=true;log('Your '+petName()+' backs off.','#cfc8b2');
+}
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
 /* ---------- Loot ---------- */

@@ -237,8 +237,17 @@ function ui(){
   $('php').style.width=(100*player.hp/mh)+'%';$('phpn').textContent=hpN+'/'+mh;$('phpp').textContent=Math.max(0,Math.ceil(100*player.hp/mh))+'%';
   if(mm){$('pmp').style.width=(100*player.mp/mm)+'%';$('pmpn').textContent=mpN+'/'+mm;$('pmpp').textContent=Math.max(0,Math.floor(100*player.mp/mm))+'%';}
   // Pet bar: health, except a charmed mob shows how long the charm has left (pink), so you can see it about to break.
+  // v0.34: the pet gets a thin row of its own at the bottom of your frame: its name (Earth elemental, Skeleton...), what it's
+  // hitting (or "held" after Back off), and a thin bar. Timed pets show seconds left; under 5s the bar turns red.
   $('petrow').style.display=pet?'block':'none';
-  if(pet){const pb=$('petbar');if(pet.charm){pb.style.width=(100*pet.charmT/pet.charmMax)+'%';pb.style.background=pet.charmT<5?'#ff4d4d':'#ff9de2'}else{pb.style.width=(100*pet.hp/pet.maxhp)+'%';pb.style.background='#cfc8b2'}}
+  if(pet){const pb=$('petbar');let nm=cap(petName()),col='#cfc8b2',w=100*pet.hp/pet.maxhp;
+    if(pet.charm){nm='Charmed '+nm+' '+Math.ceil(pet.charmT)+'s';w=100*pet.charmT/pet.charmMax;col=pet.charmT<5?'#ff4d4d':'#ff9de2'}
+    else if(pet.life){nm+=' '+Math.ceil(pet.life)+'s';if(pet.life<5)col='#ff4d4d'}
+    pb.style.width=Math.max(0,w)+'%';pb.style.background=col;
+    const tg=pet.hold?'held':pet.target&&!pet.target.dead?'› '+cap(pet.target.def.name.replace(/^an? /,'')):'';
+    if($('petnm').textContent!==nm)$('petnm').textContent=nm;if($('pettg').textContent!==tg)$('pettg').textContent=tg;}
+  ['bpetatk','bpetback'].forEach(id=>{const b=$(id);if(b)b.style.display=pet&&!player.dead?'flex':'none'});
+  const bb0=$('bpetback');if(bb0)bb0.classList.toggle('held',!!(pet&&pet.hold));
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;

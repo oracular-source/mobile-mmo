@@ -85,6 +85,15 @@ function sideBar(side,sitOnly){
   sit.textContent=player.sit?'Stand':'Sit';
   sit.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleSit()});
   ctrl.appendChild(sit);
+  // v0.34 pet orders (owner pick B): Attack and Back off, stacked above Sit at Sit's size. Built for everyone but only
+  // shown while a pet is out (render.js), so non-pet classes never see them and nothing else on this side moves.
+  const G=g[2],pb0=sitOnly?base+H+G:base+3*(sz+gap); // the old pad layout has slots 7-8 above Sit, so go above those
+  [['bpetback','Back off',petBackOff,0],['bpetatk','Attack',petAttack,1]].forEach(([id,label,fn,k])=>{
+    const b=document.createElement('button');b.id=id;b.className='gb petcmd';b.textContent=label;
+    b.style.cssText='display:none;width:'+W+'px;height:'+H+'px;bottom:'+(pb0+k*(H+G))+'px;'+side+':10px;padding:0';
+    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;fn();flash(b)});
+    ctrl.appendChild(b);
+  });
   if(sitOnly)return;
   [6,7].forEach((i,k)=>{
     const b=document.createElement('div');b.className='fb side'+(loadout[i]?'':' empty');b.dataset.slot=i;

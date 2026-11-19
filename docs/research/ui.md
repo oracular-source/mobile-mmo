@@ -20,7 +20,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 4. Target frame and boss cast bar (done v0.33)
 5. Slots 7–8 and Sit (done v0.30.2; slots 7–8 already moved into the grid in v0.28)
 6. Floating text over heads (done v0.33)
-7. Pet bar
+7. Pet bar (done v0.34)
 8. Menu screens (Spells, Arrange, Settings)
 9. Character screen (Gear, Bags, Journal)
 10. Moments (level up, death, loot, run summary)
@@ -62,3 +62,9 @@ Slots 7–8 already live in the 2 × 4 grid (v0.28), so only **Sit** was left: a
 Now: every number and word the same size (12px, a few 15px), rising straight up from one spot and fading from the first frame. DoT ticks, your hits and pet hits stack into one smear; they differ only by colour. Status words (Zz, MARKED, MISS) float away like damage.
 Options: **A** spread out and hold (your hits big and white, DoT ticks and pet hits small, each nudged a little sideways so they never stack; solid most of the way, then fade; status words sit still over the head); **B** dealt arcs right, taken arcs left (Diablo); **C** only your hits and hits on you float (DoT ticks and pet hits only in the Log).
 **Owner picked A** (Nov 18). **Built v0.33:** sizes: your hits 13px white, other numbers 11, DoT/pet/guard hits 9, milestone words 15. A new number within ~10px of one from the last 0.6s takes the next free spot around it (sideways first, then a row up). Solid for the first 65% of its life, then fades; numbers rise on an ease-out, words don't move and stack upward. Caller passes the kind: `floatText(x,y,txt,col,big,'hit'|'small')`; text that isn't a number counts as a word. Known limit: 6+ hits in the same instant on one mob still crowd a little; normal fights space them out.
+
+## 7. Pet bar
+Now (before v0.34): a 4px unlabeled line under the XP bar, easy to mistake for it; no name, no numbers, a timer only for Charm. No orders at all: the pet takes your target if it's fighting you, otherwise the nearest mob chasing you, and can't be called back.
+Options: **A** pet frame under yours (name, health, what it's hitting), no buttons; **B** A plus two orders, **Attack** and **Back off**, on the left above Sit at Sit's size; **C** pet health and orders together bottom left.
+**Owner picked B** (Nov 19), with: the pet's health bar **thinner than yours but the same length**; **Back off holds** the pet until you press Attack again; the frame names the pet (**Earth elemental**, **Fire elemental**, Skeleton, Minion, Floating sword, Charmed rat).
+**Built v0.34:** a thin row at the bottom of your frame (name left, what it's hitting or **held** right, 6px bar). Timed pets show seconds left (Floating sword 84s, Charmed rat 6s), red under 5s. Attack and Back off show only while a pet is out; Back off turns gold while held. Attack works on a mob that isn't fighting you yet (so the pet can pull), never on a sleeping one; with no target it just ends the hold. Guard, Hold, Taunt (EverQuest's other orders) wait for groups.

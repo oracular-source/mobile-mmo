@@ -166,3 +166,8 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 #bcastname{font-size:12px;font-weight:700;text-align:center;color:#e0c8ff;text-shadow:0 1px 0 #000,0 0 3px #000;margin-bottom:2px}
 #bcast .bar{height:12px;background:#1a1420;border:1px solid #b48cff;border-radius:2px}
 #bcast .bar>i{background:#b48cff;box-shadow:none;transition:none}
+/* v0.34 pet frame: a thin row at the bottom of your frame, same width as your bars (owner: thinner than your health) */
+#petrow{margin-top:4px;padding-top:3px;border-top:1px solid #555}
+#petrow .row{font-size:10px;line-height:12px}#petrow #petnm{color:#ddd;font-weight:700}#petrow #pettg{color:#aaa}
+#pframe .pbar{height:6px;margin-top:1px;background:#111;border:1px solid #555;border-radius:2px;box-shadow:none}#pframe .pbar>i{box-shadow:none}
+.gb.petcmd{font-size:10px;line-height:1.05}.gb.held{border-color:#c9a227;color:#ffd27a} /* Back off turns gold while the pet is held */
