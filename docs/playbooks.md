@@ -372,7 +372,7 @@ New rules this batch needs:
 | 1 | Sicken | dot | Poison over time |
 | 1 | Minor Healing | heal | Medium heal, 1.5s cast |
 | 2 | Drowsy | slow | Mob attacks 30% slower (not a snare: it still runs at full speed) |
-| 3 | Spirit of the Wolf | buff | Faster run speed for you and anyone nearby, until you die |
+| 3 | Spirit of the Wolf | buff | Faster run speed for you and anyone nearby, until you die; no speed while in a fight (v0.24) |
 | 4 | Swarm | dot | Second DoT (insects); runs alongside Sicken |
 | 5 | Venom Totem | totem | A totem on the ground poisons mobs near it for 20s |
 | 6 | Spirit Ward | buff | More armor and health for you and anyone nearby, until you die. Starts in the spellbook: swap it in to cast |

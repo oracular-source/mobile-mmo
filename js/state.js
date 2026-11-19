@@ -32,7 +32,7 @@ const GCD=1.5, PSPEED=34;
 // Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.
 // Chill (Wizard's Frost Bolt) only slows mobs; nothing slows you yet.
 // Shaman's Spirit of the Wolf +30%; the Bard's Song of Travel +60% (they don't add up: the faster one counts).
-const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1)*Math.max(player.buffs.wolf>0?1.3:1,songKind('speed')?1.6:1);
+const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1)*Math.max(player.buffs.wolf>0&&!inCombat()?1.3:1,songKind('speed')?1.6:1); // Spirit of the Wolf is a travel spell: no speed while anything is fighting (owner, v0.24)
 
 /* ---------- Saved progress, settings and loadout ---------- */
 // Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.

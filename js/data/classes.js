@@ -134,7 +134,7 @@ const CLASSES={
     {id:'sicken',name:'Sicken',short:'Sicken',lvl:1,mana:6,cast:0,cd:[8,5,0.4],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
     {id:'sheal',name:'Minor Healing',short:'Heal',lvl:1,mana:8,cast:1.5,cd:[6,3,0.4],col:'#7dffa6',tgt:0,tag:'Heal',kind:'heal',heal:[14,6]},
     {id:'drowsy',name:'Drowsy',short:'Drowsy',lvl:2,mana:6,cast:0,cd:[12,8,0.4],range:80,col:'#9fb8e0',tgt:1,tag:'Attack slow',kind:'slow',dur:[24,1],aslowX:1.43},
-    {id:'wolf',name:'Spirit of the Wolf',short:'Wolf',lvl:3,mana:10,cast:1,cd:[10,10,0],col:'#cfd6e0',tgt:0,tag:'Run faster',kind:'buff',buff:'wolf',dur:[99999,0]},
+    {id:'wolf',name:'Spirit of the Wolf',short:'Wolf',lvl:3,mana:10,cast:1,cd:[10,10,0],col:'#cfd6e0',tgt:0,tag:'Run faster (out of fights)',kind:'buff',buff:'wolf',dur:[99999,0]},
     {id:'swarm',name:'Swarm',short:'Swarm',lvl:4,mana:8,cast:0,cd:[10,6,0.4],range:80,col:'#c9a227',tgt:1,tag:'Second DoT',kind:'dot',dmg:[4,2],dur:[15,0.5]},
     {id:'totem',name:'Venom Totem',short:'Totem',lvl:5,mana:10,cast:0,cd:[24,16,0.8],col:'#7a9a3a',tgt:0,tag:'Poison totem',kind:'ground',all:1,totem:1,radius:26,dur:[20,0],tick:2,dmg:[4,1.6],msg:'You plant a Venom Totem. Mobs that come near it are poisoned.'},
     {id:'ward',name:'Spirit Ward',short:'Ward',lvl:6,mana:14,cast:1.5,cd:[10,10,0],col:'#c9a227',tgt:0,tag:'Armor + health',kind:'buff',buff:'ward',dur:[99999,0]},

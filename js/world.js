@@ -152,8 +152,8 @@ const BOLT={first:3,every:5,cast:2,range:110}; // first cast after 3s, then 5s b
 // A stun, fear, sleep, Evade or Feign Death (or the fight ending) breaks off a boss's cast.
 function interruptCast(m){if(!m.casting)return;m.casting=null;m.bolt=BOLT.every;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
 function bossThink(m,dt){
-  // Attack slows (Enchanter's Slow Mind, Shaman's Drowsy) slow its spellcasting too: longer casts, longer gaps.
-  if(m.aslow>0)dt/=(m.aslowX||1.6);
+  // The Enchanter's Slow Mind slows its spellcasting too: longer casts, longer gaps. The Shaman's Drowsy only slows attacks (v0.24).
+  if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;
     if(m.casting.t<m.casting.dur)return true;
     m.casting=null;m.bolt=BOLT.every;
