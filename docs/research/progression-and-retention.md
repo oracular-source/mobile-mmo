@@ -24,10 +24,10 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 ### Necromancer level 10 fork: Raise Bones (approved Nov 19)
 - **Bone Pair:** one cast raises two skeletons, each about 60% of today's health and damage (a bit stronger together). The second skeleton picks up any extra mob that hits you, so each holds its own mob. Weaker on Boss 1 and Gnawbone (they die one at a time; Mend Bones heals one). For camps and big pulls.
 - **Bone Knight:** one skeleton with about 150% health, more armor and slightly less damage. **Taunts every 8s**, pulling back any mob that turned on you, so sitting mid-fight is safer. With two mobs one still comes for you unless you Dread it. For long single fights and named.
-- **Sim check:** both against rat, skeleton, two skeletons, Boss 1 and Gnawbone, with DPS tracked. Target: Bone Pair wins two skeletons, Bone Knight wins the bosses; if either wins everywhere, redesign. Watch for exploits (taunt stacking, two pets splitting threat oddly).
+- **Sim check:** both in a single fight, a pack and a long named fight at levels 10–15 (not tuned to one boss), with DPS tracked. Target: Bone Pair wins packs, Bone Knight wins long named fights; if either wins everywhere, redesign. Watch for exploits (taunt stacking, two pets splitting threat oddly).
 
 ### Level 10 forks, the other 13 classes (draft Nov 19, owner reviewing)
-Owner notes (Nov 19): no fork option that only works on undead (too narrow); escape options are fine for some classes, but death here is cheap, so a pure escape rarely gets picked; give it a second use.
+Owner notes (Nov 19): **forks are for the rest of the character's life, so judge them on longevity (packs, long named fights, groups later), never on one boss**; no fork option that only works on undead (too narrow); escape options are fine for some classes, but death here is cheap, so a pure escape rarely gets picked; give it a second use.
 - **Druid · Tanglefoot:** *Thornsnare* (snared mob takes thorn damage while it walks) / *Tangle Field* (weaker snare on every mob near the target).
 - **Warrior · Shield Bash:** *Shield Slam* (longer stun, always breaks a cast) / *Shield Sweep* (shorter stun on every mob in front).
 - **Rogue · Evade:** *Ambush* (Evade stuns 2s and the next Backstab crits) / *Feint* (Evade also dazes every mob around you for 2s, so a Rogue can handle two).
