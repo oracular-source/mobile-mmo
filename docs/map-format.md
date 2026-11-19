@@ -1,6 +1,6 @@
 # Map format: maps as text, checked by a script
 
-Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`): the graveyard is playable from DEV → Teleport → New graveyard, or `?area=graveyard`. The crypt map is designed but not wired in yet.
+Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`). In the game now: `crossroads` (where the game starts), `rat_tunnel`, `graveyard` and `crypt`; `?area=<map>` starts in one, DEV → Teleport reaches each.
 
 ## Where things live
 - `js/data/tiles.js`: the shared tables. `TILESET` (each tile character: name, walkable or not, colour, tags) and `OBJECTS` (buildings and props: size in tiles, how much open ground they need around them, which side the door is on, light radius). Add a tile or object here once and every map can use it.
@@ -22,11 +22,14 @@ named skeleton_king 7 31 6 summon=throne key=crown_shard
 rare weeping_bride 33 22
 chest 27 41
 exit east 47 35 to=crossroads lit
+exit sinkhole 38 23 to=rat_tunnel at=mouth   # at = which exit you arrive by on the other side (when a map has two ways to the same place)
 fog 9 24 13 13                 # x y width height
 label 23 5 Bell tower          # text on the overview picture only
 `
 };
 ```
+- `enter` (optional): the chat line when you arrive. `tint`: the area's light, from `AREA_TINT` in `js/area.js` (`moonlit`, `crypt`, `dusk`, `earth`).
+- Rat holes (`h`) are earth wall with a burrow in its face; the floor tile below each one is where Old Gnawbone's rats come out. Put them where the wall has floor directly below.
 - `zone` is where the map's top-left tile sits on the Zone 1 layout (128 × 128).
 - `start` names the exit players arrive from; distances and the phone view are measured from there.
 - `rules: 'dead-inside'` turns on the dead-area check for this map.
@@ -40,6 +43,8 @@ Errors (must fix):
 - Mobs, named, rares, chests and exits stand on open ground, never inside scenery or a building.
 - Everything can be reached on foot from the way in.
 - `dead-inside`: no living grass, trees or bushes inside the fence or wall.
+
+- Exits between maps: the map an exit leads to must have the `at=` exit it names (error) and a way back (warning).
 
 Warnings (look at them):
 - Dead ends (a tile with one way out), sealed pockets nobody can reach.

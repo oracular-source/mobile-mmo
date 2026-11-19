@@ -11,12 +11,14 @@ Rules for every new monster: black outline, faces right, its own family colours 
 | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Grave rat | Gate Road | Rat | 16×8 (mid-size) | — | **New look in game (v0.19):** long low body, snout, pink ear, long tail, 4 legs, red eye, scurry frame |
 | 1b | Crypt rat | Crypt | Rat | 16×8 | — | **New look in game (v0.19):** pale colourway |
+| 1c | Tunnel rat | Rat tunnel | Rat | 16×8 | — | **In game (v0.29):** earthy brown colourway |
+| 1d | Big tunnel rat | Rat tunnel (deeper) | Rat | 20×10 | — | **In game (v0.29):** the rat a size up, darker; its own step frame |
 | 2 | Mire beetle | Gate Road | Beetle | 14×8 | Blue blob, 10×7 | **Next** |
 | 3 | Shambling corpse | Graveyard | Zombie | 12×16 | Upright, flat, less detail than the characters | To do |
 | 4 | Crypt skeleton | Crypt | Skeleton | 12×16 | Recoloured corpse (looks like a zombie) | To do: its own skeleton body |
 | 5 | Necromancer's skeleton, Shadow Knight's minion | Pets | Skeleton | 12×16 | Recoloured corpse | To do: skeleton variants (clean bone + green eyes; dark bone + red eyes) |
 | 6 | Boss 1 → **Skeleton King** | Crypt | Skeleton (boss) | about 24×32, full size | Corpse at 3× | To do: crown, drawn at full size |
-| 7 | Old Gnawbone | Gate Road graveyard | Rat (named) | about 24×12 | New rat, dark, at 2× (chunky) | To do: own sprite, scarred, torn ear. **Owner (Nov 18): must look clearly different from a recoloured rat** (shape, not just colour) |
+| 7 | Old Gnawbone | Rat tunnel (den) | Rat (named) | about 24×12 | — | **Own sprite in game (v0.29, map chat, owner asked):** 32×17, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth, step frame |
 | 8 | Earth and fire elementals | Magician pets | Elemental | 12×12 | One shape in two colours | To do |
 | 9 | Floating sword | Enchanter pet | Object | 5×10 | Tiny sprite | To do (low) |
 

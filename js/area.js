@@ -5,10 +5,12 @@ const AREA_TILES={},AREA_OBJS={};
 TILESET.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_TILES[p[0]]={name:p[1],walk:p[2]==='1',tags:p.slice(4)}});
 OBJECTS.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_OBJS[p[0]]={w:+p[1],h:+p[2],blocks:p[3]==='1',light:+p[7]}});
 // Map file mob names -> mob types in js/data/mobs.js. The Skeleton King uses Boss 1 until he has his own data.
-const AREA_MOBS={corpse:'dead',rat:'rat',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1'};
+const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw'};
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).
-const AREA_OF={gy:'graveyard',crypt:'crypt'},ZONE_OF={graveyard:'gy',crypt:'crypt'};
+const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel'};
+// Each map's light: how bright the dark is (amb) and the colour of the night over it. Shared by render.js and the minimap.
+const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee'},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a'}};
 function curArea(){const k=AREA_OF[zoneId];return k?buildArea(k):null}
 // Small integer hash so every tile gets the same "random" details each time (no effect on the game's seeded rolls).
 function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>>13))*1274126177|0;return((n^(n>>>16))>>>0)/4294967296}
@@ -16,18 +18,21 @@ function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>
 function buildArea(id){
   if(AREAS[id])return AREAS[id];
   const M=MAPS[id],rows=M.tiles,w=rows[0].length,h=rows.length;
-  const A={id:id,name:M.name,w:w,h:h,rows:rows,map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],start:null,tint:M.tint};
+  const A={id:id,name:M.name,w:w,h:h,rows:rows,map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||''};
   M.things.split('\n').forEach(line=>{const p=line.split('#')[0].trim().split(/\s+/);if(!p[0])return;
     const k=p[0],px=x=>x*T+8,py=y=>y*T+10;
     if(k==='obj')A.objs.push(Object.assign({kind:p[1],x:+p[2],y:+p[3]},AREA_OBJS[p[1]]));
-    else if(k==='spawn'||k==='named'){const lv=p[2].split('-').map(Number);A.spawns.push({type:AREA_MOBS[p[1]]||'dead',x:px(+p[3]),y:py(+p[4]),timer:0,mob:null,group:null,lv:[lv[0],lv[lv.length-1]]})}
-    else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3)});
+    if(k==='named')A.named.push({x:+p[3],y:+p[4],name:p[1]});
+    if(k==='spawn'||k==='named'){const lv=p[2].split('-').map(Number);A.spawns.push({type:AREA_MOBS[p[1]]||'dead',x:px(+p[3]),y:py(+p[4]),timer:0,mob:null,group:null,lv:[lv[0],lv[lv.length-1]]})}
+    else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3),at:(p.find(s=>s.indexOf('at=')===0)||'at=').slice(3)}); // at = the exit you arrive by on the other side
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2])});
   });
   // Walk map for the game's blocked(): 0 open, 2 water, 3 scenery, 5 buildings.
   for(let y=0;y<h;y++){A.map[y]=[];for(let x=0;x<w;x++){const t=AREA_TILES[rows[y][x]];A.map[y][x]=t.walk?0:(t.tags.indexOf('water')>=0?2:3)}}
   A.objs.forEach(o=>{if(!o.blocks)return;for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)A.map[y][x]=5;});
+  // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
+  for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
   A.objs.forEach(o=>{const cx=o.x*T+o.w*T/2;
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
@@ -35,6 +40,8 @@ function buildArea(id){
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
     if(o.kind==='crypt_mouth'){A.lights.push({x:cx,y:(o.y+o.h)*T-10,r:46,w:0})}
+    if(o.kind==='campfire'){A.lights.push({x:cx,y:o.y*T+6,r:72,w:38});A.flames.push({x:cx,y:o.y*T+11,big:1})}
+    if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   const st=A.exits.find(e=>e.name===M.start)||A.exits[0];
   const edge=st.tx>=w-1||st.tx<=0||st.ty>=h-1||st.ty<=0;
@@ -55,13 +62,13 @@ const AP={out:'#0b0a0f',dg:['#29281f','#2b2a20','#2f2d22','#33301f'],dgTuft:'#3a
   stone:'#6b6470',stoneHi:'#8d8692',stoneDk:'#4d4752',stoneDk2:'#3a3343',moss:'#4d6640',
   iron:'#2b2738',ironHi:'#4a4256',ironTip:'#6b6480',brick:'#4a4256',brickHi:'#57506a',mortar:'#2b2738',
   wood:'#5a4030',woodHi:'#7a5a42',woodDk:'#3b2a1e',roof:'#3b2616',roofHi:'#5a3a22',dirt:'#3b3128',dirtHi:'#4a3e32',bell:'#8a6f1a',bellHi:'#c9a227',
-  flr:'#2a2733',flr2:'#26232e',flrHi:'#312d3b',flrLine:'#1b1922',rock:'#14121a',rockHi:'#24212c',bone:'#b9b0a0',boneDk:'#857c6e'};
+  flr:'#2a2733',cave:['#3a3127','#362e25','#3e3429','#332b22'],caveHi:'#4c4032',caveDk:'#1f1a15',earth:'#0e0b09',earthHi:'#2a221a',earthFace:'#57442f',earthFace2:'#3e3024',root:'#5a4632',rootHi:'#7a6248',fungus:'#c9c2a8',fungusDk:'#8f8a76',plank:'#6a5038',plankHi:'#8a6a4a',plankDk:'#3e2c1e',flr2:'#26232e',flrHi:'#312d3b',flrLine:'#1b1922',rock:'#14121a',rockHi:'#24212c',bone:'#b9b0a0',boneDk:'#857c6e'};
 
 function groundCol(n,r){
   if(n==='dead_grass')return AP.dg[Math.floor(r*4)];if(n==='grass')return AP.gg[Math.floor(r*4)];
   if(n==='dirt_path'||n==='gate'||n==='broken_fence')return r<0.5?AP.path:(r<0.8?'#54473a':AP.pathHi);
   if(n==='road')return r<0.6?AP.road:'#665443';if(n==='mud')return r<0.7?AP.mud:'#2c2820';if(n==='marsh')return r<0.6?AP.marsh:'#2a3a30';
-  if(n==='water')return r<0.7?AP.water:'#16293a';if(n==='floor'||n==='stairs')return r<0.5?AP.flr:(r<0.8?AP.flr2:AP.flrHi);return AP.dg[0]}
+  if(n==='water')return r<0.7?AP.water:'#16293a';if(n==='cave_dirt'||n==='dirt_slope')return AP.cave[Math.floor(r*4)];if(n==='bridge')return AP.road;if(n==='floor'||n==='stairs')return r<0.5?AP.flr:(r<0.8?AP.flr2:AP.flrHi);return AP.dg[0]}
 function paintArea(A){
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -71,9 +78,11 @@ function paintArea(A){
   // Which open ground sits under a piece of scenery: living grass outside, dead grass inside, water under the grate.
   const under=(x,y)=>{const n=name(x,y);if(n==='fence_grate')return 'water';if(n==='tree'||n==='bush')return 'grass';
     if(n==='iron_fence'||n==='gate'||n==='broken_fence'){return name(x,y)==='gate'?'dirt_path':'dead_grass'}
+    if(A.tint==='earth')return 'cave_dirt'; // anything solid in the tunnel sits on damp earth
     if(n==='rock'||n==='bones'||n==='coffin')return 'floor';
+    if(A.tint==='dusk')return 'grass';
     return 'dead_grass'};
-  const groundOf=(x,y)=>{x=Math.max(0,Math.min(A.w-1,x));y=Math.max(0,Math.min(A.h-1,y));const t=AREA_TILES[tile(x,y)];return t.walk||t.name==='water'?t.name:under(x,y)};
+  const groundOf=(x,y)=>{x=Math.max(0,Math.min(A.w-1,x));y=Math.max(0,Math.min(A.h-1,y));const t=AREA_TILES[tile(x,y)];return t.name==='bridge'?'water':t.walk||t.name==='water'?t.name:under(x,y)};
 
   // 1) Ground: 8 x 8 patches in a few close shades (the mock-up's look), with tufts and pebbles.
   for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){
@@ -89,6 +98,7 @@ function paintArea(A){
       else if(gname==='marsh')col=r<0.6?AP.marsh:'#2a3a30';
       else if(gname==='water')col=r<0.7?AP.water:'#16293a';
       else if(gname==='floor'||gname==='stairs')col=groundCol('floor',r);
+      else if(gname==='cave_dirt'||gname==='dirt_slope')col=AP.cave[Math.floor(r*4)];
       else col=AP.dg[0];
       R(X,Y,8,8,col);
     }
@@ -101,10 +111,16 @@ function paintArea(A){
       else if(gname==='marsh'){if(i<3){R(x,y-2,1,3,AP.reed);R(x,y-2,1,1,AP.reedHi)}else if(i===3)R(x,y,3,1,AP.water)}
       else if(gname==='water'){if(i<2)R(x,y,3,1,AP.waterHi);if(i===2&&r1<0.15)R(x,y,1,1,AP.glint)}
       else if(gname==='floor'){if(i===0){R(bx,by+15,16,1,AP.flrLine);R(bx+((ty%2)?7:15),by,1,16,AP.flrLine)}else if(i===1&&r1<0.3)R(x,y,3,1,AP.flrLine);else if(i===2&&r1<0.2)R(x,y,1,1,AP.boneDk)}
+      else if(gname==='cave_dirt'){const wallAbove=AREA_TILES[tile(tx,ty-1)||'d'].tags.indexOf('wall')>=0;
+        if(i<2)R(x,y,1,1,AP.caveHi);else if(i===2)R(x,y,2,1,AP.caveDk);
+        // pale mushrooms and hanging roots along the foot of the walls; drips darken the dirt
+        else if(i===3&&wallAbove&&r1<0.35){R(x,by+2,2,1,AP.fungus);R(x,by+3,1,1,AP.fungusDk);R(x+3,by+3,1,1,AP.fungus)}
+        else if(i===4&&r1<0.2)R(x,y,2,2,'#251f19')}
+      else if(gname==='dirt_slope'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#3a3026':'#463a2c');R(bx,by+k*4,16,1,AP.root)}R(bx+3,by,1,16,AP.root);R(bx+11,by+2,1,14,AP.rootHi)}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }
     // Ragged edges wherever two kinds of ground meet (path and grass, mud and marsh...), so nothing looks stamped on in squares.
-    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs')return;
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs'||gname==='cave_dirt'||gname==='dirt_slope'||n==='cave_dirt'||n==='dirt_slope')return;
       for(let i=0;i<16;i++){const r=ah(tx*16+i,ty*16,dx*3+dy*7+50);if(r>0.6)continue;const d=1+Math.floor(ah(tx+i,ty*16,dx+dy*5+60)*3),col=groundCol(n,ah(tx*16+i,ty,61));
         if(dy===-1)R(bx+i,by,1,d,col);if(dy===1)R(bx+i,by+16-d,1,d,col);if(dx===-1)R(bx,by+i,d,1,col);if(dx===1)R(bx+16-d,by+i,d,1,col)}});
     // Dark shoreline where water meets land.
@@ -130,6 +146,9 @@ function paintArea(A){
       else if(n==='rubble')drawRubble(R,bx,by,ah(tx,ty,8));
       else if(n==='rock')drawRock(R,bx,by,name(tx,ty+1)!=='rock'&&ty+1<A.h,name(tx,ty-1)!=='rock'&&ty>0,ah(tx,ty,9));
       else if(n==='bones')drawBones(R,bx,by,ah(tx,ty,11));
+      else if(n==='earth_wall'||n==='rat_hole'){const solid=(x,y)=>{const m=name(x,y);return !m||m==='earth_wall'||m==='rat_hole'};drawEarth(R,bx,by,!solid(tx,ty+1),!solid(tx,ty-1),n==='rat_hole',ah(tx,ty,13))}
+      else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
+      else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
       else if(n==='coffin')drawCoffin(R,bx,by,ah(tx,ty,12));
       else if(n==='iron_fence'||n==='fence_grate'){const isF=(x,y)=>{const m=name(x,y);return m==='iron_fence'||m==='fence_grate'||m==='gate'||m==='broken_fence'};
         drawFence(R,bx,by,isF(tx-1,ty),isF(tx+1,ty),isF(tx,ty-1),isF(tx,ty+1),n==='fence_grate')}
@@ -213,6 +232,36 @@ function drawCoffin(R,bx,by,r){
   R(bx+2,by+13,13,2,'rgba(0,0,0,0.35)');R(bx+3,by+1,10,14,AP.out);R(bx+4,by+2,8,12,AP.stoneDk);R(bx+4,by+2,8,1,AP.stone);R(bx+4,by+2,1,12,AP.stone);
   R(bx+7,by+4,2,7,AP.stoneDk2);R(bx+5,by+6,6,2,AP.stoneDk2);
   if(r<0.35){R(bx+4,by+11,8,3,AP.out);R(bx+5,by+12,6,1,'#0e0c12')}}
+// Rat tunnel walls: packed earth. Where the wall meets the floor below you see its face: dark soil, stones, roots hanging down.
+// A rat hole is a dark burrow in that face with a spill of loose dirt (where Old Gnawbone's rats come out).
+function drawEarth(R,bx,by,face,top,hole,r){
+  R(bx,by,16,16,AP.earth);
+  if(top){R(bx,by+1,16,1,AP.earthHi);R(bx,by+2,16,1,AP.out)}
+  for(let i=0;i<3;i++){const x=bx+Math.floor(ah(bx,by,80+i)*14),y=by+Math.floor(ah(bx,by,90+i)*(face?5:14));R(x,y,2,1,'#211b15')}
+  if(!face)return;
+  R(bx,by+5,16,11,AP.earthFace2);
+  for(let i=0;i<6;i++){const x=bx+Math.floor(ah(bx,by,100+i)*15),y=by+6+Math.floor(ah(bx,by,110+i)*9);R(x,y,i%2?2:1,1,i<3?AP.earthFace:'#241c15')}
+  if(r<0.5){const sx=bx+2+Math.floor(r*20);R(sx,by+9,3,2,AP.out);R(sx,by+9,2,1,AP.stoneDk);R(sx+1,by+10,1,1,AP.stoneDk2)} // a stone stuck in the soil
+  R(bx,by+5,16,1,'#46382a');R(bx,by+15,16,1,AP.out);
+  // roots: one or two hanging out of the face, a few with a pale tip
+  const nr=1+Math.floor(ah(bx,by,120)*2);for(let i=0;i<nr;i++){const x=bx+2+Math.floor(ah(bx,by,121+i)*12),len=4+Math.floor(ah(bx,by,125+i)*7);
+    for(let k=0;k<len;k++)R(x+(k>len/2&&i%2?1:0),by+5+k,1,1,k<len-1?AP.root:AP.rootHi)}
+  if(hole){R(bx+3,by+7,10,8,AP.out);R(bx+4,by+8,8,7,'#050404');R(bx+5,by+7,6,1,AP.out);R(bx+4,by+8,8,1,'#2a2018');
+    R(bx+2,by+14,12,2,AP.caveHi);R(bx+1,by+15,3,1,AP.earthFace);R(bx+12,by+15,3,1,AP.earthFace);R(bx+6,by+12,2,1,AP.boneDk)} // gnawed bone in the mouth of the hole
+}
+// A heap of dug-out dirt, kicked out of a burrow.
+function drawDirtPile(R,bx,by,r){
+  R(bx+1,by+12,14,3,'rgba(0,0,0,0.35)');
+  for(let y=-5;y<=4;y++)for(let x=-7;x<=7;x++){const d=x*x/49+(y+1)*(y+1)/25;if(d>1)continue;R(bx+8+x,by+10+y,1,1,d>0.8?AP.out:(x+y<-2?'#5a4836':(d>0.5?'#3e3226':'#4a3c2c')))}
+  R(bx+5+Math.floor(r*4),by+8,2,1,AP.pebble);if(r>0.5)R(bx+10,by+11,1,1,AP.boneDk);
+}
+// The old plank bridge on the north road: boards across the creek, a rail on each side.
+function drawBridge(R,bx,by,topEnd,botEnd){
+  R(bx,by,16,16,AP.plankDk);
+  for(let y=0;y<16;y+=3){R(bx,by+y,16,2,AP.plank);R(bx,by+y,16,1,AP.plankHi);R(bx+5+((y/3)%2)*6,by+y,1,2,AP.plankDk)}
+  R(bx,by,1,16,AP.out);R(bx+15,by,1,16,AP.out);
+  if(topEnd){R(bx,by-3,2,5,AP.woodDk);R(bx+14,by-3,2,5,AP.woodDk)}if(botEnd){R(bx,by+13,2,4,AP.woodDk);R(bx+14,by+13,2,4,AP.woodDk)}
+}
 function drawRubble(R,bx,by,r){
   [[3,9,4,3],[8,11,5,3],[6,6,3,2],[11,7,3,3],[2,13,3,2]].forEach(([x,y,w,h],i)=>{if(i===4&&r<0.5)return;R(bx+x-1,by+y-1,w+2,h+2,AP.out);R(bx+x,by+y,w,h,i%2?AP.stoneDk:AP.stone);R(bx+x,by+y,w,1,AP.stoneHi)});
 }
@@ -302,6 +351,40 @@ function drawObj(g,R,o){
     R(cx-12,Y+8,6,10,AP.out);R(cx-11,Y+9,4,8,AP.stoneDk);R(cx+6,Y+8,6,10,AP.out);R(cx+7,Y+9,4,8,AP.stoneDk);
     R(cx-8,Y+11,16,6,AP.out);R(cx-7,Y+12,14,4,'#3d2a63');R(cx-7,Y+12,14,1,'#5a3f8a');
     R(cx-3,Y-16,6,6,AP.out);R(cx-2,Y-15,4,4,AP.bone);R(cx-2,Y-13,1,1,AP.out);R(cx+1,Y-13,1,1,AP.out);return}
+  if(k==='campfire'){
+    // The crossroads campfire: a ring of stones round a few burning logs (the flame is drawn live in world.js).
+    shadow(X+1,Y+12,14,3);[[2,9],[5,12],[10,12],[13,9],[4,6],[11,6]].forEach(([x,y])=>{R(X+x-1,Y+y-1,4,3,AP.out);R(X+x,Y+y,2,1,AP.stoneHi)});
+    R(X+4,Y+8,9,3,AP.out);R(X+5,Y+9,7,1,AP.woodHi);R(X+6,Y+7,5,3,AP.out);R(X+7,Y+8,3,1,AP.wood);R(X+6,Y+10,5,1,'#ff7a2a');return}
+  if(k==='signpost'){
+    // Wooden signpost: arms pointing down each road.
+    shadow(X+4,Y+14,8,2);R(X+7,Y-12,3,27,AP.out);R(X+8,Y-11,1,25,AP.wood);
+    R(X,Y-10,14,5,AP.out);R(X+1,Y-9,12,3,AP.woodHi);R(X+12,Y-9,2,3,AP.wood);R(X+3,Y-8,6,1,AP.woodDk);
+    R(X+3,Y-3,13,5,AP.out);R(X+4,Y-2,11,3,AP.wood);R(X+3,Y-2,1,3,AP.woodHi);R(X+6,Y-1,6,1,AP.woodDk);return}
+  if(k==='sinkhole'){
+    // The sinkhole: the ground has fallen in. Torn turf at the lip, roots hanging into the dark, dust in the air (world.js).
+    const cx=X+W/2,cy=Y+H/2;
+    for(let y=-H/2-2;y<=H/2+2;y++)for(let x=-W/2-2;x<=W/2+2;x++){const d=(x*x)/((W/2+1)*(W/2+1))+(y*y)/((H/2+1)*(H/2+1));const wob=1+0.08*Math.sin(Math.atan2(y,x)*5);
+      if(d>wob*1.05)continue;let col;if(d>wob*0.92)col=AP.out;else if(d>wob*0.72)col=y<0?'#4a3c2c':'#3a2e22';else if(d>wob*0.5)col=y<0?'#2a2018':'#16110c';else col='#050404';R(cx+x,cy+y,1,1,col)}
+    for(let i=0;i<7;i++){const a=ah(o.x,i,1)*Math.PI,x=Math.round(cx+Math.cos(a)*(W/2-6)),y0=Math.round(cy-Math.sin(a)*(H/2-6)*0.6),len=4+Math.floor(ah(o.y,i,2)*6);for(let k=0;k<len;k++)R(x,y0+k,1,1,k<len-1?AP.root:AP.rootHi)}
+    [[-W/2-1,-4],[W/2-3,-6],[-6,-H/2-1],[8,H/2-2]].forEach(([dx,dy])=>{R(cx+dx,cy+dy,5,3,AP.out);R(cx+dx+1,cy+dy,3,2,AP.ggTuft)});return}
+  if(k==='burrow'){
+    // The back hole: a narrow burrow mouth under a tree root, where the rat tunnel climbs out into the woods.
+    const cx=X+W/2,cy=Y+H/2+4;shadow(X+2,Y+H-4,W-4,3);
+    R(cx-12,cy-7,24,13,AP.out);R(cx-11,cy-6,22,11,'#3a2e22');R(cx-8,cy-4,16,8,AP.out);R(cx-7,cy-3,14,7,'#050404');
+    R(cx-14,cy-9,28,3,AP.out);R(cx-13,cy-8,26,1,AP.trunk);R(cx-13,cy-9,8,1,AP.trunkHi); // the root arching over it
+    R(cx+6,cy+5,7,3,AP.caveHi);R(cx-12,cy+5,5,2,AP.earthFace);return}
+  if(k==='light_shaft'){
+    // A crack of daylight from above: paler dirt and a few pale specks (the beam and dust are lit live).
+    for(let y=-6;y<=6;y++)for(let x=-9;x<=9;x++){if(x*x/81+y*y/36>1)continue;if(ah(X+x,Y+y,7)<0.35)R(X+8+x,Y+8+y,1,1,'#4a3e30')}
+    R(X+6,Y+7,2,1,'#6a5a46');R(X+10,Y+10,1,1,'#6a5a46');return}
+  if(k==='gnaw_pile'){
+    // Old Gnawbone's pile: a big heap of gnawed bones, a torn sack and a helmet. Touching it will summon him (later, with a severed paw).
+    shadow(X+1,Y+H-5,W-2,5);
+    for(let y=-11;y<=10;y++)for(let x=-15;x<=15;x++){const d=x*x/225+(y-2)*(y-2)/100;if(d>1)continue;R(X+16+x,Y+16+y,1,1,d>0.85?AP.out:AP.boneDk)}
+    for(let i=0;i<22;i++){const x=X+4+Math.floor(ah(o.x,i,31)*24),y=Y+9+Math.floor(ah(o.y,i,32)*14);R(x,y,3+(i%3),1,AP.bone);R(x,y+1,1,1,AP.out)}
+    R(X+18,Y+6,7,6,AP.out);R(X+19,Y+7,5,4,AP.bone);R(X+20,Y+9,1,1,AP.out);R(X+22,Y+9,1,1,AP.out); // skull on top
+    R(X+5,Y+14,8,6,AP.out);R(X+6,Y+15,6,4,'#6b5a3a');R(X+6,Y+15,6,1,'#8a7650'); // torn sack
+    R(X+24,Y+18,6,4,AP.out);R(X+25,Y+19,4,2,AP.stoneDk);R(X+25,Y+19,4,1,AP.stoneHi);return} // a dented helmet
   if(k==='brazier'){R(X+3,Y+4,10,5,AP.out);R(X+4,Y+5,8,3,AP.iron);R(X+4,Y+5,8,1,AP.ironHi);R(X+7,Y+8,2,6,AP.out);R(X+4,Y+13,8,2,AP.out);shadow(X+3,Y+14,10,2);return}
   if(k==='torch'){R(X+6,Y-6,4,22,AP.out);R(X+7,Y-5,2,20,AP.woodDk);R(X+7,Y-5,1,20,AP.wood);R(X+5,Y-6,6,3,AP.out);R(X+6,Y-5,4,1,AP.ironHi);shadow(X+5,Y+14,7,2);return}
   if(k==='lantern'){R(X+7,Y-8,2,24,AP.out);R(X+7,Y-8,1,23,AP.woodHi);R(X+8,Y-8,5,2,AP.out);R(X+11,Y-6,4,6,AP.out);R(X+12,Y-5,2,4,'#ffb860');return}

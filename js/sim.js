@@ -12,7 +12,8 @@ const SIM_FIGHTS=[
   {id:'beetle',name:'Beetle (armored)',mobs:['beetle']},
   {id:'skel',name:'Skeleton',mobs:['cskel']},
   {id:'pair',name:'Two skeletons',mobs:['cskel','cskel']},
-  {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:6,lv:7} // tried from level 6 up to find the first level that beats it
+  {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:6,lv:7}, // tried from level 6 up to find the first level that beats it
+  {id:'gnaw',name:'Old Gnawbone (lvl 6)',mobs:['gnaw'],minL:5,lv:6} // squeals for two rats at 2/3 and 1/3 health (beside him: the arena has no holes)
 ];
 // Classes with more than one playbook to compare. Empty for now: the Rogue's Evade was settled as damage (A) on Nov 17.
 // To compare again, add e.g. rogue:[{id:'A',name:'Evade as damage'},{id:'B',name:'Evade as escape'}].
@@ -527,7 +528,7 @@ function simFight(f,L,seed,mode){
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
   player.hp=maxHP(L);player.mp=maxMP(L);player.sit=false;
   arenaSpawn(f,L);
-  const maxT=f.mobs[0]==='boss1'?420:240;
+  const maxT=f.mobs[0]==='boss1'||f.mobs[0]==='gnaw'?420:240;
   let t=0,dmg=0,mana=0,hadPet=!!pet,petDied=false;
   while(t<maxT){
     const hp0=player.hp,mp0=player.mp;
@@ -563,7 +564,7 @@ function runSim(opts){
   logMute=true;settings.autoCast=false;dev.god=false;inv.equip={}; // the main loop skips its own updates while simState.busy
   const seeds=opts.seeds||SIM_SEEDS,modes=SIM_MODES[CLS]||[{id:'',name:''}],jobs=[];
   const levels=opts.levels||SIM_LEVELS;
-  modes.forEach(md=>levels.forEach(L=>SIM_FIGHTS.forEach(f=>{if(!f.minL||L>=f.minL)jobs.push({md:md,L:L,f:f})})));
+  modes.forEach(md=>levels.forEach(L=>SIM_FIGHTS.forEach(f=>{if(opts.fights&&opts.fights.indexOf(f.id)<0)return;if(!f.minL||L>=f.minL)jobs.push({md:md,L:L,f:f})})));
   const rows=[];let i=0;
   return new Promise(resolve=>{
     const step=()=>{

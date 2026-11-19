@@ -101,6 +101,7 @@ function update(dt){
       const v=victim(m);
       if(v===player&&player.fd>0&&m!==player.fdKeep){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
       const d=dist(m,v);
+      if(m.def.adds)namedAdds(m);
       if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%

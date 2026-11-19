@@ -3,8 +3,8 @@
 /* ---------- What you've explored ----------
    One bit per tile per area, saved per character as hex text (a 48 x 44 area is about 530 characters).
    New key, no change to any old save shape, so no save version bump: a missing key just means "nothing explored yet". */
-const MM_ZONES={over:1,gy:1,dun:1,crypt:1}; // the arena (testing grounds) never shows a map
-const MM_SEE={over:7,gy:7,dun:5,crypt:5};    // how many tiles around you get revealed (less underground)
+const MM_ZONES={over:1,gy:1,dun:1,crypt:1,cross:1,tunnel:1}; // the arena (testing grounds) never shows a map
+const MM_SEE={over:7,gy:7,dun:5,crypt:5,cross:7,tunnel:5};    // how many tiles around you get revealed (less underground)
 const MM_TILE=2;                     // minimap: CSS pixels per tile (shows about 43 tiles across; was 3)
 const mmSaved=store.get(KEY('explored'),{});
 const MM={z:{},dirty:false,saveT:0};
@@ -18,10 +18,14 @@ function mmPins(id){
     {x:Math.floor(SIGN.x/T),y:Math.floor(SIGN.y/T),name:'Signpost',k:'camp'},
     {x:Math.floor(DOOR.x/T),y:Math.floor(DOOR.y/T),name:'Dungeon 1',k:'dun'}];
   if(id==='dun')return[{x:3,y:30,name:'Way out',k:'exit'},{x:6,y:4,name:'Boss 1',k:'boss'}];
-  if(id==='gy'){const N={crossroads:'Crossroads (not built yet)',wolfwood:'Wolfwood (not built yet)',crypt:'Crypt'};
-    return AREAS.graveyard.exits.map(e=>({x:e.tx,y:e.ty,name:N[e.to]||e.to,k:e.to==='crypt'?'dun':'exit'}))}
-  if(id==='crypt'){const N={graveyard:'Stairs up',wolfwood_edge:'Back tunnel (not built yet)'};
-    return AREAS.crypt.exits.map(e=>({x:e.tx,y:e.ty,name:N[e.to]||e.to,k:'exit'})).concat([{x:31,y:4,name:'Skeleton King',k:'boss'}])}
+  // Areas from map files: every exit gets a pin (named by the exit, or by where it leads), plus the campfire and each named's spot.
+  if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);
+    const EX={stairs_up:'Stairs up',back_tunnel:'Back tunnel (not built yet)',sinkhole:'Sinkhole (rat tunnel)',burrow:'Back hole (rat tunnel)',mouth:'Climb out (crossroads)',back_hole:'Back hole (crossroads)'};
+    const TO={crossroads:'Crossroads',graveyard:'Sunken Graveyard',crypt:'Crypt',rat_tunnel:'Rat tunnel',wolfwood:'Wolfwood (not built yet)',wolfwood_edge:'Wolfwood (not built yet)',town1:'Town 1 (not built yet)'};
+    const NAMED={skeleton_king:'Skeleton King',old_gnawbone:'Old Gnawbone'};
+    return A.exits.map(e=>({x:e.tx,y:e.ty,name:EX[e.name]||TO[e.to]||e.to,k:(e.to==='crypt'||e.to==='rat_tunnel')?'dun':'exit'}))
+      .concat(A.objs.filter(o=>o.kind==='campfire').map(o=>({x:o.x,y:o.y,name:'Campfire',k:'camp'})))
+      .concat(A.named.map(n=>({x:n.x,y:n.y-2,name:NAMED[n.name]||n.name,k:'boss'})))}
   return[];
 }
 const MM_PIN_COL={exit:'#7dffa6',dun:'#c8a0ff',camp:'#ffd27a',boss:'#ff6b6b'};

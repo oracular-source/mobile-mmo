@@ -18,8 +18,11 @@ function devAct(a){
   else if(a==='door'){if(zoneId!=='over')enterZone('over');player.x=DOOR.x;player.y=DOOR.y+26;player.onTile=tileAt(player.x,player.y);if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='dun'){enterZone('dun')}
   else if(a==='gy'){enterZone('gy');if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='cross'){enterZone('cross');if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='den'){if(zoneId!=='tunnel')enterZone('tunnel');player.x=26*T+8;player.y=29*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
-  else if(a==='gnaw'){if(zoneId!=='over'){log('Dev: Old Gnawbone lives outside.','#ff8a80');return}const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
+  else if(a==='gnaw'){const m=spawn({type:'gnaw',x:player.x+30,y:player.y,timer:0,mob:null,group:null,noRespawn:true});log('Dev: Old Gnawbone appears.','#ff8a80')}
   else if(a==='arena'){enterZone('arena')}
   else if(a.indexOf('sp-')===0){if(zoneId!=='arena')enterZone('arena');const f=SIM_FIGHTS.find(f=>f.id===a.slice(3));arenaSpawn(f,player.lvl);log('Dev: '+f.name+' at level '+(f.lv||player.lvl)+'.','#ff8a80')}
   else if(a==='clear'){if(zoneId==='arena'){mobs.length=0;spawns.length=0;log('Dev: arena cleared.','#ff8a80')}}
@@ -40,7 +43,7 @@ function renderDev(){
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
     sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Boss 1 item'),b('copper','+500 copper')))+
-    sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('gy','New graveyard')))+
+    sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard')))+
     sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'))+
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
       '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+

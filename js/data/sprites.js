@@ -12,6 +12,13 @@ const SPR={
   // Keys: A fur light, a fur, d fur shadow, p pink (ear, nose, feet), P tail. ratstep = the scurry frame.
   rat:["...........kk...","......kkkkkkpk..",".....kAAAAAAAAk.","....kAaaaaaaAeAk","P...kaaaaaaaaaAp",".PPpkdaaaaaaddk.","...kdkddddkddk..","....kpk...kpk..."],
   ratstep:["...........kk...","......kkkkkkpk..",".....kAAAAAAAAk.","....kAaaaaaaAeAk","....kaaaaaaaaaAp","PPPpkdaaaaaaddk.","...kdkddddkddk..","...kpk.....kpk.."],
+  // Big tunnel rat (Nov 18, map chat): the same rat a size up (20x10) for the deeper tunnel.
+  brat:["...............kk...","........kkkkkkkkpk..","......kkAAAAAAAAAk..",".....kAAaaaaaaaAAAk.","....kAaaaaaaaaaaAeAk","P...kaaaaaaaaaaaaAAp",".P.kdaaaaaaaaaaaadkk","..Pkddaaaaaaaaaaddk.","...kdkddddddddkdk...","....kpk.....kpk....."],
+  bratstep:["...............kk...","........kkkkkkkkpk..","......kkAAAAAAAAAk..",".....kAAaaaaaaaAAAk.","....kAaaaaaaaaaaAeAk","P...kaaaaaaaaaaaaAAp",".P.kdaaaaaaaaaaaadkk","PPPkddaaaaaaaaaaddk.","...kdkkdddddddkdkk..","...kpk.......kpk...."],
+  // Old Gnawbone (Nov 18, map chat): his own shape, 32x17. Hunched and bristly, scarred back, torn ear, a scar through the eye,
+  // long yellow teeth. Extra keys: S scar (bald pink skin), Y teeth.
+  gnaw:[".........k.k..k.k.k.............","..........kkkkkkkk.......kk.kk..","........kkAAAAAAAAkk....kpkkpk..",".......kAAAAAAAAAAAAk...kppkpk..","......kAAAaaaSaaaAAAAk.kkpkkkk..",".....kAAaaaaaaSaaaaaAAkAAAAAAk..","....kAaaaaaaaaaSaaaaaaAAAAASAAk.","....kAaaSSaaaaaaaaaaaaaaaAAAeAAk","...kAaaaaSaaaaaaaaaaaaaaaaAAASAp","...kaaaaaaaaaaaaaaaaaaaaaaadaakk","..kdaaaaaaaaaaaaaaaaaaaaaaadkYY.","..kddaaaaaaaaaaaaaaaaaaaaaddkY..","PPkdddaaaaaaaaaaaaaaaaaadddk....","P.Pkkdddddaaaaaaaaaadddddkk.....","P..Pkdkdkkdddddddddkkdkdkk......",".PP.kdk.kdk.......kdk.kdk.......","....kpk..kpk......kpk..kpk......"],
+  gnawstep:[".........k.k..k.k.k.............","..........kkkkkkkk.......kk.kk..","........kkAAAAAAAAkk....kpkkpk..",".......kAAAAAAAAAAAAk...kppkpk..","......kAAAaaaSaaaAAAAk.kkpkkkk..",".....kAAaaaaaaSaaaaaAAkAAAAAAk..","....kAaaaaaaaaaSaaaaaaAAAAASAAk.","....kAaaSSaaaaaaaaaaaaaaaAAAeAAk","...kAaaaaSaaaaaaaaaaaaaaaaAAASAp","...kaaaaaaaaaaaaaaaaaaaaaaadaakk","..kdaaaaaaaaaaaaaaaaaaaaaaadkYY.",".Pkdddaaaaaaaaaaaaaaaaaadddk....","P.Pkkdddddaaaaaaaaaadddddkk.....","P..Pkdkdkkdddddddddkkdkdkk......","..PPkdkk.kdk......kdkk.kdk......","....kpk...kpk.....kpk...kpk.....","....kpk..kpk......kpk..kpk......"],
   beetle:["...k..k...","..kkkkkk..",".kcCccCck.","kcccCCccck","kcCccccCck",".kcccccck.",".k.k..k.k."],
   guard:["....kkkk..l.","...kGGGGk.l.","..kGGGGGGkl.","...ksksk..l.","...kssssk.l.","..kgbbbbgkl.",".kgkbyybkgsk",".kgkbyybkgl.",".kskbbbbk.l.","..koooooo.l.","..kbbbbbbkl.","..kgg.ggk.l.","..kgk.kgk.l.","..kgk.kgk.l.","..kDk.kDk.l.","..kkk.kkk.l."],
   peddler:["....kkkk....","...kPPPPk...","..kPPPPPPk..","..kPskskPk..","..kPssssPk..","...kxxxxk...","..kpkxxkpk..",".kpppkkpppk.",".kppppppppk.",".ksppyypppsk",".kpppppppk..",".kppppppppk.",".kPppppppPk.",".kppppppppk.","..kPPPPPPk..","...kkkkkk..."],
@@ -26,8 +33,10 @@ const SPR={
   warrior:["...kkkkk....","..kGGGGGk...","..kGkkkGk...","..kGsksGk..l","..kGssssk..l",".kkgRRRRgk.l","kbbkRyyRgkkl","kbybRyyRgksk","kyyybRRRgk..","kbybkRRRgk..",".kbkoooook..","..kgg.ggk...","..kgk.kgk...","..kgk.kgk...","..kDk.kDk...","..kkk.kkk..."]
 };
 
-// Rat colourways: grave rat (grey-brown), crypt rat (pale), Old Gnawbone (dark; drawn 2x until he gets his own sprite).
-const RAT_PAL={rat:{A:'#8a7a6e',a:'#6b5d52',d:'#463b34',p:'#c98a86',P:'#9a6a66'},crat:{A:'#c4bfc8',a:'#9a94a0',d:'#6b6672',p:'#c98a86',P:'#9a6a66'},gnaw:{A:'#6e5048',a:'#4f3832',d:'#2f221f',p:'#b07a76',P:'#8a5a56'}};
+// Rat colourways: grave rat (grey-brown), crypt rat (pale), tunnel rat (earthy brown), big tunnel rat (darker), Old Gnawbone (his own sprite).
+const RAT_PAL={rat:{A:'#8a7a6e',a:'#6b5d52',d:'#463b34',p:'#c98a86',P:'#9a6a66'},crat:{A:'#c4bfc8',a:'#9a94a0',d:'#6b6672',p:'#c98a86',P:'#9a6a66'},
+  trat:{A:'#8a6e56',a:'#6a5240',d:'#43342a',p:'#c98a86',P:'#9a6a66'},brat:{A:'#7a604c',a:'#5c4636',d:'#3a2c22',p:'#c08480',P:'#946462'},
+  gnaw:{A:'#6e5c52',a:'#4f4038',d:'#2f2520',p:'#b07a76',P:'#8a5a56',S:'#a87a72',Y:'#e6d29a',e:'#ff3b30'}};
 
 /* ---------- Default skin (v0.15) ----------
    One shared body for every class, told apart by colours and weapon. New classes use it until the art redo.

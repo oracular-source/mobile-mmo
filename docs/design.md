@@ -244,7 +244,7 @@ Raids come after the MVP, once group dungeons are proven fun.
 
 ## Zone 1: Ashfen Hollow (levels 1–10)
 
-A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyard, a rat-infested sinkhole and a darkening forest that ends at a ruined chapel. Reworked Nov 17, 2026 from the Gate Road sandbox; research and reasoning in `docs/research/map-design.md`, rough layout in the "Mobile MMO — Zone 1 layout (rough)" sketch. The name is a placeholder until the setting is decided. **Status: design only; the game still has the old Gate Road, Sunken Graveyard and instanced crypt.**
+A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyard, a rat-infested sinkhole and a darkening forest that ends at a ruined chapel. Reworked Nov 17, 2026 from the Gate Road sandbox; research and reasoning in `docs/research/map-design.md`, rough layout in the "Mobile MMO — Zone 1 layout (rough)" sketch. The name is a placeholder until the setting is decided. **Status (v0.29): the crossroads, the rat tunnel, the Sunken Graveyard and the crypt are in the game; Wolfwood and the chapel are design only.** Order (owner, Nov 18): crossroads → rat tunnel → graveyard and crypt → Wolfwood → chapel.
 
 **Size:** about 128 × 128 tiles. A straight walk from the town gate to the chapel is about 2 minutes on a winding road (about 250 tiles); each area's entrance is about 30 seconds from the crossroads. Judge it on the phone and adjust.
 
@@ -259,9 +259,9 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 
 | Area | Levels | Landmark | Named | What's there |
 | --- | --- | --- | --- | --- |
-| Crossroads (outside Town 1's gate) | 1–3 | Campfire and signpost | none | Guards, Marrow the Peddler, rats and beetles, critters |
+| Crossroads (outside Town 1's gate; where the game starts, v0.29) | 1–3 | Campfire and signpost | none | Guards, Marrow the Peddler (not in yet), rats and beetles, critters |
 | Sunken Graveyard (west) | 3–5 | A broken bell tower | **Skeleton King** at the crypt throne | Shambling corpses, crypt skeletons, dug graves, low fog; the crypt is an open, shared area at the back |
-| Rat tunnel (east) | 3–6 | A sinkhole with dust rising and squeaks you can hear | **Old Gnawbone** at the bottom | A shared cave: easier rats at the mouth, bigger ones deeper; gnawed bones, collapsed carts |
+| Rat tunnel (east) | 2–5 | A sinkhole with dust rising and squeaks you can hear | **Old Gnawbone** (6) at the bottom | The first stop after the crossroads (easier than the crypt). A damp earth tunnel, not a mine: tunnel rats at the mouth, big tunnel rats deeper, holes in the walls, dirt piles, bones, roots, daylight through cracks, a pool cavern, a squeeze passage; a back hole climbs out north-east of the crossroads |
 | Wolfwood (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop with his pack | Blight wolves, a hunter's abandoned camp, the forest getting darker |
 | Ruined Chapel (deep wood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** inside his dungeon (Dungeon 1) | Fen cultists in camps of three outside; the dungeon entrance under the altar |
 
@@ -272,7 +272,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 | Named | Level | Where | Look | Move | Summon key |
 | --- | --- | --- | --- | --- | --- |
 | Skeleton King | 7 | Crypt throne (shared) | Crown, bigger than the skeletons, gold glint in the dark | Throws a spinning bone, calls two skeletons at half health | Crown shard (crypt skeletons) |
-| Old Gnawbone | 5 | Bottom of the rat tunnel (shared) | Huge and scarred, torn ear | Squeals and rats pour out of the walls | Severed paw (tunnel rats) |
+| Old Gnawbone | 6 | Bottom of the rat tunnel (shared) | Huge, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth (own sprite, v0.29) | Squeals at 2/3 and 1/3 health and two rats burrow out of the nearest wall holes | Severed paw (tunnel rats) |
 | Greyfang | 7 | Wanders Wolfwood | Silver coat, glowing eyes, leads the pack | Howls to call the pack back, never flees | none (wanders on a timer) |
 | Brother Malrec | 11 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
 

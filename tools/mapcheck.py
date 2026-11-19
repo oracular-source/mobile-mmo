@@ -197,11 +197,13 @@ def font(sz, bold=False):
         if os.path.exists(p): return ImageFont.truetype(p, sz)
     return ImageFont.load_default()
 
-SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt_rat': (220, 170, 130, 255), 'skeleton': (240, 234, 216, 255)}
-TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), '': (0, 0, 0, 0)}
+SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt_rat': (220, 170, 130, 255), 'skeleton': (240, 234, 216, 255),
+             'tunnel_rat': (220, 170, 130, 255), 'big_rat': (200, 140, 100, 255), 'beetle': (130, 170, 220, 255)}
+TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), '': (0, 0, 0, 0)}
 OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030', 'mausoleum': '#6b6578', 'dead_oak': '#4a3e32',
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
-           'throne': '#3a3446', 'brazier': '#ff9a3c'}
+           'throne': '#3a3446', 'brazier': '#ff9a3c', 'campfire': '#ff9a3c', 'signpost': '#8a6a4a', 'sinkhole': '#120d0a',
+           'burrow': '#1a120c', 'light_shaft': '#cfd8dc', 'gnaw_pile': '#b9b0a0'}
 
 def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
     g = m['tiles']; x1 = x1 or m['W']; y1 = y1 or m['H']
@@ -215,7 +217,7 @@ def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
 def ground_pass(d, m, tiles, s, x, y, px, py):
     g = m['tiles']; c = g[y][x]; t = tiles[c]; col = hexc(t['color'])
     base = col
-    if 'tree' in t['tags'] or t['name'] in ('bush', 'dead_bush', 'grave', 'dug_grave', 'rubble', 'bones', 'coffin'):
+    if 'tree' in t['tags'] or t['name'] in ('bush', 'dead_bush', 'grave', 'dug_grave', 'rubble', 'bones', 'coffin', 'dirt_pile'):
         # draw the ground under scenery as the nearest open ground around it
         base = next((hexc(tiles[g[yy][xx]]['color']) for xx, yy in ((x, y + 1), (x - 1, y), (x + 1, y), (x, y - 1))
                      if 0 <= xx < m['W'] and 0 <= yy < m['H'] and tiles[g[yy][xx]]['walk']), hexc('#3b3a2c'))
@@ -279,6 +281,14 @@ def scenery_pass(d, m, tiles, s, x, y, px, py):
         d.rectangle([px + s * 0.5 - q, py + s * 0.1, px + s * 0.5 + q, py + s * 0.2], fill=hexc('#a8a4bc'))
     if t['name'] == 'gate':
         d.rectangle([px, py + s * 0.45, px + s - 1, py + s * 0.55], fill=hexc('#8a7650'))
+    if t['name'] in ('earth_wall', 'rat_hole') and y + 1 < m['H'] and tiles[g[y + 1][x]]['walk']:
+        d.rectangle([px, py + s * 0.35, px + s - 1, py + s - 1], fill=hexc('#3e3024'))  # the wall's face above the floor
+    if t['name'] == 'rat_hole':
+        d.ellipse([px + s * 0.25, py + s * 0.45, px + s * 0.75, py + s * 0.95], fill=hexc('#050404'))
+    if t['name'] == 'dirt_pile':
+        d.ellipse([px + 1, py + s * 0.3, px + s - 2, py + s - 2], fill=col, outline=hexc('#0b0a0f'))
+    if t['name'] == 'bridge':
+        for i in range(0, s, max(2, s // 5)): d.line([px, py + i, px + s - 1, py + i], fill=hexc('#3e2c1e'))
     if t['name'] == 'rock':
         if (x + y) % 4 == 0: d.rectangle([px + 2, py + 2, px + s // 3, py + s // 3], fill=hexc('#221f2a'))
 
@@ -287,7 +297,12 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
         px, py = ox + (o['x'] - x0) * s, oy + (o['y'] - y0) * s
         w, h = o['w'] * s, o['h'] * s; col = hexc(OBJ_COL.get(o['kind'], '#777777'))
         k = o['kind']
-        if k in ('torch', 'lantern', 'candle', 'brazier'):
+        if k == 'light_shaft':
+            d.ellipse([px - s * 0.3, py - s * 0.2, px + s * 1.3, py + s * 1.2], fill=(200, 215, 220, 40)); continue
+        if k == 'sinkhole' or k == 'burrow':
+            d.ellipse([px, py, px + w - 1, py + h - 1], fill=hexc('#3a2e22'), outline=hexc('#0b0a0f'))
+            d.ellipse([px + w * 0.2, py + h * 0.2, px + w * 0.8, py + h * 0.85], fill=col); continue
+        if k in ('torch', 'lantern', 'candle', 'brazier', 'campfire'):
             d.rectangle([px + s * 0.4, py + s * 0.35, px + s * 0.6, py + s - 1], fill=hexc('#3a2a1c'))
             d.ellipse([px + s * 0.25, py, px + s * 0.75, py + s * 0.5], fill=col)
             continue
@@ -409,9 +424,18 @@ def main():
         else: paths.append(args[i]); i += 1
     os.makedirs(outdir, exist_ok=True)
     tiles, objs = load_tables(); bad = 0
+    maps = {load_map(p)['id']: load_map(p) for p in paths}
     for p in paths:
         m = load_map(p)
         E, W, mm = check(m, tiles, objs)
+        # exits between maps: the other map must exist and lead back here (by at= exit name, or any exit to this map)
+        for t in m['things']:
+            if t[0] != 'exit': continue
+            kv = dict(a.split('=', 1) for a in t[4:] if '=' in a); to = kv.get('to', '')
+            if to in maps:
+                back = [x for x in maps[to]['things'] if x[0] == 'exit']
+                if kv.get('at') and not any(x[1] == kv['at'] for x in back): E.append(f"exit {t[1]}: map {to} has no exit named {kv['at']}")
+                if not any(('to=' + m['id']) in x for x in back): W.append(f'exit {t[1]}: map {to} has no way back to {m["id"]}')
         print(f"== {m['name']} ({m.get('W','?')}x{m.get('H','?')} tiles) ==")
         for e in E: print('  ERROR  ' + e)
         for w in W: print('  warn   ' + w)

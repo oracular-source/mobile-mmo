@@ -14,7 +14,9 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.
   necro:mk(SPR.necro,Object.assign({},PAL,{p:'#2e2338',P:'#1d1626',x:'#b8b4c4'})),
   pet:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#2a4a28',e:'#7dffa6'})),minion:mk(SPR.dead,Object.assign({},PAL,{z:'#9a9282',Z:'#6b6470',r:'#3a1418',e:'#ff3b30'})),blade:mk(SPR.blade,PAL),
   earth:mk(SPR.elem,Object.assign({},PAL,{A:'#8a6a48',a:'#5e4630',e:'#ffd27a'})),fire:mk(SPR.elem,Object.assign({},PAL,{A:'#ff9a4a',a:'#c4471f',e:'#fff3c4'})),peddler:mk(SPR.peddler,PAL),crow:mk(SPR.crow,PAL),crowfly:mk(SPR.crowfly,PAL),frog:mk(SPR.frog,PAL),
-  gnaw:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.gnaw),2),
+  gnaw:mkWalk(SPR.gnaw,SPR.gnawstep,Object.assign({},PAL,RAT_PAL.gnaw)),
+  trat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.trat)),
+  brat:mkWalk(SPR.brat,SPR.bratstep,Object.assign({},PAL,RAT_PAL.brat)),
   crat:mkWalk(SPR.rat,SPR.ratstep,Object.assign({},PAL,RAT_PAL.crat)),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
@@ -85,7 +87,7 @@ function lightStamp(r,amb,kind){
   for(let y=0;y<size;y++)for(let x=0;x<size;x++){
     const v=Math.max(0,1-Math.hypot(x-r-1,(y-r-1)*1.15)/r);if(v<=0)continue;
     let a=kind==='cut'?Math.min(1,v*v*0.9/(1-amb)):v*v;
-    const o=(y*size+x)*4;if(kind==='warm'){d[o]=255;d[o+1]=150;d[o+2]=60}d[o+3]=a*255;
+    const o=(y*size+x)*4;if(kind==='warm'){d[o]=255;d[o+1]=150;d[o+2]=60}else if(kind==='cool'){d[o]=170;d[o+1]=200;d[o+2]=215}d[o+3]=a*255;
   }
   g.putImageData(id,0,0);stampCache[key]=c;return c;
 }
@@ -102,9 +104,10 @@ function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round
 let time=0;
 function render(){
   const pxr=Math.round(player.x),pyr=Math.round(player.y);
-  // The camera may scroll a little past the map's top edge so the top bars never cover you.
-  const topPad=Math.round(66*dpr/S);
-  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH,pyr-Math.round(VH/2)-10));
+  // The camera may scroll a little past the map's top edge so the top bars never cover you, and past the bottom edge
+  // so the spell pad never covers you either (the crossroads starts at its bottom edge, v0.28).
+  const topPad=Math.round(66*dpr/S),botPad=Math.round(VH*0.28);
+  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH+botPad,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
@@ -163,18 +166,18 @@ function render(){
   lx.restore();
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
-  const amb=zoneId==='dun'||zoneId==='crypt'?0.22:zoneId==='gy'?0.44:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
+  const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
   const zl=curArea()?curArea().lights:zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
-    .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*fl),w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
+    .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
   if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}
-  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle=zoneId==='gy'?'rgba(3,12,14,'+(1-amb)+')':zoneId==='crypt'?'rgba(2,4,14,'+(1-amb)+')':'rgba(0,0,0,'+(1-amb)+')';dg.fillRect(0,0,VW,VH);
+  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,VW,VH);
   dg.globalCompositeOperation='destination-out';
   lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-l.r-1,l.y-l.r-1));
   dg.globalCompositeOperation='source-over';
   lx.drawImage(dark,0,0);
   lx.globalCompositeOperation='lighter';
-  lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}});
+  lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.globalAlpha=1;lx.globalCompositeOperation='source-over';
   drawGlows();
   cx.imageSmoothingEnabled=false;

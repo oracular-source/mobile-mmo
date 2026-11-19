@@ -27,6 +27,12 @@ _    floor        1   #34303d floor ground
 B    bones        0   #b9b0a0 rubble
 C    coffin       0   #4a3c30 grave
 ^    stairs       1   #0b0a0f exit ground floor
+H    bridge       1   #6a5038 path ground
+d    cave_dirt    1   #3a3128 ground floor cave
+u    dirt_slope   1   #4a3e30 exit ground floor cave
+E    earth_wall   0   #1c1712 wall cave
+h    rat_hole     0   #1c1712 wall cave hole
+p    dirt_pile    0   #4a3a2c rubble cave
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -45,4 +51,10 @@ candle       1 1 0      ground 0     -    2
 cart         2 1 1      ground 0     -    0
 throne       3 2 1      floor  1     S    0
 brazier      1 1 1      floor  0     -    4
+campfire     1 1 1      ground 1     -    4
+signpost     1 1 1      ground 0     -    0
+sinkhole     4 3 1      ground 1     -    0
+burrow       2 2 1      ground 1     -    0
+light_shaft  1 1 0      floor  0     -    4
+gnaw_pile    2 2 1      floor  1     -    0
 `;

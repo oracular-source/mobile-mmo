@@ -6,6 +6,24 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
+## Old Gnawbone (v0.29, map chat)
+Old Gnawbone is level 6 and comes before the crypt, so he should go down earlier than the Skeleton King (7–8). Fight added to the testing grounds (`gnaw`, tried from level 5); `runSim({fights:['gnaw']})` runs just him. In the arena his rats appear beside him (no wall holes there). Wins in 10 at levels 5 · 6 · 7 · 8 (Druid, Enchanter, Ranger, Shaman, Wizard from the first run with 140 + 34/level health; the rest after the cut to 125 + 31/level):
+
+| Class | Beats him at | Wins at L5 · 6 · 7 · 8 |
+| --- | --- | --- |
+| Druid, Enchanter, Ranger, Shaman, Wizard | 5 | 10 · 10 · 10 · 10 |
+| Necromancer | 6 | 3 · 10 · 10 · 10 |
+| Warrior | 6 | 0 · 9 · 10 · 10 |
+| Magician | 6 | 0 · 9 · 4 · 10 |
+| Monk | 7 | 0 · 0 · 10 · 10 |
+| Shadow Knight | 7 | 0 · 3 · 10 · 10 |
+| Paladin | 7 | 0 · 0 · 8 · 10 |
+| Rogue | 8 | 0 · 1 · 0 · 10 |
+| Cleric | 8 | 0 · 0 · 1 · 9 |
+| Bard | 8 | 0 · 0 · 0 · 8 |
+
+Rogue, Cleric and Bard need level 8, the same as the King: the extra rats are what kill them. For the balance lane to look at.
+
 ## The yardstick (owner, Nov 17)
 Beating the level-7 Boss 1 at level 6–8 is fine. Needing level 9 is borderline. **Needing level 10 (the cap), or never, means the class needs a different look for soloing.** Losing two skeletons at level 1 is fine: pull singles at level 1.
 

@@ -87,6 +87,9 @@ function drawGlows(){
   const CA=curArea();if(CA){const A=CA;A.flames.forEach(f=>{if(f.tiny){const k=Math.floor(time*6+f.x)%3;lx.fillStyle='#ffb347';lx.fillRect(f.x,f.y-2-(k===1?1:0),1,2);lx.fillStyle='#ffe9a8';lx.fillRect(f.x,f.y-1,1,1)}else if(f.lamp){lx.fillStyle=Math.floor(time*5)%4?'#ffd27a':'#ffb347';lx.fillRect(f.x+4,f.y-4,2,3)}else flame(f.x,f.y,f.big)});
     // Cold motes drifting up out of the crypt mouth.
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
+    // Dust turning in the daylight shafts (rat tunnel) and rising out of the sinkhole (crossroads).
+    (A.motes||[]).forEach((m,j)=>{for(let i=0;i<5;i++){const ph=(time*0.25+i/5+j*0.13)%1;lx.fillStyle=i%2?'#c8c0a8':'#8f8a76';lx.fillRect(Math.round(m.x-6+i*3+Math.sin(time*0.7+i+j)*3),Math.round(m.y-ph*26),1,1)}});
+    A.objs.forEach(o=>{if(o.kind!=='sinkhole')return;const cx=o.x*T+o.w*T/2,cy=o.y*T+o.h*T/2;for(let i=0;i<6;i++){const ph=(time*0.35+i/6)%1;lx.fillStyle=i%2?'#8a7a62':'#6a5c4a';lx.fillRect(Math.round(cx-14+i*5+Math.sin(time*0.8+i)*3),Math.round(cy+2-ph*30),1,1)}});
     lx.restore();return}
   if(zoneId!=='over'){(zoneId==='arena'?ARENA:DUN).braziers.forEach(b=>flame(b.x,b.y-1,true));lx.restore();return}
   flame(CAMPFIRE.x,CAMPFIRE.y,true);
@@ -114,7 +117,7 @@ function areaSpot(A,ex){
     if(x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0)return{x:x*T+8,y:y*T+8}}
   return A.start||null}
 // from: the map key of the area you came from, so you arrive at the matching exit (up the crypt stairs -> crypt mouth).
-function enterZone(id,from){
+function enterZone(id,from,at){
   if(MM.dirty&&!simState.busy)mmSave(); // keep what you explored in the area you're leaving
   zoneId=id;const A=curArea();
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
@@ -126,9 +129,9 @@ function enterZone(id,from){
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
-  else if(A){const ex=from&&A.exits.find(e=>e.to===from),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;
-    const col=id==='crypt'?'#9fb4ee':'#9fd8c0';
-    log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':'You stand in the Sunken Graveyard.',col);
+  else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;
+    const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
+    log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
@@ -145,15 +148,15 @@ function checkPortals(){
   if(A){const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     if(ex!==player.atExit){player.atExit=ex;if(ex){
       // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
-      if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id)}
-      else if(ex.to==='crossroads')log('The road east leads to the crossroads. It is not built yet.','#9aa');
+      if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id,ex.at)}
+      else if(ex.to==='town1')log('The road south leads to Town 1. It is not built yet.','#9aa');
       else if(ex.to==='wolfwood'||ex.to==='wolfwood_edge')log('The way ahead leads into Wolfwood. It is not built yet.','#9aa');
       else log('This way is not built yet.','#9aa');}}
     return}
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
     if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
-    if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the Sunken Graveyard.','Leave',()=>enterZone('gy'));}
+    if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the crossroads.','Leave',()=>enterZone('cross'));}
     else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('gy'));}
   }
 }
@@ -181,4 +184,16 @@ function bossThink(m,dt){
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('Boss 1 calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
   return false;
+}
+
+// A named with adds (Old Gnawbone): at each share of health it squeals and rats burrow out of the nearest holes in the walls.
+// Seen coming: the squeal and a puff of dirt at each hole before the rats join the fight. Holes come from the map (h tiles).
+function namedAdds(m){
+  const list=m.def.adds;m.addsDone=m.addsDone||0;
+  while(m.addsDone<list.length&&m.hp<=m.maxhp*list[m.addsDone].at){
+    const a=list[m.addsDone++],A=curArea(),holes=(A?A.holes:[]).filter(h=>Math.hypot(h.x-m.x,h.y-m.y)<160).sort((p,q)=>Math.hypot(p.x-m.x,p.y-m.y)-Math.hypot(q.x-m.x,q.y-m.y));
+    floatText(m.x,m.y-26,'SQUEAL!','#ffb37a',true);log(cap(m.def.name)+' squeals, and rats pour out of the walls!','#ffb37a');
+    for(let i=0;i<a.n;i++){const h=holes[i%Math.max(1,holes.length)],sp={type:a.type,x:h?h.x:m.x+(i?16:-16),y:h?h.y:m.y+6,timer:0,mob:null,group:null,lv:[a.lv,a.lv],noRespawn:true};
+      if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const r=spawn(sp);r.state='chase';burst(r.x,r.y-4,'#5a4836',10,true)}
+  }
 }

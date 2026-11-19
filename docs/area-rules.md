@@ -39,3 +39,9 @@ Each area gets a short look sheet here once its style is picked.
 
 ### Sunken Graveyard
 Style: **A · Moonlit** (picked Nov 18; other takes kept in the "Mobile MMO — Sunken Graveyard mock-up" canvas). Cold green night tint, blue crypt light, warm torches at the gate. The iron fence and gate are the border: living forest up to it, dead trees only and dead grass inside, low fog, broken bell tower with a wooden door, crypt mouth with cold light and candles. Full map: `js/data/maps/graveyard.js` and `crypt.js` (Nov 18).
+
+### Crossroads
+Style: **warm dusk** (v0.29). Living forest everywhere, trees thick along every road (owner loves trees), open grass at the crossing with the campfire and signpost, a creek with a plank bridge on the north road and a reedy marsh meadow on its west banks. Hard cut nowhere: it's open land, so the roads simply run off the edges. East: the sinkhole, torn turf and stones round it, roots hanging into the dark, dust rising, a lantern on a post that someone left as a warning. Full map: `js/data/maps/crossroads.js`.
+
+### Rat tunnel
+Style: **B · cold damp earth** (owner picked Nov 18; a tunnel, not a mine). Packed earth walls with dark soil faces, stones and hanging roots; rat holes with spilled dirt and gnawed bones; dirt piles kicked out of the burrows; pale mushrooms at the foot of the walls; drips; bones heaped in the den. Cold daylight falls through the sinkhole and a few cracks, with dust turning in it; mist over the pool and the den floor. Rats get a size bigger as you go deeper. Full map: `js/data/maps/rat_tunnel.js`.
