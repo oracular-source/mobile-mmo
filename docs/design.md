@@ -265,19 +265,19 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 | Wolfwood (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop with his pack | Blight wolves, a hunter's abandoned camp, the forest getting darker |
 | Ruined Chapel (deep wood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** inside his dungeon (Dungeon 1) | Fen cultists in camps of three outside; the dungeon entrance under the altar |
 
-**Level ladder (owner, Nov 18: spread the levels out; proposal, owner to confirm).** Owner's take (Nov 18): wider bands that overlap from the graveyard on, so levels 7–9 offer a choice (crypt, Wolfwood, the edge of the chapel grounds) while each area's top end still climbs. Inside each area it's easy at the entrance and hard at the far end. A named is a tough fight for the top of its band: most classes should beat it there (the sim's "beats it at" level), whatever its own level number. Zone 1 grows to about level 12–13, so the level cap (10 today) rises to about 15 and classes need abilities past level 8. Rules in `area-rules.md` (Levels).
+**Level ladder (draft 2, Nov 18, for owner review): Dungeon 1 at 15.** Owner: spread the levels out, worried there are too many mobs and too much to explore for a short climb, so the zone stretches to 15 and the bands widen. Bands overlap from the graveyard on (a choice of where to level, EverQuest-style), each area's top end still climbs, and inside each area it's easy at the entrance and hard at the far end. A named is the tough fight for the top of its band: most classes should beat it there in the sim, whatever its own level number. Rules in `area-rules.md` (Levels).
 
-| Step | Area | Band | Named |
-| --- | --- | --- | --- |
-| 1 | Crossroads | 1–3 | none (Ironshell rare 3) |
-| 2 | Rat tunnel | 3–5 | Old Gnawbone 6 |
-| 3 | Sunken Graveyard | 5–7 | none (the Weeping Bride rare 7) |
-| 4 | Crypt (shared) | 6–9 | Skeleton King 7 (sims: every class beats him at 6–9, v0.24) |
-| 5 | Wolfwood | 7–10 | Greyfang 11 |
-| 6 | Ruined Chapel grounds | 8–12 | none (the Ashen Acolyte rare 12) |
-| 7 | Dungeon 1 (Malrec's chapel) | 12–13 | Brother Malrec 14 |
+| Step | Area | Band | Named (beaten at) | Change from today |
+| --- | --- | --- | --- | --- |
+| 1 | Crossroads | 1–3 | Ironshell rare 3 | none |
+| 2 | Rat tunnel | 3–6 | Old Gnawbone 6 (5–6) | big tunnel rats deep in go to 5–6 (now 4–5) |
+| 3 | Sunken Graveyard | 5–8 | the Weeping Bride rare 8 | back graves to 7–8 (now up to 5) |
+| 4 | Crypt (shared) | 6–9 | Skeleton King 7 (6–9 in the sims) | none |
+| 5 | Wolfwood | 8–11 | Greyfang (11–12) | not built |
+| 6 | Ruined Chapel grounds | 10–14 | the Ashen Acolyte rare 14 | not built |
+| 7 | Dungeon 1 (Malrec's chapel) | 14–15 | Brother Malrec (15) | not built (was 12–13, Malrec 11) |
 
-The table above lists the old bands; the ladder replaces them once the owner confirms.
+What it needs: the level cap goes from 10 to 15 (XP table to 15), every class gets abilities or ability ranks for levels 9–15 (balance chat), and the built areas get the small re-levels in the last column. Owner to confirm, then a new chat applies it. Open: the owner's "first big step at about level 10" (to clarify).
 
 The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
@@ -288,7 +288,7 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 | Skeleton King | 7 | Crypt throne (shared) | Crown, bigger than the skeletons, gold glint in the dark | Throws a spinning bone, calls two skeletons at half health | Crown shard (crypt skeletons) |
 | Old Gnawbone | 6 | Bottom of the rat tunnel (shared) | Huge, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth (own sprite, v0.29) | Squeals at 2/3 and 1/3 health and two rats burrow out of the nearest wall holes | Severed paw (tunnel rats) |
 | Greyfang | 7 | Wanders Wolfwood | Silver coat, glowing eyes, leads the pack | Howls to call the pack back, never flees | none (wanders on a timer) |
-| Brother Malrec | 11 | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
+| Brother Malrec | beaten at 15 (draft 2) | End of Dungeon 1 | Censer trailing smoke, candles light up around him | Heals his cultists; kill or root them first | none (dungeon boss) |
 
 **Summoning.** At the Skeleton King's and Old Gnawbone's spots, touching an object (the throne, a pile of bones) summons the named if it isn't up, so nobody finds an empty camp. It needs only the area's key item, which is used up (no cooldown).
 
@@ -310,17 +310,17 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
 ## Dungeon 1: Brother Malrec's chapel (placeholder name)
 
-The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shared area in the graveyard). Entered from under the ruined chapel's altar, for about levels 8–10, scaled for one player until multiplayer exists.
+The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shared area in the graveyard). Entered from under the ruined chapel's altar, for about levels 14–15 (draft 2 ladder, Nov 18; was 8–10), scaled for one player until multiplayer exists.
 
 - **Shape (owner, Nov 17):** a crypt under the altar, then the cult halls, ending at Brother Malrec. Kept short on purpose (later dungeons go bigger): **4 rooms, about 16 mobs plus Malrec, a 10–15 minute run.**
 - **Rooms:**
   1. **Chapel nave** (above ground): one camp of three fen cultists by a lit altar. Touching the altar opens the stairs down.
   2. **Flooded catacomb:** the crypt's dead (skeletons and shambling corpses, levels 8–9) in knee-deep water that **slows everyone, you and the mobs**, so kiting still works but takes more care. A side passage hides a chest.
   3. **Cult halls:** two camps of three cultists (levels 9–10), each with a **healer**. Kill or root the healer first: the warm-up for Malrec.
-  4. **Malrec's sanctum:** Brother Malrec (**level 11**, one above today's level cap, so he's a stretch fight) with two acolytes at his side. Candles light up one by one as the fight goes on; censer smoke trails behind him.
+  4. **Malrec's sanctum:** Brother Malrec (a stretch fight at the top of the zone; draft 2 ladder: most classes beat him at **15**) with two acolytes at his side. Candles light up one by one as the fight goes on; censer smoke trails behind him.
 - **Malrec's fight:** he heals his acolytes, so deal with them first (kill, root, mez or fear). His big move follows the telegraph rule (seen coming, with a counter); details when it's built.
 - **Malrec's chest:** like Boss 1's: one named item for your class and one uncommon every time, plus a small rare chance. Then the exit with a run summary.
-- **Solo check:** level 11 against a level-10 cap must still be soloable (pillar 2). When it's built, the sim checks that most classes can beat him at 10; if not, tune him, not the level.
+- **Solo check:** he must stay soloable at the cap (pillar 2). When he's built, the sim checks that most classes beat him at 15 (draft 2 ladder); if not, tune him, not the level.
 - **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a shadow bolt about every 7 seconds and two skeletons at half health. The bolt is a **telegraphed 2s cast** (v0.18.3): a purple cast bar shows in the target frame and over its head, and Boss 1 stands still while casting. A stun or fear interrupts it (Evade and Feign Death too); being out of range (110), Deflect or Divine Aura makes it miss. Every boss's big move should follow this rule: seen coming, with a counter, a chest and an exit with a run summary.
 - **Placeholder names:** Town 1, Dungeon 1 and Boss 1 stand in until the setting is decided.
 
