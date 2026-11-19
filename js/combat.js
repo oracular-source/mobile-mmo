@@ -312,7 +312,7 @@ function applyAbility(a,t,fromHide){
     t.snare=at(a.dur,a)*durMult(t);if(a.aslow){t.aslow=t.snare;t.aslowX=1.6}burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
   else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   // Attack slow (Shaman's Drowsy): the mob swings slower but still runs at full speed.
-  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks '+Math.round((1-1/t.aslowX)*100)+'% slower for '+Math.round(t.aslow)+'s (it still runs at full speed).','#9fd0d0');engage(t);}
+  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks '+Math.round((1-1/t.aslowX)*100)+'% slower for '+Math.round(t.aslow)+'s.','#9fd0d0');engage(t);}
   // Ranger's Hunter's Mark: your hits on it do more until it dies.
   else if(a.kind==='mark'){t.mark=a.mark||1.2;burst(t.x,t.y-10,a.col,8);floatText(t.x,t.y-26,'MARKED','#ffb37a');log(cap(t.def.name)+' is marked. Your hits on it do '+Math.round((t.mark-1)*100)+'% more.','#ffb37a');engage(t);}
   else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');}
