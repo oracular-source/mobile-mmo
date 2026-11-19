@@ -34,7 +34,7 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 - **Plan the whole zone's levels before building the next area.** The level ladder in `design.md` (Zone 1) is the one source of truth; update it first, then build.
 - **Every area is a step up at its top end.** Bands can overlap (owner, Nov 18: overlap gives a choice of where to level, EverQuest-style, as long as the areas play differently), but each area's top level is higher than the last one's.
 - **Easy at the door, hard at the far end:** spread an area's band across it (low end by the entrance, top end deepest), so a wide band still feels like a climb.
-- **The named sits just above its area's band** (top of the band +1) and the area's rare at the top of the band.
+- **The named is the fight for the top of its area's band:** most classes should beat it by then in the sim (the Skeleton King, level 7, is beaten at 6–9, which matches the crypt's 6–9). Its own level number can sit inside the band. The area's rare sits at the top of the band.
 - **The dungeon comes when it comes.** The first dungeon can be at 12, 13 or 15; what matters is a smooth climb to it, not hitting a set level.
 - **Check the pace when an area is built:** clearing an area normally (plus its named) should take you up through most of its band. Too fast and you outlevel the next area; too slow and you grind. Tune spawns, XP or the band, and note it on the board.
 
