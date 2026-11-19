@@ -16,7 +16,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 ## Breakdown list (order)
 1. Spell pad and Next ⟳ (done v0.28)
 2. Chat log (done v0.30.1)
-3. Your frame (name, level, health, mana, XP, buffs) (reviewed Nov 18: fine for now)
+3. Your frame (name, level, health, mana, XP, buffs) (matched to the target frame v0.33.1)
 4. Target frame and boss cast bar (done v0.33)
 5. Slots 7–8 and Sit (done v0.30.2; slots 7–8 already moved into the grid in v0.28)
 6. Floating text over heads (done v0.33)
@@ -53,7 +53,7 @@ Options: **A** full-word coloured tags with seconds that wrap (like the buff bar
 - Debuffs as **full-word tags** with seconds left (Rooted 6, Snared 4, Rot 9, Swarm 5, Marked), wrapping to more lines as needed. Rough version until spell icons exist; then each tag becomes an icon with the same timer (backlog card).
 - **Cast bar only in the middle of the screen, never in the target frame.** Bosses and named only. It shows whoever is casting at you **even if you're targeting something else**; if you target the boss you already see it in the middle, so no need for both. (Today only Boss 1's Shadow Bolt is a cast, so nothing is lost.)
 - Log and Menu move down when the frame grows, so it never covers them.
-**Built v0.33.** Claude's calls: Stunned and Afraid tags added (they matter for the bolt); the small purple bar over the casting boss's head stays, since it shows *which* mob is casting; the minimap and DEV move down with Log/Menu. Your frame keeps its old look for now (breakdown 3).
+**Built v0.33.** Claude's calls: Stunned and Afraid tags added (they matter for the bolt); the small purple bar over the casting boss's head stays, since it shows *which* mob is casting; the minimap and DEV move down with Log/Menu. **v0.33.1 (owner):** your frame now matches: plain grey, health and mana as numbers left and percent right.
 
 ## 5. Slots 7–8 and Sit
 Slots 7–8 already live in the 2 × 4 grid (v0.28), so only **Sit** was left: a round button on the left, the last bit of the old look. **Owner: keep it on the left, make it square to match the grid.** v0.30.2: Sit uses the grid's plain grey square style, **about 80% of a spell button's size** (owner: the left side has less on it, so it needn't be as big; **pet buttons later get this smaller size too**), and follows Settings → Grid size; it reads **Stand** with a gold border while you sit. The left side stays free for pet controls later.

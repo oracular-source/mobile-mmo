@@ -232,8 +232,10 @@ function ui(){
   const L=player.lvl;
   mmReveal();drawMinimap();
   $('plv').textContent='Lv '+L;
-  $('php').style.width=(100*player.hp/maxHP(L))+'%';
-  $('pmp').style.width=(100*player.mp/maxMP(L))+'%';
+  // Your frame (v0.33.1): numbers on the left, percent on the right, same as the target frame.
+  const mh=maxHP(L),mm=maxMP(L),hpN=Math.max(0,Math.ceil(player.hp)),mpN=Math.max(0,Math.floor(player.mp));
+  $('php').style.width=(100*player.hp/mh)+'%';$('phpn').textContent=hpN+'/'+mh;$('phpp').textContent=Math.max(0,Math.ceil(100*player.hp/mh))+'%';
+  if(mm){$('pmp').style.width=(100*player.mp/mm)+'%';$('pmpn').textContent=mpN+'/'+mm;$('pmpp').textContent=Math.max(0,Math.floor(100*player.mp/mm))+'%';}
   // Pet bar: health, except a charmed mob shows how long the charm has left (pink), so you can see it about to break.
   $('petrow').style.display=pet?'block':'none';
   if(pet){const pb=$('petbar');if(pet.charm){pb.style.width=(100*pet.charmT/pet.charmMax)+'%';pb.style.background=pet.charmT<5?'#ff4d4d':'#ff9de2'}else{pb.style.width=(100*pet.hp/pet.maxhp)+'%';pb.style.background='#cfc8b2'}}
