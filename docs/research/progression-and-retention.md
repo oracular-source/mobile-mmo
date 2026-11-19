@@ -10,7 +10,7 @@ Owner, Nov 17: nothing here is a hard yes. Revisit once real leveling times are 
 3. **Never more than about 3 sessions without something new:** a level, an upgrade, a named drop or a step in an ability quest.
 4. **Ability counts:** the core kit by about level 10 (classes have 7–8 now), then 3–4 more by level 30 (**about 10–12 total**), and about 3 more by 50 (**about 13–15**). Loadout stays at 8 slots, so a few abilities always sit on the bench, and that's the build.
 5. **Merge instead of adding:** abilities that do a similar job become upgrades to one button (see the Druid example below). Replaces design.md's "15–20 abilities by 30".
-6. **Skill tree from level 5:** 1 skill point per level from 5 (26 by 30, 46 by 50). About 30 upgrades per class at launch, so a player can afford most but not all. Three branches per class tied to its playstyle. Expansions add upgrades for 31–50. Cheap respec in town.
+6. **Skill tree from level 10** (owner, Nov 18; was 5): first skill point at level 10, then 1 per level (21 by 30, 41 by 50). Points are the payoff from 10 on, so not every level needs a new ability. About 30 upgrades per class at launch, so a player can afford most but not all. Three branches per class tied to its playstyle. Expansions add upgrades for 31–50. Cheap respec in town.
 7. **Skill points replace stat points;** stats come from gear. One point system and one menu on the phone. (Owner, Nov 17; check this reading.)
 8. **Abilities still grow a little every level, automatically,** so they keep pace with mobs. Skill points add on top, so spending points on utility never leaves a player behind.
 9. **Good upgrades change how an ability plays,** not "+5%". No must-have upgrades: anything every player would take should just come with the class.
