@@ -6,6 +6,33 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
+## Zone 1 pace (v0.33.4, Nov 19, map chat)
+How a fresh level-1 character climbs through the built areas (crossroads → rat tunnel → graveyard → crypt). New sim: `runPace()` in `js/sim.js`, DEV → Testing grounds → **Zone 1 pace** (runs the class you're playing, 3 runs, a few seconds). The bot does laps of all four areas and plays like a sensible player: it fights spawns from 3 levels below it to 2 above (easiest first), walks past the rest, and tries a named only when it's at most 1 level above. Fights run at each spawn's real level, XP is the game's own rule, a death costs the real 10% plus 25 s and one retry. Laps go on until level 8 (Wolfwood's door). Best case: bots play perfectly, no gear, no rares or chests, rest to 80%; real phone play will be slower.
+
+| Class | Level after lap 1 | Lap 1 (min) | Level after each area, lap 1 | Laps to 8 | Time to 8 | Deaths | Gnawbone first beaten | King first beaten |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| Enchanter | 5.7 | 20 | 3 → 4 → 5 → 5 | 6 | 1.6 h | 0.7 | 6 | 6 |
+| Magician | 5.7 | 20 | 3 → 4 → 5 → 5 | 6.3 | 1.6 h | 2.3 | 6 | 7 |
+| Rogue | 5.7 | 17 | 3 → 4 → 5 → 5 | 9 | 1.6 h | 8 | 6 (1/3) | 8 |
+| Wizard | 5.7 | 19 | 3 → 4 → 5 → 5 | 8 | 1.7 h | 4.7 | 6 | 7 |
+| Necromancer | 5.7 | 23 | 3 → 4 → 5 → 5 | 6.3 | 1.7 h | 2.3 | 5 | 6 |
+| Monk | 5.7 | 21 | 3 → 4 → 5 → 5 | 8 | 1.8 h | 6.3 | 7 | 8 |
+| Druid | 5.7 | 21 | 3 → 4 → 5 → 5 | 7.3 | 1.9 h | 5 | 5 | 8 (2/3) |
+| Bard | 5.7 | 19 | 3 → 4 → 5 → 5 | 7 | 1.9 h | 4.3 | not by 8 | 6 |
+| Cleric | 5.7 | 23 | 3 → 4 → 5 → 5 | 8 | 1.9 h | 6.7 | 7 (1/3) | 6 |
+| Ranger | 5.7 | 21 | 3 → 4 → 5 → 5 | 7.7 | 2.0 h | 4 | 6 | 7 |
+| Paladin | 5.7 | 24 | 3 → 4 → 5 → 5 | 8.3 | 2.0 h | 9 | 7 | 8 |
+| Shaman | 5.6 | 24 | 3 → 4 → 5 → 5 | 6.7 | 2.0 h | 3 | 5 | 6 |
+| Warrior | 5.7 | 23 | 3 → 4 → 5 → 5 | 8 | 2.2 h | 4.3 | 6 | 8 |
+| Shadow Knight | 5.7 | 23 | 3 → 4 → 5 → 5 | 8.3 | 2.5 h | 6 | 6 | 8 |
+
+**What it says**
+- **Nobody outlevels Zone 1. It's the other way round.** One lap of everything (about 20 minutes) ends at **level 5.6–5.7 for every class**: crossroads 3, rat tunnel 4, graveyard 5, crypt 5 (the bot skips the crypt's skeletons and the back graves on lap 1 because they're too high). Every area ends **below the top of its band** (tunnel 4.6 vs 6, graveyard 5 vs 8, crypt 5.7 vs 9).
+- **Getting to Wolfwood's 8 takes 6–9 more laps of the same four areas: 1.6–2.5 hours.** Fastest: Enchanter, Magician, Rogue (1.6 h); slowest: Warrior (2.2 h) and Shadow Knight (2.5 h). From level 6 on, a lap gives less than half a level (level 6 needs 8,400 XP, 7 needs 15,400).
+- **Why:** the XP table was set for about 10 hours to level 10 at 50 kills an hour, but Zone 1 has only about 54 spawns in all, so there's far less to kill than the curve expects.
+- **Named:** Old Gnawbone falls at 5–7 (the Bard bot never beats him by 8: its kite doesn't deal with his rats); the Skeleton King at 6–8.
+- **Most deaths:** Paladin 9, Rogue 8, Cleric 7, Monk 6 (mostly pulls 2 levels above, and the King).
+
 ## Old Gnawbone (v0.29, map chat)
 Old Gnawbone is level 6 and comes before the crypt, so he should go down earlier than the Skeleton King (7–8). Fight added to the testing grounds (`gnaw`, tried from level 5); `runSim({fights:['gnaw']})` runs just him. In the arena his rats appear beside him (no wall holes there). Wins in 10 at levels 5 · 6 · 7 · 8 (Druid, Enchanter, Ranger, Shaman, Wizard from the first run with 140 + 34/level health; the rest after the cut to 125 + 31/level):
 

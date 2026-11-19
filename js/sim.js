@@ -552,16 +552,27 @@ function simFight(f,L,seed,mode){
 
 /* ---------- A full run for the class you're playing ---------- */
 const simState={busy:false,last:null};
+// Keep the real character safe while a sim runs: no saving, no gear, no god mode, chat muted; simEnd puts it all back.
+function simBegin(){
+  simState.busy=true; // the main loop skips its own updates while simState.busy
+  const keep={lvl:player.lvl,xp:player.xp,inv:JSON.stringify(inv),kills:JSON.stringify(kills),auto:settings.autoCast,god:dev.god,set:store.set};
+  store.set=function(){};logMute=true;settings.autoCast=false;dev.god=false;inv.equip={};
+  return keep;
+}
+function simEnd(keep){
+  seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;
+  const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;
+  Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));
+  enterZone('arena');player.lvl=keep.lvl;player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);
+  player.buffs={};player.cds={};player.dead=0;player.target=null;
+  floats.length=0;parts.length=0;beams.length=0;
+  simState.busy=false;
+}
 // Runs every scenario for your class, one fight per tick so the phone stays responsive. Resolves with the results.
 function runSim(opts){
   opts=opts||{};
   if(simState.busy||!BOTS[CLS])return Promise.resolve(null);
-  simState.busy=true;
-  // Keep the real character safe: no saving, no gear, no god mode, chat muted; everything goes back after.
-  const keep={lvl:player.lvl,xp:player.xp,hp:player.hp,mp:player.mp,x:player.x,y:player.y,zone:zoneId,
-    inv:JSON.stringify(inv),kills:JSON.stringify(kills),auto:settings.autoCast,god:dev.god};
-  const realSet=store.set;store.set=function(){};
-  logMute=true;settings.autoCast=false;dev.god=false;inv.equip={}; // the main loop skips its own updates while simState.busy
+  const keep=simBegin();
   const seeds=opts.seeds||SIM_SEEDS,modes=SIM_MODES[CLS]||[{id:'',name:''}],jobs=[];
   const levels=opts.levels||SIM_LEVELS;
   modes.forEach(md=>levels.forEach(L=>SIM_FIGHTS.forEach(f=>{if(opts.fights&&opts.fights.indexOf(f.id)<0)return;if(!f.minL||L>=f.minL)jobs.push({md:md,L:L,f:f})})));
@@ -575,15 +586,9 @@ function runSim(opts){
           kill:avg(w,'t'),dmg:avg(rs,'dmg'),mana:avg(rs,'mana'),rest:avg(w,'rest'),left:avg(rs.filter(r=>!r.win),'left'),petDied:rs.filter(r=>r.petDied).length});
         if(opts.onProgress)opts.onProgress(i,jobs.length);
         setTimeout(step,0);return}
-      // Put everything back.
-      seedRng(null);store.set=realSet;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;
-      const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;
-      Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));
-      enterZone('arena');player.lvl=keep.lvl;player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);
-      player.buffs={};player.cds={};player.dead=0;player.target=null;
-      floats.length=0;parts.length=0;beams.length=0;
+      simEnd(keep);
       const res={cls:CLS,name:C.name,seeds:seeds,rows:rows};
-      simState.busy=false;simState.last=res;resolve(res);
+      simState.last=res;simState.lastAt=Date.now();resolve(res);
     };
     step();
   });
@@ -602,6 +607,71 @@ function simFirst(res,fightName,need){need=need||0.5;
 function simSummary(res){
   const b=simFirst(res,'Boss 1 (lvl 7)'),p=simFirst(res,'Two skeletons',0.8);
   return 'Boss 1 first beaten (5+ wins in 10): '+(b?'level '+b:'never (by level 10)')+' · Two skeletons (8+ in 10): '+(p?'from level '+p:'never');
+}
+
+/* ---------- Zone 1 pace: how a fresh character climbs through the built areas ---------- */
+// A level-1 character does laps of the built areas in the owner's order (crossroads, rat tunnel, graveyard, crypt),
+// playing like a sensible player: it fights spawns from 3 levels below it up to 2 above (easiest first), walks past the
+// rest, and tries a named only when it's at most 1 level above. Each fight runs in the arena at that spawn's real level
+// against the character's current level. XP uses the game's own rule (xpFor), levels come at the real thresholds, and a
+// death costs the real 10% plus a respawn and walk back, then one retry (a lost named waits until you level).
+// Laps go on until level 8 (Wolfwood's door) or PACE_LAPS. Simplified on purpose: singles only (the maps have no social
+// camps), no rares or chests, rest to 80% between pulls (like runSim), walking at straight-line distance x1.4.
+const PACE_AREAS=['crossroads','rat_tunnel','graveyard','crypt'];
+const PACE_GOAL=8;          // Wolfwood's first level (draft 2 ladder)
+const PACE_LAPS=20;         // stop after this many laps even if the goal isn't reached
+const PACE_DEATH=25;        // seconds to respawn and walk back after a death
+const PACE_HOP=30;          // seconds walking from one area into the next
+function paceList(id){
+  const A=buildArea(id),named=A.named.map(n=>n.sp);
+  const sps=A.spawns.filter(sp=>named.indexOf(sp)<0).slice().sort((a,b)=>a.lv[0]-b.lv[0]||a.lv[1]-b.lv[1]);
+  return sps.concat(named).map(sp=>({type:sp.type,lv:sp.lv,x:sp.x,y:sp.y,named:named.indexOf(sp)>=0}));
+}
+function paceRun(seed){
+  let L=1,xp=0,time=0,deaths=0,fights=0,kills=0;const areas=[],laps=[],lost={},namedAt={};
+  const gain=n=>{if(L>=10)return;xp+=n;while(L<10&&xp>=need(L)){xp-=need(L);L++}if(L>=10)xp=0};
+  const clear=(id,lap)=>{
+    const t0=time,L0=L,d0=deaths,k0=kills;let px=null,py=null;time+=PACE_HOP;
+    paceList(id).forEach(sp=>{
+      seedRng(seed*7919+fights*31+kills*17+1);const lv=sp.lv[0]+Math.floor(rng()*(sp.lv[1]-sp.lv[0]+1));
+      if(lv>L+(sp.named?1:2)||lv<L-3)return;      // too tough for now, or not worth the time: walk past
+      if(sp.named&&lost[sp.type]>=L)return;          // lost to this named at this level: leave it until you ding
+      if(px!==null)time+=Math.hypot(sp.x-px,sp.y-py)*1.4/PSPEED;px=sp.x;py=sp.y;
+      for(let tries=0;tries<2;tries++){
+        fights++;const r=simFight({mobs:[sp.type],lv:lv},L,seed*104729+fights,'');
+        time+=r.t+(r.rest||0);
+        if(r.win){kills++;if(sp.named&&!namedAt[sp.type])namedAt[sp.type]=L;gain(xpFor(lv,TYPES[sp.type],L));return}
+        if(r.death){deaths++;xp=Math.max(0,xp-Math.floor(need(L)*0.1));time+=PACE_DEATH}
+      }
+      if(sp.named)lost[sp.type]=L;
+    });
+    if(lap===1)areas.push({area:MAPS[id].name,from:L0,to:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:(time-t0)/60,deaths:deaths-d0,kills:kills-k0});
+  };
+  for(let lap=1;lap<=PACE_LAPS&&(lap===1||L<PACE_GOAL);lap++){PACE_AREAS.forEach(id=>clear(id,lap));laps.push({lap:lap,lvl:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:time/60})}
+  const named={};Object.keys(namedAt).forEach(k=>named[TYPES[k].name]=namedAt[k]);
+  return{seed:seed,lvl:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:time/60,deaths:deaths,kills:kills,areas:areas,laps:laps,named:named};
+}
+// Runs the pace for your class (a few seeds), one area-walk per tick. Resolves with {cls, runs}.
+function runPace(opts){
+  opts=opts||{};
+  if(simState.busy||!BOTS[CLS])return Promise.resolve(null);
+  const keep=simBegin(),seeds=opts.seeds||3,runs=[];let i=0;
+  return new Promise(resolve=>{
+    const step=()=>{
+      if(i<seeds){runs.push(paceRun(1+i++));if(opts.onProgress)opts.onProgress(i,seeds);setTimeout(step,0);return}
+      simEnd(keep);const res={cls:CLS,name:C.name,runs:runs};simState.lastPace=res;simState.lastPaceAt=Date.now();resolve(res);
+    };
+    step();
+  });
+}
+
+// Pace results for the DEV panel: level after the first lap, time to level 8, deaths, and when each named first fell.
+function paceSummary(res){
+  const R=res.runs,avg=f=>R.reduce((a,r)=>a+f(r),0)/R.length,l1=R.map(r=>r.laps[0]);
+  const nm=k=>{const v=R.map(r=>r.named[k]).filter(x=>x);return v.length?'level '+Math.min.apply(null,v)+(v.length<R.length?' ('+v.length+' of '+R.length+' runs)':''):'not by 8'};
+  return '<p><b>'+res.name+', '+R.length+' runs.</b> First lap of every built area: '+Math.round(l1.reduce((a,l)=>a+l.min,0)/R.length)+' min, ends at level '+(l1.reduce((a,l)=>a+l.lvl+l.pct/100,0)/R.length).toFixed(1)+
+    '. To level '+PACE_GOAL+': '+(avg(r=>r.min)/60).toFixed(1)+' h ('+avg(r=>r.laps.length).toFixed(1)+' laps), '+avg(r=>r.deaths).toFixed(1)+' deaths.</p>'+
+    '<p>Level after each area, first lap: '+R[0].areas.map(a=>a.area+' '+a.to).join(' → ')+'. Old Gnawbone first beaten: '+nm('Old Gnawbone')+'. Skeleton King: '+nm('Boss 1')+'.</p>';
 }
 
 /* ---------- Watch the bot: it plays your character live in the arena ---------- */

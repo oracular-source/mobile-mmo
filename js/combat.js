@@ -52,13 +52,16 @@ function hitMob(m,dmg,kind,label,src){
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
+// XP for a kill: grows with the mob's level, more for mobs above you, less below; bosses 6x, named and rares 3x.
+// Shared with the Zone 1 pace sim (sim.js runPace) so both use the same rule.
+function xpFor(lv,def,L){const mult=Math.max(0.1,Math.min(1.6,1+0.2*(lv-L)));
+  return Math.round((lv*lv*4+6)*mult*(def.boss?6:(def.named||def.rare)?3:1)*XP_MULT)}
 function killMob(m){
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   burst(m.x,m.y-6,'#cfc8b2',10,false);
   log('You have slain '+m.def.name+'!','#ffd27a');
-  const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
-  let xp=Math.round((m.lv*m.lv*4+6)*mult*(m.def.boss?6:(m.def.named||m.def.rare)?3:1)*XP_MULT);
+  let xp=xpFor(m.lv,m.def,player.lvl);
   const credit=m.pdmg>=m.odmg;
   if(player.lvl>=10)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}

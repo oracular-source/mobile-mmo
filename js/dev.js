@@ -31,6 +31,8 @@ function devAct(a){
   else if(a==='watch'){simWatch.on=!simWatch.on;simWatch.st={mode:'A'};if(simWatch.on&&zoneId!=='arena')enterZone('arena');log('Dev: bot '+(simWatch.on?'plays your character (testing grounds only).':'off.'),'#ff8a80')}
   else if(a==='sim'){if(simState.busy||!BOTS[CLS])return;
     runSim({onProgress:(i,n)=>{const o=$('simout');if(o)o.textContent='Running fight set '+i+' of '+n+'…'}}).then(()=>{log('Dev: sim finished.','#ff8a80');renderDev()});renderDev();return}
+  else if(a==='pace'){if(simState.busy||!BOTS[CLS])return;
+    runPace({onProgress:(i,n)=>{const o=$('simout');if(o)o.textContent='Zone 1 pace: run '+i+' of '+n+'…'}}).then(()=>{log('Dev: Zone 1 pace finished.','#ff8a80');renderDev()});renderDev();return}
   else if(a==='wipe'){if(!devAct.armed){devAct.armed=true;log('Dev: tap Wipe again to erase all saves for every class.','#ff8a80');renderDev();return}
     store.keys().filter(k=>k!=='ashfen-dev').forEach(k=>store.del(k));location.reload();return}
   devAct.armed=false;renderDev();
@@ -46,9 +48,9 @@ function renderDev(){
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
     sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Boss 1 item'),b('copper','+500 copper')))+
     sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard')))+
-    sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'))+
+    sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'),b('pace','Zone 1 pace'))+
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
-      '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+
+      '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.lastPace&&simState.lastPace.cls===CLS&&(!simState.last||simState.lastPaceAt>simState.lastAt)?paceSummary(simState.lastPace):simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+
     sec('look','Look and galleries',g(b('old','Old look'),b('skin','Default skin'))+'<p class="hint" style="margin:8px 0 0">Classes</p><div id="skingal" class="skingal"></div><p class="hint" style="margin:8px 0 0">Monsters</p><div id="mobgal" class="skingal"></div>')+
     sec('world','World',g(b('gnaw','Spawn Gnawbone'),b('keys','Summon keys'),b('rarespawn','Rare here'),b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')));
   // Every class in rags (gear tier 0) side by side, so colours can be compared on the phone.
