@@ -125,8 +125,14 @@ function render(){
   // Venom Totem: a little carved post in the middle of its ring. Spike Traps: grey spikes on the ground.
   grounds.forEach(g=>{if(!g.totem)return;const x=Math.round(g.x),y=Math.round(g.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-2,y-9,4,10);lx.fillStyle='#6e4a2a';lx.fillRect(x-1,y-8,2,8);lx.fillStyle=Math.floor(time*3)%2?'#7a9a3a':'#9be37a';lx.fillRect(x-1,y-9,2,2)});
   traps.forEach(tr=>{const x=Math.round(tr.x),y=Math.round(tr.y);lx.fillStyle='#8d8692';for(let i=-3;i<=3;i+=2)lx.fillRect(x+i,y-1-((i+3)%4?0:1),1,2);lx.fillStyle='#4a3b33';lx.fillRect(x-4,y+1,9,1)});
-  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],decoy?[decoy]:[],[player]).sort((a,b)=>a.y-b.y);
+  // Trees in view join the depth sort (v0.30): whoever stands north of a trunk is drawn first, so the crown covers them.
+  const A0=curArea(),trees=A0?A0.trees.filter(tr=>tr.b[2]>=camX&&tr.b[0]<=camX+VW&&tr.b[3]>=camY&&tr.b[1]<=camY+VH):[];
+  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],decoy?[decoy]:[],[player],trees).sort((a,b)=>a.y-b.y);
+  // A tree you (or your target) are behind fades so you never lose sight of the fight.
+  const behind=(o,tr)=>o&&!o.dead&&o.y<tr.y&&o.x+6>tr.b[0]&&o.x-6<tr.b[2]&&o.y>tr.b[1]+4&&o.y-14<tr.b[3];
   ents.forEach(e=>{
+    if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
+      lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
     if(e===player){
       if(player.dead>0)return;
       shadow(player.x,player.y,6);
