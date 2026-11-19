@@ -14,6 +14,9 @@ const petName=()=>pet?(pet.name||'skeleton'):'skeleton';
 const songOn=id=>!!(player.songs&&player.songs.indexOf(id)>=0);
 const songKind=k=>(player.songs||[]).some(id=>ABI[id]&&ABI[id].song===k);
 const isUndead=m=>!!(m&&m.def.undead);
+// Respawn wait (owner, Nov 18): 2 minutes for regular mobs (was 24s), 5 for named and bosses (was 30s / 24s),
+// so a solo player can clear a path to the boss. Revisit when more players share a zone.
+const respawnTime=m=>(m.def.boss||m.def.named||m.type==='gnaw')?300:120;
 // Divine Aura blocks all damage; Mana Shield takes damage out of your mana first. Returns what's left to hit your health.
 function shieldDmg(dmg){
   if(player.buffs.aura>0){floatText(player.x,player.y-20,'IMMUNE','#ffd27a');return 0}
@@ -49,7 +52,7 @@ function hitMob(m,dmg,kind,label,src){
   if(m.hp<=0)killMob(m);
 }
 function killMob(m){
-  m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:(m.type==='gnaw'?30:24);m.sp.mob=null;
+  m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   burst(m.x,m.y-6,'#cfc8b2',10,false);
   log('You have slain '+m.def.name+'!','#ffd27a');
   const d=m.lv-player.lvl,mult=Math.max(0.1,Math.min(1.6,1+0.2*d));
@@ -135,7 +138,7 @@ function damagePet(dmg){
   if(!pet)return;
   pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a');
   if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);
-    if(pet.charm){const cm=pet.charm;cm.dead=true;cm.sp.mob=null;cm.sp.timer=cm.sp.noRespawn?Infinity:24;log('Your charmed '+cm.def.name.replace(/^an? /,'')+' is slain.','#ffb37a')}
+    if(pet.charm){const cm=pet.charm;cm.dead=true;cm.sp.mob=null;cm.sp.timer=cm.sp.noRespawn?Infinity:respawnTime(cm);log('Your charmed '+cm.def.name.replace(/^an? /,'')+' is slain.','#ffb37a')}
     else log('Your '+petName()+' is destroyed.','#ffb37a');
     pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
 }

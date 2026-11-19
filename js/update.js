@@ -35,12 +35,17 @@ function update(dt){
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(!fight)player.lsUsed=false; // Last Stand comes back once the fight is over
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
-    player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*(player.buffs.clarity>0?1.5:1)*dt); // Clarity: +50% mana regen
+    // Out of combat (owner, Nov 18: no potions in this game): health and mana come back fast,
+    // about 5% a second standing (full in ~20s) and 12% sitting (full in ~8s); the campfire doubles it.
+    // In a fight the old slow rates stay, so fight balance and the sim's fight numbers don't move.
+    const clar=player.buffs.clarity>0?1.5:1; // Clarity: +50% mana regen
+    if(fight)player.mp=Math.min(maxMP(L),player.mp+(player.sit?4:1)*f*clar*dt);
+    else player.mp=Math.min(maxMP(L),player.mp+maxMP(L)*(player.sit?0.12:0.05)*fire*clar*dt);
     // Heals over time (Cleric's Renew) tick every 2s; each tick also burns nearby undead.
     if(player.hots&&player.hots.length)for(let i=player.hots.length-1;i>=0;i--){const o=player.hots[i];o.t-=dt;o.next-=dt;
       if(o.next<=0){o.next+=2;const h=Math.round(o.heal*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');if(o.holy)holyPulse(o.heal*o.holy,o.name);}
       if(o.t<=0)player.hots.splice(i,1);}
-    if(!fight)player.hp=Math.min(maxHP(L),player.hp+(player.sit?3:0.8)*f*C.regen*dt);
+    if(!fight)player.hp=Math.min(maxHP(L),player.hp+maxHP(L)*(player.sit?0.12:0.05)*fire*dt);
     for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
     // Bard songs pulse every 3s while they play: walking, fighting or sitting.
     if(player.songs&&player.songs.length){player.songNext-=dt;if(player.songNext<=0){player.songNext+=3;player.songs.forEach(id=>songPulse(ABI[id],1))}}
