@@ -265,16 +265,16 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 | Wolfwood (north) | 4–7 | A dead giant tree at the forest edge | **Greyfang** wanders a loop with his pack | Blight wolves, a hunter's abandoned camp, the forest getting darker |
 | Ruined Chapel (deep wood) | 7–10 | The chapel tower above the trees; candles at night | **Brother Malrec** inside his dungeon (Dungeon 1) | Fen cultists in camps of three outside; the dungeon entrance under the altar |
 
-**Level ladder (owner, Nov 18: spread the levels out; proposal, owner to confirm).** Each area starts about where the last ends; the named sits one above its band. Zone 1 grows to about level 12–13, so the level cap (10 today) rises to about 15 and classes need abilities past level 8. Rules in `area-rules.md` (Levels).
+**Level ladder (owner, Nov 18: spread the levels out; proposal, owner to confirm).** Owner's take (Nov 18): wider bands that overlap from the graveyard on, so levels 7–9 offer a choice (crypt, Wolfwood, the edge of the chapel grounds) while each area's top end still climbs. Inside each area it's easy at the entrance and hard at the far end. The named sits one above its band. Zone 1 grows to about level 12–13, so the level cap (10 today) rises to about 15 and classes need abilities past level 8. Rules in `area-rules.md` (Levels).
 
 | Step | Area | Band | Named |
 | --- | --- | --- | --- |
 | 1 | Crossroads | 1–3 | none (Ironshell rare 3) |
 | 2 | Rat tunnel | 3–5 | Old Gnawbone 6 |
 | 3 | Sunken Graveyard | 5–7 | none (the Weeping Bride rare 7) |
-| 4 | Crypt (shared) | 6–8 | Skeleton King 9 |
-| 5 | Wolfwood | 8–10 | Greyfang 11 |
-| 6 | Ruined Chapel grounds | 10–12 | none (the Ashen Acolyte rare 12) |
+| 4 | Crypt (shared) | 6–9 | Skeleton King 10 |
+| 5 | Wolfwood | 7–10 | Greyfang 11 |
+| 6 | Ruined Chapel grounds | 8–12 | none (the Ashen Acolyte rare 12) |
 | 7 | Dungeon 1 (Malrec's chapel) | 12–13 | Brother Malrec 14 |
 
 The table above lists the old bands; the ladder replaces them once the owner confirms.

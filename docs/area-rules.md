@@ -32,7 +32,8 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 
 ## Levels (owner, Nov 18)
 - **Plan the whole zone's levels before building the next area.** The level ladder in `design.md` (Zone 1) is the one source of truth; update it first, then build.
-- **Each area gets its own band that starts about where the last one ends** (1 level of overlap at most), so every area is a step up and no two areas sit at the same levels.
+- **Every area is a step up at its top end.** Bands can overlap (owner, Nov 18: overlap gives a choice of where to level, EverQuest-style, as long as the areas play differently), but each area's top level is higher than the last one's.
+- **Easy at the door, hard at the far end:** spread an area's band across it (low end by the entrance, top end deepest), so a wide band still feels like a climb.
 - **The named sits just above its area's band** (top of the band +1) and the area's rare at the top of the band.
 - **The dungeon comes when it comes.** The first dungeon can be at 12, 13 or 15; what matters is a smooth climb to it, not hitting a set level.
 - **Check the pace when an area is built:** clearing an area normally (plus its named) should take you up through most of its band. Too fast and you outlevel the next area; too slow and you grind. Tune spawns, XP or the band, and note it on the board.
