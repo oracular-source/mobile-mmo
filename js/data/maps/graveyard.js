@@ -1,4 +1,4 @@
-// Sunken Graveyard (surface), levels 3-8. West spoke of Zone 1. Format: docs/map-format.md
+// Sunken Graveyard (surface), levels 4-8. West spoke of Zone 1. Format: docs/map-format.md
 // Check and draw it: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.graveyard = {
@@ -70,14 +70,14 @@ exit north 30 0 to=wolfwood
 exit crypt 13 18 to=crypt lit
 # front graves, just inside the gate: easy
 spawn rat 3 37 29
-spawn corpse 3 25 35
-spawn corpse 3 31 35
-spawn corpse 3 36 35
+spawn corpse 4 25 35
+spawn corpse 4 31 35
+spawn corpse 4 36 35
 # middle graves by the flooded corner
-spawn corpse 4 29 20
-spawn corpse 4 35 22
-spawn corpse 4 29 24
-spawn corpse 4 36 24
+spawn corpse 5 29 20
+spawn corpse 5 35 22
+spawn corpse 5 29 24
+spawn corpse 5 36 24
 rare weeping_bride 33 22
 # back graves under the fog: pairs, pull one at a time (ladder draft 2: 7-8, the top of the graveyard band)
 spawn corpse 7-8 12 27
@@ -87,6 +87,14 @@ spawn corpse 7-8 17 33
 # round the crypt and the tower
 spawn corpse 5 19 13
 spawn corpse 5 21 19
+spawn corpse 5 38 27
+spawn corpse 5-6 33 30
+spawn corpse 6 26 27
+spawn corpse 6 22 30
+spawn corpse 6-7 20 25
+spawn corpse 6-7 17 22
+spawn corpse 5-6 25 13
+spawn corpse 6 14 21
 # secrets
 chest 27 41
 # fog banks (x y w h)

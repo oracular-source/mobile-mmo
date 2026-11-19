@@ -73,6 +73,12 @@ spawn big_rat 5 23 27
 spawn big_rat 5-6 28 29
 spawn big_rat 5-6 31 32
 spawn big_rat 6 39 31
+spawn tunnel_rat 3-4 29 17
+spawn tunnel_rat 4 29 20
+spawn tunnel_rat 3-4 26 12
+spawn big_rat 4 9 23
+spawn big_rat 4-5 16 25
+spawn big_rat 4-5 43 21
 named old_gnawbone 6 34 29 summon=gnaw_pile key=severed_paw
 # secrets: the side burrow with a dead adventurer, and the Pale Rat
 chest 32 4

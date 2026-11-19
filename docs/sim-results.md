@@ -6,6 +6,31 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
+## Zone 1 pace after the XP knobs (v0.34.1, Nov 19, map chat)
+Same pace sim as below (DEV → Testing grounds → **Zone 1 pace**), after the three-knob XP system: mob XP from level × toughness; 20 more spawns (tunnel +6, graveyard +8, crypt +6) and the graveyard and crypt a level up. Kills per level: first try 6, 9, 12, 16, 21, 27, 34, 42, 52 reached 8 in 44–68 min, which the owner found a bit fast; now **x1.4: 8, 12, 17, 22, 29, 38, 48, 59, 73**. This run goes on to level 10 (there's nothing above level 7 in Zone 1 yet, so 8 to 10 is grinding the crypt; Wolfwood will take over there). 3 runs per class, perfect bots.
+
+| Class | Level after lap 1 | Lap 1 (min) | Level after each area, lap 1 | Time to 8 | Time to 10 | Deaths (to 10) |
+| --- | --- | --- | --- | --- | --- | --- |
+| Wizard | 6.4 | 28 | 3.2 → 4.7 → 5.7 → 6.4 | 68 min | 2.7 h | 5 |
+| Magician | 6.4 | 30 | 3.2 → 4.7 → 5.7 → 6.4 | 71 min | 2.9 h | 2 |
+| Ranger | 6.7 | 31 | 3.2 → 4.7 → 5.7 → 6.8 | 74 min | 2.9 h | 2 |
+| Rogue | 6.5 | 26 | 3.1 → 4.8 → 5.9 → 6.5 | 75 min | 2.6 h | 9.7 |
+| Enchanter | 6.9 | 31 | 3.2 → 4.7 → 5.7 → 6.8 | 75 min | 3.1 h | 0 |
+| Bard | 6.8 | 34 | 3.1 → 4.8 → 5.8 → 6.8 | 79 min | 3.3 h | 4.7 |
+| Necromancer | 6.9 | 37 | 2.6 → 4.5 → 5.8 → 6.9 | 80 min | 3.1 h | 4.7 |
+| Cleric | 6.5 | 34 | 3.1 → 4.8 → 5.9 → 6.5 | 82 min | 3.1 h | 6.7 |
+| Druid | 6.4 | 37 | 1.5 → 4.7 → 5.8 → 6.4 | 83 min | 3.1 h | 12.7 |
+| Monk | 6.5 | 32 | 3.1 → 4.7 → 5.7 → 6.5 | 86 min | 2.7 h | 7 |
+| Shaman | 6.9 | 37 | 3.1 → 4.8 → 5.9 → 6.9 | 87 min | 3.4 h | 2.3 |
+| Warrior | 6.4 | 34 | 3.2 → 4.7 → 5.7 → 6.4 | 88 min | 3.4 h | 4 |
+| Paladin | 6.4 | 34 | 3.1 → 4.6 → 5.8 → 6.5 | 93 min | 3.0 h | 10 |
+| Shadow Knight | 6.4 | 35 | 3.1 → 4.7 → 5.7 → 6.4 | 94 min | 3.8 h | 5.3 |
+
+**What it says**
+- **One lap of Zone 1 ends at level 6.4–6.9** (was 5.7 before v0.34.1) and takes 26–37 minutes. Every area ends inside its band, in the lower half: crossroads 3.1–3.2 (band 1–3), tunnel 4.5–4.8 (3–6), graveyard 5.7–5.9 (5–8), crypt 6.4–6.9 (6–9).
+- **Wolfwood's 8 comes at 68–94 minutes; level 10 at 2.6–3.8 hours** (was 1.6–2.5 hours to 8 before v0.34.1). Real play is slower than the bots. Fastest: Wizard; slowest: Shadow Knight. That spread is kill speed (the balance chat's job); XP never looks at class.
+- **Most deaths on the way to 10:** Druid 12.7 (one run lost a lot early to beetles at level 1–2), Paladin 10, Rogue 9.7.
+
 ## Zone 1 pace (v0.33.4, Nov 19, map chat)
 How a fresh level-1 character climbs through the built areas (crossroads → rat tunnel → graveyard → crypt). New sim: `runPace()` in `js/sim.js`, DEV → Testing grounds → **Zone 1 pace** (runs the class you're playing, 3 runs, a few seconds). The bot does laps of all four areas and plays like a sensible player: it fights spawns from 3 levels below it to 2 above (easiest first), walks past the rest, and tries a named only when it's at most 1 level above. Fights run at each spawn's real level, XP is the game's own rule, a death costs the real 10% plus 25 s and one retry. Laps go on until level 8 (Wolfwood's door). Best case: bots play perfectly, no gear, no rares or chests, rest to 80%; real phone play will be slower.
 

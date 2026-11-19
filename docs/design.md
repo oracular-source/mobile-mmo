@@ -270,9 +270,9 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 | Step | Area | Band | Named (beaten at) | Change from today |
 | --- | --- | --- | --- | --- |
 | 1 | Crossroads | 1–3 | Ironshell rare 3 | none |
-| 2 | Rat tunnel | 3–6 | Old Gnawbone 6 (5–6) | done v0.30.3: big tunnel rats 5 in the pool cavern, 5–6 in the den (were 4–5) |
-| 3 | Sunken Graveyard | 5–8 | the Weeping Bride rare 8 | done v0.30.3: back graves 7–8 (were 4–5) |
-| 4 | Crypt (shared) | 6–9 | Skeleton King 7 (6–9 in the sims) | none |
+| 2 | Rat tunnel | 3–6 | Old Gnawbone 6 (5–8 in the pace sim) | done v0.30.3: big tunnel rats 5 in the pool cavern, 5–6 in the den (were 4–5); v0.34.1: six more rats (3–5) between the warren and the den |
+| 3 | Sunken Graveyard | 5–8 | the Weeping Bride rare 8 | done v0.30.3: back graves 7–8 (were 4–5); v0.34.1: front graves 4, middle field 5 (were 3 and 4), eight more corpses (5–7) |
+| 4 | Crypt (shared) | 6–9 | Skeleton King 7 (6–9 in the sims) | v0.34.1: a level up all round (stairs 5, halls 6, throne room 7) and six more mobs |
 | 5 | Wolfwood | 8–11 | Greyfang (11–12) | not built |
 | 6 | Ruined Chapel grounds | 10–14 | the Ashen Acolyte rare 14 | not built |
 | 7 | Dungeon 1 (Malrec's chapel) | 14–15 | Brother Malrec (15) | not built (was 12–13, Malrec 11) |
@@ -335,7 +335,7 @@ Every class can solo to level cap. Grouping is never required, just clearly wort
 
 ## Progression and builds
 
-The level cap is 30 at launch and gets raised with each expansion; the game is planned as levels 1–50 (31–40 and 41–50 in expansions). Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Target: level 2 in about 10 minutes, level 5 in about 1.3 hours, level 10 in about 10 hours. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP. Leaning (Nov 17, not locked): about 60–80 hours of play to level 30, and never more than about 3 sessions without something new. Plan and research: `docs/research/progression-and-retention.md`.
+The level cap is 30 at launch and gets raised with each expansion; the game is planned as levels 1–50 (31–40 and 41–50 in expansions). Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Pace is set by **kills per level** (v0.34.1): level 1 takes 8 even-level kills, then about 25% more each level (8, 12, 17, 22, 29, 38, 48, 59, 73 to reach 10); the XP needed is worked out from that, and each mob's XP from its level and how tough it is (health with armor, and damage, next to a standard mob). Zone 1 is filled so one clear of an area takes you into its band: in the pace sim (perfect bots) one lap of all four areas takes about half an hour and ends at level 6.4–6.9, Wolfwood's level 8 comes at 70–95 minutes and level 10 at about 3 hours (by class). Real play is slower. Was: level 10 in about 10 hours; owner, Nov 19: an hour per level is too slow, the first try (8 in an hour) a bit fast. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP. Leaning (Nov 17, not locked): about 60–80 hours of play to level 30, and never more than about 3 sessions without something new. Plan and research: `docs/research/progression-and-retention.md`.
 
 - **Stats:** come from gear. There are no stat points or skill points (decided Nov 18); forks replace them.
 - **Forks (decided Nov 18):** no tree before level 10, while players learn their kit. At level 10 and every even level after, one ability gets its fork: pick one of two versions (two skeletons or one tougher one, a DoT that spreads or stacks). Each ability gets one fork; utility like Gate may get none.

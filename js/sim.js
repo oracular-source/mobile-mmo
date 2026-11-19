@@ -619,7 +619,7 @@ function simSummary(res){
 // camps), no rares or chests, rest to 80% between pulls (like runSim), walking at straight-line distance x1.4.
 const PACE_AREAS=['crossroads','rat_tunnel','graveyard','crypt'];
 const PACE_GOAL=8;          // Wolfwood's first level (draft 2 ladder)
-const PACE_LAPS=20;         // stop after this many laps even if the goal isn't reached
+const PACE_LAPS=40;         // stop after this many laps even if the goal isn't reached
 const PACE_DEATH=25;        // seconds to respawn and walk back after a death
 const PACE_HOP=30;          // seconds walking from one area into the next
 function paceList(id){
@@ -627,7 +627,7 @@ function paceList(id){
   const sps=A.spawns.filter(sp=>named.indexOf(sp)<0).slice().sort((a,b)=>a.lv[0]-b.lv[0]||a.lv[1]-b.lv[1]);
   return sps.concat(named).map(sp=>({type:sp.type,lv:sp.lv,x:sp.x,y:sp.y,named:named.indexOf(sp)>=0}));
 }
-function paceRun(seed){
+function paceRun(seed,goal){goal=goal||PACE_GOAL;
   let L=1,xp=0,time=0,deaths=0,fights=0,kills=0;const areas=[],laps=[],lost={},namedAt={};
   const gain=n=>{if(L>=10)return;xp+=n;while(L<10&&xp>=need(L)){xp-=need(L);L++}if(L>=10)xp=0};
   const clear=(id,lap)=>{
@@ -647,7 +647,7 @@ function paceRun(seed){
     });
     if(lap===1)areas.push({area:MAPS[id].name,from:L0,to:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:(time-t0)/60,deaths:deaths-d0,kills:kills-k0});
   };
-  for(let lap=1;lap<=PACE_LAPS&&(lap===1||L<PACE_GOAL);lap++){PACE_AREAS.forEach(id=>clear(id,lap));laps.push({lap:lap,lvl:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:time/60})}
+  for(let lap=1;lap<=PACE_LAPS&&(lap===1||L<goal);lap++){PACE_AREAS.forEach(id=>clear(id,lap));laps.push({lap:lap,lvl:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:time/60})}
   const named={};Object.keys(namedAt).forEach(k=>named[TYPES[k].name]=namedAt[k]);
   return{seed:seed,lvl:L,pct:L>=10?0:Math.round(100*xp/need(L)),min:time/60,deaths:deaths,kills:kills,areas:areas,laps:laps,named:named};
 }
@@ -658,7 +658,7 @@ function runPace(opts){
   const keep=simBegin(),seeds=opts.seeds||3,runs=[];let i=0;
   return new Promise(resolve=>{
     const step=()=>{
-      if(i<seeds){runs.push(paceRun(1+i++));if(opts.onProgress)opts.onProgress(i,seeds);setTimeout(step,0);return}
+      if(i<seeds){runs.push(paceRun(1+i++,opts.goal));if(opts.onProgress)opts.onProgress(i,seeds);setTimeout(step,0);return}
       simEnd(keep);const res={cls:CLS,name:C.name,runs:runs};simState.lastPace=res;simState.lastPaceAt=Date.now();resolve(res);
     };
     step();

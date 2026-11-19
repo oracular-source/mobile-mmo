@@ -248,7 +248,7 @@ function ui(){
     if($('petnm').textContent!==nm)$('petnm').textContent=nm;if($('pettg').textContent!==tg)$('pettg').textContent=tg;}
   ['bpetatk','bpetback'].forEach(id=>{const b=$(id);if(b)b.style.display=pet&&!player.dead?'flex':'none'});
   const bb0=$('bpetback');if(bb0)bb0.classList.toggle('held',!!(pet&&pet.hold));
-  $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
+  $('pxp').style.width=(L>=10?100:Math.min(100,100*player.xp/need(L)))+'%'; // capped: a save from before v0.34.1 can hold more XP than the new table needs (it dings on the next kill)
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     const hp=Math.max(0,Math.ceil(t.hp)),pc=Math.max(0,Math.ceil(100*t.hp/t.maxhp));

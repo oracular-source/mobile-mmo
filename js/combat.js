@@ -52,10 +52,21 @@ function hitMob(m,dmg,kind,label,src){
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
   if(m.hp<=0)killMob(m);
 }
-// XP for a kill: grows with the mob's level, more for mobs above you, less below; bosses 6x, named and rares 3x.
-// Shared with the Zone 1 pace sim (sim.js runPace) so both use the same rule.
+// XP for a kill (v0.34.1): the mob's level sets the base (xpEven), its toughness scales it, mobs above you pay more and
+// below you less, and named / rares pay 3x, bosses 6x. Shared with the Zone 1 pace sim (sim.js runPace).
+function xpEven(lv){return lv*lv*4+6}
+// How tough a regular mob is next to a standard one of its level: (health with armor x damage), square-rooted so a mob
+// that's twice as tanky and hits twice as hard pays double. Capped by TOUGH_RANGE.
+function toughness(def,lv){
+  if(def.named||def.rare||def.boss)return 1;
+  const ehp=(def.hp+def.hpl*lv)/(1-(def.armor||0))/(STD_MOB.hp+STD_MOB.hpl*lv),hit=(def.dmg+def.dmgl*lv)/(STD_MOB.dmg+STD_MOB.dmgl*lv);
+  return Math.max(TOUGH_RANGE[0],Math.min(TOUGH_RANGE[1],Math.sqrt(ehp*hit)));
+}
 function xpFor(lv,def,L){const mult=Math.max(0.1,Math.min(1.6,1+0.2*(lv-L)));
-  return Math.round((lv*lv*4+6)*mult*(def.boss?6:(def.named||def.rare)?3:1)*XP_MULT)}
+  return Math.round(xpEven(lv)*toughness(def,lv)*mult*(def.boss?6:(def.named||def.rare)?3:1))}
+// XP needed for each level, worked out from KILLS_PER_LEVEL (mobs.js): that many even-level standard kills.
+const NEED=KILLS_PER_LEVEL.map((k,L)=>Math.round(k*xpEven(L)));
+const need=L=>NEED[L]||NEED[NEED.length-1];
 function killMob(m){
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;

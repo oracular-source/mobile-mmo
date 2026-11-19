@@ -1,4 +1,4 @@
-// DATA ONLY. Mob types and the XP curve.
+// DATA ONLY. Mob types and the XP knobs.
 'use strict';
 // undead:1 = Cleric and Paladin holy spells hit it harder (and some only work on undead).
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
@@ -23,8 +23,14 @@ const TYPES={
     adds:[{at:0.5,type:'dead',n:2,lv:6,from:'ground',shout:'WAIL!',say:'lets out a long wail, and the dead claw their way out of the ground!',col:'#3a3727'}]},
   boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
-const XP_MULT=1.25; // mobs got tougher, so each kill is worth a bit more
-// XP needed per level, EverQuest-shaped: early levels are quick, later ones slow down a lot.
-// Target at roughly 50 kills an hour: L2 ~10 min, L5 ~1.3 h, L10 ~10 h total.
-const NEED=[0,80,260,670,1680,3800,8400,15400,27200,47500];
-const need=L=>NEED[L]||NEED[NEED.length-1];
+// XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:
+// 1) KILLS_PER_LEVEL: how many even-level, standard-toughness kills each level takes (index = level). The XP needed for
+//    each level is worked out from it in combat.js. A smooth ~+25% a level; to slow or speed the whole climb, change this row.
+const KILLS_PER_LEVEL=[0,8,12,17,22,29,38,48,59,73]; // v0.34.1 first try was 6,9,12,16,21,27,34,42,52; owner: a bit slower (x1.4)
+// 2) Toughness: a regular mob pays more or less than a standard mob of its level by how tanky it is (health, with armor)
+//    and how hard it hits, so stat changes carry their XP with them. STD_MOB is the standard; TOUGH_RANGE caps the swing.
+//    Named, rares and bosses skip it: they keep their flat 3x / 6x.
+const STD_MOB={hp:50,hpl:20,dmg:3.2,dmgl:1.5};
+const TOUGH_RANGE=[0.5,2];
+// 3) Spawn count lives in the map files: enough mobs that one clear takes you through most of an area's levels.
+// Check all three with DEV -> Testing grounds -> Zone 1 pace.

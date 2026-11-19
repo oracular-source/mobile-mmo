@@ -1,4 +1,4 @@
-// The crypt under the Sunken Graveyard: open and shared, levels 4-7, Skeleton King at the throne. Format: docs/map-format.md
+// The crypt under the Sunken Graveyard: open and shared, levels 5-7, Skeleton King at the throne. Format: docs/map-format.md
 // Check and draw it: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.crypt = {
@@ -49,23 +49,29 @@ obj brazier 27 24
 exit stairs_up 6 25 to=graveyard lit
 exit back_tunnel 39 8 to=wolfwood_edge lit
 # stair hall: crypt rats
-spawn crypt_rat 4 5 21
-spawn crypt_rat 4 8 22
-spawn crypt_rat 4 8 20
+spawn crypt_rat 5 5 21
+spawn crypt_rat 5 8 22
+spawn crypt_rat 5 8 20
 # ossuary: rats and the first skeletons
-spawn crypt_rat 5 5 8
-spawn skeleton 5 8 5
-spawn skeleton 5 10 9
+spawn crypt_rat 6 5 8
+spawn skeleton 6 8 5
+spawn skeleton 6 10 9
 # coffin hall: skeletons between the rows
-spawn skeleton 5 17 17
-spawn skeleton 5 24 17
-spawn skeleton 5 21 23
-spawn crypt_rat 5 19 21
+spawn skeleton 6 17 17
+spawn skeleton 6 24 17
+spawn skeleton 6 21 23
+spawn crypt_rat 6 19 21
 # throne room: the King's guard
-spawn skeleton 6 27 7
-spawn skeleton 6 35 7
-spawn skeleton 6 28 10
-spawn skeleton 6 34 10
+spawn skeleton 7 27 7
+spawn skeleton 7 35 7
+spawn skeleton 7 28 10
+spawn skeleton 7 34 10
+spawn crypt_rat 5 5 12
+spawn skeleton 5-6 12 22
+spawn skeleton 6 26 20
+spawn skeleton 6 21 19
+spawn skeleton 6-7 17 7
+spawn skeleton 7 32 11
 named skeleton_king 7 31 6 summon=throne key=crown_shard
 chest 20 2
 label 31 1 Throne
