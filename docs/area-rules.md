@@ -30,6 +30,13 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 - 1–2 secrets per area off the main road (a hidden chest, a side path, a rare spawn spot).
 - Light as breadcrumbs: torches at entrances, one lit marker in view at a time.
 
+## Levels (owner, Nov 18)
+- **Plan the whole zone's levels before building the next area.** The level ladder in `design.md` (Zone 1) is the one source of truth; update it first, then build.
+- **Each area gets its own band that starts about where the last one ends** (1 level of overlap at most), so every area is a step up and no two areas sit at the same levels.
+- **The named sits just above its area's band** (top of the band +1) and the area's rare at the top of the band.
+- **The dungeon comes when it comes.** The first dungeon can be at 12, 13 or 15; what matters is a smooth climb to it, not hitting a set level.
+- **Check the pace when an area is built:** clearing an area normally (plus its named) should take you up through most of its band. Too fast and you outlevel the next area; too slow and you grind. Tune spawns, XP or the band, and note it on the board.
+
 ## Phone readability
 - Mobs and the player must stand out from the ground: different lightness, not just a different colour.
 - Effects (fog, rain, ash) never hide a mob or the target ring for long.
