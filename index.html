@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.32">
+<link rel="stylesheet" href="css/game.css?v=0.33">
 </head>
 <body>
 <div id="app">
@@ -30,8 +30,7 @@
       </div>
       <div class="frame" id="tframe" style="visibility:hidden">
         <div class="row"><span id="tname">-</span><span id="tlv"></span></div>
-        <div class="bar hp"><i id="thp"></i></div>
-        <div id="tcast" style="display:none"><span id="tcastname"></span><div class="bar"><i id="tcastfill"></i></div></div>
+        <div class="bar hp" id="thpbar"><i id="thp"></i><b id="thpn"></b><b id="thpp"></b></div>
         <div id="tfx"></div>
       </div>
     </div>
@@ -40,6 +39,8 @@
     <button id="devbtn" style="display:none;position:absolute;right:6px;top:calc(188px + env(safe-area-inset-top));height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(60,20,20,.9);border-color:#a3252f;z-index:4">DEV</button>
     <div id="castbar"><div id="castname"></div><div class="bar"><i id="castfill"></i></div></div>
     <div id="qchip"></div>
+    <!-- Boss and named casts at you: one big bar in the middle of the screen, even when you're targeting something else (v0.31). -->
+    <div id="bcast"><div id="bcastname"></div><div class="bar"><i id="bcastfill"></i></div></div>
     <div id="log"></div>
     <div id="logpanel"><div id="logtabs"><button data-f="all">All</button><button data-f="fight">Fight</button><button data-f="loot">Loot</button><button id="logclose" aria-label="Close log">✕</button></div><div id="loglist"></div></div>
     <div id="controls"></div>
@@ -47,7 +48,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.32: the crossroads, the rat tunnel, the Sunken Graveyard and its crypt.
+        Prototype v0.33: the crossroads, the rat tunnel, the Sunken Graveyard and its crypt.
         <p class="hint" style="margin:10px 0 4px">Pick your class:</p>
         <div id="clspick"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
@@ -137,32 +138,32 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.32"></script>
-<script src="js/data/sprites.js?v=0.32"></script>
-<script src="js/rng.js?v=0.32"></script>
-<script src="js/save.js?v=0.32"></script>
-<script src="js/map.js?v=0.32"></script>
-<script src="js/data/classes.js?v=0.32"></script>
-<script src="js/data/mobs.js?v=0.32"></script>
-<script src="js/data/items.js?v=0.32"></script>
-<script src="js/data/tiles.js?v=0.32"></script>
-<script src="js/data/maps/graveyard.js?v=0.32"></script>
-<script src="js/data/maps/crypt.js?v=0.32"></script>
-<script src="js/data/maps/crossroads.js?v=0.32"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.32"></script>
-<script src="js/state.js?v=0.32"></script>
-<script src="js/spawns.js?v=0.32"></script>
-<script src="js/fx.js?v=0.32"></script>
-<script src="js/combat.js?v=0.32"></script>
-<script src="js/input.js?v=0.32"></script>
-<script src="js/ui.js?v=0.32"></script>
-<script src="js/world.js?v=0.32"></script>
-<script src="js/area.js?v=0.32"></script>
-<script src="js/update.js?v=0.32"></script>
-<script src="js/render.js?v=0.32"></script>
-<script src="js/sim.js?v=0.32"></script>
-<script src="js/dev.js?v=0.32"></script>
-<script src="js/minimap.js?v=0.32"></script>
-<script src="js/main.js?v=0.32"></script>
+<script src="js/core.js?v=0.33"></script>
+<script src="js/data/sprites.js?v=0.33"></script>
+<script src="js/rng.js?v=0.33"></script>
+<script src="js/save.js?v=0.33"></script>
+<script src="js/map.js?v=0.33"></script>
+<script src="js/data/classes.js?v=0.33"></script>
+<script src="js/data/mobs.js?v=0.33"></script>
+<script src="js/data/items.js?v=0.33"></script>
+<script src="js/data/tiles.js?v=0.33"></script>
+<script src="js/data/maps/graveyard.js?v=0.33"></script>
+<script src="js/data/maps/crypt.js?v=0.33"></script>
+<script src="js/data/maps/crossroads.js?v=0.33"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.33"></script>
+<script src="js/state.js?v=0.33"></script>
+<script src="js/spawns.js?v=0.33"></script>
+<script src="js/fx.js?v=0.33"></script>
+<script src="js/combat.js?v=0.33"></script>
+<script src="js/input.js?v=0.33"></script>
+<script src="js/ui.js?v=0.33"></script>
+<script src="js/world.js?v=0.33"></script>
+<script src="js/area.js?v=0.33"></script>
+<script src="js/update.js?v=0.33"></script>
+<script src="js/render.js?v=0.33"></script>
+<script src="js/sim.js?v=0.33"></script>
+<script src="js/dev.js?v=0.33"></script>
+<script src="js/minimap.js?v=0.33"></script>
+<script src="js/main.js?v=0.33"></script>
 </body>
 </html>

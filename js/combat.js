@@ -42,9 +42,9 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
-  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
-  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
-  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
+  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
+  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
+  else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
   // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
   if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
   if(m.def.shell&&kind==='direct'&&!m.shellHint){m.shellHint=1;log('Your hit glances off '+m.def.name+"'s shell. Damage over time gets through.",'#c8b89a')}
@@ -138,7 +138,7 @@ function hurtPet(m){
 }
 function damagePet(dmg){
   if(!pet)return;
-  pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a');
+  pet.hp-=dmg;floatText(pet.x,pet.y-18,String(dmg),'#ffb37a',0,'small');
   if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);
     if(pet.charm){const cm=pet.charm;cm.dead=true;cm.sp.mob=null;cm.sp.timer=cm.sp.noRespawn?Infinity:respawnTime(cm);log('Your charmed '+cm.def.name.replace(/^an? /,'')+' is slain.','#ffb37a')}
     else log('Your '+petName()+' is destroyed.','#ffb37a');

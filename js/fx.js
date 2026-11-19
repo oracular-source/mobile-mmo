@@ -3,7 +3,17 @@
 /* ---------- Effects, text, log ---------- */
 const floats=[],parts=[],beams=[];
 let rangeShow=0,rangeR=80;
-function floatText(x,y,txt,col,big){floats.push({x:x,y:y,txt:txt,col:col,t:0,big:!!big})}
+// Floating text, option A (owner, Nov 18; v0.33): spread out and hold. kind: 'hit' = your own hits (big, white);
+// 'small' = DoT ticks, pet and NPC hits; numbers otherwise medium. Words (Zz, MARKED, RESIST...) sit still over the head.
+// Each new number near a recent one is nudged sideways so they never stack; text stays solid most of the way, then fades.
+const FLOAT={big:{px:15,life:1.6,rise:10},hit:{px:13,life:1.1,rise:16},num:{px:11,life:1.1,rise:14},small:{px:9,life:0.9,rise:10},word:{px:10,life:1.3,rise:0}};
+const NUDGE=[[0,0],[16,-4],[-16,-4],[8,-12],[-8,-12],[24,-10],[-24,-10],[0,-20]]; // spots around the first number: sideways first, then a row up
+function floatText(x,y,txt,col,big,kind){
+  kind=big?'big':kind||(/^[+-]?\d/.test(txt)?'num':'word');
+  let dx=0,dy=0;
+  if(kind==='word'||kind==='big'){dy=-14;let hit=true;while(hit){hit=floats.some(f=>(f.kind==='word'||f.kind==='big')&&f.t<0.8&&Math.abs(f.x0-x)<10&&Math.abs(f.y-(y+dy))<9);if(hit)dy-=11}} // words stack upward instead of on top of each other
+  else{const n=floats.filter(f=>f.kind!=='word'&&f.kind!=='big'&&f.t<0.6&&Math.abs(f.x0-x)<10&&Math.abs(f.y0-y)<12).length;[dx,dy]=NUDGE[n%NUDGE.length]}
+  floats.push({x0:x,y0:y,x:x+dx,y:y+dy,txt:txt,col:col,t:0,big:!!big,kind:kind,life:FLOAT[kind].life})}
 function burst(x,y,col,n,up){for(let i=0;i<n;i++)parts.push({x:x+rr(-4,4),y:y+rr(-4,2),vx:rr(-12,12),vy:up?rr(-28,-12):rr(-18,8),t:0,life:rr(0.4,0.9),col:col})}
 const logEl=$('log'),lines=[],logHist=[];
 let logMute=false; // the sim runs thousands of fights; it mutes the chat box meanwhile

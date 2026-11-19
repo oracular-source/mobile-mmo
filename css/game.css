@@ -11,11 +11,9 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .hp>i{background:#b3302f}.mp>i{background:#3b6fd1}.xp>i{background:#c9a227}
 .row{display:flex;justify-content:space-between;gap:4px;white-space:nowrap;overflow:hidden}
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
-/* Enemy cast bar in the target frame: a boss's big spell you can see coming (stun or fear it, or step out of range). */
-#tcast{margin-top:3px;font-size:10px;color:#e0c8ff}
-#tcast .bar{height:6px;border:1px solid #6a4fa3;margin-top:1px}
-#tcast .bar>i{background:#b48cff}
-#tfx{font-size:10px;color:#9fb0a0;margin-top:3px;min-height:12px;white-space:nowrap;overflow:hidden}
+/* Target frame (v0.33, UI breakdown 4): plain grey EverQuest-style frame, health as numbers and percent, debuffs as tags that wrap. */
+#tfx{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}#tfx:empty{display:none}
+#tfx span{font-size:8px;line-height:10px;padding:0 3px;border-radius:2px;color:#0b0a0f;font-weight:700;white-space:nowrap}
 /* Chat box: 4 lines, newest at the bottom (v0.30.1). It only shows lines that matter; routine hits live in the Log panel.
    pointer-events:none so the chat area stays joystick space. Its old 96px height is still used to place Sit (ui.js). */
 #log{position:absolute;bottom:8px;max-height:72px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
@@ -152,3 +150,17 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 #controls.arrange .gb{outline:2px dashed #ffd27a;outline-offset:1px}
 .gtb{position:absolute;height:34px;padding:0;font-size:12px;border-radius:4px;background:#222;border:1px solid #6c6c6c;color:#ddd}
 .gtb.flash{background:#55524a;border-color:#fff}
+
+/* v0.33 target frame: plain grey like the spell grid (your frame keeps its look for now) */
+#tframe{background:rgba(40,40,40,.92);border:1px solid #8a8a8a;border-radius:4px;box-shadow:none}
+#tframe .row span:first-child{font-weight:700}
+#tframe #tlv{color:#cfcfcf}
+#thpbar{position:relative;height:12px;background:#111;border:1px solid #555;border-radius:2px;box-shadow:none}
+#thpbar>i{background:#b3302f;box-shadow:none}
+#thpbar b{position:absolute;top:0;font-size:9px;line-height:10px;font-weight:700;color:#fff;text-shadow:0 0 2px #000,0 1px 0 #000}
+#thpn{left:3px}#thpp{right:3px}
+/* v0.33 boss cast bar: middle of the screen, above your character */
+#bcast{position:absolute;left:50%;transform:translateX(-50%);top:30%;width:min(62%,240px);display:none;pointer-events:none;z-index:3}
+#bcastname{font-size:12px;font-weight:700;text-align:center;color:#e0c8ff;text-shadow:0 1px 0 #000,0 0 3px #000;margin-bottom:2px}
+#bcast .bar{height:12px;background:#1a1420;border:1px solid #b48cff;border-radius:2px}
+#bcast .bar>i{background:#b48cff;box-shadow:none;transition:none}

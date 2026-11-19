@@ -111,7 +111,7 @@ function update(dt){
       if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0}
     }
   });
-  for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>1.1)floats.splice(i,1)}
+  for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)parts.splice(i,1)}
   for(let i=beams.length-1;i>=0;i--){beams[i].t+=dt;if(beams[i].t>0.15)beams.splice(i,1)}
 }

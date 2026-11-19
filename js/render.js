@@ -203,8 +203,10 @@ function render(){
   // A boss casting its big spell: a purple bar over its head that fills up, so you can see it coming and stun it or step away.
   mobs.forEach(m=>{if(m.dead||!m.casting)return;const w=40*dpr,h=5*dpr,sx=(m.x-camX)*S-w/2,sy=(m.y-IMG[m.def.img].h-(m===t?22:10)-camY)*S;
     cx.fillStyle='#000';cx.fillRect(sx-dpr,sy-dpr,w+2*dpr,h+2*dpr);cx.fillStyle='#2a2033';cx.fillRect(sx,sy,w,h);cx.fillStyle=Math.floor(time*8)%2?'#d8b8ff':'#b48cff';cx.fillRect(sx,sy,w*Math.min(1,m.casting.t/m.casting.dur),h)});
-  floats.forEach(f=>{const a=1-f.t/1.1,sx=(f.x-camX)*S,sy=(f.y-camY-f.t*18)*S;cx.globalAlpha=Math.max(0,a);
-    cx.font='700 '+Math.round((f.big?15:12)*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
+  // Floating text (v0.33, option A): solid for the first two thirds, then fades; numbers ease upward, words hold still.
+  floats.forEach(f=>{const F=FLOAT[f.kind]||FLOAT.num,p=Math.min(1,f.t/f.life),a=p<0.65?1:1-(p-0.65)/0.35,rise=F.rise*(1-(1-p)*(1-p)),
+    sx=(f.x-camX)*S,sy=(f.y-camY-rise)*S;cx.globalAlpha=Math.max(0,a);
+    cx.font='700 '+Math.round(F.px*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=(F.px<10?2.5:3)*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
   if(settings.move==='drag'&&settings.showJoy&&joy.active){
     const r=cv.getBoundingClientRect(),bx=(joy.sx-r.left)*dpr,by=(joy.sy-r.top)*dpr,R=40*dpr,d=Math.hypot(joy.dx,joy.dy)||1,k=Math.min(1,40/d);
     cx.globalAlpha=0.35;cx.fillStyle='#14121a';cx.beginPath();cx.arc(bx,by,R,0,Math.PI*2);cx.fill();cx.strokeStyle='#c9a227';cx.lineWidth=2*dpr;cx.stroke();
@@ -238,11 +240,24 @@ function ui(){
   $('pxp').style.width=(L>=10?100:100*player.xp/need(L))+'%';
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
-    $('thp').style.width=(100*t.hp/t.maxhp)+'%';
-    const fx=[];if(t.def.rare)fx.push('Rare');if(t.root>0)fx.push('Rooted '+Math.ceil(t.root)+'s');if(t.snare>0)fx.push('Snared '+Math.ceil(t.snare)+'s');t.dots.forEach(d=>fx.push((d.name||'Rot').split(' ').pop()+' '+Math.ceil(d.t)+'s'));if(t.mez>0)fx.push('Asleep '+Math.ceil(t.mez)+'s');if(t.chill>0)fx.push('Chilled x'+t.chill);if(t.aslow>0)fx.push('Slowed '+Math.ceil(t.aslow)+'s');if(t.discord>0)fx.push('Discord');if(t.mark>0)fx.push('Marked');if(t.def.undead)fx.push('Undead');if(t.def.armor>=0.5)fx.push('Armored');
-    $('tfx').textContent=fx.join(' · ');
-    const tc=$('tcast');if(t.casting){tc.style.display='block';$('tcastname').textContent='Casting '+t.casting.name;$('tcastfill').style.width=(100*t.casting.t/t.casting.dur)+'%'}else tc.style.display='none';}
+    const hp=Math.max(0,Math.ceil(t.hp)),pc=Math.max(0,Math.ceil(100*t.hp/t.maxhp));
+    $('thp').style.width=(100*t.hp/t.maxhp)+'%';$('thpn').textContent=hp+'/'+t.maxhp;$('thpp').textContent=pc+'%';
+    // Debuffs as full-word tags with seconds left (v0.33). Rough until spell icons exist; then each tag becomes an icon with the same timer.
+    const fx=[],tag=(txt,col,s)=>fx.push('<span style="background:'+col+'">'+txt+(s>0?' '+Math.ceil(s):'')+'</span>');
+    if(t.def.rare)tag('Rare','#ffd75e');if(t.mez>0)tag('Asleep','#e0c3ff',t.mez);if(t.stun>0)tag('Stunned','#ffe08a',t.stun);if(t.fear>0)tag('Afraid','#d9a0ff',t.fear);
+    if(t.root>0)tag('Rooted','#8fd17a',t.root);if(t.snare>0)tag('Snared','#a8d8a0',t.snare);
+    t.dots.forEach(d=>{const ab=ABI[d.id];tag((d.name||'Rot').split(' ').pop(),ab&&ab.col||(d.id==='bleed'?'#ff8a80':d.id==='burn'?'#ff9a4a':'#9be37a'),d.t)});
+    if(t.chill>0)tag('Chilled x'+t.chill,'#bfe6ff');if(t.aslow>0)tag('Slowed','#c8b8a0',t.aslow);if(t.discord>0)tag('Discord','#ffd27a',t.discord<100?t.discord:0);
+    if(t.mark>0)tag('Marked','#ffb37a');if(t.def.undead)tag('Undead','#b8b8b8');if(t.def.armor>=0.5)tag('Armored','#b8b8b8');
+    const fh=fx.join('');if($('tfx').dataset.h!==fh){$('tfx').dataset.h=fh;$('tfx').innerHTML=fh}}
   else tf.style.visibility='hidden';
+  // Boss and named casts at you: big bar in the middle of the screen, whoever you're targeting (never in the target frame).
+  const bc=$('bcast'),cm=mobs.find(m=>!m.dead&&m.casting&&(m.def.boss||m.def.named));
+  if(cm){bc.style.display='block';$('bcastname').textContent=cap(cm.def.name)+': '+cm.casting.name;$('bcastfill').style.width=Math.min(100,100*cm.casting.t/cm.casting.dur)+'%'}else bc.style.display='none';
+  // Log, Menu, the minimap and DEV sit under the top frames and move down when the frames grow (debuff tags, buffs wrapping).
+  {const hb=$('hud').getBoundingClientRect(),vt=$('view').getBoundingClientRect().top,base=$('hud').offsetTop+52,dy=Math.max(0,Math.round(hb.bottom-vt-base));
+    [['topbtns',62],['mm',94],['logpanel',94],['devbtn',188]].forEach(([id,top])=>{const el=$(id);if(el&&el.dataset.dy!==String(dy)){el.dataset.dy=dy;el.style.top='calc('+(top+dy)+'px + env(safe-area-inset-top))'}})}
+
   const cb=$('castbar');
   if(player.cast){cb.style.display='block';$('castname').textContent=player.cast.a.name;$('castfill').style.width=(100*player.cast.time/player.cast.a.cast)+'%'}else cb.style.display='none';
   const cdPct=100*player.gcd/GCD;
