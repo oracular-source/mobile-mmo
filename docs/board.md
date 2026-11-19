@@ -9,7 +9,6 @@ One place for the work: what's being built now, what's next, every idea, and wha
 - **Definition of done:** works in a headless test with no errors → docs updated (this board, `design.md` if rules changed) → committed and pushed → owner plays it on the phone.
 - **Feedback loop:** play-test notes become cards. Defects get fixed before new features.
 - **Prioritize by value ÷ effort.** Value = does it make the core loop more fun or answer an open question. Effort = S (one session), M (2–3), L (4+).
-- **Dev game artifact:** after each release, republish `index.html` (with `dev.on` forced to true) to the owner's "Mobile MMO — Dev game" artifact, slug `4705b8bf-2515-4e08-89d4-64251da5813f`, so it stays current.
 - **Chat lanes (owner, Nov 17; skill tree lane added Nov 19):** several chats run side by side, each on its own work. Start a new chat with the lane's phrase and pick up only that lane:
   - **"Continue on balance"** (the **balance and class chat**) → the Balance card in Now (milestone 3c): sim runs, class kits and tuning, Boss 1. Results in `docs/sim-results.md`. **Next pickup (Nov 18, after v0.24):** (1) owner play-tests v0.21–v0.24 (levels 1–4 on Shaman, Enchanter, Necro, Paladin, Rogue; Gouge and Leg Sweep on Boss 1's bolt; Shaman on Boss 1 at 7) and reports how they feel; (2) decide whether milestone 3c is done. Standing rule (owner, Nov 18): when testing, track DPS and try other ways a person could play a class, and log anything that breaks, even bot-only. Standing rule: big pulls stay, no chase cap in solo (Decisions). **Reminder:** once the Sunken Graveyard area is built out, bring up the "Outleveling Zone 1" card (XP pace vs the zone's level range).
   - **World design** → Zone 1 layout rework and its cards (summon the named, rare spawns, chests, explore map); notes in `docs/research/map-design.md`.
@@ -208,6 +207,7 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - **Rares are placeholders:** Ironshell is the beetle drawn at 2x (chunky pixels, like Boss 1), the Pale Rat is the big rat in white, the Weeping Bride is a quick veiled recolour of the corpse. Redrawn in the character design pass.
 
 ## Changelog
+- **Docs (Nov 19)** Dropped the "Dev game" artifact step (owner): play-tests use the live link only, so releases no longer republish it. No game changes.
 - **Docs (Nov 19)** Skill tree lane: **level 10 forks approved for all 14 classes** (list in the progression note). Next: level 12 forks. No game changes.
 - **Docs (Nov 19)** Owner: Boss 1 is the **Skeleton King** from now on (game rename card added); balance will be tuned toward **Brother Malrec** (end of Zone 1) instead of the King; forks are judged on longevity, not one boss. No game changes.
 - **Docs (Nov 19)** Skill tree lane: level 10 forks drafted for the other 13 classes (in the progression note, owner reviewing; Cleric's Radiant Renew now hits any mob, Rogue and Monk escape options reworked). New backlog cards from the owner: zone teleports after a zone's first dungeon, mounts, teleport pillars that pay the caster. No game changes.
