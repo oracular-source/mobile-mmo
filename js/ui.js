@@ -1,9 +1,11 @@
 // On-screen controls and menus: spell pad, side slots, arrange mode, spellbook, settings, character screen.
 'use strict';
-/* ---------- Input: spell pad and classic buttons ---------- */
+/* ---------- Input: spell grid and spell pad ---------- */
 // Pad: tap the center for slot 1, or flick toward one of the five ring spells (or tap it).
 // Ring order is clockwise from straight up, 72 degrees apart.
-const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],grid:['Row 1 corner (main)','Row 1 inner','Row 2 corner','Row 2 inner','Row 3 corner','Row 3 inner','Row 4 corner','Row 4 inner'],buttons:['Main button','Button 2','Button 3','Button 4','Button 5','Button 6','Side bar top','Side bar bottom']};
+const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],grid:['Top row left (main)','Top row right','Row 2 left','Row 2 right','Row 3 left','Row 3 right','Bottom row left','Bottom row right']};
+// Grid button sizes (v0.29.1: owner found the v0.28 size, now Large, too big). Width, height, gap, font size.
+const GRID_PX={S:[44,36,5,9],M:[50,41,5,10],L:[58,48,6,11]};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
 const ctrl=$('controls'),ghost=$('ghost');
@@ -21,21 +23,23 @@ function buildControls(){
   logEl.style.left=settings.left?'auto':'6px';logEl.style.right=settings.left?'6px':'auto';
   if(settings.scheme==='grid'){
     // EverQuest-style grid (v0.28): all 8 spells in one 2 x 4 block of square buttons, all the same size, in the thumb corner.
-    // Slot 0 (main) sits in the bottom corner, nearest the thumb; Arrange moves anything anywhere.
-    // Above it: Back and Next target, so you can hop to a closer mob and back again.
-    const W=58,H=48,G=6,M=10;
+    // v0.29.1 (owner): read like a page, slot 1 (main, what Auto keeps casting) top left, then left to right, top to bottom.
+    // The thumb rests a little high on the grid, so the first spells go on top. Arrange still moves anything anywhere.
+    // Above it: Back and Next target, which cycle through nearby enemies in opposite directions.
+    const [W,H,G,FS]=GRID_PX[settings.gridSize]||GRID_PX.M,M=10;
     for(let i=0;i<8;i++){
-      const col=i%2,row=Math.floor(i/2); // col 0 = screen edge, row 0 = bottom
+      const row=Math.floor(i/2), onLeft=i%2===0; // row 0 = top
+      const fromEdge=(side==='right')===onLeft?1:0; // distance in columns from the screen edge the grid hugs
       const b=document.createElement('div');b.className='gb'+(i===0?' main':'');b.dataset.slot=i;
-      b.style.cssText='width:'+W+'px;height:'+H+'px;bottom:'+(M+row*(H+G))+'px;'+side+':'+(M+col*(W+G))+'px';
+      b.style.cssText='width:'+W+'px;height:'+H+'px;font-size:'+FS+'px;bottom:'+(M+(3-row)*(H+G))+'px;'+side+':'+(M+fromEdge*(W+G))+'px';
       b.innerHTML=slotHTML(i,true);
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
-    const tb=M+4*(H+G),tw=W;
+    const tb=M+4*(H+G),tw=W,th=Math.round(H*0.72);
     [['tgtback','◀ Back',backTarget,settings.left?0:W+G],['nexttgt','Next ▶',nextTarget,settings.left?W+G:0]] /* Back always on the left, Next on the right */.forEach(([id,label,fn,off])=>{
       const t=document.createElement('button');t.id=id;t.className='gtb';t.textContent=label;
-      t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px';
+      t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px;height:'+th+'px';
       t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;fn();flash(t)});
       ctrl.appendChild(t);
     });
@@ -60,20 +64,8 @@ function buildControls(){
     pad.addEventListener('pointerup',padUp);pad.addEventListener('pointercancel',()=>{gest=null});
     ctrl.appendChild(pad);
     autoPill(side,P+20);
-  }else{
-    // Classic: main button in the corner, five more fanned in a quarter circle around it.
-    const main=62,sm=50,R=132,cxp=12+main/2,cyp=12+main/2;
-    for(let i=0;i<6;i++){
-      const b=document.createElement('div');b.className='fb'+(i===0?' main':'');b.dataset.slot=i;
-      let sz=i===0?main:sm,ox=cxp,oy=cyp;
-      if(i>0){const a=(i-1)*(Math.PI/2)/4;ox=cxp+Math.cos(a)*R;oy=cyp+Math.sin(a)*R;}
-      b.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+(oy-sz/2)+'px;'+side+':'+(ox-sz/2)+'px';
-      b.innerHTML=slotHTML(i,true);
-      b.addEventListener('pointerdown',e=>{e.preventDefault();castSlot(i);flash(b)});
-      ctrl.appendChild(b);
-    }
-    autoPill(side,12+main+R+4);
   }
+  // The Classic fan layout was removed in v0.29.1 (owner); it's in git history (v0.28.1, js/ui.js) if we ever want it back.
   sideBar(settings.left?'right':'left');
   ctrlEls=Array.from(ctrl.querySelectorAll('[data-slot]'));
 }
@@ -228,7 +220,8 @@ function renderSettings(){
   const seg=(label,key,opts)=>'<h2>'+label+'</h2><div class="seg">'+opts.map(o=>'<button data-k="'+key+'" data-v="'+o[0]+'" class="'+(String(settings[key])===String(o[0])?'active':'')+'">'+o[1]+'</button>').join('')+'</div>';
   box.innerHTML=
     '<button class="go" id="chgcls" style="margin:0 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
-    seg('Controls','scheme',[['grid','Grid'],['pad','Spell pad'],['buttons','Classic buttons']])+
+    seg('Controls','scheme',[['grid','Grid'],['pad','Spell pad']])+
+    (settings.scheme==='grid'?seg('Grid size','gridSize',[['S','Small'],['M','Medium'],['L','Large']]):'')+
     seg('Hand','left',[['false','Right-handed'],['true','Left-handed']])+
     seg('Auto first attack (tap an enemy)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Auto attack (keep casting)','autoCast',[['true','On'],['false','Off']])+
@@ -317,11 +310,11 @@ function nextTarget(){
   if(!list.length){log('No targets nearby.','#9aa');return}
   const i=list.indexOf(player.target);switchTarget(list[(i+1)%list.length]);
 }
-// Remember the mob you just left, so Back can return to it (e.g. Next to grab a closer add, then Back).
-function switchTarget(m){if(!m||m===player.target)return;if(player.target&&!player.target.dead)player.prevTarget=player.target;player.target=m}
+// Back is Next in reverse (v0.29.1, owner): both walk the same nearest-first list, so you can step either way and never get lost.
 function backTarget(){
-  const p=player.prevTarget;
-  if(!p||p.dead||mobs.indexOf(p)<0||dist(p,player)>160){player.prevTarget=null;log('No earlier target.','#9aa');return}
-  switchTarget(p);
+  const list=mobs.filter(m=>!m.dead&&dist(m,player)<130).sort((a,b)=>dist(a,player)-dist(b,player));
+  if(!list.length){log('No targets nearby.','#9aa');return}
+  const i=list.indexOf(player.target);switchTarget(list[i<0?list.length-1:(i-1+list.length)%list.length]);
 }
+function switchTarget(m){if(!m||m===player.target)return;player.target=m}
 function toggleSit(){if(player.dead)return;player.sit=!player.sit;if(player.sit){player.tx=null;player.cast=null;log('You sit down.','#9aa')}else log('You stand up.','#9aa')}
