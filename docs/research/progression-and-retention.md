@@ -1,45 +1,55 @@
 # Leveling, abilities and what keeps players coming back
 
-Research for how fast levels and abilities should come, how a class kit keeps changing once it's complete, and what keeps MMO players around. Starts with **The plan so far** (owner, Nov 17), then the research behind it. Researched Nov 17, 2026.
+Research for how fast levels and abilities should come, how a class kit keeps changing once it's complete, and what keeps MMO players around. Starts with **The plan so far** (owner, Nov 17; skill tree decided Nov 18), then the research behind it. Researched Nov 17, 2026; skill tree research added Nov 18.
 
-## The plan so far (leaning, not locked)
-Owner, Nov 17: nothing here is a hard yes. Revisit once real leveling times are known.
+## The plan so far
+Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling times are known. Items 6–11 (the skill tree) were decided by the owner on Nov 18.
 
 1. **Plan the game as levels 1–50, launch with a cap of 30.** Open 31–40 and 41–50 in expansions. Design ability rhythm and growth for 50 now so nothing has to be redone.
 2. **Leveling time:** keep the early targets (level 10 in about 10 hours). Aim for **about 60–80 hours to level 30**: 2–3 months for a player with a job at about an hour a day. Hardcore players will always be faster; tune for the busy player.
 3. **Never more than about 3 sessions without something new:** a level, an upgrade, a named drop or a step in an ability quest.
 4. **Ability counts:** the core kit by about level 10 (classes have 7–8 now), then 3–4 more by level 30 (**about 10–12 total**), and about 3 more by 50 (**about 13–15**). Loadout stays at 8 slots, so a few abilities always sit on the bench, and that's the build.
-5. **Merge instead of adding:** abilities that do a similar job become upgrades to one button (see the Druid example below). Replaces design.md's "15–20 abilities by 30".
-6. **Skill tree from level 10** (owner, Nov 18; was 5): first skill point at level 10, then 1 per level (21 by 30, 41 by 50). Points are the payoff from 10 on, so not every level needs a new ability. About 30 upgrades per class at launch, so a player can afford most but not all. Three branches per class tied to its playstyle. Expansions add upgrades for 31–50. Cheap respec in town.
-7. **Skill points replace stat points;** stats come from gear. One point system and one menu on the phone. (Owner, Nov 17; check this reading.)
-8. **Abilities still grow a little every level, automatically,** so they keep pace with mobs. Skill points add on top, so spending points on utility never leaves a player behind.
-9. **Good upgrades change how an ability plays,** not "+5%". No must-have upgrades: anything every player would take should just come with the class.
+5. **Merge instead of adding:** abilities that do a similar job become fork options on one button (see the Druid example below). Replaces design.md's "15–20 abilities by 30".
+6. **Skill tree = forks (decided Nov 18).** No tree before level 10: players are still learning their kit. The **first fork at level 10 is the "first big step"**. At **level 10 and every even level after**, one ability gets its **fork**: pick one of **two** versions. Each ability gets one fork; utility like Gate or Circle Port may get none.
+7. **Majors at 20 and 30** (40 and 50 in the expansions). A major is class-wide, has **three** options, and changes the class's signature mechanic. Level 20 = *how you play* (solo or group, pet or self); level 30 = *your big moment* (a flashy new effect or a once-a-fight power). A major takes that even level's slot, so by 30: **9 ability forks (10, 12, 14, 16, 18, 22, 24, 26, 28) + 2 majors**.
+8. **Odd levels:** new abilities, rank-ups, and the 7th and 8th loadout slots (15 and 25). Every level still brings something.
+9. **Power comes from your level, not your picks.** Both sides of a fork are a bit stronger than the base ability and about equal to each other; they differ by situation (solo vs group, one mob vs many). Mobs are tuned assuming "has a fork at this level", whichever side. Abilities still grow a little every level on their own. No "+5%" options. Sim each side (solo, group, boss); if one wins everywhere, redesign it.
+10. **Swapping is free in town.**
+11. **No skill points;** forks replace the old stat points, and stats come from gear.
 
 ### Example: Druid, 18 abilities folded into 11
 - **Kept as abilities:** Thornlash, Mending Touch, Creeping Rot, Tanglefoot, Rootgrip, Barkskin, Thorn Aura (the core 7), plus Stormcall, Mending Rain, Wolf Form and Circle Port (quest).
-- **Became upgrades in the tree:** Wild Regrowth and Cleanse onto Mending Touch, Sap Strength onto Creeping Rot, Pack Run onto Wolf Form, Briar Wall onto Rootgrip. Nature's Sight becomes a passive. Heart of the Grove becomes the tree's top pick.
+- **Became fork options:** Mending Touch (Cleanse *or* Wild Regrowth heal over time), Creeping Rot (Sap Strength), Wolf Form (Pack Run for the group), Rootgrip (Briar Wall, roots an area). Nature's Sight becomes a passive. Heart of the Grove becomes a level 30 major option.
 
-### Example: Necromancer tree
-- **Branches:** Bones (pet), Plague (DoTs), Blood (lifetaps and survival).
-- **Pick-one spot in Bones:** *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher skeleton that taunts). Two pets need a threat and balance check in the sim.
-- **Plague:** Siphon Plague spreads to a nearby mob when the target dies, or stacks twice on one target.
-- **Blood:** Lifetap II, shorter Feign Death cooldown, Mend Bones heals over time.
+### Example: Necromancer (draft)
+- **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
+- **Major at 20, "what kind of necro":** *Bone Lord* (skeletons cleave, the main one taunts: solo pet build) / *Plaguebringer* (DoTs spread to every mob near your target: group pulls) / *Blood Pact* (lifetaps heal your group a little: group support).
+- **Major at 30, "signature moment":** *Army of Bones* (once a fight, raise every corpse nearby for 15s) / *Lichform* (20s of free spells and double lifetaps) / *Death's Door* (the first killing blow each fight drops you into Feign Death at 30% health instead).
 
 ### Keeping the work manageable
-14 classes × about 30 upgrades is a lot. Most upgrades should be generic kinds stored as data (cooldown cut, +1 charge, longer effect, hits an area, spreads on death), so only a few per class need custom work. Build trees for the launch six first.
+- Forks use shared templates stored as data (two weaker pets vs one tougher, spreads vs stacks, longer vs area, instant vs over time), each with its own class flavor; only a few per class need custom work.
+- Launch six by 30: 6 × (9 forks + 2 majors) = 66 picks (about 140 options), versus about 180 upgrades in the old 30-per-class tree. Build the launch six first.
 
 ### Past the cap
-- Each expansion: one or two new abilities, more tree upgrades and a new pick-one spot.
+- Each expansion: one or two new abilities (each with its fork) and a new major (40, 50).
 - At max level: capped side perks (run speed, faster sitting, longer pulls, pet looks, small power) so new players can catch up, plus collections (journal, named-drop log, cosmetics), harder dungeon tiers and raids. 14 classes and an account-wide bank make alts a long goal of their own.
 
 ## The short version of the research
 1. **No empty dings.** A level that only adds stats feels like padding, because mobs scale at the same rate.
 2. **Full core kit early, then the kit changes instead of growing.**
 3. **Fewer new buttons, more upgrades,** which also fits the 8-button phone limit.
-4. **Upgrades should change how an ability plays,** and big milestones can offer a pick-one-of-two choice.
+4. **Upgrades should change how an ability plays,** and big milestones can offer a pick-one choice.
 5. **Something new every 3–5 sessions** (mobile guideline for 20-minute sessions).
 6. **Past the cap:** raise it with expansions and add capped side progression (like EverQuest's AAs).
 7. **Retention:** players early in the game stay for achievement; at max level they stay for other people. Never punish skipping a day.
+
+## Skill tree research (Nov 18)
+- **Scarcity makes a choice real.** If every node can eventually be unlocked, the tree is just an order of operations and everyone ends the same. Fun = scarcity plus options that change how you play.
+- **Mists of Pandaria (WoW):** one pick of three every 15 levels (6 total). Fewer talents, but each could change gameplay much more; "at worst a talent is only right situationally." The catch: once points stopped coming every level, there was little to look forward to at the next level, which is why Dragonflight brought point trees back. Lesson: the levels between picks need their own rewards (our odd levels).
+- **Guild Wars 2:** each tier offers three major traits and you take one; free swaps out of combat; stat boosts were removed from traits.
+- **Diablo 4:** criticised for low-risk +damage and +defense passives (easier to balance, boring). The expansion rework removed passives from the tree so it only changes how active skills behave.
+- **Diablo 3 runes:** one change per skill, picked from several. The lead designer's regret: a newly unlocked rune often goes untried because players are happy with what they have. Lesson: present a fork as "pick your new toy" at the moment it arrives.
+- **ESO morphs and Last Epoch skill trees:** the same skill playing very differently is what players remember (Last Epoch's "big boy skeletons"). Last Epoch also shows the cost: once skill trees hold the fun, passive trees shrink to % boosts.
 
 ## What other games do
 
@@ -85,3 +95,10 @@ Leveling feels too fast when abilities arrive faster than you can learn them or 
 - OSRS interview: https://www.gamesradar.com/games/mmo/how-did-the-most-timeless-mmo-hit-a-new-peak-of-240-000-players-12-years-after-launch-protecting-peoples-achievements-and-progression-while-preventing-fomo
 - EverQuest AAs: https://en.wikibooks.org/wiki/EverQuest/AA_info and https://seforums.pantheonmmo.com/content/forums/topic/11097/player-progression-you-better-add-aa-system
 - Mobile retention benchmarks: https://segwise.ai/blog/mobile-gaming-app-user-retention-strategies and https://appagent.com/?p=61637
+- Skill tree scarcity: https://bugnet.io/blog/how-to-design-a-skill-tree-thats-fun-to-plan
+- Mists of Pandaria talents: https://classic.wowhead.com/guide=5.0&talents and https://www.pcgamer.com/mists-of-pandaria-will-fix-talents-once-and-for-all-say-blizzard
+- Dragonflight bringing points back: https://www.laptopmag.com/features/wow-dragonflight-game-director-ion-hazzikostas-discusses-new-talent-trees-and-the-fate-of-covenant-abilities
+- Guild Wars 2 traits: https://wiki.guildwars2.com/wiki/Trait and https://www.dualshockers.com/arenanet-shares-specialization-details-and-images-from-guild-wars-2-heart-of-thorns-expansion/
+- Diablo 4 tree criticism and rework: https://us.forums.blizzard.com/en/d4/t/diablo-4-most-shallow-arpg-ever-created/11134 and https://wp-prod.icy-veins.com/?p=131327
+- Diablo 3 runes, Wyatt Cheng's regret: https://www.wowhead.com/classic/pt/news/디아블로-iii-개발에-대한-와이엇-쳉-q-a-지옥불-난이도-현금-경매장-등-327085
+- Last Epoch skill trees: https://www.goonhammer.com/the-last-epoch-an-arpg-that-cares-how-skilled-you-are and https://forum.lastepoch.com/t/beta-feedback-and-impressions-after-30-hours/14166/7

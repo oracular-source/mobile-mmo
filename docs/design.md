@@ -20,7 +20,7 @@ Take EverQuest's social danger and Dreadmyst's small, tight scope. Leave out the
 | Classes need each other | EverQuest | Buffs, heals and crowd control make groups clearly faster |
 | Death has weight | EverQuest | Death costs XP and time, never your gear |
 | Small, finished scope | Dreadmyst | Six launch classes and a few zones, polished before adding more |
-| Build customization | Dreadmyst | Stat points and ability loadouts as you level |
+| Build customization | Dreadmyst | Ability forks, majors and loadouts as you level |
 | Short repeatable runs | Dreadmyst | Camps and dungeons that fit 15–30 minutes |
 | Tab-target, 2D view | Dreadmyst | Readable on a phone screen, forgiving on cell signal |
 
@@ -277,7 +277,7 @@ A cursed borderland just outside the hub city (Town 1): a crossroads, a graveyar
 | 6 | Ruined Chapel grounds | 10–14 | the Ashen Acolyte rare 14 | not built |
 | 7 | Dungeon 1 (Malrec's chapel) | 14–15 | Brother Malrec (15) | not built (was 12–13, Malrec 11) |
 
-What it needs: the level cap goes from 10 to 15 (XP table to 15), every class gets abilities or ability ranks for levels 9–15 (balance chat), and the built areas get the small re-levels in the last column (done v0.30.3). The cap stays at 10 until the skill tree exists. **The "first big step at level 10" (owner, Nov 18) is the first skill point:** the skill tree opens at 10, so levels 10–15 pay out in skill points (6 by 15) and a class doesn't need a new ability at every one of those levels; the balance chat fills 9–15 with a mix of points, ability ranks and the odd new ability. The tree (or a first slice of it) has to exist before the cap goes past 10, or those levels are empty dings.
+What it needs: the level cap goes from 10 to 15 (XP table to 15), every class gets abilities or ability ranks for levels 9–15 (balance chat), and the built areas get the small re-levels in the last column (done v0.30.3). The cap stays at 10 until the forks exist. **The "first big step at level 10" (owner, Nov 18) is the first fork:** levels 10, 12 and 14 each bring a fork (pick one of two versions of an ability), and 11, 13 and 15 bring a new ability or rank-up (15 also opens loadout slot 7); the balance chat fills 9–15 on that rhythm. The forks (or a first slice of them) have to exist before the cap goes past 10, or those levels are empty dings.
 
 The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
@@ -337,10 +337,13 @@ Every class can solo to level cap. Grouping is never required, just clearly wort
 
 The level cap is 30 at launch and gets raised with each expansion; the game is planned as levels 1–50 (31–40 and 41–50 in expansions). Builds come from choices, not from grinding. Leveling is EverQuest-shaped: early levels are quick, then it slows sharply. Target: level 2 in about 10 minutes, level 5 in about 1.3 hours, level 10 in about 10 hours. Gear, loot and named mobs fill the gaps between dings. This pulls against pillar 1, so every session still needs a clear payoff besides XP. Leaning (Nov 17, not locked): about 60–80 hours of play to level 30, and never more than about 3 sessions without something new. Plan and research: `docs/research/progression-and-retention.md`.
 
-- **Stats:** come from gear. (Leaning, Nov 17: skill points replace the 3 stat points per level.)
-- **Skill tree (leaning, Nov 17; opens at 10 per owner, Nov 18):** opens at level 10 (first skill point there, was 5), 1 point per level after that (6 by 15, 21 by 30, 41 by 50). About 30 upgrades per class in three branches tied to its playstyle, so you can afford most but not all. Upgrades change how an ability plays (two skeletons, a DoT that spreads, an extra charge), not "+5%"; pick-one-of-two spots at key points. Abilities still grow a little every level on their own so they keep pace with mobs. Cheap respec in town.
-- **Abilities:** EverQuest-style spellbook. Each class learns about 10–12 abilities by level 30 and 13–15 by 50 (leaning, Nov 17; was 15–20), with similar abilities merged into tree upgrades, but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
-- **Respec:** cheap respecs in town, so experimenting is encouraged.
+- **Stats:** come from gear. There are no stat points or skill points (decided Nov 18); forks replace them.
+- **Forks (decided Nov 18):** no tree before level 10, while players learn their kit. At level 10 and every even level after, one ability gets its fork: pick one of two versions (two skeletons or one tougher one, a DoT that spreads or stacks). Each ability gets one fork; utility like Gate may get none.
+- **Majors (decided Nov 18):** at levels 20 and 30 (40 and 50 in expansions), a class-wide pick of three that changes the class's signature mechanic. Level 20 is how you play (solo or group, pet or self); level 30 is your big moment. A major takes that level's fork slot, so by 30: 9 ability forks and 2 majors.
+- **Odd levels:** new abilities, rank-ups, and loadout slots 7 (level 15) and 8 (level 25), so every level brings something.
+- **Power comes from level, not picks:** both sides of a fork are a little stronger than the base ability and about equal to each other; they differ by situation. Mobs are tuned assuming every player has their forks. Abilities still grow a little every level on their own. No "+5%" options. The sim checks each option; if one wins everywhere, it gets redesigned.
+- **Abilities:** EverQuest-style spellbook. Each class learns about 10–12 abilities by level 30 and 13–15 by 50 (leaning, Nov 17; was 15–20), with similar abilities merged into fork options, but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
+- **Swapping:** forks, majors and loadouts can be changed free in town, so experimenting costs nothing.
 - **Gear:** 8 slots (head, chest, legs, feet, hands, weapon, off-hand, ring), with drops from camps, named mobs and dungeon bosses, in rarity tiers (junk, common, uncommon, rare, named). Loot is personal and goes straight to your bags. Stats: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens incoming hits. No gear score gates.
 - **Alts:** an account-wide bank and cosmetic unlocks make leveling a second class feel good.
 
