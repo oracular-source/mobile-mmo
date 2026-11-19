@@ -47,7 +47,7 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 ## Art and audio
 - Only original assets (made by us) or CC0 / public domain assets. Nothing that needs a paid license or comes from another game.
 - Log every asset in `docs/credits.md`: file, who made it or where it came from, and its license.
-- Art style: dark 2D pixel art, 3/4 top-down view (Dreadmyst meets Diablo 2 and Vampire Survivors). Characters are 16x18 pixel sprites (the A+B take 1 look, v0.19: 6-row head, 12-row body) with a black outline; monsters follow the size tiers in `docs/research/monsters-weapons-spells.md`, list in `docs/monsters.md`. Use the palette in `art/palette.md`.
+- Art style: dark 2D pixel art, 3/4 top-down view (Dreadmyst meets Diablo 2 and Vampire Survivors). Characters are 16x18 pixel sprites in the game today (the A+B take 1 look, v0.19: 6-row head, 12-row body) with a black outline; the locked target size is **20x24** (take 1, normal head; owner, Nov 18), drawn in the character design pass, with humanoid monsters scaled to match; monsters follow the size tiers in `docs/research/monsters-weapons-spells.md`, list in `docs/monsters.md`. Use the palette in `art/palette.md`.
 - Sprites are currently stored as text grids in `js/data/sprites.js` (one character per pixel, see `SPR` and `PAL`).
 - Render at low resolution and scale up with nearest-neighbor (no smoothing) so pixels stay crisp.
 - **New areas:** follow `docs/area-rules.md` (one area per pass: brief, style takes, full area mock-up, owner notes, build). Add new rules there as we learn them.
