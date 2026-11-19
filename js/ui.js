@@ -75,8 +75,11 @@ function buildControls(){
 // Sit lives here (not in a menu) because Necros sit a lot while the pet and DoTs do the work.
 function sideBar(side,sitOnly){
   const sz=48,gap=8,base=8+96+8+44; // chat box bottom + height + gap, lifted 44px (v0.27.1 play-test: was too low)
-  const sit=document.createElement('button');sit.id='bsit';sit.className='fb';
-  sit.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+base+'px;'+side+':8px;font-size:11px';
+  // v0.30.2 (owner): Sit is a square in the same plain grey style as the spell grid, so both sides match, but smaller
+  // (about 80% of a spell button) since the left side has less on it. Pet buttons will use this size later.
+  const g=GRID_PX[settings.gridSize]||GRID_PX.M,W=Math.round(g[0]*0.8),H=Math.round(g[1]*0.8),FS=g[3]-1;
+  const sit=document.createElement('button');sit.id='bsit';sit.className='gb';
+  sit.style.cssText='width:'+W+'px;height:'+H+'px;bottom:'+base+'px;'+side+':10px;font-size:'+FS+'px;padding:0';
   sit.textContent=player.sit?'Stand':'Sit';
   sit.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleSit()});
   ctrl.appendChild(sit);

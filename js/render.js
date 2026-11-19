@@ -260,5 +260,5 @@ function ui(){
     const tg=$('toggles');if(tg){const top=Math.round($('pframe').getBoundingClientRect().bottom-tg.parentNode.getBoundingClientRect().top+4);if(tg.dataset.top!==String(top)){tg.dataset.top=top;tg.style.top=top+'px'}}}
   // Songs that are playing light up their buttons.
   ctrlEls.forEach(el=>{const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];el.classList.toggle('playing',!!(a&&a.kind==='song'&&songOn(a.id)))});
-  const sb=$('bsit');if(sb){sb.classList.toggle('active',player.sit);sb.textContent=player.sit?'Stand':'Sit'}
+  const sb=$('bsit');if(sb){sb.classList.toggle('sitting',player.sit);sb.textContent=player.sit?'Stand':'Sit'}
 }

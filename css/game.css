@@ -146,6 +146,7 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 .gb .nm{position:absolute;right:3px;top:1px;font-size:10px;color:#9cc4ff}
 .gb.flash{background:#55524a;border-color:#fff}
 .gb.lock{opacity:.35}
+.gb.sitting{border-color:#c9a227;color:#ffd27a} /* Sit reads Stand and turns gold while you're sitting */
 .gb.queued::after{inset:0;border:none;border-radius:3px;animation:none;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='58' height='48' viewBox='0 0 58 48'%3E%3Crect x='2' y='2' width='54' height='44' rx='3' fill='none' stroke='%23ffd35a' stroke-width='2.5' stroke-dasharray='7 5'%3E%3Canimate attributeName='stroke-dashoffset' from='0' to='-24' dur='0.8s' repeatCount='indefinite'/%3E%3C/rect%3E%3C/svg%3E") 0 0/100% 100% no-repeat} /* squares: gold dashes march round the edge */
 .gb.playing{box-shadow:inset 0 0 0 2px #7fd1a0}
 #controls.arrange .gb{outline:2px dashed #ffd27a;outline-offset:1px}

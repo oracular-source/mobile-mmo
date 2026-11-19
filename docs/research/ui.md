@@ -17,9 +17,9 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 1. Spell pad and Next ⟳ (done v0.28)
 2. Chat log (done v0.30.1)
 3. Your frame (name, level, health, mana, XP, buffs) (reviewed Nov 18: fine for now)
-4. Target frame and boss cast bar (next; debuff list parked, see 3)
-5. Slots 7–8 and Sit
-6. Floating text over heads
+4. Target frame and boss cast bar (back burner, Nov 18: not right yet, revisit later)
+5. Slots 7–8 and Sit (done v0.30.2; slots 7–8 already moved into the grid in v0.28)
+6. Floating text over heads (next)
 7. Pet bar
 8. Menu screens (Spells, Arrange, Settings)
 9. Character screen (Gear, Bags, Journal)
@@ -42,3 +42,9 @@ Owner idea (Nov 18): the joystick doesn't need to be visible at all; the chat bo
 
 ## 3. Your frame
 **Owner (Nov 18): clean enough for now, no changes.** The one problem he's seen is on the **target frame**: the debuffs on an enemy are a single line of names joined by dots (`tfx`), which gets hard to read once several are up (Rot · Rootgrip · Marked ...). Parked until spell icons exist; then buffs and debuffs become **small icons with a timer running down** (on your frame and the target's). Backlog card: "Buff and debuff icons with timers".
+
+## 4. Target frame and boss cast bar
+**Owner (Nov 18): not right yet, but back burner** for the UI pass; revisit later (with the debuff icons card). Backlog card: "Target frame and boss cast bar rework".
+
+## 5. Slots 7–8 and Sit
+Slots 7–8 already live in the 2 × 4 grid (v0.28), so only **Sit** was left: a round button on the left, the last bit of the old look. **Owner: keep it on the left, make it square to match the grid.** v0.30.2: Sit uses the grid's plain grey square style, **about 80% of a spell button's size** (owner: the left side has less on it, so it needn't be as big; **pet buttons later get this smaller size too**), and follows Settings → Grid size; it reads **Stand** with a gold border while you sit. The left side stays free for pet controls later.
