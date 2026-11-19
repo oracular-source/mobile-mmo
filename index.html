@@ -45,7 +45,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.27: the Sunken Graveyard and the crypt under it.
+        Prototype v0.27.1: the Sunken Graveyard and the crypt under it.
         <p class="hint" style="margin:10px 0 4px">Pick your class:</p>
         <div id="clspick"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
@@ -117,7 +117,8 @@
     <div id="mapUI" class="modal">
       <div class="card">
         <h1 id="mapname">Map</h1>
-        <div id="mapbox" style="text-align:center"><canvas id="mapcv" style="image-rendering:pixelated;border:1px solid #3a3343;border-radius:4px"></canvas></div>
+        <div class="mapz"><button id="mapzout">−</button><span id="mapzl">1x</span><button id="mapzin">+</button></div>
+        <div id="mapbox"><canvas id="mapcv" style="image-rendering:pixelated;border:1px solid #3a3343;border-radius:4px"></canvas></div>
         <div id="maplegend"></div>
         <button class="go" data-close="mapUI">Back to game</button>
       </div>

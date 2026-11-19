@@ -5,7 +5,7 @@
    New key, no change to any old save shape, so no save version bump: a missing key just means "nothing explored yet". */
 const MM_ZONES={over:1,gy:1,dun:1,crypt:1}; // the arena (testing grounds) never shows a map
 const MM_SEE={over:7,gy:7,dun:5,crypt:5};    // how many tiles around you get revealed (less underground)
-const MM_TILE=3;                     // minimap: CSS pixels per tile (shows about 29 tiles across)
+const MM_TILE=2;                     // minimap: CSS pixels per tile (shows about 43 tiles across; was 3)
 const mmSaved=store.get(KEY('explored'),{});
 const MM={z:{},dirty:false,saveT:0};
 
@@ -108,18 +108,30 @@ function renderMapScreen(){
   const Z=mmZone(zoneId);if(!Z)return;
   $('mapname').textContent=Z.name;
   const cv2=$('mapcv'),box=cv2.parentNode,dpr=Math.min(2,window.devicePixelRatio||1);
-  const cssW=Math.min(box.clientWidth||300,360),s=Math.max(2,Math.floor(cssW/Z.w)),cw=Z.w*s,ch=Z.h*s;
+  const cssW=Math.min(box.clientWidth||300,360),fit=Math.max(2,Math.floor(cssW/Z.w)),s=fit*MAPZ,cw=Z.w*s,ch=Z.h*s;
   cv2.style.width=cw+'px';cv2.style.height=ch+'px';cv2.width=cw*dpr;cv2.height=ch*dpr;
   const g=cv2.getContext('2d'),S=s*dpr;g.imageSmoothingEnabled=false;
   g.fillStyle='#07060a';g.fillRect(0,0,cv2.width,cv2.height);g.drawImage(Z.c,0,0,Z.w*S,Z.h*S);
   Z.pins.forEach((p,i)=>{if(!p.found)return;const x=(p.x+0.5)*S,y=(p.y+0.5)*S;
     g.fillStyle='#000';g.fillRect(x-4*dpr,y-4*dpr,8*dpr,8*dpr);g.fillStyle=MM_PIN_COL[p.k];g.fillRect(x-3*dpr,y-3*dpr,6*dpr,6*dpr)});
   const x=player.x/T*S,y=player.y/T*S;
+  if(MAPZ>1){box.scrollLeft=x/dpr-box.clientWidth/2;box.scrollTop=y/dpr-box.clientHeight/2} // keep you in view when zoomed
   g.fillStyle='#000';g.beginPath();g.arc(x,y,4.5*dpr,0,Math.PI*2);g.fill();g.fillStyle='#ffd27a';g.beginPath();g.arc(x,y,3*dpr,0,Math.PI*2);g.fill();
   const found=Z.pins.filter(p=>p.found);
   $('maplegend').innerHTML='<div style="color:#9aa;margin-bottom:4px">Explored '+Math.round(100*Z.count/(Z.w*Z.h))+'%</div>'+
     '<div><span class="mpin" style="background:#ffd27a;border-radius:50%"></span>You</div>'+
     (found.length?found.map(p=>'<div><span class="mpin" style="background:'+MM_PIN_COL[p.k]+'"></span>'+p.name+'</div>').join(''):'<div style="color:#9aa">No places found yet. Walk around to fill in the map.</div>');
 }
+// Map zoom (v0.27.1): + / - buttons or pinch on the map. 1 = whole area fits; zoomed in, drag to scroll.
+let MAPZ=1;const MAPZ_MAX=4;
+function mapZoom(d){const n=Math.min(MAPZ_MAX,Math.max(1,MAPZ+d));if(n===MAPZ)return;MAPZ=n;$('mapzl').textContent=MAPZ+'x';renderMapScreen()}
+$('mapzin').addEventListener('click',()=>mapZoom(1));$('mapzout').addEventListener('click',()=>mapZoom(-1));
+(()=>{const box=$('mapbox'),pts=new Map();let d0=0;
+  const dist=()=>{const a=[...pts.values()];return Math.hypot(a[0].x-a[1].x,a[0].y-a[1].y)};
+  box.addEventListener('pointerdown',e=>{pts.set(e.pointerId,{x:e.clientX,y:e.clientY});if(pts.size===2)d0=dist()});
+  box.addEventListener('pointermove',e=>{if(!pts.has(e.pointerId))return;pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    if(pts.size===2){const d=dist();if(d>d0*1.25){mapZoom(1);d0=d}else if(d<d0/1.25){mapZoom(-1);d0=d}}});
+  ['pointerup','pointercancel','pointerleave'].forEach(t=>box.addEventListener(t,e=>pts.delete(e.pointerId)));
+})();
 mmEl.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;openModal('mapUI');renderMapScreen()});
 document.addEventListener('visibilitychange',()=>{if(document.hidden&&MM.dirty)mmSave()}); // save the map when the app goes to the background

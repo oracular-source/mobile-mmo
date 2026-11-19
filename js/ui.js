@@ -59,7 +59,7 @@ function buildControls(){
 // Kept to 2 spells so the screen never shows more than 8 ability buttons (a design rule).
 // Sit lives here (not in a menu) because Necros sit a lot while the pet and DoTs do the work.
 function sideBar(side){
-  const sz=48,gap=8,base=8+96+8; // chat box bottom + height + gap
+  const sz=48,gap=8,base=8+96+8+44; // chat box bottom + height + gap, lifted 44px (v0.27.1 play-test: was too low)
   const sit=document.createElement('button');sit.id='bsit';sit.className='fb';
   sit.style.cssText='width:'+sz+'px;height:'+sz+'px;bottom:'+base+'px;'+side+':8px;font-size:11px';
   sit.textContent=player.sit?'Stand':'Sit';
