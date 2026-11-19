@@ -87,7 +87,7 @@ Things all classes share (from the game rules today):
 **Fight, in order:**
 1. Something is fighting you and Evade is ready (level 5) → Evade, then Backstab right away (triple damage, can't miss). **Evade is damage, not an escape** (owner's call, Nov 17).
 2. Mob stunned or Evaded and Backstab ready → Backstab (double or triple damage from any side).
-3. Gouge ready → Gouge (stun), then Backstab.
+3. Gouge ready → Gouge (stun), then Backstab. Against a boss, save Gouge for when it starts casting: the stun breaks the bolt (v0.23).
 4. Rend not on the target → Rend.
 5. Otherwise → Stab.
 
@@ -245,7 +245,7 @@ New rules this batch needs (everything else reuses what the game already has):
 
 **Pull:** Fireball from max range (level 4), else Frost Bolt.
 **Fight, in order:**
-1. Health low and Gate ready (level 8) and losing → Gate out (counts as an escape, not a death).
+1. Health low and Gate ready (level 8) and losing → Gate out (counts as an escape, not a death). Against a boss, "losing" means the boss is above 40%, not whatever skeleton you're targeting (v0.23).
 2. Health low → Mana Shield (level 6), Blink away, Freeze.
 3. Mob frozen and Shatter ready → Shatter.
 4. Mob within melee range and Freeze ready → Freeze, step back, then Shatter.
@@ -354,7 +354,7 @@ New rules this batch needs:
 1. Two or more mobs on you and Feign Death ready (level 3) → Feign Death (splits the target off).
 2. Health low and Mend ready → Mend.
 3. Health low and Deflect ready (level 6) → Deflect.
-4. Leg Sweep ready → Leg Sweep.
+4. Leg Sweep ready → Leg Sweep. Against a boss, save it for when it starts casting: the stun breaks the bolt (v0.23).
 5. Flurry ready (level 5) → Flurry.
 6. Dragon Strike ready (level 8) → Dragon Strike.
 7. Otherwise → Palm Strike.

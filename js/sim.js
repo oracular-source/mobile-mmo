@@ -185,8 +185,8 @@ const BOTS={
       if(dist(player,t)>18)return;
       // 2. Stunned or Evaded: Backstab from any side.
       if((t.stun>0||t.lost>0)&&B.can('backstab')){B.use('backstab',t);return}
-      // 3. Gouge, then Backstab.
-      if(B.can('gouge')){B.use('gouge',t);return}
+      // 3. Gouge, then Backstab. Against a boss, save Gouge to break its bolt (the counter rule uses it when the cast starts).
+      if(!t.def.boss&&B.can('gouge')){B.use('gouge',t);return}
       // 4. Rend.
       if(!B.dot(t,'rend')&&B.can('rend')){B.use('rend',t);return}
       // 5. Stab.
@@ -326,7 +326,8 @@ const BOTS={
       const on=B.onMe().filter(m=>!(m.root>0)&&!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
       const th=on[0],d=th?dist(th,player):999;
       // 1. Low and losing: Gate out (an escape, not a death).
-      if(B.hp()<0.35&&t.hp/t.maxhp>0.4&&B.can('gate')&&d>40){B.stop();B.use('gate');return}
+      const bossM=fight.find(m=>m.def.boss),gl=bossM||t; // against a boss, judge by the boss, not one of its adds
+      if(B.hp()<0.35&&gl.hp/gl.maxhp>0.4&&B.can('gate')&&d>40){B.stop();B.use('gate');return}
       // 2. Low: Mana Shield, Blink away, Freeze.
       if(B.hp()<0.35){if(!(player.buffs.mshield>0)&&B.can('mshield')){B.use('mshield');return}
         if(th&&d<20&&B.can('blink')){B.faceAway(th);B.use('blink');return}
@@ -437,7 +438,7 @@ const BOTS={
       if(B.hp()<0.35&&on.length&&B.can('deflect')){B.use('deflect');return}
       if(dist(player,t)>18)return;
       // 4. Leg Sweep. 5. Flurry. 6. Dragon Strike. 7. Palm Strike.
-      if(B.can('sweep')){B.use('sweep',t);return}
+      if(!t.def.boss&&B.can('sweep')){B.use('sweep',t);return} // against a boss, save it to break the bolt
       if(B.can('flurry')){B.use('flurry',t);return}
       if(B.can('dragon')){B.use('dragon',t);return}
       if(B.can('palm'))B.use('palm',t);
