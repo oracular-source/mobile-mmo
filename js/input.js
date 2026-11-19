@@ -52,6 +52,7 @@ function tapWorld(clientX,clientY,targetOnly){
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
   if(best){switchTarget(best);if(settings.tapCast&&!(best.mez>0))castSlot(0);return} // tapping a sleeping mob only targets it
+  if(!targetOnly&&tapSummon(wx,wy))return; // the throne or bone pile, when you're standing at it
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
   player.tx=wx;player.ty=wy;player.sit=false;
 }

@@ -1,12 +1,15 @@
 // DATA ONLY. Item rarity colours and every item.
 'use strict';
 /* ---------- Items, bags and gear (personal loot: every drop is yours) ---------- */
-const RAR={junk:'#9a9a9a',common:'#e8e2cf',uncommon:'#5fdf6f',rare:'#5fa8ff',named:'#ff9de2'};
+const RAR={junk:'#9a9a9a',common:'#e8e2cf',uncommon:'#5fdf6f',rare:'#5fa8ff',named:'#ff9de2',key:'#e8c060'};
 const ITEMS={
   whisker:{name:'Rat Whisker',rar:'junk',value:1,stack:true},
   shell:{name:'Beetle Shell',rar:'junk',value:3,stack:true},
   bone:{name:'Brittle Bone',rar:'junk',value:4,stack:true},
   rag:{name:'Grave Rag',rar:'junk',value:2,stack:true},
+  // Summon keys (v0.31): used up at a named's spot to call it if it isn't up. Not junk, so "Sell all junk" leaves them alone.
+  severed_paw:{name:'Severed Paw',rar:'key',value:1,stack:true,desc:"Summon key · lay it on the bone pile at the bottom of the rat tunnel to call Old Gnawbone"},
+  crown_shard:{name:'Crown Shard',rar:'key',value:1,stack:true,desc:"Summon key · set it on the empty throne in the crypt to call the Skeleton King"},
   cap:{name:'Cloth Cap',slot:'head',rar:'common',ac:1,value:6},
   robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10,cls:'caster'},
   legs:{name:'Patched Leggings',slot:'legs',rar:'common',ac:1,value:6},
@@ -96,3 +99,6 @@ const ITEMS={
   b1lute:{name:'Boss 1 Lute',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110,cls:'bard'},
   b1coat:{name:'Boss 1 Coat',slot:'chest',rar:'named',ac:6,sta:3,str:2,value:120,cls:'bard'}
 };
+// Which mobs drop which summon key, by area (zone id -> mob type -> key). One in KEY_CHANCE kills drops one.
+const KEY_DROPS={tunnel:{trat:'severed_paw',brat:'severed_paw'},crypt:{cskel:'crown_shard'}};
+const KEY_CHANCE=0.1;

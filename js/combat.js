@@ -213,6 +213,8 @@ function rollLoot(m){
   if(m.lv>=4&&rng()<(dun?0.03:0.01))got.push(pick(RARES));
   // Boss 1's loot waits in its chest: one named item and one uncommon, every time, plus a small rare chance.
   if(m.type==='boss1'){const c=[pick(BOSS1),pick(UNCOMMONS)];if(rng()<0.15)c.push(pick(RARES));if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
+  // Summon keys: only from that area's mobs, in that area (the zone check comes first, so the arena sim rolls nothing extra).
+  const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
   if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }

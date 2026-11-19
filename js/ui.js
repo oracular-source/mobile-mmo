@@ -282,7 +282,7 @@ function renderChar(){
     h+='</div>';
     if(bagSel!==null&&inv.bags[bagSel]){
       const b=inv.bags[bagSel],it=ITEMS[b.id];
-      h+='<div class="idet"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:'Junk')+' · sells for '+it.value*b.n+'c</span>';
+      h+='<div class="idet"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
       if(it.slot){h+='<br>'+(itemStats(it)||'No stats');const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
         const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
         h+='<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');}

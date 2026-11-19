@@ -129,7 +129,7 @@ function enterZone(id,from,at){
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
-  else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;
+  else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
     log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
@@ -139,13 +139,42 @@ function enterZone(id,from,at){
   decoy=null;grounds.length=0;traps.length=0;
   player.onTile=tileAt(player.x,player.y);
 }
+/* ---------- Summoning a named (v0.31) ---------- */
+// At a named's spot (the crypt throne, Gnawbone's bone pile) you can call it back if it isn't up, so a trip is never wasted.
+// It takes one of the area's key items (dropped by the mobs there), used up; no cooldown (owner, Nov 17).
+const SUMMON_TEXT={
+  throne:{hint:'The throne sits empty. A crown shard from the crypt\'s skeletons could call its king back.',act:'You set the crown shard on the throne. The bones in the dark begin to stir...'},
+  gnaw_pile:{hint:'A heap of gnawed bones. A severed paw from the tunnel rats might draw out whatever made it.',act:'You toss the severed paw onto the bones. Something huge scrabbles in the walls...'}};
+function keyCount(id){return inv.bags.reduce((n,b)=>n+(b&&b.id===id?b.n:0),0)}
+function useKey(id){const i=inv.bags.findIndex(b=>b&&b.id===id);if(i<0)return false;if(--inv.bags[i].n<=0)inv.bags[i]=null;saveInv();return true}
+// Standing in the ring of floor around the object (one tile out from its footprint).
+function summonAt(A,tx,ty){return A.named.find(n=>n.obj&&n.key&&tx>=n.obj.x-1&&tx<=n.obj.x+n.obj.w&&ty>=n.obj.y-1&&ty<=n.obj.y+n.obj.h)}
+function offerSummon(n){
+  const def=TYPES[n.sp.type],key=ITEMS[n.key],txt=SUMMON_TEXT[n.summon]||{},have=keyCount(n.key);
+  if(n.sp.mob&&!n.sp.mob.dead){log(def.name+' is already here.','#9aa');return}
+  if(!have){log(txt.hint||('You need a '+key.name.toLowerCase()+' to summon '+def.name+'.'),'#c8b89a');return}
+  prompt('Summon '+def.name+'?','Uses one '+key.name+' (you have '+have+'). It comes out fighting.','Summon',()=>doSummon(n));
+}
+function doSummon(n){
+  if((n.sp.mob&&!n.sp.mob.dead)||!useKey(n.key))return;
+  log((SUMMON_TEXT[n.summon]||{}).act||'You use the '+ITEMS[n.key].name+'.','#e8c060');
+  const m=spawn(n.sp);n.sp.timer=0;
+  burst(m.x,m.y-8,'#e8c060',18,true);floatText(m.x,m.y-34,m.def.name,'#ff9de2',true);
+  log(m.def.name+' appears!','#ff8a80');
+}
+// Walking up to the object offers the summon once per approach; tapping it while you stand there offers it again.
+function checkSummon(A){const n=summonAt(A,Math.floor(player.x/T),Math.floor(player.y/T))||null;
+  if(n!==player.atSummon){player.atSummon=n;if(n)offerSummon(n)}}
+function tapSummon(wx,wy){const A=curArea();if(!A)return false;
+  const n=A.named.find(n=>n.obj&&n.key&&wx>=n.obj.x*T&&wx<(n.obj.x+n.obj.w)*T&&wy>=n.obj.y*T-8&&wy<(n.obj.y+n.obj.h)*T);
+  if(!n)return false;if(player.atSummon===n){offerSummon(n);return true}return false} // not there yet: the tap just walks you over
 // Step onto the crypt door or the exit circle to get a prompt (once per step onto it).
 function checkPortals(){
   if(zoneId==='dun'&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
-  if(A){const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  if(A){checkSummon(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     if(ex!==player.atExit){player.atExit=ex;if(ex){
       // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
       if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id,ex.at)}
