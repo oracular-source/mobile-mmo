@@ -24,8 +24,8 @@ const CLASSES={
     {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]},
   rogue:{name:'Rogue',sprite:'rogue',hp:[48,14],mana:null,ac:8,regen:1.2,dodge:0.25,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Dodges a quarter of melee hits, but has no heal: best with a tank.',
     loadout:['stab','backstab','hide','gouge','evade','rend','knife','sprint'],abilities:[
-    {id:'stab',name:'Stab',short:'Stab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#d8dde6',tgt:1,tag:'Melee',kind:'nuke',dmg:[10,4],melee:1},
-    {id:'backstab',name:'Backstab',short:'Backst',lvl:1,mana:0,cast:0,cd:[10,6,0.4],range:18,col:'#e05a5a',tgt:1,tag:'Backstab',kind:'backstab',dmg:[20,7],melee:1},
+    {id:'stab',name:'Stab',short:'Stab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#d8dde6',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
+    {id:'backstab',name:'Backstab',short:'Backst',lvl:1,mana:0,cast:0,cd:[10,6,0.4],range:18,col:'#e05a5a',tgt:1,tag:'Backstab',kind:'backstab',dmg:[10,6],melee:1},
     {id:'hide',name:'Hide',short:'Hide',lvl:1,mana:0,cast:0,cd:[6,3,0.3],col:'#6b6f80',tgt:0,tag:'Stealth',kind:'stealth',melee:1},
     {id:'knife',name:'Throwing Knife',short:'Knife',lvl:1,mana:0,cast:0,cd:[6,4,0.25],range:80,col:'#9aa3b0',tgt:1,tag:'Pull',kind:'nuke',dmg:[3,1.2],melee:1,beam:'#d8dde6'},
     {id:'gouge',name:'Gouge',short:'Gouge',lvl:2,mana:0,cast:0,cd:[12,8,0.5],range:18,col:'#c9a227',tgt:1,tag:'Stun',kind:'stun',dmg:[3,1],dur:[2.5,0.1],melee:1},
@@ -33,10 +33,10 @@ const CLASSES={
     {id:'evade',name:'Evade',short:'Evade',lvl:5,mana:0,cast:0,cd:[30,18,1.2],col:'#8d8692',tgt:0,tag:'Drop aggro',kind:'evade',dur:[3,0.15],melee:1},
     {id:'sprint',name:'Sprint',short:'Sprint',lvl:7,mana:0,cast:0,cd:[40,25,1.5],col:'#7dbbd0',tgt:0,tag:'Speed',kind:'buff',buff:'sprint',dur:[8,0.3],melee:1}]},
   necro:{name:'Necromancer',sprite:'necro',hp:[36,11],mana:[44,11],ac:0,regen:1,caster:1,desc:'Dark caster with an undead pet that tanks for you. Lifetaps, plague, fear and feign death.',
-    loadout:['tap','raise','plague','dread','feign','mendb'],abilities:[
+    loadout:['tap','plague','dread','raise','feign','mendb'],abilities:[
     {id:'tap',name:'Lifetap',short:'Tap',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[6,2.4],beam:'#b48cff'},
-    {id:'raise',name:'Raise Bones',short:'Raise',lvl:1,mana:15,cast:3,cd:[30,15,1.5],col:'#cfc8b2',tgt:0,tag:'Pet',kind:'pet'},
-    {id:'plague',name:'Siphon Plague',short:'Plague',lvl:2,mana:9,cast:0,cd:[10,5,0.5],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
+    {id:'raise',name:'Raise Bones',short:'Raise',lvl:4,mana:15,cast:3,cd:[30,15,1.5],col:'#cfc8b2',tgt:0,tag:'Pet',kind:'pet'},
+    {id:'plague',name:'Siphon Plague',short:'Plague',lvl:1,mana:9,cast:0,cd:[10,5,0.5],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
     {id:'dread',name:'Dread',short:'Dread',lvl:3,mana:8,cast:0,cd:[20,12,0.8],range:80,col:'#6a4fa3',tgt:1,tag:'Fear',kind:'fear',dur:[6,0.3]},
     {id:'feign',name:'Feign Death',short:'Feign',lvl:6,mana:5,cast:0,cd:[60,35,2.5],col:'#9a9a9a',tgt:0,tag:'Escape',kind:'feign'},
     {id:'mendb',name:'Mend Bones',short:'MendB',lvl:8,mana:10,cast:1,cd:[10,6,0.4],col:'#e8e2cf',tgt:0,tag:'Pet heal',kind:'petheal',heal:[20,8]}]},
@@ -54,7 +54,8 @@ const CLASSES={
     {id:'gheal',name:'Greater Heal',short:'GHeal',lvl:6,mana:22,cast:2.5,cd:[12,8,0.5],col:'#fff3c4',tgt:0,tag:'Big heal',kind:'heal',heal:[40,12],holy:0.6},
     {id:'aura',name:'Divine Aura',short:'Aura',lvl:8,mana:10,cast:0,cd:[120,90,3],col:'#ffd27a',tgt:0,tag:'Immune',kind:'buff',buff:'aura',dur:[4,0]}]},
   enchanter:{name:'Enchanter',hp:[34,10],mana:[48,12],ac:0,regen:1,caster:1,desc:'Crowd control. Puts extra mobs to sleep, slows the one you fight, and lets a floating sword or a charmed mob do the hitting. Solo: fine if you keep control.',
-    loadout:['mrot','mez','blade','slow','clarity','charm','flash','phantasm'],abilities:[
+    loadout:['mlash','mrot','mez','blade','slow','charm','flash','phantasm'],abilities:[
+    {id:'mlash',name:'Mind Lash',short:'Lash',lvl:1,mana:3,cast:0,cd:null,range:80,col:'#e0c3ff',tgt:1,tag:'Nuke',kind:'nuke',dmg:[5,2],beam:'#e0c3ff'},
     {id:'mrot',name:'Mind Rot',short:'Rot',lvl:1,mana:6,cast:0,cd:[8,5,0.4],range:80,col:'#c8a0ff',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[12,0.5]},
     {id:'mez',name:'Mesmerize',short:'Mez',lvl:1,mana:8,cast:0,cd:[6,4,0.2],range:80,col:'#e0c3ff',tgt:1,tag:'Sleep',kind:'mez',dur:[18,0.3]},
     {id:'blade',name:'Animate Blade',short:'Blade',lvl:2,mana:14,cast:2,cd:[20,10,1],col:'#cfd6e0',tgt:0,tag:'Pet',kind:'pet',pet:{name:'floating sword',img:'blade',hp:[16,6],dmg:[3,1.5],ac:2,life:120,atk:1.5}},
@@ -64,11 +65,11 @@ const CLASSES={
     {id:'flash',name:'Color Flash',short:'Flash',lvl:6,mana:12,cast:0,cd:[30,20,1],col:'#ffffff',tgt:0,tag:'Area stun',kind:'cleave',radius:30,stun:[3,0.1]},
     {id:'phantasm',name:'Phantasm',short:'Phantm',lvl:8,mana:12,cast:0,cd:[45,30,1.5],col:'#c8a0ff',tgt:0,tag:'Decoy',kind:'decoy',dur:[5,0.2]}]},
   paladin:{name:'Paladin',hp:[54,15],mana:[24,6],ac:10,regen:1.3,gear:['warrior','knight'],desc:'Holy tank. Heals, stuns, and lays holy ground that heals you and burns the undead. Very strong in the crypt. Solo: steady.',
-    loadout:['pstrike','loh','hbash','pmend','smiteu','taunt','consec','dstrike'],abilities:[
+    loadout:['pstrike','pmend','hbash','loh','smiteu','taunt','consec','dstrike'],abilities:[
     {id:'pstrike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
-    {id:'loh',name:'Lay on Hands',short:'LoH',lvl:1,mana:0,cast:0,cd:[180,120,4],col:'#ffd27a',tgt:0,tag:'Full heal',kind:'heal',heal:[0,0],full:1},
+    {id:'loh',name:'Lay on Hands',short:'LoH',lvl:5,mana:0,cast:0,cd:[180,120,4],col:'#ffd27a',tgt:0,tag:'Full heal',kind:'heal',heal:[0,0],full:1},
     {id:'hbash',name:'Holy Bash',short:'Bash',lvl:2,mana:0,cast:0,cd:[12,8,0.5],range:18,col:'#6a82b0',tgt:1,tag:'Stun',kind:'stun',dmg:[4,1],dur:[2,0.1],melee:1},
-    {id:'pmend',name:'Mend',short:'Mend',lvl:3,mana:8,cast:2,cd:[8,5,0.4],col:'#ffe9a8',tgt:0,tag:'Heal',kind:'heal',heal:[12,5]},
+    {id:'pmend',name:'Mend',short:'Mend',lvl:1,mana:8,cast:2,cd:[8,5,0.4],col:'#ffe9a8',tgt:0,tag:'Heal',kind:'heal',heal:[12,5]},
     {id:'smiteu',name:'Smite Undead',short:'SmiteU',lvl:4,mana:10,cast:0,cd:[12,8,0.5],range:80,col:'#ffe9a8',tgt:1,tag:'Undead nuke',kind:'nuke',dmg:[16,6],undeadOnly:1,beam:'#ffe9a8'},
     {id:'taunt',name:'Taunt',short:'Taunt',lvl:5,mana:0,cast:0,cd:[8,6,0.2],range:40,col:'#ffb37a',tgt:1,tag:'Taunt',kind:'taunt'},
     {id:'consec',name:'Consecrate',short:'Consec',lvl:6,mana:14,cast:0,cd:[30,20,1],col:'#ffd27a',tgt:0,tag:'Holy ground',kind:'ground',radius:26,dur:[15,0],heal:[2,0.8],dmg:[3,1.2]},
@@ -128,7 +129,8 @@ const CLASSES={
     {id:'deflect',name:'Deflect',short:'Deflct',lvl:6,mana:0,cast:0,cd:[40,28,1.2],col:'#cfd6e0',tgt:0,tag:'Dodge all hits',kind:'buff',buff:'deflect',dur:[3,0.1],melee:1},
     {id:'dragon',name:'Dragon Strike',short:'Dragon',lvl:8,mana:0,cast:0,cd:[16,10,0.6],range:18,col:'#ff9a4a',tgt:1,tag:'Big hit + knockback',kind:'nuke',dmg:[18,6],knock:22,melee:1}]},
   shaman:{name:'Shaman',hp:[40,12],mana:[42,11],ac:4,regen:1,caster:1,gear:['shaman'],dotStack:0.1,desc:'Never casts a bolt. Slows the mob so it barely hurts, stacks poisons (each one a bit stronger with the other on), drops a totem and walks away. Solo: strong and safe.',
-    loadout:['sicken','sheal','drowsy','wolf','swarm','totem','ward','canni'],abilities:[
+    loadout:['jab','sicken','sheal','drowsy','wolf','swarm','totem','canni'],abilities:[
+    {id:'jab',name:'Spear Jab',short:'Jab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[6,2.4],melee:1},
     {id:'sicken',name:'Sicken',short:'Sicken',lvl:1,mana:6,cast:0,cd:[8,5,0.4],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
     {id:'sheal',name:'Minor Healing',short:'Heal',lvl:1,mana:8,cast:1.5,cd:[6,3,0.4],col:'#7dffa6',tgt:0,tag:'Heal',kind:'heal',heal:[14,6]},
     {id:'drowsy',name:'Drowsy',short:'Drowsy',lvl:2,mana:6,cast:0,cd:[12,8,0.4],range:80,col:'#9fb8e0',tgt:1,tag:'Attack slow',kind:'slow',dur:[24,1],aslowX:1.43},

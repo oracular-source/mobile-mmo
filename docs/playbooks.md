@@ -58,7 +58,9 @@ Things all classes share (from the game rules today):
 ## Necromancer: the juggler
 **Idea:** the pet tanks, the plague does the damage, and you control who's hitting what. Sits a lot.
 
-**Before pulling:** no pet → Raise Bones (3s cast). Pet hurt → Mend Bones (level 8) or sit.
+**Levels 1–3 (no pet yet, early-levels pass Nov 18):** Siphon Plague on the target, Dread it when it gets close (level 3), back off and Lifetap. Raise Bones comes at level 4.
+
+**Before pulling (level 4+):** no pet → Raise Bones (3s cast). Pet hurt → Mend Bones (level 8) or sit.
 
 **Pull:** Siphon Plague on the target, so the pet picks it up.
 
@@ -88,6 +90,8 @@ Things all classes share (from the game rules today):
 3. Gouge ready → Gouge (stun), then Backstab.
 4. Rend not on the target → Rend.
 5. Otherwise → Stab.
+
+**Early-levels pass (Nov 18):** Stab hits like the other melee starters now, and Backstab from Hide one-shots mobs about two levels below you, not even ones (it did both before, so level-1 kills took 5s).
 
 **Getting around:** Sprint (level 7) to get to a fight, get out of one, or cross a cleared area. It works in dungeons too.
 
@@ -146,11 +150,12 @@ New rules this batch needs (everything else reuses what the game already has):
 
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
-| 1 | Mind Rot | dot | Damage over time (main attack) |
+| 1 | Mind Lash | nuke | Cheap instant hit, spammable (main attack, added Nov 18) |
+| 1 | Mind Rot | dot | Damage over time |
 | 1 | Mesmerize | mez | Puts a mob to sleep until it's hit, up to ~20s |
 | 2 | Animate Blade | pet | A floating sword fights for you for 2 minutes (weak, doesn't tank long) |
 | 3 | Slow Mind | snare | Mob moves **and attacks** slower |
-| 4 | Clarity | buff | Faster mana regen for you (lasts until you die) |
+| 4 | Clarity | buff | Faster mana regen for you (lasts until you die). Starts in the spellbook, not on a button: swap it in to cast |
 | 5 | Charm | charm | A mob fights for you for 20–40s, then breaks free and attacks you |
 | 6 | Color Flash | stun | Stuns every mob near you (escape button) |
 | 8 | Phantasm | pet | A see-through copy of you appears; mobs attack it for a few seconds |
@@ -164,7 +169,8 @@ New rules this batch needs (everything else reuses what the game already has):
 4. Slow Mind not on the target → Slow Mind.
 5. Mind Rot not on the target → Mind Rot.
 6. Blade expired and nothing on you → Animate Blade.
-7. Otherwise → stand back and let the pets work (sit if nothing is hitting you).
+7. Mana above half (or no sword yet) → Mind Lash.
+8. Otherwise → stand back and let the pets work (sit if nothing is hitting you).
 **Between fights:** sit until mana is about 80%.
 **Touch control for mez (built, v0.17):** the Mez button sleeps the closest awake mob coming at you that you're not fighting (no extra around: your target). Sleeping mobs show "Zz" and the seconds left. Tapping a sleeping mob only targets it.
 
@@ -175,9 +181,9 @@ New rules this batch needs (everything else reuses what the game already has):
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
 | 1 | Strike | melee | Sword swing (main attack) |
-| 1 | Lay on Hands | heal | Full heal, very long cooldown (once a fight at most) |
+| 1 | Mend | heal | Small heal, 2s cast (was level 3) |
 | 2 | Holy Bash | stun | Shield stun |
-| 3 | Mend | heal | Small heal, 2s cast |
+| 5 | Lay on Hands | heal | Full heal, very long cooldown (once a fight at most; was level 1) |
 | 4 | Smite Undead | nuke | Big nuke, undead only |
 | 5 | Taunt | taunt | Pull a mob off your pet or a friend (matters in groups) |
 | 6 | Consecrate | holy ground | A circle under you for 15s: you heal slowly in it, undead in it take damage |
@@ -362,18 +368,20 @@ New rules this batch needs:
 
 | Lvl | Ability | Kind | What it does |
 | --- | --- | --- | --- |
-| 1 | Sicken | dot | Poison over time (main attack) |
+| 1 | Spear Jab | melee | Spear poke, spammable (main attack, added Nov 18; still never a bolt) |
+| 1 | Sicken | dot | Poison over time |
 | 1 | Minor Healing | heal | Medium heal, 1.5s cast |
 | 2 | Drowsy | slow | Mob attacks 30% slower (not a snare: it still runs at full speed) |
 | 3 | Spirit of the Wolf | buff | Faster run speed for you and anyone nearby, until you die |
 | 4 | Swarm | dot | Second DoT (insects); runs alongside Sicken |
 | 5 | Venom Totem | totem | A totem on the ground poisons mobs near it for 20s |
-| 6 | Spirit Ward | buff | More armor and health for you and anyone nearby, until you die |
+| 6 | Spirit Ward | buff | More armor and health for you and anyone nearby, until you die. Starts in the spellbook: swap it in to cast |
 | 8 | Cannibalize | health for mana | Trade 15% of your health for mana, instant |
 
 **Before pulling:** Spirit of the Wolf and Spirit Ward up (buff bar).
 **Pull:** Sicken from max range, then Drowsy as it arrives.
-**Fight, in order:**
+**Levels 1–3 (before Swarm):** Drowsy and Sicken on it, then stand and Spear Jab. Heal when low.
+**Fight, level 4+, in order:**
 1. Health low → Minor Healing (back off first if you can).
 2. Drowsy not on the target → Drowsy.
 3. Sicken not on the target → Sicken.

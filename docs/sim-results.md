@@ -1,6 +1,6 @@
 # Sim results
 
-Made by the testing grounds sim (`js/sim.js`), v0.18.4, Nov 17. Each class's bot plays by its playbook (`docs/playbooks.md`) with no gear, against mobs at its own level (Boss 1 is always level 7). **Every level from 1 to 10** (the level cap) is run now, and Boss 1 is tried from level 6 up, so you can see where a class turns the corner. Each line is 10 fights with fixed seeds 1000–1009, so running it again gives the same numbers until the game changes.
+Made by the testing grounds sim (`js/sim.js`), v0.21, Nov 18. Each class's bot plays by its playbook (`docs/playbooks.md`) with no gear, against mobs at its own level (Boss 1 is always level 7). **Every level from 1 to 10** (the level cap) is run now, and Boss 1 is tried from level 6 up, so you can see where a class turns the corner. Each line is 10 fights with fixed seeds 1000–1009, so running it again gives the same numbers until the game changes.
 
 How to read it: **Kill** = seconds from the pull to the last mob dying (wins only). **Rest** = seconds sitting afterward to get back to 80% health and mana. **Dmg taken** and **Mana used** are per fight. **Mob HP left** = how much health the mobs still had when you lost. **Beats Boss 1** = the first level that wins 5 or more fights in 10 (a retry or two gets it done).
 
@@ -9,25 +9,34 @@ Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds
 ## The yardstick (owner, Nov 17)
 Beating the level-7 Boss 1 at level 6–8 is fine. Needing level 9 is borderline. **Needing level 10 (the cap), or never, means the class needs a different look for soloing.** Losing two skeletons at level 1 is fine: pull singles at level 1.
 
-## First level that beats Boss 1 (v0.18.4)
-| Class | Beats Boss 1 at | Was (v0.18.3) | Wins at L6 · 7 · 8 · 9 · 10 | Boss 1 kill at L8 (s) | Two skeletons from | Verdict |
-| --- | --- | --- | --- | --- | --- | --- |
-| Bard | level 6 | never | 10 · 10 · 10 · 10 · 10 | 261 | level 4 | Fine |
-| Shaman | level 6 | level 6 | 10 · 10 · 10 · 10 · 10 | 54 | level 1 | Fine |
-| Cleric | level 7 | level 7 | 3 · 10 · 10 · 10 · 10 | 52 | level 2 | Fine |
-| Enchanter | level 7 | level 10 | 2 · 9 · 5 · 9 · 10 | 143 | level 1 | Fine |
-| Magician | level 7 | level 10 | 0 · 7 · 10 · 10 · 10 | 85 | level 3 | Fine |
-| Necromancer | level 7 | level 7 | 2 · 10 · 8 · 10 · 10 | 51 | level 1 | Fine |
-| Paladin | level 8 | level 8 | 0 · 0 · 10 · 10 · 10 | 35 | level 1 | Fine |
-| Ranger | level 8 | level 8 | 1 · 2 · 9 · 10 · 10 | 69 | level 1 | Fine |
-| Shadow Knight | level 8 | level 8 | 0 · 0 · 8 · 9 · 10 | 58 | level 6 | Fine |
-| Warrior | level 8 | level 8 | 0 · 0 · 7 · 10 · 10 | 61 | level 1 | Fine |
-| Wizard | level 8 | level 8 | 0 · 0 · 5 · 8 · 10 | 66 | level 1 | Fine |
-| Druid | level 9 | level 9 | 0 · 0 · 3 · 10 · 10 | 49 | level 3 | Borderline |
-| Monk | level 9 | level 9 | 0 · 0 · 0 · 7 · 10 | – | level 6 | Borderline |
-| Rogue | level 9 | level 10 | 0 · 0 · 2 · 8 · 10 | 33 | level 1 | Borderline |
+## First level that beats Boss 1 (v0.21)
+| Class | Beats Boss 1 at | Was (v0.18.4) | Wins at L6 · 7 · 8 · 9 · 10 | Boss 1 kill at L8 (s) | L1 skeleton, kill + rest (s) | Two skeletons from (was) | Verdict |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| Bard | level 6 | level 6 | 10 · 10 · 10 · 10 · 10 | 261 | 18 | level 4 (4) | Fine |
+| Enchanter | level 6 | level 7 | 10 · 10 · 10 · 10 · 10 | 92 | 19 | level 1 (1) | Fine |
+| Shaman | level 6 | level 6 | 10 · 10 · 10 · 10 · 10 | 54 | 16 | level 4 (1) | Fine |
+| Cleric | level 7 | level 7 | 3 · 10 · 10 · 10 · 10 | 52 | 18 | level 2 (2) | Fine |
+| Magician | level 7 | level 7 | 0 · 7 · 10 · 10 · 10 | 85 | 15 | level 3 (3) | Fine |
+| Necromancer | level 7 | level 7 | 3 · 10 · 9 · 10 · 10 | 49 | 16 | level 4 (1) | Fine |
+| Paladin | level 8 | level 8 | 0 · 0 · 10 · 10 · 10 | 35 | 19 | level 4 (1) | Fine |
+| Ranger | level 8 | level 8 | 1 · 2 · 9 · 10 · 10 | 69 | 14 | level 1 (1) | Fine |
+| Shadow Knight | level 8 | level 8 | 0 · 0 · 8 · 9 · 10 | 58 | 18 | level 6 (6) | Fine |
+| Warrior | level 8 | level 8 | 0 · 0 · 7 · 10 · 10 | 61 | 17 | level 1 (1) | Fine |
+| Wizard | level 8 | level 8 | 0 · 0 · 5 · 8 · 10 | 66 | 19 | level 1 (1) | Fine |
+| Druid | level 9 | level 9 | 0 · 0 · 3 · 10 · 10 | 49 | 17 | level 3 (3) | Borderline |
+| Monk | level 9 | level 9 | 0 · 0 · 0 · 7 · 10 | – | 17 | level 6 (6) | Borderline |
+| Rogue | level 9 | level 9 | 0 · 0 · 0 · 7 · 10 | – | 12 | level 2 (1) | Borderline |
 
-*Two skeletons from* = first level that wins 8 or more in 10. *Was* = v0.18.3. *Boss 1 kill* = average seconds for a win at level 8.
+*Two skeletons from* = first level that wins 8 or more in 10. *Was* = v0.18.4. *Boss 1 kill* = average seconds for a win at level 8. *L1 skeleton* target: about 12–22s for every class.
+
+## Early-levels pass (v0.21, Nov 18)
+Goal (owner OK, Nov 18): every class kills a level-1 skeleton in roughly 12–22s with a spammable starter, and no class front-loads a big cooldown. Before → after (level-1 skeleton, kill + rest):
+- **Shaman: Spear Jab** (level 1 melee, spammable; still never a bolt). 48s → **17s**. Levels 1–3 the Shaman stands and jabs with Drowsy and Sicken ticking; the kite starts with Swarm at 4. Level 3 was 43s → 16s. Two skeletons now from level 4 (was 1): pull singles early.
+- **Enchanter: Mind Lash** (cheap instant hit, spammable). 43s → **20s**, and kills are about twice as fast at every level (level-4 skeleton 44s → 19s). Boss 1 level 7 → **6**, with a faster kill. Clarity starts in the spellbook.
+- **Necromancer:** Siphon Plague at level 1, Raise Bones at **level 4**. 28s → **16s**. No pet before 4 means two skeletons only from level 4 (was 1). Boss 1 unchanged (7).
+- **Paladin:** Mend at level 1, Lay on Hands at **level 5**. Single skeleton unchanged (19s). Without Lay on Hands, two skeletons go from level 4 (was a wobbly 1). Boss 1 unchanged (8).
+- **Rogue:** Stab 10+4/level → 7+2.8 (like the other melee starters), Backstab 20+7 → 10+6: from Hide it still one-shots mobs about two levels below you, not even ones. 5s → **12s**. Two skeletons from level 2 (was 1). Boss 1 unchanged (9).
+- Everyone else unchanged (their kits weren't touched; numbers match v0.18.4).
 
 ## Per-class pass (v0.18.4)
 One change per class, smallest that does the job, each tried in the sim first:
@@ -62,11 +71,13 @@ Hold the Line (20% less damage per mob on you, up to 3, so 20–60%) and Last St
 - Full rerun of all 14 (Nov 17) changed nothing else: v0.18.2 only touched the Warrior.
 
 ## Earlier runs
+v0.18.4 (per-class pass, before the early-levels pass): Bard, Shaman 6; Cleric, Enchanter, Magician, Necromancer 7; Paladin, Ranger, Shadow Knight, Warrior, Wizard 8; Druid, Monk, Rogue 9. Level-1 skeleton kill + rest: Shaman 48s, Enchanter 43s, Necro 28s, Rogue 5s, most others 13–19s.
+
 v0.18.3 (telegraph, before the per-class pass): Shaman 6; Cleric, Necromancer 7; Paladin, Ranger, Shadow Knight, Warrior, Wizard 8; Druid, Monk 9; Rogue, Magician, Enchanter 10; Bard never. Shadow Knight two skeletons from level 8.
 
 v0.18.1 (before the Warrior pass and the telegraph): Shaman 6, Ranger 7, Cleric, Druid, Paladin 8, Necromancer 9; Rogue, Magician, Wizard, Shadow Knight, Monk 10; Warrior, Enchanter, Bard never. v0.16–v0.18 ran only levels 1, 4 and 8 with Boss 1 at 8. Rogue's Evade comparison (A as damage vs B as escape) is settled as A; see the board's decisions.
 
-## Tables (every level, v0.18.4)
+## Tables (every level, v0.21)
 
 ### Druid
 
@@ -174,97 +185,97 @@ Boss 1 first beaten (5+ wins in 10): level 8 · Two skeletons (8+ in 10): from l
 
 ### Rogue
 
-Boss 1 first beaten (5+ wins in 10): level 9 · Two skeletons (8+ in 10): from level 1
+Boss 1 first beaten (5+ wins in 10): level 9 · Two skeletons (8+ in 10): from level 2
 
 | Lvl | Fight | Win | Deaths | Kill (s) | Rest (s) | Dmg taken | Mana used | Mob HP left (losses) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 1 | Beetle (armored) | 10/10 | 0 | 7 | 0 | 6 | – | – |
-| 1 | Skeleton | 10/10 | 0 | 5 | 0 | 4 | – | – |
-| 1 | Two skeletons | 10/10 | 0 | 16 | 5 | 31 | – | – |
-| 2 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 2 | Beetle (armored) | 10/10 | 0 | 9 | 0 | 5 | – | – |
-| 2 | Skeleton | 10/10 | 0 | 6 | 0 | 5 | – | – |
-| 2 | Two skeletons | 10/10 | 0 | 18 | 6 | 39 | – | – |
-| 3 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 3 | Beetle (armored) | 10/10 | 0 | 9 | 0 | 8 | – | – |
-| 3 | Skeleton | 10/10 | 0 | 8 | 0 | 10 | – | – |
-| 3 | Two skeletons | 10/10 | 0 | 19 | 6 | 46 | – | – |
-| 4 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 4 | Beetle (armored) | 10/10 | 0 | 9 | 0 | 9 | – | – |
-| 4 | Skeleton | 10/10 | 0 | 8 | 0 | 12 | – | – |
-| 4 | Two skeletons | 10/10 | 0 | 18 | 7 | 57 | – | – |
-| 5 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 5 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 14 | – | – |
-| 5 | Skeleton | 10/10 | 0 | 10 | 0 | 15 | – | – |
-| 5 | Two skeletons | 10/10 | 0 | 20 | 8 | 65 | – | – |
-| 6 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 6 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 11 | – | – |
-| 6 | Skeleton | 10/10 | 0 | 10 | 0 | 11 | – | – |
-| 6 | Two skeletons | 10/10 | 0 | 19 | 6 | 62 | – | – |
-| 6 | Boss 1 (lvl 7) | 0/10 | 10 | – | – | 132 | – | 52% |
-| 7 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 7 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 12 | – | – |
-| 7 | Skeleton | 10/10 | 0 | 10 | 0 | 13 | – | – |
-| 7 | Two skeletons | 10/10 | 0 | 19 | 6 | 66 | – | – |
-| 7 | Boss 1 (lvl 7) | 0/10 | 10 | – | – | 146 | – | 35% |
-| 8 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 8 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 14 | – | – |
-| 8 | Skeleton | 10/10 | 0 | 10 | 0 | 14 | – | – |
-| 8 | Two skeletons | 10/10 | 0 | 19 | 6 | 69 | – | – |
-| 8 | Boss 1 (lvl 7) | 2/10 | 8 | 33 | 17 | 157 | – | 26% |
-| 9 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 9 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 15 | – | – |
-| 9 | Skeleton | 10/10 | 0 | 10 | 0 | 15 | – | – |
-| 9 | Two skeletons | 10/10 | 0 | 20 | 7 | 80 | – | – |
-| 9 | Boss 1 (lvl 7) | 8/10 | 2 | 32 | 16 | 148 | – | 11% |
-| 10 | Rat | 10/10 | 0 | 3 | 0 | 0 | – | – |
-| 10 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 17 | – | – |
-| 10 | Skeleton | 10/10 | 0 | 10 | 0 | 17 | – | – |
-| 10 | Two skeletons | 10/10 | 0 | 20 | 7 | 85 | – | – |
-| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 27 | 7 | 86 | – | – |
+| 1 | Rat | 10/10 | 0 | 6 | 0 | 2 | – | – |
+| 1 | Beetle (armored) | 10/10 | 0 | 14 | 1 | 15 | – | – |
+| 1 | Skeleton | 10/10 | 0 | 11 | 1 | 15 | – | – |
+| 1 | Two skeletons | 6/10 | 4 | 26 | 10 | 56 | – | 16% |
+| 2 | Rat | 10/10 | 0 | 6 | 0 | 3 | – | – |
+| 2 | Beetle (armored) | 10/10 | 0 | 15 | 1 | 17 | – | – |
+| 2 | Skeleton | 10/10 | 0 | 11 | 0 | 10 | – | – |
+| 2 | Two skeletons | 9/10 | 1 | 24 | 11 | 62 | – | 11% |
+| 3 | Rat | 10/10 | 0 | 8 | 0 | 4 | – | – |
+| 3 | Beetle (armored) | 10/10 | 0 | 12 | 0 | 13 | – | – |
+| 3 | Skeleton | 10/10 | 0 | 11 | 0 | 14 | – | – |
+| 3 | Two skeletons | 10/10 | 0 | 24 | 12 | 75 | – | – |
+| 4 | Rat | 10/10 | 0 | 7 | 0 | 5 | – | – |
+| 4 | Beetle (armored) | 10/10 | 0 | 12 | 0 | 15 | – | – |
+| 4 | Skeleton | 10/10 | 0 | 11 | 0 | 15 | – | – |
+| 4 | Two skeletons | 9/10 | 1 | 24 | 12 | 83 | – | 5% |
+| 5 | Rat | 10/10 | 0 | 9 | 0 | 6 | – | – |
+| 5 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 21 | – | – |
+| 5 | Skeleton | 10/10 | 0 | 13 | 1 | 25 | – | – |
+| 5 | Two skeletons | 7/10 | 3 | 26 | 13 | 101 | – | 11% |
+| 6 | Rat | 10/10 | 0 | 9 | 0 | 7 | – | – |
+| 6 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 21 | – | – |
+| 6 | Skeleton | 10/10 | 0 | 13 | 1 | 26 | – | – |
+| 6 | Two skeletons | 9/10 | 1 | 24 | 12 | 98 | – | 44% |
+| 6 | Boss 1 (lvl 7) | 0/10 | 10 | – | – | 132 | – | 58% |
+| 7 | Rat | 10/10 | 0 | 8 | 0 | 8 | – | – |
+| 7 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 24 | – | – |
+| 7 | Skeleton | 10/10 | 0 | 12 | 1 | 27 | – | – |
+| 7 | Two skeletons | 10/10 | 0 | 24 | 14 | 113 | – | – |
+| 7 | Boss 1 (lvl 7) | 0/10 | 10 | – | – | 146 | – | 47% |
+| 8 | Rat | 10/10 | 0 | 8 | 0 | 7 | – | – |
+| 8 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 24 | – | – |
+| 8 | Skeleton | 10/10 | 0 | 12 | 0 | 28 | – | – |
+| 8 | Two skeletons | 10/10 | 0 | 24 | 13 | 119 | – | – |
+| 8 | Boss 1 (lvl 7) | 0/10 | 10 | – | – | 160 | – | 36% |
+| 9 | Rat | 10/10 | 0 | 8 | 0 | 7 | – | – |
+| 9 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 26 | – | – |
+| 9 | Skeleton | 10/10 | 0 | 12 | 0 | 31 | – | – |
+| 9 | Two skeletons | 10/10 | 0 | 24 | 13 | 125 | – | – |
+| 9 | Boss 1 (lvl 7) | 7/10 | 3 | 35 | 17 | 159 | – | 32% |
+| 10 | Rat | 10/10 | 0 | 7 | 0 | 7 | – | – |
+| 10 | Beetle (armored) | 10/10 | 0 | 14 | 0 | 29 | – | – |
+| 10 | Skeleton | 10/10 | 0 | 12 | 0 | 32 | – | – |
+| 10 | Two skeletons | 10/10 | 0 | 25 | 14 | 136 | – | – |
+| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 34 | 16 | 154 | – | – |
 
 ### Necromancer
 
-Boss 1 first beaten (5+ wins in 10): level 7 · Two skeletons (8+ in 10): from level 1
+Boss 1 first beaten (5+ wins in 10): level 7 · Two skeletons (8+ in 10): from level 4
 
 | Lvl | Fight | Win | Deaths | Kill (s) | Rest (s) | Dmg taken | Mana used | Mob HP left (losses) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Rat | 10/10 | 0 | 22 | 0 | 0 | 6 | – |
-| 1 | Beetle (armored) | 10/10 | 0 | 34 | 4 | 0 | 46 | – |
-| 1 | Skeleton | 10/10 | 0 | 24 | 4 | 0 | 41 | – |
-| 1 | Two skeletons | 10/10 | 0 | 32 | 8 | 37 | 110 | – |
-| 2 | Rat | 10/10 | 0 | 15 | 0 | 0 | 9 | – |
-| 2 | Beetle (armored) | 10/10 | 0 | 20 | 0 | 0 | 18 | – |
-| 2 | Skeleton | 10/10 | 0 | 20 | 0 | 0 | 25 | – |
-| 2 | Two skeletons | 10/10 | 0 | 25 | 1 | 38 | 81 | – |
-| 3 | Rat | 10/10 | 0 | 14 | 0 | 0 | 9 | – |
-| 3 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
-| 3 | Skeleton | 10/10 | 0 | 22 | 0 | 0 | 19 | – |
-| 3 | Two skeletons | 10/10 | 0 | 33 | 2 | 10 | 97 | – |
+| 1 | Rat | 10/10 | 0 | 9 | 3 | 11 | 46 | – |
+| 1 | Beetle (armored) | 10/10 | 0 | 13 | 4 | 24 | 60 | – |
+| 1 | Skeleton | 10/10 | 0 | 12 | 4 | 37 | 58 | – |
+| 1 | Two skeletons | 0/10 | 10 | – | – | 86 | 66 | 49% |
+| 2 | Rat | 10/10 | 0 | 9 | 2 | 14 | 45 | – |
+| 2 | Beetle (armored) | 10/10 | 0 | 13 | 3 | 31 | 60 | – |
+| 2 | Skeleton | 10/10 | 0 | 12 | 3 | 47 | 58 | – |
+| 2 | Two skeletons | 0/10 | 10 | – | – | 125 | 79 | 35% |
+| 3 | Rat | 10/10 | 0 | 12 | 3 | 7 | 48 | – |
+| 3 | Beetle (armored) | 10/10 | 0 | 15 | 3 | 13 | 65 | – |
+| 3 | Skeleton | 10/10 | 0 | 15 | 5 | 24 | 62 | – |
+| 3 | Two skeletons | 1/10 | 9 | 30 | 12 | 140 | 100 | 19% |
 | 4 | Rat | 10/10 | 0 | 14 | 0 | 0 | 9 | – |
 | 4 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
-| 4 | Skeleton | 10/10 | 0 | 19 | 0 | 0 | 12 | – |
-| 4 | Two skeletons | 10/10 | 0 | 31 | 1 | 22 | 89 | – |
+| 4 | Skeleton | 10/10 | 0 | 19 | 0 | 0 | 9 | – |
+| 4 | Two skeletons | 10/10 | 0 | 33 | 1 | 22 | 91 | – |
 | 5 | Rat | 10/10 | 0 | 14 | 0 | 0 | 9 | – |
 | 5 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
 | 5 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
-| 5 | Two skeletons | 10/10 | 0 | 32 | 0 | 14 | 88 | – |
+| 5 | Two skeletons | 10/10 | 0 | 35 | 1 | 17 | 91 | – |
 | 6 | Rat | 10/10 | 0 | 14 | 0 | 0 | 9 | – |
 | 6 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
 | 6 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
-| 6 | Two skeletons | 10/10 | 0 | 33 | 0 | 14 | 83 | – |
-| 6 | Boss 1 (lvl 7) | 2/10 | 8 | 71 | 12 | 210 | 129 | 47% |
+| 6 | Two skeletons | 10/10 | 0 | 33 | 0 | 14 | 84 | – |
+| 6 | Boss 1 (lvl 7) | 3/10 | 7 | 69 | 12 | 196 | 131 | 50% |
 | 7 | Rat | 10/10 | 0 | 13 | 0 | 0 | 9 | – |
 | 7 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
 | 7 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 9 | – |
-| 7 | Two skeletons | 10/10 | 0 | 33 | 0 | 0 | 84 | – |
-| 7 | Boss 1 (lvl 7) | 10/10 | 0 | 62 | 8 | 281 | 183 | – |
+| 7 | Two skeletons | 10/10 | 0 | 33 | 0 | 0 | 86 | – |
+| 7 | Boss 1 (lvl 7) | 10/10 | 0 | 64 | 10 | 270 | 196 | – |
 | 8 | Rat | 10/10 | 0 | 13 | 0 | 0 | 9 | – |
 | 8 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 15 | – |
 | 8 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 19 | – |
 | 8 | Two skeletons | 10/10 | 0 | 31 | 0 | 2 | 64 | – |
-| 8 | Boss 1 (lvl 7) | 8/10 | 2 | 51 | 4 | 252 | 126 | 22% |
+| 8 | Boss 1 (lvl 7) | 9/10 | 1 | 49 | 5 | 252 | 129 | 31% |
 | 9 | Rat | 10/10 | 0 | 13 | 0 | 0 | 9 | – |
 | 9 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 14 | – |
 | 9 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 19 | – |
@@ -274,7 +285,7 @@ Boss 1 first beaten (5+ wins in 10): level 7 · Two skeletons (8+ in 10): from l
 | 10 | Beetle (armored) | 10/10 | 0 | 17 | 0 | 0 | 12 | – |
 | 10 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 19 | – |
 | 10 | Two skeletons | 10/10 | 0 | 33 | 0 | 0 | 63 | – |
-| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 43 | 4 | 201 | 100 | – |
+| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 43 | 4 | 203 | 100 | – |
 
 ### Cleric
 
@@ -330,78 +341,78 @@ Boss 1 first beaten (5+ wins in 10): level 7 · Two skeletons (8+ in 10): from l
 
 ### Enchanter
 
-Boss 1 first beaten (5+ wins in 10): level 7 · Two skeletons (8+ in 10): from level 1
+Boss 1 first beaten (5+ wins in 10): level 6 · Two skeletons (8+ in 10): from level 1
 
 | Lvl | Fight | Win | Deaths | Kill (s) | Rest (s) | Dmg taken | Mana used | Mob HP left (losses) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Rat | 10/10 | 0 | 34 | 0 | 0 | 18 | – |
-| 1 | Beetle (armored) | 10/10 | 0 | 30 | 0 | 0 | 18 | – |
-| 1 | Skeleton | 10/10 | 0 | 43 | 0 | 0 | 25 | – |
-| 1 | Two skeletons | 10/10 | 0 | 89 | 0 | 0 | 73 | – |
-| 2 | Rat | 10/10 | 0 | 14 | 0 | 0 | 11 | – |
-| 2 | Beetle (armored) | 10/10 | 0 | 22 | 0 | 0 | 13 | – |
-| 2 | Skeleton | 10/10 | 0 | 32 | 0 | 0 | 19 | – |
-| 2 | Two skeletons | 10/10 | 0 | 77 | 0 | 0 | 71 | – |
-| 3 | Rat | 10/10 | 0 | 13 | 0 | 0 | 15 | – |
-| 3 | Beetle (armored) | 10/10 | 0 | 18 | 0 | 0 | 20 | – |
-| 3 | Skeleton | 10/10 | 0 | 26 | 0 | 0 | 27 | – |
-| 3 | Two skeletons | 10/10 | 0 | 64 | 0 | 0 | 84 | – |
-| 4 | Rat | 10/10 | 0 | 35 | 0 | 0 | 33 | – |
-| 4 | Beetle (armored) | 10/10 | 0 | 34 | 0 | 0 | 33 | – |
-| 4 | Skeleton | 10/10 | 0 | 44 | 0 | 0 | 43 | – |
-| 4 | Two skeletons | 10/10 | 0 | 91 | 0 | 0 | 107 | – |
-| 5 | Rat | 10/10 | 0 | 36 | 0 | 0 | 33 | – |
-| 5 | Beetle (armored) | 10/10 | 0 | 33 | 0 | 0 | 33 | – |
-| 5 | Skeleton | 10/10 | 0 | 45 | 0 | 0 | 40 | – |
-| 5 | Two skeletons | 10/10 | 0 | 86 | 0 | 0 | 101 | – |
-| 6 | Rat | 10/10 | 0 | 37 | 0 | 0 | 33 | – |
-| 6 | Beetle (armored) | 10/10 | 0 | 34 | 0 | 0 | 33 | – |
-| 6 | Skeleton | 10/10 | 0 | 46 | 0 | 0 | 37 | – |
-| 6 | Two skeletons | 10/10 | 0 | 84 | 0 | 0 | 100 | – |
-| 6 | Boss 1 (lvl 7) | 2/10 | 8 | 166 | 7 | 91 | 150 | 58% |
-| 7 | Rat | 10/10 | 0 | 32 | 0 | 0 | 27 | – |
-| 7 | Beetle (armored) | 10/10 | 0 | 30 | 0 | 0 | 27 | – |
-| 7 | Skeleton | 10/10 | 0 | 39 | 0 | 0 | 33 | – |
-| 7 | Two skeletons | 10/10 | 0 | 69 | 0 | 0 | 86 | – |
-| 7 | Boss 1 (lvl 7) | 9/10 | 1 | 138 | 11 | 90 | 178 | 51% |
-| 8 | Rat | 10/10 | 0 | 32 | 0 | 0 | 27 | – |
-| 8 | Beetle (armored) | 10/10 | 0 | 30 | 0 | 0 | 27 | – |
-| 8 | Skeleton | 10/10 | 0 | 39 | 0 | 0 | 33 | – |
-| 8 | Two skeletons | 10/10 | 0 | 70 | 0 | 0 | 85 | – |
-| 8 | Boss 1 (lvl 7) | 5/10 | 5 | 143 | 11 | 110 | 161 | 33% |
-| 9 | Rat | 10/10 | 0 | 33 | 0 | 0 | 27 | – |
-| 9 | Beetle (armored) | 10/10 | 0 | 30 | 0 | 0 | 27 | – |
-| 9 | Skeleton | 10/10 | 0 | 40 | 0 | 0 | 33 | – |
-| 9 | Two skeletons | 10/10 | 0 | 72 | 0 | 0 | 85 | – |
-| 9 | Boss 1 (lvl 7) | 9/10 | 1 | 140 | 4 | 92 | 154 | 38% |
-| 10 | Rat | 10/10 | 0 | 33 | 0 | 0 | 27 | – |
-| 10 | Beetle (armored) | 10/10 | 0 | 30 | 0 | 0 | 27 | – |
-| 10 | Skeleton | 10/10 | 0 | 41 | 0 | 0 | 33 | – |
-| 10 | Two skeletons | 10/10 | 0 | 73 | 0 | 0 | 84 | – |
-| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 133 | 0 | 44 | 140 | – |
+| 1 | Rat | 10/10 | 0 | 11 | 1 | 0 | 27 | – |
+| 1 | Beetle (armored) | 10/10 | 0 | 17 | 3 | 0 | 42 | – |
+| 1 | Skeleton | 10/10 | 0 | 17 | 3 | 0 | 42 | – |
+| 1 | Two skeletons | 10/10 | 0 | 36 | 7 | 0 | 89 | – |
+| 2 | Rat | 10/10 | 0 | 8 | 0 | 0 | 20 | – |
+| 2 | Beetle (armored) | 10/10 | 0 | 11 | 0 | 0 | 28 | – |
+| 2 | Skeleton | 10/10 | 0 | 11 | 0 | 0 | 28 | – |
+| 2 | Two skeletons | 10/10 | 0 | 31 | 2 | 0 | 77 | – |
+| 3 | Rat | 10/10 | 0 | 8 | 0 | 0 | 25 | – |
+| 3 | Beetle (armored) | 10/10 | 0 | 12 | 0 | 0 | 32 | – |
+| 3 | Skeleton | 10/10 | 0 | 11 | 0 | 0 | 31 | – |
+| 3 | Two skeletons | 10/10 | 0 | 30 | 2 | 0 | 84 | – |
+| 4 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 4 | Beetle (armored) | 10/10 | 0 | 19 | 0 | 0 | 49 | – |
+| 4 | Skeleton | 10/10 | 0 | 19 | 0 | 0 | 48 | – |
+| 4 | Two skeletons | 10/10 | 0 | 35 | 0 | 0 | 102 | – |
+| 5 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 5 | Beetle (armored) | 10/10 | 0 | 19 | 0 | 0 | 49 | – |
+| 5 | Skeleton | 10/10 | 0 | 19 | 0 | 0 | 48 | – |
+| 5 | Two skeletons | 10/10 | 0 | 37 | 0 | 0 | 101 | – |
+| 6 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 6 | Beetle (armored) | 10/10 | 0 | 19 | 0 | 0 | 49 | – |
+| 6 | Skeleton | 10/10 | 0 | 18 | 0 | 0 | 48 | – |
+| 6 | Two skeletons | 10/10 | 0 | 37 | 0 | 0 | 101 | – |
+| 6 | Boss 1 (lvl 7) | 10/10 | 0 | 83 | 6 | 50 | 234 | – |
+| 7 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 7 | Beetle (armored) | 10/10 | 0 | 16 | 0 | 0 | 42 | – |
+| 7 | Skeleton | 10/10 | 0 | 17 | 0 | 0 | 43 | – |
+| 7 | Two skeletons | 10/10 | 0 | 35 | 0 | 0 | 96 | – |
+| 7 | Boss 1 (lvl 7) | 10/10 | 0 | 88 | 4 | 43 | 205 | – |
+| 8 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 8 | Beetle (armored) | 10/10 | 0 | 16 | 0 | 0 | 42 | – |
+| 8 | Skeleton | 10/10 | 0 | 17 | 0 | 0 | 43 | – |
+| 8 | Two skeletons | 10/10 | 0 | 35 | 0 | 0 | 96 | – |
+| 8 | Boss 1 (lvl 7) | 10/10 | 0 | 92 | 4 | 44 | 187 | – |
+| 9 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 9 | Beetle (armored) | 10/10 | 0 | 17 | 0 | 0 | 43 | – |
+| 9 | Skeleton | 10/10 | 0 | 17 | 0 | 0 | 43 | – |
+| 9 | Two skeletons | 10/10 | 0 | 36 | 0 | 0 | 96 | – |
+| 9 | Boss 1 (lvl 7) | 10/10 | 0 | 96 | 1 | 34 | 177 | – |
+| 10 | Rat | 10/10 | 0 | 13 | 0 | 0 | 34 | – |
+| 10 | Beetle (armored) | 10/10 | 0 | 16 | 0 | 0 | 41 | – |
+| 10 | Skeleton | 10/10 | 0 | 17 | 0 | 0 | 42 | – |
+| 10 | Two skeletons | 10/10 | 0 | 36 | 0 | 0 | 94 | – |
+| 10 | Boss 1 (lvl 7) | 10/10 | 0 | 97 | 0 | 22 | 174 | – |
 
 ### Paladin
 
-Boss 1 first beaten (5+ wins in 10): level 8 · Two skeletons (8+ in 10): from level 1
+Boss 1 first beaten (5+ wins in 10): level 8 · Two skeletons (8+ in 10): from level 4
 
 | Lvl | Fight | Win | Deaths | Kill (s) | Rest (s) | Dmg taken | Mana used | Mob HP left (losses) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | 1 | Rat | 10/10 | 0 | 12 | 0 | 11 | 0 | – |
 | 1 | Beetle (armored) | 10/10 | 0 | 20 | 4 | 30 | 0 | – |
 | 1 | Skeleton | 10/10 | 0 | 16 | 3 | 35 | 0 | – |
-| 1 | Two skeletons | 8/10 | 2 | 33 | 4 | 113 | 0 | 7% |
+| 1 | Two skeletons | 0/10 | 10 | – | – | 69 | 0 | 48% |
 | 2 | Rat | 10/10 | 0 | 12 | 0 | 13 | 0 | – |
 | 2 | Beetle (armored) | 10/10 | 0 | 22 | 3 | 32 | 0 | – |
 | 2 | Skeleton | 10/10 | 0 | 18 | 2 | 38 | 0 | – |
-| 2 | Two skeletons | 4/10 | 6 | 35 | 5 | 150 | 0 | 9% |
+| 2 | Two skeletons | 0/10 | 10 | – | – | 88 | 2 | 53% |
 | 3 | Rat | 10/10 | 0 | 13 | 0 | 17 | 0 | – |
 | 3 | Beetle (armored) | 10/10 | 0 | 21 | 4 | 40 | 0 | – |
 | 3 | Skeleton | 10/10 | 0 | 18 | 2 | 42 | 0 | – |
-| 3 | Two skeletons | 7/10 | 3 | 38 | 6 | 190 | 6 | 8% |
+| 3 | Two skeletons | 0/10 | 10 | – | – | 104 | 2 | 58% |
 | 4 | Rat | 10/10 | 0 | 12 | 0 | 20 | 0 | – |
 | 4 | Beetle (armored) | 10/10 | 0 | 22 | 4 | 47 | 0 | – |
 | 4 | Skeleton | 10/10 | 0 | 14 | 1 | 37 | 20 | – |
-| 4 | Two skeletons | 10/10 | 0 | 31 | 1 | 144 | 35 | – |
+| 4 | Two skeletons | 9/10 | 1 | 32 | 5 | 144 | 43 | 50% |
 | 5 | Rat | 10/10 | 0 | 13 | 0 | 25 | 0 | – |
 | 5 | Beetle (armored) | 10/10 | 0 | 22 | 6 | 59 | 0 | – |
 | 5 | Skeleton | 10/10 | 0 | 14 | 1 | 42 | 20 | – |
@@ -694,22 +705,22 @@ Boss 1 first beaten (5+ wins in 10): level 9 · Two skeletons (8+ in 10): from l
 
 ### Shaman
 
-Boss 1 first beaten (5+ wins in 10): level 6 · Two skeletons (8+ in 10): from level 1
+Boss 1 first beaten (5+ wins in 10): level 6 · Two skeletons (8+ in 10): from level 4
 
 | Lvl | Fight | Win | Deaths | Kill (s) | Rest (s) | Dmg taken | Mana used | Mob HP left (losses) |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
-| 1 | Rat | 10/10 | 0 | 40 | 0 | 0 | 18 | – |
-| 1 | Beetle (armored) | 10/10 | 0 | 33 | 0 | 0 | 12 | – |
-| 1 | Skeleton | 10/10 | 0 | 48 | 0 | 0 | 18 | – |
-| 1 | Two skeletons | 10/10 | 0 | 58 | 0 | 0 | 38 | – |
-| 2 | Rat | 10/10 | 0 | 34 | 0 | 0 | 24 | – |
-| 2 | Beetle (armored) | 10/10 | 0 | 32 | 0 | 0 | 24 | – |
-| 2 | Skeleton | 10/10 | 0 | 42 | 0 | 0 | 31 | – |
-| 2 | Two skeletons | 10/10 | 0 | 51 | 0 | 0 | 63 | – |
-| 3 | Rat | 10/10 | 0 | 34 | 0 | 0 | 24 | – |
-| 3 | Beetle (armored) | 10/10 | 0 | 31 | 0 | 0 | 24 | – |
-| 3 | Skeleton | 10/10 | 0 | 43 | 0 | 0 | 32 | – |
-| 3 | Two skeletons | 10/10 | 0 | 52 | 0 | 0 | 64 | – |
+| 1 | Rat | 10/10 | 0 | 10 | 0 | 14 | 6 | – |
+| 1 | Beetle (armored) | 10/10 | 0 | 14 | 4 | 24 | 6 | – |
+| 1 | Skeleton | 10/10 | 0 | 14 | 3 | 36 | 9 | – |
+| 1 | Two skeletons | 0/10 | 10 | – | – | 70 | 14 | 56% |
+| 2 | Rat | 10/10 | 0 | 11 | 0 | 14 | 12 | – |
+| 2 | Beetle (armored) | 10/10 | 0 | 15 | 3 | 25 | 12 | – |
+| 2 | Skeleton | 10/10 | 0 | 14 | 2 | 36 | 12 | – |
+| 2 | Two skeletons | 0/10 | 10 | – | – | 90 | 20 | 58% |
+| 3 | Rat | 10/10 | 0 | 12 | 1 | 19 | 13 | – |
+| 3 | Beetle (armored) | 10/10 | 0 | 15 | 5 | 35 | 13 | – |
+| 3 | Skeleton | 10/10 | 0 | 16 | 6 | 53 | 16 | – |
+| 3 | Two skeletons | 0/10 | 10 | – | – | 99 | 20 | 59% |
 | 4 | Rat | 10/10 | 0 | 17 | 0 | 0 | 22 | – |
 | 4 | Beetle (armored) | 10/10 | 0 | 16 | 0 | 0 | 22 | – |
 | 4 | Skeleton | 10/10 | 0 | 22 | 0 | 0 | 34 | – |

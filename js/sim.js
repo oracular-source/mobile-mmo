@@ -127,7 +127,7 @@ const BOTS={
     }
   },
   necro:{
-    prep(){if(pet)return !player.cast;if(!player.cast&&B.can('raise'))B.use('raise');return false},
+    prep(){if(pet)return !player.cast;if(player.lvl<ABI.raise.lvl)return true;if(!player.cast&&B.can('raise'))B.use('raise');return false},
     think(st){
       if(player.cast||player.fd>0)return;
       const t=B.target();if(!t)return;
@@ -138,6 +138,11 @@ const BOTS={
       if(B.hp()<0.2&&B.can('feign')){B.stop();player.sit=false;B.use('feign');return}
       // Lost the pet: Dread, back off, re-raise if there's time.
       if(!pet){const th=on.sort((a,b)=>dist(a,player)-dist(b,player))[0];
+        // Levels 1-3 (no pet yet): keep Plague up, Dread what gets close, back off and Lifetap.
+        if(player.lvl<ABI.raise.lvl){const tt=B.target();
+          if(th&&dist(th,player)<24&&B.can('dread')){B.use('dread',th);return}
+          if(!B.dot(tt,'plague')&&B.can('plague')&&dist(player,tt)<=80){B.use('plague',tt);return}
+          if(B.can('tap')&&B.near(tt,75))B.use('tap',tt);return}
         if(th&&B.can('dread')){B.use('dread',th);return}
         if((!th||dist(th,player)>50)&&B.can('raise')){B.stop();B.use('raise');return}
         if(th&&dist(th,player)<30)B.kite(th);
@@ -247,7 +252,9 @@ const BOTS={
       if(!B.dot(main,'mrot')&&B.can('mrot')&&dist(player,main)<=80){B.use('mrot',main);return}
       // 6. Sword gone and nothing on you: Animate Blade.
       if(!pet&&!on.length&&B.can('blade')){B.stop();B.use('blade');return}
-      // 7. Otherwise let the pets work; sit if nothing is on you.
+      // 7. Mind Lash while mana is above half (always before the sword, level 1).
+      if((B.mp()>0.5||!pet)&&B.can('mlash')&&dist(player,main)<=80){B.use('mlash',main);return}
+      // 8. Otherwise let the pets work; sit if nothing is on you.
       if(!on.length&&pet){B.stop();player.sit=true}
     }
   },
@@ -449,6 +456,11 @@ const BOTS={
       if(!fight.length){if(B.near(t,75)&&B.can('sicken'))B.use('sicken',t);return}
       const on=B.onMe().filter(m=>!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
       const th=on[0],d=th?dist(th,player):999;
+      // Levels 1-3 (before Swarm): Drowsy and Sicken on it, then stand and Spear Jab.
+      if(player.lvl<ABI.swarm.lvl){if(B.hp()<0.35&&B.can('sheal')){B.stop();B.use('sheal');return}
+        if(!(t.aslow>0)&&B.can('drowsy')&&dist(player,t)<=80){B.use('drowsy',t);return}
+        if(!B.dot(t,'sicken')&&B.can('sicken')&&dist(player,t)<=80){B.use('sicken',t);return}
+        if(B.near(t,14)&&B.can('jab'))B.use('jab',t);return}
       // 1. Low: back off, then Minor Healing.
       if(B.hp()<0.4){if(d>30&&B.can('sheal')){B.stop();B.use('sheal');return}if(th)B.kite(th);}
       // 2-4. Drowsy, Sicken, Swarm on every mob in the fight.
