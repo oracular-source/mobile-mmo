@@ -34,7 +34,9 @@ function mkRags(id){
   c.w.forEach(w=>RAG_WEAPONS[w].forEach(([y0,rows])=>rows.forEach((r,j)=>{const y=y0+j;if(!g[y])return;for(let i=0;i<r.length&&i<W;i++)if(r[i]!=='.')g[y][i]=r[i]})));
   const pal=Object.assign({},RAG_COMMON,c.c),H=g.length;
   const step=(a,b)=>{const n=g.map(r=>r.slice());for(let x=a;x<=b;x++){n[H-3][x]=g[H-2][x];n[H-2][x]=g[H-1][x];n[H-1][x]='.'}return n.map(r=>r.join(''))};
-  const im=mk(g.map(r=>r.join('')),pal);im.steps=[mk(step(4,7),pal),mk(step(10,13),pal)];return im;
+  // v0.27.2: 20x24 read too big next to doors, so shrink to 15x18 (just over the old 12x16) by dropping every 4th row/column.
+  const shrink=rows=>{const sh=18,sw=15,h=rows.length,w=rows[0].length,o=[];for(let j=0;j<sh;j++){let r='';const src=rows[Math.floor(j*h/sh)];for(let i=0;i<sw;i++)r+=src[Math.floor(i*w/sw)];o.push(r)}return o};
+  const im=mk(shrink(g.map(r=>r.join(''))),pal);im.steps=[mk(shrink(step(4,7)),pal),mk(shrink(step(10,13)),pal)];return im;
 }
 // The player's picture: the rags look by default. DEV "Old look" shows the class's previous sprite
 // (or the v0.15 default skin), and "Default skin" forces the shared 12x16 body, for comparing.
