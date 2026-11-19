@@ -48,9 +48,9 @@ function playerImg(){
 // Walk cycle for pictures that have step frames: stand, left foot up, stand, right foot up (body rises on steps).
 function walkFrame(img,walk,moving){
   if(!moving)return{im:img,bob:0};
-  const f=Math.floor(walk*8)%4;
+  const f=Math.floor(walk*6)%4; // a bit slower than before so the steps read clearly
   if(!img.steps)return{im:img,bob:f%2};
-  return{im:f===1?img.steps[0]:f===3?img.steps[1]:img,bob:f%2?-1:0};
+  return{im:f===1?img.steps[0]:f===3?img.steps[1]:img,bob:0}; // feet move, body stays put (the bob made it look jittery)
 }
 
 /* ---------- Render ---------- */
@@ -78,14 +78,13 @@ function zoomStep(d){
 window.addEventListener('resize',resize);
 const bay=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
 const dark=document.createElement('canvas'),dg=dark.getContext('2d'),stampCache={};
-// A light pool, pre-dithered into 6 brightness steps. 'cut' removes darkness, 'warm' adds firelight color.
+// A light pool with a smooth fade (v0.27.2: the old dither pattern looked grainy). 'cut' removes darkness, 'warm' adds firelight color.
 function lightStamp(r,amb,kind){
   const key=r+'|'+amb+'|'+kind;if(stampCache[key])return stampCache[key];
   const size=r*2+2,c=document.createElement('canvas');c.width=c.height=size;const g=c.getContext('2d'),id=g.createImageData(size,size),d=id.data;
   for(let y=0;y<size;y++)for(let x=0;x<size;x++){
     const v=Math.max(0,1-Math.hypot(x-r-1,(y-r-1)*1.15)/r);if(v<=0)continue;
     let a=kind==='cut'?Math.min(1,v*v*0.9/(1-amb)):v*v;
-    a=Math.min(1,Math.floor(a*6+bay[(y&3)*4+(x&3)]/16)/6);
     const o=(y*size+x)*4;if(kind==='warm'){d[o]=255;d[o+1]=150;d[o+2]=60}d[o+3]=a*255;
   }
   g.putImageData(id,0,0);stampCache[key]=c;return c;

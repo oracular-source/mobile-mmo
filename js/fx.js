@@ -20,7 +20,8 @@ function moveToward(e,tx,ty,spd,dt){
   if(!blocked(e.x+vx,e.y))e.x+=vx;else if(!blocked(e.x+vx,e.y+(vy>=0?3:-3)))e.y+=(vy>=0?1:-1)*Math.abs(vx);
   if(!blocked(e.x,e.y+vy))e.y+=vy;else if(!blocked(e.x+(vx>=0?3:-3),e.y+vy))e.x+=(vx>=0?1:-1)*Math.abs(vy);
   e.x=Math.max(4,Math.min(WW-4,e.x));e.y=Math.max(8,Math.min(WH-2,e.y));
-  if(Math.abs(vx)>0.01)e.dir=vx>0?1:-1;e.walk+=dt;
+  if(Math.abs(vx)>step*0.4)e.dir=vx>0?1:-1; // only turn when clearly moving sideways, so walking up/down doesn't flip the sprite back and forth
+  e.walk+=dt;
   return d<=step+0.01;
 }
 const inCombat=()=>mobs.some(m=>!m.dead&&m.state==='chase');
