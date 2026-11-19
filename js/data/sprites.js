@@ -64,45 +64,50 @@ const SKINS={
   bard:{body:'#b0306a',shade:'#7a2048',trim:'#ffd27a',hair:'#c9a227',boots:'#4a3b33',weapons:['sword','lute']}
 };
 
-/* ---------- Rags: gear tier 0 (v0.19) ----------
-   The A+B mix look (take 1): 16x18, 6-row heads. Everyone starts in rags and sticks; the head
-   (face, hood, mask, helm) and the starter weapon tell classes apart. Later gear tiers add their own looks.
+/* ---------- Rags: gear tier 0 (v0.25: 20x24) ----------
+   The A+B mix look (take 1) at the picked size, 20x24 (owner, Nov 18): 8-row heads, 16-row bodies.
+   The two bodies and the Druid and Paladin heads come straight from the character-size mock-up (draft 4);
+   the other heads follow the same pattern. Everyone starts in rags and sticks; the head and starter weapon
+   tell classes apart. Later gear tiers add their own looks.
    Keys: k outline, H/n/N/d cloth light to dark (sackcloth with a light class dye), y rope belt, w leg wraps,
    O foot wraps, S lit hand, s skin, e eyes, h hair, A/a/Q hood light to dark, m glowing eyes, R accent,
-   W pale cloth or bone, I/i iron, T headband, L leaf, o wood, l rusty steel. Hand is at x12 y9. */
+   W pale cloth or bone, I/i iron, T headband, L leaf, o wood, l rusty steel. Hand is at x15 y13. */
 const RAG_COMMON={"k": "#0b0a0f", "y": "#9c8a5a", "w": "#8a7f70", "O": "#4a3b33", "S": "#f0c99a", "s": "#d9a77c", "e": "#1a1820", "o": "#6e4a2a", "l": "#8f8a86", "L": "#5f8a3a"};
 const RAG_HEADS={
-  druid:[".....kLLLk......","....kLhLhLk.....","....khhhhhk.....","....khssshk.....","....ksesesk.....",".....ksssk......"],
-  warrior:[".....kkkkk......","....khhhhhk.....","...RkRRRRRk.....","....khssshk.....","....ksesesk.....",".....ksssk......"],
-  paladin:[".....kkkkk......","....khhhhhk.....","....kIIIIIk.....","....khssshk.....","....ksesesk.....",".....ksssk......"],
-  shadowknight:[".....kkkkk......","....kIIIIIk.....","....kIIIIIk.....","....kiiiiik.....","....kkmkmkk.....",".....kiiik......"],
-  rogue:["......kk........",".....kAak.......","....kAaaaQk.....","....kAkkkQk.....","....kAeseQk.....",".....kRRRk......"],
-  necro:["......kk........",".....kAak.......","....kAaaaQk.....","....kAkkkQk.....","....kAmkmQk.....",".....kQQQk......"],
-  ranger:["......kk........",".....kAak.......","....kAaaaQk.....","....kAsssQk.....","....kAeseQk.....",".....ksssk......"],
-  cleric:[".....kkkkk......","....kWWWWWk.....","....kWhhhWk.....","....kWsssWk.....","....kWeseWk.....",".....kWsWk......"],
-  enchanter:[".....kkkkk......","....kAaaaQk.....","....kAWWWQk.....","....kWWWWWk.....","....kWmWmWk.....",".....kWWWk......"],
-  wizard:["......kk........",".....kAak.......","...kAAaaaQQk....","....ksesesk.....","....ksWWWsk.....",".....kWWWk......"],
-  magician:["......kRk.......","....kRRRRRk.....","....khRRRhk.....","....khssshk.....","....ksesesk.....",".....ksssk......"],
-  shaman:[".....kkkkk.W....","....khhhhhkW....","....khhhhhk.....","....khssshk.....","....kReReRk.....","...khkssskhk...."],
-  monk:[".....kkkkk......","....ksssssk.....","...TkTTTTTk.....","....ksssssk.....","....ksesesk.....",".....ksssk......"],
-  bard:["......kkk..R....","....kAAAAAkR....","....khhhhhk.....","....khssshk.....","....ksesesk.....",".....ksssk......"]
+  druid:["......kLLLLk",".....kLhLLhLk","....khhhhhhhhk","....khhhhhhhhk","....khsssssshk","....kssessessk","....kssssssssk",".....kssssssk"],
+  warrior:["......kkkkkk",".....khhhhhhk","...RkRRRRRRRRk","....khhhhhhhhk","....khsssssshk","....kssessessk","....kssssssssk",".....kssssssk"],
+  paladin:["......kkkkkk",".....khhhhhhk","....kIIIIIIIIk","....khhhhhhhhk","....khsssssshk","....kssessessk","....kssssssssk",".....kssssssk"],
+  shadowknight:["......kkkkkk",".....kIIIIIIk","....kIIIIIIIIk","....kIIIIIIIIk","....kiiiiiiiik","....kkkmkkmkkk","....kiiiiiiiik",".....kiiiiiik"],
+  rogue:[".......kkk","......kAaak",".....kAaaaaQk","....kAaaaaaaQk","....kAkkkkkkQk","....kAsessesQk","....kARRRRRRQk",".....kRRRRRRk"],
+  necro:[".......kkk","......kAaak",".....kAaaaaQk","....kAaaaaaaQk","....kAkkkkkkQk","....kAkmkkmkQk","....kAkkkkkkQk",".....kQQQQQQk"],
+  ranger:[".......kkk","......kAaak",".....kAaaaaQk","....kAaaaaaaQk","....kAssssssQk","....kAsessesQk","....kAssssssQk",".....kssssssk"],
+  cleric:["......kkkkkk",".....kWWWWWWk","....kWWWWWWWWk","....kWhhhhhhWk","....kWssssssWk","....kWsessesWk","....kWssssssWk",".....kWssssWk"],
+  enchanter:["......kkkkkk",".....kAaaaaQk","....kAaaaaaaQk","....kAWWWWWWQk","....kWWWWWWWWk","....kWWmWWmWWk","....kWWWWWWWWk",".....kWWWWWWk"],
+  wizard:["........kk",".......kAak","......kAaaak",".....kAaaaaQk","..kAAAaaaaaQQQk","....kssessessk","....ksWWWWWWsk",".....kWWWWWWk"],
+  magician:["........kRk","......kRRRRk",".....kRRRRRRk","....kRRRRRRRRk","....khRRRRRRhk","....khsssssshk","....kssessessk",".....kssssssk"],
+  shaman:["......kkkkkk.W",".....khhhhhhkW","....khhhhhhhhk","....khhhhhhhhk","....khsssssshk","....kRReRReRRk","....kssssssssk","...khksssssskhk"],
+  monk:["......kkkkkk",".....kssssssk","....kssssssssk","..TTkTTTTTTTTk","....kssssssssk","....kssessessk","....kssssssssk",".....kssssssk"],
+  bard:[".......kkkk...R",".....kAAAAAAk.R","....kAAAAAAAAkR","....khhhhhhhhk","....khsssssshk","....kssessessk","....kssssssssk",".....kssssssk"]
 };
-const RAG_BODIES={  // rag = robe to the knee (casters), tunic = short tunic and trousers (fighters)
-  rag:[".....kHnNk......","....kHnnnNk.....","...kHnnnnnNk....","...kHyyyyyNkS...","...kHnnnnnNk....","...kHnnnNNNk....","...kHkNnkNkNk...","....kwk.kwk.....","....kwk.kwk.....","....kwk.kwk.....","....kOk.kOk.....","....kkk.kkk....."],
-  tunic:[".....kHnNk......","....kHnnnNk.....","...kHnnnnnNk....","...kHyyyyyNkS...","...kHnnnnnNk....","...kHkNnkNkNk...","....kwwwwwk.....","....kwk.kwk.....","....kwk.kwk.....","....kwk.kwk.....","....kOk.kOk.....","....kkk.kkk....."]
+const RAG_BODIES={  // rag = robe to the knee (casters), tunic = short tunic and trousers (fighters). From the mock-up.
+  rag:["......kHnnNk",".....kHnnnnNk","....kHnnnnnnNk","...kHnnnnnnnnNk","...kHnnnnnnnnNk","...kHyyyyyyyyNkS","...kHnnnnnnnnNk","...kHnnnnnnNNNk",
+    "...kHnnnnnNNNNk","...kHnnnnNNNNdk","...kHkNnkNkNNdk","....kwwk..kwwk","....kwwk..kwwk","....kwwk..kwwk","....kOOk..kOOk","....kkkk..kkkk"],
+  tunic:["......kHnnNk",".....kHnnnnNk","....kHnnnnnnNk","...kHnnnnnnnnNk","...kHnnnnnnnnNk","...kHyyyyyyyyNkS","...kHnnnnnnnnNk","...kHnnnnnnNNNk",
+    "...kHkNnkNnkNNk","....kwwwwwwwwk","....kwwk..kwwk","....kwwk..kwwk","....kwwk..kwwk","....kwwk..kwwk","....kOOk..kOOk","....kkkk..kkkk"]
 };
+// Weapons: each is a list of [first row, rows] pieces laid over the 20x24 grid ('.' = see-through).
 const RAG_WEAPONS={
-  stick:["................","................",".............o..",".............o..","............o...","............o...","............o...","............o...","............o...","................","............o...","............o...","............o...","............o...","............o...","............o...","............o...","............o..."],
-  leafstick:["................","..............L.",".............o..",".............o..","............o...","............o...","............o...","............o...","............o...","................","............o...","............o...","............o...","............o...","............o...","............o...","............o...","............o..."],
-  club:["................","................","................","..........kkkkk.","..........koook.","..........koook.","..........koOok.","..........koook.","..........kkkkk.","................","............o...","............o...","................","................","................","................","................","................"],
-  sword:["................","............k...","...........klk..","...........klk..","...........klk..","...........klk..","...........klk..","...........klk..","...........ooo..","................","............o...","................","................","................","................","................","................","................"],
-  shield:["................","................","................","................","................","................","................","................","kkkk............","kook............","koOk............","kOok............","kook............","kkkk............","................","................","................","................"],
-  dagger:["................","................","................","................","................","............k...","...........klk..","...........klk..","............o...","................","................","................","................","................","................","................","................","................"],
-  offknife:["................","................","................","................","................","................","................","................","................","................",".kS.............",".klk............",".klk............","..k.............","................","................","................","................"],
-  bow:["................","................","................",".............k..","..............o.","..............wo","..............wo","..............wo","..............wo","..............wo","..............wo","..............wo","..............wo","..............o.",".............k..","................","................","................"],
-  spear:["............W...","...........kWk..","............y...","............o...","............o...","............o...","............o...","............o...","............o...","................","............o...","............o...","............o...","............o...","............o...","............o...","............o...","............o..."],
-  lute:["................","................","................","................","................","................","................","k...............",".o..............",".kok............","koook...........","kokok...........","koook...........",".kkk............","................","................","................","................"],
-  wraps:["................","................","................","................","................","................","................","................","................","............w...","..w.............","................","................","................","................","................","................","................"]
+  stick:[[2,Array(22).fill("................o")]],
+  leafstick:[[1,[".................L"].concat(Array(23).fill("................o"))]],
+  club:[[5,["..............kkkkk","..............koook","..............koOok","..............koook","..............kooOk","..............kkkkk","................o","................o","................o","................o"]]],
+  sword:[[4,["................k","...............klk","...............klk","...............klk","...............klk","...............klk","...............klk","..............kooook","................o","...............So","................o"]]],
+  shield:[[11,["kkkkk","kooOk","koOok","kOook","kooOk","kOook","kkkkk"]]],
+  dagger:[[9,["................k","...............klk","...............klk","...............klk","................o","................o"]]],
+  offknife:[[13,[".kS",".klk",".klk","..k"]]],
+  bow:[[3,[".................k","..................o"].concat(Array(13).fill(".................wo"),["..................o",".................k"])]],
+  spear:[[0,["................W","...............kWk","................y"].concat(Array(21).fill("................o"))]],
+  lute:[[10,["k",".o",".kok","koook","kokok","koook",".kkk"]]],
+  wraps:[[14,["..w.............w"]]]
 };
 const RAGS={
   druid:{"body":"rag","w":["leafstick"],"c":{"H":"#686d56","n":"#535a44","N":"#3e4734","d":"#303a28","h":"#6e4a2a"}},

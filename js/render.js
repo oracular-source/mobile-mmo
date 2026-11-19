@@ -26,15 +26,15 @@ function mkSkin(id){
   (sk.weapons||[]).forEach(w=>(WEAPONS[w]||[]).forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.')rows[j][i]=r[i]}));
   return mk(rows.map(r=>r.join('')),Object.assign({},PAL,{h:sk.hair,b:sk.body,B:sk.shade,t:sk.trim,u:sk.boots,v:sk.glow||'#ffffff',q:sk.shield||'#6a82b0'}));
 }
-// Rags (gear tier 0): head + body + starter weapon, coloured from RAGS. Also makes two walk frames
-// where one foot lifts a pixel (feet are columns 4-6 and 8-10), so legs move instead of the whole body bobbing.
+// Rags (gear tier 0): head + body + starter weapon on a 20x24 grid, coloured from RAGS. Also makes two
+// walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
 function mkRags(id){
   const c=RAGS[id];if(!c)return null;
-  const g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>r.split(''));
-  c.w.forEach(w=>RAG_WEAPONS[w].forEach((r,j)=>{for(let i=0;i<r.length;i++)if(r[i]!=='.')g[j][i]=r[i]}));
+  const W=20,g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>{const a=r.split('');while(a.length<W)a.push('.');return a});
+  c.w.forEach(w=>RAG_WEAPONS[w].forEach(([y0,rows])=>rows.forEach((r,j)=>{const y=y0+j;if(!g[y])return;for(let i=0;i<r.length&&i<W;i++)if(r[i]!=='.')g[y][i]=r[i]})));
   const pal=Object.assign({},RAG_COMMON,c.c),H=g.length;
   const step=(a,b)=>{const n=g.map(r=>r.slice());for(let x=a;x<=b;x++){n[H-3][x]=g[H-2][x];n[H-2][x]=g[H-1][x];n[H-1][x]='.'}return n.map(r=>r.join(''))};
-  const im=mk(g.map(r=>r.join('')),pal);im.steps=[mk(step(4,6),pal),mk(step(8,10),pal)];return im;
+  const im=mk(g.map(r=>r.join('')),pal);im.steps=[mk(step(4,7),pal),mk(step(10,13),pal)];return im;
 }
 // The player's picture: the rags look by default. DEV "Old look" shows the class's previous sprite
 // (or the v0.15 default skin), and "Default skin" forces the shared 12x16 body, for comparing.
@@ -123,7 +123,7 @@ function render(){
   ents.forEach(e=>{
     if(e===player){
       if(player.dead>0)return;
-      shadow(player.x,player.y,5);
+      shadow(player.x,player.y,6);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
       const wf=walkFrame(playerImg(),player.walk,moving&&!player.sit);
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
