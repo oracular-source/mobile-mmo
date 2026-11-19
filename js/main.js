@@ -20,5 +20,6 @@ if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player
   $('start').textContent='Play '+C.name;
   if(!C.mana)document.querySelector('.bar.mp').style.display='none';
 })();
-$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');if(/[?&]area=graveyard/.test(location.search))enterZone('gy')});
+// The game starts in the Sunken Graveyard (Gate Road retired, Nov 18); ?area=crypt starts in the crypt.
+$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(/[?&]area=crypt/.test(location.search)?'crypt':'gy')});
 requestAnimationFrame(t=>{last=t;loop(t)});

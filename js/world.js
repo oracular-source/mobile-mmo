@@ -84,7 +84,7 @@ function drawCritters(){
 function drawGlows(){
   const flame=(x,y,big)=>{const k=Math.floor(time*8)%3;lx.fillStyle='#e0611f';lx.fillRect(x-1,y-4-(k===1?1:0),3,4);if(big){lx.fillRect(x-2,y-2,5,2)}lx.fillStyle='#ffb347';lx.fillRect(x,y-3,1,2);if(k!==2){lx.fillStyle='#ffe9a8';lx.fillRect(x,y-2,1,1)}};
   lx.save();lx.translate(-camX,-camY);
-  if(zoneId==='gy'){const A=AREAS.graveyard;A.flames.forEach(f=>{if(f.tiny){const k=Math.floor(time*6+f.x)%3;lx.fillStyle='#ffb347';lx.fillRect(f.x,f.y-2-(k===1?1:0),1,2);lx.fillStyle='#ffe9a8';lx.fillRect(f.x,f.y-1,1,1)}else if(f.lamp){lx.fillStyle=Math.floor(time*5)%4?'#ffd27a':'#ffb347';lx.fillRect(f.x+4,f.y-4,2,3)}else flame(f.x,f.y,false)});
+  const CA=curArea();if(CA){const A=CA;A.flames.forEach(f=>{if(f.tiny){const k=Math.floor(time*6+f.x)%3;lx.fillStyle='#ffb347';lx.fillRect(f.x,f.y-2-(k===1?1:0),1,2);lx.fillStyle='#ffe9a8';lx.fillRect(f.x,f.y-1,1,1)}else if(f.lamp){lx.fillStyle=Math.floor(time*5)%4?'#ffd27a':'#ffb347';lx.fillRect(f.x+4,f.y-4,2,3)}else flame(f.x,f.y,f.big)});
     // Cold motes drifting up out of the crypt mouth.
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
     lx.restore();return}
@@ -104,23 +104,32 @@ const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null};
 function finishRun(){
   const secs=Math.round(time-run.t0),mm=Math.floor(secs/60),ss=String(secs%60).padStart(2,'0');
   const loot=run.loot.filter(n=>!/Whisker|Shell|Bone|Rag/.test(n));
-  prompt('Dungeon 1 complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Return to the graveyard',()=>enterZone('over'));
+  prompt('Dungeon 1 complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Return to the graveyard',()=>enterZone('gy'));
 }
 function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;openModal('promptUI')}
 $('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');running=true;if(promptAction)promptAction();promptAction=null});
-function enterZone(id){
+// A free spot a couple of tiles from an exit (not on it, so you don't trigger it again on arrival).
+function areaSpot(A,ex){
+  for(const [dx,dy] of [[0,2],[0,-2],[2,0],[-2,0],[0,3],[0,-3],[3,0],[-3,0],[2,2],[-2,2],[2,-2],[-2,-2]]){const x=ex.tx+dx,y=ex.ty+dy;
+    if(x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0)return{x:x*T+8,y:y*T+8}}
+  return A.start||null}
+// from: the map key of the area you came from, so you arrive at the matching exit (up the crypt stairs -> crypt mouth).
+function enterZone(id,from){
   if(MM.dirty&&!simState.busy)mmSave(); // keep what you explored in the area you're leaving
-  zoneId=id;
+  zoneId=id;const A=curArea();
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
   else if(id==='arena'){map=ARENA.map;MW=ARENA.w;MH=ARENA.h;world=ARENA.world;spawns=[];}
-  else if(id==='gy'){const A=buildArea('graveyard');map=A.map;MW=A.w;MH=A.h;world=A.world;spawns=A.spawns;}
+  else if(A){map=A.map;MW=A.w;MH=A.h;world=A.world;spawns=A.spawns;}
   else{map=overMap;MW=40;MH=30;world=overWorld;spawns=overSpawns;}
   WW=MW*T;WH=MH*T;
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;sp.timer=0;spawn(sp)});
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
-  else if(id==='gy'){const A=AREAS.graveyard;player.x=A.start.x;player.y=A.start.y;log('You pass through the iron gate into the Sunken Graveyard.','#9fd8c0');floatText(player.x,player.y-30,'Sunken Graveyard','#9fd8c0',true)}
+  else if(A){const ex=from&&A.exits.find(e=>e.to===from),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;
+    const col=id==='crypt'?'#9fb4ee':'#9fd8c0';
+    log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':'You stand in the Sunken Graveyard.',col);
+    floatText(player.x,player.y-30,A.name,col,true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
@@ -132,17 +141,20 @@ function checkPortals(){
   if(zoneId==='dun'&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
-  if(zoneId==='gy'){const A=AREAS.graveyard,tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  const A=curArea();
+  if(A){const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     if(ex!==player.atExit){player.atExit=ex;if(ex){
-      if(ex.to==='crossroads'){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave the graveyard?','The road east leads back to the Gate Road (the crossroads is not built yet).','Leave',()=>{enterZone('over');player.x=3.5*T;player.y=15*T+8})}
-      else if(ex.to==='wolfwood')log('The path north leads into Wolfwood. It is not built yet.','#9aa');
-      else if(ex.to==='crypt')log('Stairs lead down into the crypt. It is not built in the game yet.','#9fb4ee');}}
+      // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
+      if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id)}
+      else if(ex.to==='crossroads')log('The road east leads to the crossroads. It is not built yet.','#9aa');
+      else if(ex.to==='wolfwood'||ex.to==='wolfwood_edge')log('The way ahead leads into Wolfwood. It is not built yet.','#9aa');
+      else log('This way is not built yet.','#9aa');}}
     return}
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
     if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
-    if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the Gate Road.','Leave',()=>enterZone('over'));}
-    else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('over'));}
+    if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the Sunken Graveyard.','Leave',()=>enterZone('gy'));}
+    else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('gy'));}
   }
 }
 // Boss 1: casts a shadow bolt (a 2s cast you can see coming) and calls two skeletons at half health.

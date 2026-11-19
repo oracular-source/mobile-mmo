@@ -194,7 +194,7 @@ function updatePet(dt){
     pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
-function respawnPlayer(){if(zoneId==='gy'){player.x=AREAS.graveyard.start.x;player.y=AREAS.graveyard.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'?'You wake at the crypt entrance.':'You return to the Gate Road.','#9aa')}
+function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':'You return to the Gate Road.','#9aa')}
 
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
@@ -204,7 +204,7 @@ function rollLoot(m){
   const got=[];
   if(rng()<0.6)got.push(JUNK[m.type]);
   if(m.type==='dead'&&rng()<0.3)got.push('rag');
-  const lb=m.lv*0.01,r=rng(),dun=zoneId==='dun';
+  const lb=m.lv*0.01,r=rng(),dun=zoneId==='dun'||zoneId==='crypt';
   if(r<0.10+lb)got.push(pick(COMMONS));
   else if(r<0.10+lb+(0.025+lb*0.5)*(dun?2:1))got.push(pick(UNCOMMONS));
   if(m.lv>=4&&rng()<(dun?0.03:0.01))got.push(pick(RARES));
@@ -421,12 +421,12 @@ function blink(range,back){
   player.x+=fx/d*n;player.y+=fy/d*n;player.tx=null;
   log(back?'You hop back.':'You blink.','#c8e8ff');
 }
-// Gate: home to the Gate Road guards. Every fight ends (mobs forget you). In Dungeon 1 this leaves the run.
+// Gate: home to the graveyard gate (the start of the game until Town 1 exists). Every fight ends (mobs forget you). In Dungeon 1 this leaves the run.
 function gateHome(){
-  log('You gate home to the Gate Road.','#c8a0ff');
+  log('You gate home to the graveyard gate.','#c8a0ff');
   mobs.forEach(o=>{if(!o.dead&&o.state==='chase'){o.threat.p=0;o.state='return'}});
-  if(zoneId!=='over')enterZone('over');
-  player.x=3.5*T;player.y=15*T+8;player.target=null;
+  if(zoneId!=='gy')enterZone('gy');
+  player.x=AREAS.graveyard.start.x;player.y=AREAS.graveyard.start.y;player.target=null;
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null}
   burst(player.x,player.y-6,'#c8a0ff',16,true);
 }

@@ -106,7 +106,7 @@ function render(){
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
-  if(zoneId==='gy')drawAreaFog(AREAS.graveyard);
+  if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
   if(zoneId==='dun'&&run.portal){const p=run.portal;lx.fillStyle='#7dffa6';for(let a=0;a<24;a++){if((a+Math.floor(time*8))%3===0)continue;const an=a/24*Math.PI*2;lx.fillRect(Math.round(p.x+Math.cos(an)*7),Math.round(p.y+Math.sin(an)*4),1,1)}lx.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,2,2)}
   if(zoneId==='dun'&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
@@ -160,12 +160,12 @@ function render(){
   lx.restore();
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
-  const amb=zoneId==='dun'?0.22:zoneId==='gy'?0.44:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=zoneId==='gy'?AREAS.graveyard.lights:zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const amb=zoneId==='dun'||zoneId==='crypt'?0.22:zoneId==='gy'?0.44:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
+  const zl=curArea()?curArea().lights:zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
     .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*fl),w:l.w})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
   if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}
-  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle=zoneId==='gy'?'rgba(3,12,14,'+(1-amb)+')':'rgba(0,0,0,'+(1-amb)+')';dg.fillRect(0,0,VW,VH);
+  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle=zoneId==='gy'?'rgba(3,12,14,'+(1-amb)+')':zoneId==='crypt'?'rgba(2,4,14,'+(1-amb)+')':'rgba(0,0,0,'+(1-amb)+')';dg.fillRect(0,0,VW,VH);
   dg.globalCompositeOperation='destination-out';
   lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-l.r-1,l.y-l.r-1));
   dg.globalCompositeOperation='source-over';

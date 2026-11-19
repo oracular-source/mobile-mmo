@@ -3,8 +3,8 @@
 /* ---------- What you've explored ----------
    One bit per tile per area, saved per character as hex text (a 48 x 44 area is about 530 characters).
    New key, no change to any old save shape, so no save version bump: a missing key just means "nothing explored yet". */
-const MM_ZONES={over:1,gy:1,dun:1}; // the arena (testing grounds) never shows a map
-const MM_SEE={over:7,gy:7,dun:5};    // how many tiles around you get revealed (less underground)
+const MM_ZONES={over:1,gy:1,dun:1,crypt:1}; // the arena (testing grounds) never shows a map
+const MM_SEE={over:7,gy:7,dun:5,crypt:5};    // how many tiles around you get revealed (less underground)
 const MM_TILE=3;                     // minimap: CSS pixels per tile (shows about 29 tiles across)
 const mmSaved=store.get(KEY('explored'),{});
 const MM={z:{},dirty:false,saveT:0};
@@ -18,8 +18,10 @@ function mmPins(id){
     {x:Math.floor(SIGN.x/T),y:Math.floor(SIGN.y/T),name:'Signpost',k:'camp'},
     {x:Math.floor(DOOR.x/T),y:Math.floor(DOOR.y/T),name:'Dungeon 1',k:'dun'}];
   if(id==='dun')return[{x:3,y:30,name:'Way out',k:'exit'},{x:6,y:4,name:'Boss 1',k:'boss'}];
-  if(id==='gy'){const N={crossroads:'Gate Road',wolfwood:'Wolfwood (not built yet)',crypt:'Crypt (not built yet)'};
+  if(id==='gy'){const N={crossroads:'Crossroads (not built yet)',wolfwood:'Wolfwood (not built yet)',crypt:'Crypt'};
     return AREAS.graveyard.exits.map(e=>({x:e.tx,y:e.ty,name:N[e.to]||e.to,k:e.to==='crypt'?'dun':'exit'}))}
+  if(id==='crypt'){const N={graveyard:'Stairs up',wolfwood_edge:'Back tunnel (not built yet)'};
+    return AREAS.crypt.exits.map(e=>({x:e.tx,y:e.ty,name:N[e.to]||e.to,k:'exit'})).concat([{x:31,y:4,name:'Skeleton King',k:'boss'}])}
   return[];
 }
 const MM_PIN_COL={exit:'#7dffa6',dun:'#c8a0ff',camp:'#ffd27a',boss:'#ff6b6b'};
@@ -31,7 +33,7 @@ function mmZone(id){
   let src;
   if(id==='over')src={w:40,h:30,world:overWorld,map:overMap,name:'Gate Road'};
   else if(id==='dun')src={w:DUN.w,h:DUN.h,world:DUN.world,map:DUN.map,name:'Dungeon 1'};
-  else if(id==='gy'){const A=buildArea('graveyard');src={w:A.w,h:A.h,world:A.world,map:A.map,name:A.name}}
+  else if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);src={w:A.w,h:A.h,world:A.world,map:A.map,name:A.name}}
   else return null;
   const w=src.w,h=src.h,pix=src.world.getContext('2d').getImageData(0,0,w*T,h*T).data,col=[];
   for(let ty=0;ty<h;ty++)for(let tx=0;tx<w;tx++){
