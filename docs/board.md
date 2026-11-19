@@ -11,7 +11,7 @@ One place for the work: what's being built now, what's next, every idea, and wha
 - **Prioritize by value ÷ effort.** Value = does it make the core loop more fun or answer an open question. Effort = S (one session), M (2–3), L (4+).
 - **Dev game artifact:** after each release, republish `index.html` (with `dev.on` forced to true) to the owner's "Mobile MMO — Dev game" artifact, slug `4705b8bf-2515-4e08-89d4-64251da5813f`, so it stays current.
 - **Chat lanes (owner, Nov 17):** three chats run side by side, each on its own work. Start a new chat with the lane's phrase and pick up only that lane:
-  - **"Continue on balance"** → the Balance card in Now (milestone 3c): sim runs, class tuning, Boss 1. Results in `docs/sim-results.md`.
+  - **"Continue on balance"** (the **balance and class chat**) → the Balance card in Now (milestone 3c): sim runs, class kits and tuning, Boss 1. Results in `docs/sim-results.md`. **Next pickup (Nov 18):** (1) owner play-tests v0.21 levels 1–4 on Shaman, Enchanter, Necro, Paladin, Rogue and reports how the starters feel; (2) answer the open questions in Balance step 5 (Bard's 4-minute boss kite, Druid/Monk/Rogue at level 9, Shaman and now Enchanter at 6); (3) decide whether milestone 3c is done. Standing rule: big pulls stay, no chase cap in solo (Decisions).
   - **World design** → Zone 1 layout rework and its cards (summon the named, rare spawns, chests, explore map); notes in `docs/research/map-design.md`.
   - **Character design** → art direction, monster templates and the art redo (milestone 3d).
   Each lane updates only its own Now item and cards, plus its own changelog lines; pull before pushing, since the other lanes push too.
