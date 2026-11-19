@@ -5,6 +5,7 @@
 // Ring order is clockwise from straight up, 72 degrees apart.
 const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],grid:['Top row left (main)','Top row right','Row 2 left','Row 2 right','Row 3 left','Row 3 right','Bottom row left','Bottom row right']};
 // Grid button sizes (v0.29.1: owner found the v0.28 size, now Large, too big). Width, height, gap, font size.
+const GRID_LIFT=1;
 const GRID_PX={S:[44,36,5,9],M:[50,41,5,10],L:[58,48,6,11]};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
@@ -26,17 +27,18 @@ function buildControls(){
     // v0.29.1 (owner): read like a page, slot 1 (main, what Auto keeps casting) top left, then left to right, top to bottom.
     // The thumb rests a little high on the grid, so the first spells go on top. Arrange still moves anything anywhere.
     // Above it: Back and Next target, which cycle through nearby enemies in opposite directions.
-    const [W,H,G,FS]=GRID_PX[settings.gridSize]||GRID_PX.M,M=10;
+    // v0.33.2 (owner): the grid sits one button higher off the bottom edge (GRID_LIFT buttons; owner may try 1.5).
+    const [W,H,G,FS]=GRID_PX[settings.gridSize]||GRID_PX.M,M=10,MB=M+Math.round(GRID_LIFT*(H+G)); // M = side margin, MB = bottom margin
     for(let i=0;i<8;i++){
       const row=Math.floor(i/2), onLeft=i%2===0; // row 0 = top
       const fromEdge=(side==='right')===onLeft?1:0; // distance in columns from the screen edge the grid hugs
       const b=document.createElement('div');b.className='gb'+(i===0?' main':'');b.dataset.slot=i;
-      b.style.cssText='width:'+W+'px;height:'+H+'px;font-size:'+FS+'px;bottom:'+(M+(3-row)*(H+G))+'px;'+side+':'+(M+fromEdge*(W+G))+'px';
+      b.style.cssText='width:'+W+'px;height:'+H+'px;font-size:'+FS+'px;bottom:'+(MB+(3-row)*(H+G))+'px;'+side+':'+(M+fromEdge*(W+G))+'px';
       b.innerHTML=slotHTML(i,true);
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
-    const tb=M+4*(H+G),tw=W,th=Math.round(H*0.72);
+    const tb=MB+4*(H+G),tw=W,th=Math.round(H*0.72);
     [['tgtback','◀ Back',backTarget,settings.left?0:W+G],['nexttgt','Next ▶',nextTarget,settings.left?W+G:0]] /* Back always on the left, Next on the right */.forEach(([id,label,fn,off])=>{
       const t=document.createElement('button');t.id=id;t.className='gtb';t.textContent=label;
       t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px;height:'+th+'px';

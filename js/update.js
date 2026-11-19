@@ -25,13 +25,14 @@ function update(dt){
         else{player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t)}}}
     player.gcd=Math.max(0,player.gcd-dt);
     for(const k in player.cds)player.cds[k]=Math.max(0,player.cds[k]-dt);
-    // Auto-cast: once you're fighting your target, the main (center) spell repeats whenever it's ready.
+    // Auto-cast: whenever your target is in range, the main spell repeats when it's ready, even if the mob hasn't noticed you
+    // (v0.33.3, owner: run past and hit things). Not from Hide (a Rogue's Backstab opener) or Feign Death and not on a sleeping mob.
     // Normal mana cost. Pauses below 15% mana so there's always enough left to heal.
     // A spell you tapped during the cooldown goes first; auto-cast waits its turn.
     if(player.queued&&(time>player.queued.until||player.dead))player.queued=null;
     if(player.queued&&!player.cast&&player.gcd<=0){const q=player.queued.a;player.queued=null;cast(q);}
     const tg=player.target;
-    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&tg.state==='chase'&&!(tg.lost>0)&&!(tg.mez>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
+    if(!player.queued&&settings.autoCast&&tg&&!tg.dead&&!hidden()&&!(player.fd>0)&&!(tg.lost>0)&&!(tg.mez>0)&&!player.cast&&player.gcd<=0&&!player.sit&&dist(player,tg)<=(ABI[loadout[0]].range||80)&&(!C.mana||player.mp>maxMP(player.lvl)*0.15))castSlot(0,true);
     const fight=inCombat(),L=player.lvl,fire=player.sit&&nearFire()?2:1,f=(1+L*0.1)*fire;
     if(!fight)player.lsUsed=false; // Last Stand comes back once the fight is over
     if(fire>1&&!player.warmed){player.warmed=true;log("The fire's warmth speeds your rest.",'#ffb347')}if(!player.sit)player.warmed=false;
