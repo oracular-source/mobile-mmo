@@ -92,7 +92,8 @@ Deep dive for the "Items and gold rethink" card on the board. Must be settled be
 - **Teleport orbs:** drop from monsters **and** can be bought.
 - **Unwanted gear:** breaks down into **orb dust** (duplicates give a lot). No selling gear for copper.
 - **Gold's jobs:** forge fees, plus **orbs for sale at a very high price** as a backstop, so bad luck never leaves you grinding with no orbs at all.
-- **Trading:** undecided. Owner's thought: trade orbs only, no gear trading, gear breaks down into dust. Worry: items might feel like grind fodder, and players want things to spend gold on.
+- **Trading (decided, Nov 19, later reply):** orbs are **tradable between players** (phase 3). If player trading is popular enough, **the shop orbs go away** and players supply each other. Gear and dust stay bound (Claude's lean below, not objected to).
+- **Trading (first thought):** undecided. Owner's thought: trade orbs only, no gear trading, gear breaks down into dust. Worry: items might feel like grind fodder, and players want things to spend gold on.
 
 ### Claude's view on trading (for phase 3; nothing to build now)
 - **Lean: orbs tradable, gear bound to whoever looted it, dust bound.** Orbs are small, all the same and easy to price, so a player market for them is simple and gives gold a second use (buy orbs from other players below the shop price). Bound gear keeps loot personal (it's already personal loot) and stops gear farmers.
