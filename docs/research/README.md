@@ -23,3 +23,4 @@ Short notes on how games (and MMOs especially) are usually built, so our choices
 6. **Plan for "never trust the player".** In an MMO the server decides everything. We stay single-player for now, but keeping rules separate from input and drawing makes that move much easier.
 
 Researched Nov 17, 2026.
+- `gold-and-items.md`: gold, gear upgrades (enchant orbs) and teleport orbs; options for the items and gold rethink (Nov 19).
