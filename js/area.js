@@ -498,12 +498,20 @@ function drawObj(g,R,o){
     for(let i=0;i<8;i++){const x=X+4+Math.floor(ah(o.x,i,25)*(W-8)),y=Y+H-4+Math.floor(ah(o.y,i,26)*5);R(x,y,3,1,AP.bone);R(x,y+1,1,1,AP.out)}
     R(X+W-14,Y+H-2,12,1,AP.out);R(X+W-13,Y+H-3,10,1,AP.wood);R(X+W-14,Y+H-4,1,2,AP.wood);R(X+W-3,Y+H-4,1,2,AP.wood);return} // the bow
   if(k==='lean_to'){
-    // The hunter's lean-to: a slope of branches and bark from a crossbar down to the ground, a hide hung over one side.
-    const top=Y-12;shadow(X+2,Y+H-3,W-2,4);
-    R(X+2,top,3,H+12,AP.out);R(X+3,top+1,1,H+11,AP.wood);R(X+W-5,top,3,H+12,AP.out);R(X+W-4,top+1,1,H+11,AP.wood);R(X+1,top,W-2,3,AP.out);R(X+2,top+1,W-4,1,AP.woodHi);
-    for(let y=0;y<H+10;y++){const off=Math.floor(y/2);R(X+off,top+2+y,W-off*2,1,y%3===0?AP.woodDk:y%2?AP.wood:AP.woodHi)}
-    R(X+W/2-6,Y+H-12,12,12,'#0c0a08');R(X+W/2-7,Y+H-13,14,1,AP.out);
-    R(X+W-12,top+6,8,14,AP.out);R(X+W-11,top+7,6,12,'#8a6a4a');R(X+W-11,top+7,6,1,'#a88a64');return}
+    // The hunter's lean-to (v0.41.1, owner: the first one read as an upside-down pyramid). Open side faces you:
+    // a pole roof sloping up and back from a ridge pole on two forked posts, a dark sleeping space under it with a fur on the ground,
+    // a hide hung over one end against the wind.
+    const ridge=Y+3,top=Y-15;shadow(X+1,Y+H-3,W-2,4);
+    // roof: wider at the ridge, narrowing a little toward the back (top), poles running down the slope
+    for(let y=top;y<=ridge;y++){const f=(y-top)/(ridge-top),inset=Math.round(5*(1-f)),x0=X+1+inset,x1=X+W-1-inset;
+      R(x0-1,y,x1-x0+2,1,AP.out);for(let x=x0;x<x1;x++){const c=(x-X)%4===0?AP.woodDk:(x-X)%4===1?AP.woodHi:AP.wood;R(x,y,1,1,y===top?AP.out:c)}}
+    R(X+8,top+3,10,2,AP.mossHi);R(X+28,top+6,7,2,AP.mossHi); // moss and needles on the poles
+    // ridge pole, posts, the space under it
+    R(X+1,ridge,W-2,4,AP.out);R(X+2,ridge+1,W-4,2,AP.trunk);R(X+2,ridge+1,W-4,1,AP.trunkHi);
+    R(X+5,ridge+4,W-10,H-ridge+Y-7,'#0b0907');R(X+8,Y+H-8,W-20,3,'#6a5038');R(X+8,Y+H-8,W-20,1,'#8a6a4a'); // the dark inside, a fur bed
+    [X+3,X+W-6].forEach(x=>{R(x-1,ridge-2,5,Y+H-ridge,AP.out);R(x,ridge-1,3,Y+H-ridge-2,AP.wood);R(x,ridge-1,1,Y+H-ridge-2,AP.woodHi);R(x-1,ridge-3,1,2,AP.out);R(x+3,ridge-3,1,2,AP.out)});
+    R(X+W-15,ridge+3,9,13,AP.out);R(X+W-14,ridge+3,7,12,'#8a6a4a');R(X+W-14,ridge+3,7,1,'#a88a64');R(X+W-13,ridge+14,5,1,'#6a5038'); // hide over the end
+    return}
   if(k==='drying_rack'){
     // A tanning frame (v0.41, owner: the old pole rack didn't read): a square wooden frame standing on its feet,
     // a wolf hide stretched inside it, laced to the frame at the edges.
