@@ -27,7 +27,7 @@ Drawn when their area is built, so the list stays in step with the map chat.
 
 | Monster | Area | Family | Look notes (from `design.md`) |
 | --- | --- | --- | --- |
-| Blight wolf | Wolfwood | Wolf | Packs of 2–3, flee at low health |
+| Blight wolf | Wolfwood | Wolf | Packs of 2–3, flee at low health. **Draft 3 (Nov 19, map chat)**: `tools/wolfwood_mobs.py`, owner to OK (Greyfang, Old Scar and the thornback boar drafted there too) |
 | Greyfang (named) | Wolfwood | Wolf | Silver coat, glowing eyes, leads the pack |
 | Old Scar (rare) | Wolfwood | Wolf | One-eyed grey wolf, torn ear |
 | Fen cultist | Ruined Chapel | Humanoid | Camps of three, a healer in each |
