@@ -43,6 +43,24 @@ Owner notes (Nov 19): **forks are for the rest of the character's life, so judge
 - **Shaman · Drowsy:** *Torpor* (stronger attack slow on one) / *Drowsy Cloud* (weaker slow on every mob near the target).
 - **Bard · Crescendo:** *Finale* (bigger pulse, songs end) / *Encore* (smaller pulse, songs keep playing).
 
+### Level 12 forks, all 14 classes (drafted Nov 19, owner reviewing)
+Same rules as level 10: both sides a bit stronger than the base, about equal, different by situation (one mob vs many, solo vs group later). Picked a different ability from the level 10 fork for each class, and mixed templates so level 10 and 12 don't feel like the same choice twice.
+- **Necromancer · Siphon Plague:** *Leaping Plague* (when its mob dies, the rest of the plague jumps to the nearest mob) / *Twin Plague* (stacks twice on one mob).
+- **Druid · Creeping Rot:** *Sap Strength* (rotting mob hits about 15% softer) / *Blight Spores* (rot also lands on up to 2 mobs near the target, weaker).
+- **Warrior · Cleave:** *Whirlwind* (hits every mob around you, not just in front, with extra threat on each) / *Sunder* (heavy hit on your target that cracks its armor for 10s; mobs beside it take a light hit).
+- **Rogue · Gouge:** *Blind* (much longer, but breaks on damage: park a second mob out of the fight) / *Kidney Shot* (shorter stun, shorter cooldown, and your next 2 hits count as from behind).
+- **Cleric · Holy Light:** *Judgment* (bigger hit, and the target deals less damage for 6s) / *Holy Nova* (light bursts around you, hitting every mob near you and healing you a little per mob hit).
+- **Enchanter · Charm:** *Lasting Charm* (lasts much longer and breaks less) / *Thrall* (normal length, but when it ends the mob falls asleep for 6s instead of turning on you).
+- **Paladin · Taunt:** *Challenge* (taunts every mob near you) / *Rebuke* (one mob, and it deals 20% less damage for 8s).
+- **Shadow Knight · Disease Cloud:** *Plague Cloud* (spreads to mobs near the target) / *Withering Cloud* (one mob, it hits softer and your Siphon heals more off it).
+- **Wizard · Frost Nova:** *Deep Freeze* (roots twice as long, less damage: sets up a kite) / *Nova Blast* (more damage and knocks mobs back, short root).
+- **Magician · Burnout:** *Overdrive* (pet attacks much faster for a shorter time, and loses a little health each second) / *Wildfire* (same speed as now, but the pet's hits splash onto mobs near it).
+- **Ranger · Volley:** *Rain of Arrows* (wider and longer, lighter hits) / *Pinning Volley* (same size, every mob hit is rooted 3s: damage plus a getaway).
+- **Monk · Flurry:** *Hundred Fists* (more punches on one mob) / *Whirling Flurry* (punches spread across every mob around you).
+- **Shaman · Swarm:** *Locust Swarm* (when its mob dies, it jumps to the nearest mob) / *Stinging Swarm* (one mob, and it counts as two DoTs for the Shaman's stacking bonus).
+- **Bard · Chant of Blades:** *Bladesong* (your swings also hit one mob next to your target) / *Battle Tempo* (swing speed keeps building through a long fight, up to double).
+- **Sim check (when built):** each side in a single fight, a pack and a long named fight at levels 12–15, DPS tracked; if one side wins everywhere, redesign. Watch for: Leaping Plague / Locust Swarm chaining forever through a big pull, Thrall chain-sleeping, Whirlwind threat with Challenge-style tanks in groups later.
+
 ### Example: Necromancer (draft)
 - **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
 - **Major at 20, "what kind of necro":** *Bone Lord* (skeletons cleave, the main one taunts: solo pet build) / *Plaguebringer* (DoTs spread to every mob near your target: group pulls) / *Blood Pact* (lifetaps heal your group a little: group support).
