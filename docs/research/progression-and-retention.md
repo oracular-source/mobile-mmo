@@ -16,6 +16,7 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 9. **Power comes from your level, not your picks.** Both sides of a fork are a bit stronger than the base ability and about equal to each other; they differ by situation (solo vs group, one mob vs many). Mobs are tuned assuming "has a fork at this level", whichever side. Abilities still grow a little every level on their own. No "+5%" options. Sim each side (solo, group, boss); if one wins everywhere, redesign it.
 10. **Swapping is free in town.** Until Town 1 exists: you pick at the ding (a "pick your new toy" card), then swap for free at any campfire (owner, Nov 19).
 11. **No skill points;** forks replace the old stat points, and stats come from gear.
+12. **Scaling rule (owner, Nov 19): breadth grows, depth stays flat, zones fixed.** What grows with level is how many mobs you can take at once (about 1–2 at 10, 3–4 at 30, 5–6 at 50), not how fast one dies. Forks pick *how* you get breadth. Details: `power-scaling.md`.
 
 ### Example: Druid, 18 abilities folded into 11
 - **Kept as abilities:** Thornlash, Mending Touch, Creeping Rot, Tanglefoot, Rootgrip, Barkskin, Thorn Aura (the core 7), plus Stormcall, Mending Rain, Wolf Form and Circle Port (quest).
