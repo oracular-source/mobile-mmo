@@ -236,12 +236,12 @@ function updatePetOne(dt,second){
     if(pt&&!pt.dead&&pt.state==='chase'&&!(pt.mez>0))pet.target=pt;
     else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
   const t=pet.target;
-  if(t){if(dist(pet,t)>12)moveToward(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=(pet.rate||1.8)/(player.buffs.burnout>0?1.3:1);burst(t.x,t.y-6,pet.img==='fire'?'#ff9a4a':'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee',petName(),'pet');
+  if(t){if(dist(pet,t)>12)pathTo(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=(pet.rate||1.8)/(player.buffs.burnout>0?1.3:1);burst(t.x,t.y-6,pet.img==='fire'?'#ff9a4a':'#cfc8b2',3);hitMob(t,pet.dmg*rr(0.8,1.2)*(1-t.def.armor),'melee',petName(),'pet');
       // Fire elemental: every hit sets the mob burning (a short DoT that refreshes).
       if(pet&&pet.burn&&!t.dead){t.dots=t.dots.filter(d=>d.id!=='burn');t.dots.push({id:'burn',name:'Burn',t:6,next:2,dmg:pet.burn,pet:1})}}}}
   // Follow with a dead zone: start walking past 30px, stop once close to its spot. One threshold made it stop and start every frame (the jitter).
   else{const d=dist(pet,player);if(d>30)pet.follow=true;
-    if(pet.follow){const fx=player.x-12*player.dir,fy=player.y+4;if(moveToward(pet,fx,fy,d>60?52:40,dt)||Math.hypot(pet.x-fx,pet.y-fy)<6)pet.follow=false;}
+    if(pet.follow){const fx=player.x-12*player.dir,fy=player.y+4;if(pathTo(pet,fx,fy,d>60?52:40,dt)||Math.hypot(pet.x-fx,pet.y-fy)<6)pet.follow=false;}
     pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }

@@ -29,8 +29,8 @@ function updateNPCs(dt){
     if(n.target&&(n.target.dead||Math.hypot(n.target.x-n.hx,n.target.y-n.hy)>180))n.target=null;
     // Guards attack any mob chasing you that comes near them: run to the gate when you over-pull.
     if(!n.target){const m=mobs.find(m=>!m.dead&&m.state==='chase'&&dist(m,n)<75&&Math.hypot(m.x-n.hx,m.y-n.hy)<170);if(m){n.target=m;say(n,pick(['For the gate!','Back, vermin!','I have this one!']))}}
-    if(n.target){const t=n.target;if(dist(n,t)>12)moveToward(n,t.x,t.y,44,dt);else{n.dir=t.x>n.x?1:-1;if(n.atk<=0){n.atk=1.2;burst(t.x,t.y-6,'#cfd6e0',4);hitMob(t,22+rr(0,8),'melee',n.name,'npc')}}}
-    else if(Math.hypot(n.x-n.hx,n.y-n.hy)>2)moveToward(n,n.hx,n.hy,30,dt);
+    if(n.target){const t=n.target;if(dist(n,t)>12)pathTo(n,t.x,t.y,44,dt);else{n.dir=t.x>n.x?1:-1;if(n.atk<=0){n.atk=1.2;burst(t.x,t.y-6,'#cfd6e0',4);hitMob(t,22+rr(0,8),'melee',n.name,'npc')}}}
+    else if(Math.hypot(n.x-n.hx,n.y-n.hy)>2)pathTo(n,n.hx,n.hy,30,dt);
   });
   chatT-=dt;
   if(chatT<=0){chatT=rr(22,38);const near=npcs.filter(n=>dist(n,player)<120);if(near.length){const n=pick(near);say(n,pick(LINES[n.kind]))}}
@@ -241,16 +241,19 @@ function namedAdds(m){
 // Greyfang walks his route point to point at a stroll. If something blocks him for a few seconds he skips to the next point.
 function walkRoute(m,dt){const R=m.sp.route;if(m.ri===undefined){m.ri=0;m.stuck=0}
   const p=R[m.ri],ox=m.x,oy=m.y;
-  if(moveToward(m,p.x,p.y,m.def.spd*0.4,dt)||Math.hypot(m.x-p.x,m.y-p.y)<4){m.ri=(m.ri+1)%R.length;m.stuck=0}
+  if(pathTo(m,p.x,p.y,m.def.spd*0.4,dt)||Math.hypot(m.x-p.x,m.y-p.y)<4){m.ri=(m.ri+1)%R.length;m.stuck=0}
   else if(Math.hypot(m.x-ox,m.y-oy)<0.05){m.stuck+=dt;if(m.stuck>3){m.ri=(m.ri+1)%R.length;m.stuck=0}}
   m.hx=m.x;m.hy=m.y} // home is wherever he left the path, so a reset doesn't walk him through the trees
-// Below its flee share of health a wolf runs from you for a few seconds (once per fight). Anything idle it runs past joins in.
+// Below its flee share of health a wolf runs off in a random direction for a few seconds (once per fight). Anything idle it runs past joins in.
 // A snare slows the run; a root stops it.
 const FLEE_TIME=4;
 function wolfFlee(m,dt,spd){
   if(!m.fled&&m.hp<=m.maxhp*m.def.flee){m.fled=true;m.fleeT=FLEE_TIME;floatText(m.x,m.y-20,'flees!','#ffb37a');log(cap(m.def.name)+' turns tail and runs!','#ffb37a')}
   if(!(m.fleeT>0))return false;
-  m.fleeT-=dt;const dx=m.x-player.x,dy=m.y-player.y,dd=Math.hypot(dx,dy)||1;if(spd>0)moveToward(m,m.x+dx/dd*20,m.y+dy/dd*20,spd*1.05,dt);
+  m.fleeT-=dt;
+  // Runs for a random open spot nearby (owner, Nov 19), then another if there's time left. Not toward other packs yet (backlog).
+  if(!m.fleeTo||Math.hypot(m.x-m.fleeTo.x,m.y-m.fleeTo.y)<4)m.fleeTo=randomRunSpot(m,player)||{x:m.x+(m.x-player.x),y:m.y+(m.y-player.y)};
+  if(spd>0)pathTo(m,m.fleeTo.x,m.fleeTo.y,spd*1.05,dt);
   mobs.forEach(o=>{if(o!==m&&!o.dead&&o.state==='idle'&&Math.hypot(o.x-m.x,o.y-m.y)<40){engage(o);log(cap(o.def.name)+' is drawn in by the fleeing wolf!','#ffb37a')}});
   return true}
 // The boar: when you're a little way off it stops and lowers its head (you see it coming), then rushes you at three times its speed
@@ -283,7 +286,7 @@ function rareCall(m,dt,spd){
   if(f.dead||f.state!=='idle'||Math.hypot(f.x-m.x,f.y-m.y)<20){m.called=true;
     mobs.filter(o=>o!==m&&!o.dead&&o.state==='idle'&&Math.hypot(o.x-m.x,o.y-m.y)<48).forEach(o=>{engage(o);log(cap(o.def.name)+' answers the call!','#ffb37a')});
     return false}
-  if(spd>0)moveToward(m,f.x,f.y,spd,dt);return true}
+  if(spd>0)pathTo(m,f.x,f.y,spd,dt);return true}
 
 /* ---------- Hidden chests (v0.32) ---------- */
 // Walk up to one to open it: some copper and one piece of gear your class can use (odds by area in CHEST_ODDS).
