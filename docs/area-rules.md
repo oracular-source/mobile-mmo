@@ -53,6 +53,16 @@ The map is made of square tiles, but the world shouldn't look like it. Square wa
 - **Drawing, not map changes:** these are fixed in how tiles are drawn, so map files, walking and saves stay the same.
 - **Check it on the in-game view:** if a shape looks like it follows the grid, redraw it.
 
+## Area pass checklist (owner, Nov 20)
+Every built area gets a pass with this list, and every new area (the Ruined Chapel grounds, Dungeon 1, Zone 2) is built with it from day one. Tick each line on the in-game view on a phone-sized screen:
+1. **Natural shapes:** water and ground edges use the recipes above; walls, cliffs and cave edges don't follow tile steps; woods are mixed.
+2. **Edges and ways out:** no black past the map edge; every way out looks like what it is (gate, cave mouth, stairs, or a path that carries on).
+3. **Heart:** something alive in every screen; wear and age on anything old; doors and props sized for people; 1–3 small stories.
+4. **Reads at a glance:** every prop and monster passes the squint test (references first).
+5. **Natural placement:** nothing overlaps, things sit where they'd really be (`tools/mapcheck.py`).
+6. **Its own place:** the area matches its look sheet below, and its light and fog change where the place changes.
+7. **Saved:** every decision and recipe from the pass goes into this file in the same push, and the reply says what was saved.
+
 ## Every look decision gets saved here (owner, Nov 20)
 Whenever the owner makes a call on how things should look or feel (in any chat), write it into this file in the section it fits, with the date, in the same push. This file is how every chat keeps the world consistent; the board only tracks the work. **Also save the recipe (owner, Nov 20):** when a visual change ships, add a short "how it's drawn" line here (like the water and ground recipes above), so every new location is built the same way from day one. Each reply that changes a visual says which rule it saved. This is the best-practice file for every new location.
 
