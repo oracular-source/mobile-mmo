@@ -173,6 +173,15 @@ def check(m, tiles, objs):
             edge = x in (0, Wd - 1) or y in (0, H - 1)
             if n == 1 and not edge and (x, y) not in mpos: ends.append((x, y))
         for p in ends[:10]: W.append(f'dead end at {p[0]},{p[1]}')
+        # a wandering named walks a loop of waypoints: route=x,y;x,y;... (every point on open ground, reachable)
+        for mk in markers:
+            if mk['k'] != 'named': continue
+            rt = next((e[6:] for e in mk.get('extra', []) if e.startswith('route=')), None)
+            if not rt: continue
+            mk['route'] = [tuple(int(v) for v in pt.split(',')) for pt in rt.split(';')]
+            for (x, y) in mk['route']:
+                if not walk(x, y): E.append(f"{mk['type']} route point {x},{y} is not open ground")
+                elif (x, y) not in dist: E.append(f"{mk['type']} route point {x},{y} can't be reached")
         # difficulty should grow with distance from the start
         sp = sorted([mk for mk in markers if mk['k'] in ('spawn', 'named') and (mk['x'], mk['y']) in dist], key=lambda mk: dist[(mk['x'], mk['y'])])
         for i, a in enumerate(sp):
@@ -198,12 +207,15 @@ def font(sz, bold=False):
     return ImageFont.load_default()
 
 SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt_rat': (220, 170, 130, 255), 'skeleton': (240, 234, 216, 255),
-             'tunnel_rat': (220, 170, 130, 255), 'big_rat': (200, 140, 100, 255), 'beetle': (130, 170, 220, 255)}
-TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), '': (0, 0, 0, 0)}
+             'tunnel_rat': (220, 170, 130, 255), 'big_rat': (200, 140, 100, 255), 'beetle': (130, 170, 220, 255),
+             'blight_wolf': (170, 176, 184, 255), 'thornback_boar': (176, 120, 80, 255)}
+TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), '': (0, 0, 0, 0)}
 OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030', 'mausoleum': '#6b6578', 'dead_oak': '#4a3e32',
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
            'throne': '#3a3446', 'brazier': '#ff9a3c', 'campfire': '#ff9a3c', 'signpost': '#8a6a4a', 'sinkhole': '#120d0a',
-           'burrow': '#1a120c', 'light_shaft': '#cfd8dc', 'gnaw_pile': '#b9b0a0'}
+           'burrow': '#1a120c', 'light_shaft': '#cfd8dc', 'gnaw_pile': '#b9b0a0',
+           'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'lean_to': '#6a5034', 'firepit': '#3a3430',
+           'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038'}
 
 def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
     g = m['tiles']; x1 = x1 or m['W']; y1 = y1 or m['H']
@@ -217,7 +229,7 @@ def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
 def ground_pass(d, m, tiles, s, x, y, px, py):
     g = m['tiles']; c = g[y][x]; t = tiles[c]; col = hexc(t['color'])
     base = col
-    if 'tree' in t['tags'] or t['name'] in ('bush', 'dead_bush', 'grave', 'dug_grave', 'rubble', 'bones', 'coffin', 'dirt_pile'):
+    if 'tree' in t['tags'] or t['name'] in ('boulder', 'bush', 'dead_bush', 'grave', 'dug_grave', 'rubble', 'bones', 'coffin', 'dirt_pile'):
         # draw the ground under scenery as the nearest open ground around it
         base = next((hexc(tiles[g[yy][xx]]['color']) for xx, yy in ((x, y + 1), (x - 1, y), (x + 1, y), (x, y - 1))
                      if 0 <= xx < m['W'] and 0 <= yy < m['H'] and tiles[g[yy][xx]]['walk']), hexc('#3b3a2c'))
@@ -229,6 +241,14 @@ def ground_pass(d, m, tiles, s, x, y, px, py):
         d.rectangle([px + h * 2 + 1, py + s // 2, px + h * 2 + 1 + s // 8, py + s // 2 + s // 8], fill=shade(col, 0.8))
     if t['name'] == 'water' and (x + y) % 3 == 0:
         d.line([px + s // 4, py + s // 2, px + s * 3 // 4, py + s // 2], fill=hexc('#4c7a8c'))
+    if t['name'] == 'needles' and h < 2:
+        d.line([px + h * 3 + 2, py + s * 0.6, px + h * 3 + 2 + s // 5, py + s * 0.5], fill=hexc('#5a5236'))
+    if t['name'] == 'moss' and h < 3:
+        d.ellipse([px + s * 0.2 + h, py + s * 0.3, px + s * 0.55 + h, py + s * 0.6], fill=hexc('#45602f'))
+    if t['name'] == 'blight' and h < 2:
+        d.line([px + s * 0.2, py + s * 0.3 + h, px + s * 0.7, py + s * 0.6 + h], fill=hexc('#6e6a62'))
+    if t['name'] == 'fern':
+        for a in (-0.25, 0, 0.25): d.line([px + s / 2, py + s * 0.85, px + s * (0.5 + a), py + s * 0.25], fill=hexc('#4e7a3c'))
     if t['name'] == 'marsh' and h < 2:
         d.line([px + s // 2, py + s // 4, px + s // 2, py + s * 3 // 4], fill=hexc('#4f6b4a'))
     if t['name'] == 'fence_grate':
@@ -247,6 +267,17 @@ def scenery_pass(d, m, tiles, s, x, y, px, py):
         r2 = r - max(1, s / 8)
         d.ellipse([px + s / 2 - r2, py + s / 2 - r2 - s * 0.15, px + s / 2 + r2, py + s / 2 + r2 - s * 0.15], fill=col)
         d.ellipse([px + s * 0.25, py + s * 0.05, px + s * 0.55, py + s * 0.35], fill=shade(col, 1.4))
+    if t['name'] == 'fir':
+        # tall dark fir: a stacked cone, taller than its tile
+        d.ellipse([px + s * 0.15, py + s * 0.75, px + s * 0.85, py + s * 1.0], fill=(0, 0, 0, 90))
+        for i, (top, bot, half) in enumerate(((-0.55, 0.15, 0.32), (-0.2, 0.5, 0.42), (0.15, 0.85, 0.5))):
+            d.polygon([(px + s / 2, py + s * top), (px + s * (0.5 + half), py + s * bot), (px + s * (0.5 - half), py + s * bot)],
+                      fill=shade(col, 1 + i * 0.12), outline=hexc('#0a120e'))
+        d.line([px + s * 0.42, py + s * -0.3, px + s * 0.3, py + s * 0.45], fill=shade(col, 1.6))
+    if t['name'] == 'boulder':
+        d.ellipse([px + 1, py + s * 0.15, px + s - 2, py + s - 2], fill=col, outline=hexc('#1a1a18'))
+        d.ellipse([px + s * 0.25, py + s * 0.25, px + s * 0.6, py + s * 0.5], fill=shade(col, 1.3))
+        d.ellipse([px + s * 0.5, py + s * 0.55, px + s * 0.85, py + s * 0.85], fill=hexc('#45602f'))
     if t['name'] == 'dead_tree':
         # gnarled and bigger than its tile, like the living trees outside
         cx = px + s / 2; w = max(2, s // 5); dk = hexc('#1c1712'); lt = hexc('#6a5a48')
@@ -309,6 +340,32 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
         if k == 'statue':
             d.rectangle([px + s * 0.2, py + s * 0.7, px + s * 0.8, py + s - 1], fill=shade(col, 0.6))
             d.ellipse([px + s * 0.3, py, px + s * 0.7, py + s * 0.75], fill=col); continue
+        if k == 'giant_tree':
+            cx = px + w / 2
+            d.ellipse([px, py + h * 0.7, px + w - 1, py + h - 1], fill=(0, 0, 0, 110))
+            for a, b in ((-0.6, -1.4), (1.6, -1.2), (0.1, -2.0), (0.9, -1.9), (-0.3, -0.6), (1.4, -0.4)):
+                d.line([cx, py + h * 0.4, px + w * a, py + h * b * 0.5], fill=hexc('#1c1712'), width=max(3, s // 2 + 2))
+                d.line([cx, py + h * 0.4, px + w * a, py + h * b * 0.5], fill=col, width=max(2, s // 2))
+            d.polygon([(px + w * 0.2, py + h - 1), (px + w * 0.35, py + h * 0.1), (px + w * 0.65, py + h * 0.1), (px + w * 0.8, py + h - 1)],
+                      fill=col, outline=hexc('#1c1712'))
+            d.ellipse([cx - s * 0.5, py + h - s * 1.1, cx + s * 0.5, py + h - 1], fill=hexc('#0b0a0f'))  # the hollow
+            continue
+        if k in ('fallen_log', 'drying_rack', 'stump', 'trap', 'firepit'):
+            if k == 'fallen_log':
+                d.rounded_rectangle([px + 1, py + s * 0.3, px + w - 2, py + s * 0.85], radius=s * 0.25, fill=col, outline=hexc('#1c1712'))
+            elif k == 'drying_rack':
+                d.line([px + 2, py + s * 0.3, px + w - 3, py + s * 0.3], fill=col, width=2)
+                for a in (0.15, 0.85): d.line([px + w * a, py + s * 0.2, px + w * a, py + s - 1], fill=col, width=2)
+                d.rectangle([px + w * 0.35, py + s * 0.3, px + w * 0.6, py + s * 0.75], fill=hexc('#8a6a50'))
+            elif k == 'stump':
+                d.ellipse([px + s * 0.15, py + s * 0.3, px + s * 0.85, py + s * 0.9], fill=col, outline=hexc('#1c1712'))
+            elif k == 'trap':
+                d.arc([px + s * 0.15, py + s * 0.25, px + s * 0.85, py + s * 0.85], 180, 360, fill=col, width=2)
+                d.arc([px + s * 0.15, py + s * 0.35, px + s * 0.85, py + s * 0.95], 0, 180, fill=col, width=2)
+            else:
+                d.ellipse([px + s * 0.1, py + s * 0.3, px + s * 0.9, py + s * 0.9], fill=hexc('#6a6460'))
+                d.ellipse([px + s * 0.3, py + s * 0.45, px + s * 0.7, py + s * 0.75], fill=col)
+            continue
         if k == 'dead_oak':
             cx, cy = px + w / 2, py + h / 2
             for a, b in ((0.05, 0.1), (0.95, 0.0), (0.15, 0.55), (0.9, 0.5), (0.5, 0.0)):
@@ -323,6 +380,10 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
         if k == 'crypt_mouth':
             d.rectangle([px + 1.6 * s, py + 1.2 * s, px + 3.4 * s, py + h - 1], fill=hexc('#07060a'))
             d.rectangle([px + 1.8 * s, py + 1.5 * s, px + 3.2 * s, py + h - 1], fill=hexc('#2a3a6a'))
+        if k in ('tunnel_mouth', 'wolf_den'):
+            d.rectangle([px + w * 0.3, py + h * 0.45, px + w * 0.7, py + h - 1], fill=hexc('#07060a'))
+        if k == 'lean_to':
+            d.polygon([(px, py + h - 1), (px + w / 2, py), (px + w - 1, py + h - 1)], fill=hexc('#7a5a38'), outline=hexc('#1c1712'))
         if k == 'shack':
             d.polygon([(px, py + s), (px + w / 2, py - s * 0.2), (px + w, py + s)], fill=hexc('#6e4a2a'))
         if k == 'throne':
@@ -341,6 +402,13 @@ def draw_markers(d, m, s, f, ox=0, oy=0, x0=0, y0=0, labels=True):
                 d.ellipse([x + dx - r * 0.4, y + dy - r * 0.4, x + dx + r * 0.4, y + dy + r * 0.4], fill=sc, outline=(10, 10, 14, 255))
             if labels: tag(d, f, '-'.join(map(str, sorted(set(mk['lv'])))), x + r + 8, y, sc)
         elif mk['k'] == 'named':
+            if mk.get('route') and labels:
+                pts = [(ox + (a - x0) * s + s / 2, oy + (b - y0) * s + s / 2) for a, b in mk['route']]
+                for a, b in zip(pts, pts[1:] + pts[:1]):
+                    n = int(max(abs(b[0] - a[0]), abs(b[1] - a[1])) // 6) + 1
+                    for i in range(0, n, 2):
+                        d.line([a[0] + (b[0] - a[0]) * i / n, a[1] + (b[1] - a[1]) * i / n,
+                                a[0] + (b[0] - a[0]) * (i + 1) / n, a[1] + (b[1] - a[1]) * (i + 1) / n], fill=(255, 138, 112, 200), width=2)
             d.ellipse([x - r, y - r, x + r, y + r], fill=(224, 72, 42, 255), outline=(10, 10, 14, 255), width=2)
             if labels: tag(d, f, mk['type'].replace('_', ' ').title() + f" ({mk['lv'][0]})", x, y - r - 7, (255, 138, 112, 255))
         elif mk['k'] == 'rare':

@@ -1,6 +1,6 @@
 # Map format: maps as text, checked by a script
 
-Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`). In the game now: `crossroads` (where the game starts), `rat_tunnel`, `graveyard` and `crypt`; `?area=<map>` starts in one, DEV → Teleport reaches each.
+Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`). In the game now: `crossroads` (where the game starts), `rat_tunnel`, `graveyard` and `crypt` (`wolfwood` is drawn and checked but not loaded yet); `?area=<map>` starts in one, DEV → Teleport reaches each.
 
 ## Where things live
 - `js/data/tiles.js`: the shared tables. `TILESET` (each tile character: name, walkable or not, colour, tags) and `OBJECTS` (buildings and props: size in tiles, how much open ground they need around them, which side the door is on, light radius). Add a tile or object here once and every map can use it.
@@ -32,6 +32,7 @@ label 23 5 Bell tower          # text on the overview picture only
 - Rat holes (`h`) are earth wall with a burrow in its face; the floor tile below each one is where Old Gnawbone's rats come out. Put them where the wall has floor directly below.
 - `zone` is where the map's top-left tile sits on the Zone 1 layout (128 × 128).
 - `start` names the exit players arrive from; distances and the phone view are measured from there.
+- `named ... route=x,y;x,y;...` (optional): a wandering named's loop. The checker makes sure every point is open ground you can reach and draws the loop as a dashed line; `pack=N` is how many wolves walk with it.
 - `rules: 'dead-inside'` turns on the dead-area check for this map.
 - Coordinates count from 0 at the top-left; x goes right, y goes down. The overview picture has a ruler every 4 tiles, so notes like "move the shack to 2,20" work.
 

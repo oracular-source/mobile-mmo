@@ -33,6 +33,12 @@ u    dirt_slope   1   #4a3e30 exit ground floor cave
 E    earth_wall   0   #1c1712 wall cave
 h    rat_hole     0   #1c1712 wall cave hole
 p    dirt_pile    0   #4a3a2c rubble cave
+F    fir          0   #1a2e26 living tree
+n    needles      1   #3a3a2a ground
+v    moss         1   #34452c living ground
+k    blight       1   #4e4c48 dead ground
+f    fern         1   #2e4a2a living ground
+O    boulder      0   #4a4a48 wall
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -57,4 +63,13 @@ sinkhole     4 3 1      ground 1     -    0
 burrow       2 2 1      ground 1     -    0
 light_shaft  1 1 0      floor  0     -    4
 gnaw_pile    2 2 1      floor  1     -    0
+giant_tree   4 4 1      ground 1     S    0
+tunnel_mouth 3 2 1      ground 1     S    2
+lean_to      3 2 1      ground 1     S    0
+firepit      1 1 1      ground 1     -    0
+drying_rack  2 1 1      ground 0     -    0
+trap         1 1 0      ground 0     -    0
+wolf_den     4 2 1      ground 1     S    0
+fallen_log   3 1 1      ground 0     -    0
+stump        1 1 1      ground 0     -    0
 `;

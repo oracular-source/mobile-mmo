@@ -47,7 +47,7 @@ obj brazier 16 16
 obj brazier 27 24
 # ways in and out
 exit stairs_up 6 25 to=graveyard lit
-exit back_tunnel 39 8 to=wolfwood_edge lit
+exit back_tunnel 39 8 to=wolfwood at=crypt_tunnel lit
 # stair hall: crypt rats
 spawn crypt_rat 5 5 21
 spawn crypt_rat 5 8 22
