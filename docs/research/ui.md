@@ -120,3 +120,19 @@ Options (rough):
 - **C Toggles become icons on your frame:** two small square chips inside the bottom-right corner of your frame (a sword for 1st hit, a loop for Auto), lit gold when on; Log and Menu go square (as A). Least clutter, but icons need art and must be learned.
 Claude leans **A** (small, finished, nothing moves so muscle memory holds).
 **Built v0.44 (owner, Nov 19: "fix up those buttons", A):** all four are grey squares in the grid's style (4px corners), 32px tall. 1st hit and Auto have a small light at the left, lit gold (and gold border and text) when on, dim grey when off; no on/off words, so the width never changes. Log has the gold border while the Log panel is open; Menu reads Done (gold) while arranging. The minimap, Log panel and DEV button moved down 6px.
+
+## 14. Minimap look (owner, Nov 19: "the minimap doesn't look great")
+Now (v0.44): each tile is the average colour of the painted ground under it, brightened, so it reads as blurry green with soft tan roads; pins are plain coloured squares; you're a gold dot (no facing); no area name.
+Drafts: `art/drafts/ui-minimap-options.png` (made by `tools/ui_drafts.py` from the real crossroads map).
+- **A Flat colours:** one clean colour per kind of ground (road, grass, trees, water, stone), so roads stand out; pins become the small map icons (15); you're a gold arrow that shows which way you face; the area name in a grey strip under it.
+- **B Roads only:** dark ground, only roads, water and walls drawn. Quietest and easiest to read; loses the forest shapes.
+- **C A plus monsters:** A, with red dots for monsters near you.
+Claude leans **A** (cohesive with the flat grey UI; C's dots can be added later if wanted).
+
+## 15. Icons (owner, Nov 19: icons for spells and map places)
+Same 12 × 12 shapes on a 16 × 16 grey square with the grid's 1px light border, three looks. Drafts: `art/drafts/ui-icon-styles.png`.
+- **1 Plain:** grey/white shape, no colour. Quietest, most EverQuest.
+- **2 Tinted:** the shape in the spell's colour (the colour chip each spell already has) or the pin's colour. Matches today's colour chips and pin colours.
+- **3 Filled:** a dark square of that colour with a light shape. Boldest, most like classic MMO spell icons.
+Draft shapes: Thornlash, Mend, Rootgrip, a fire nuke, Shield Bash, Raise Bones; Town, Dungeon door, Campfire, Way out, Named, Hidden chest. Rough first pass: references-first applies when each real icon is drawn (Thornlash still reads as a stick).
+Claude leans **2 Tinted** (keeps the grey UI quiet, colour carries meaning already used everywhere). Scope once picked: ~156 abilities across 14 classes share shapes by kind where it makes sense (every heal a cross variant, every root roots), plus ~6 map icons; the icon replaces the colour chip on spell buttons and the Spells list. Map icons ship with the minimap pass; spell icons can go class by class.
