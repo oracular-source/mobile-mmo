@@ -1,6 +1,11 @@
-// Touch and keyboard: tap to move, the drag joystick, pinch zoom, tapping enemies.
+// Touch and keyboard: three movement modes (tap to walk, joystick, hold to walk), pinch zoom, tapping enemies.
 'use strict';
-/* ---------- Input: movement (tap to move, invisible drag joystick) ---------- */
+/* ---------- Input: movement ---------- */
+// settings.move picks ONE way to walk (v0.35.1, kept separate so they can't trip each other):
+//  'tap'  tap the ground to walk there; dragging does nothing
+//  'joy'  drag anywhere for an invisible joystick; tapping the ground does nothing
+//  'hold' press and hold, you walk toward your finger; a quick tap does nothing
+// In every mode a tap on an enemy, NPC or summon spot still works.
 const joy={id:null,sx:0,sy:0,cx:0,cy:0,dx:0,dy:0,t0:0,active:false};
 const HOLD_MS=180; // hold-to-move: a press longer than this walks instead of tapping
 const keys={};
@@ -27,7 +32,10 @@ cv.addEventListener('pointermove',e=>{
   if(e.pointerId!==joy.id)return;
   joy.cx=e.clientX;joy.cy=e.clientY;
   const dx=e.clientX-joy.sx,dy=e.clientY-joy.sy;
-  if(!joy.active&&Math.hypot(dx,dy)>12){joy.active=true;player.tx=null;player.sit=false;}
+  if(!joy.active&&Math.hypot(dx,dy)>12){
+    if(settings.move==='tap'){joy.noTap=true;return} // tap mode: a drag isn't a tap and doesn't steer
+    joy.active=true;player.tx=null;player.sit=false;}
+  if(settings.move==='tap')return;
   joy.dx=dx;joy.dy=dy;
 });
 function endJoy(e){
@@ -54,6 +62,7 @@ function tapWorld(clientX,clientY,targetOnly){
   if(best){switchTarget(best);if(settings.tapCast&&!(best.mez>0))castSlot(0);return} // tapping a sleeping mob only targets it
   if(!targetOnly&&tapSummon(wx,wy))return; // the throne or bone pile, when you're standing at it
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
+  if(settings.move!=='tap')return; // only tap-to-walk walks on a ground tap
   player.tx=wx;player.ty=wy;player.sit=false;
 }
 window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();if(e.shiftKey)backTarget();else nextTarget()}});

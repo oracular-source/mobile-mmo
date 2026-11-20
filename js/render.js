@@ -207,7 +207,7 @@ function render(){
   floats.forEach(f=>{const F=FLOAT[f.kind]||FLOAT.num,p=Math.min(1,f.t/f.life),a=p<0.65?1:1-(p-0.65)/0.35,rise=F.rise*(1-(1-p)*(1-p)),
     sx=(f.x-camX)*S,sy=(f.y-camY-rise)*S;cx.globalAlpha=Math.max(0,a);
     cx.font='700 '+Math.round(F.px*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=(F.px<10?2.5:3)*dpr;cx.strokeStyle='#000';cx.strokeText(f.txt,sx,sy);cx.fillStyle=f.col;cx.fillText(f.txt,sx,sy);cx.globalAlpha=1});
-  if(settings.move==='drag'&&settings.showJoy&&joy.active){
+  if(settings.move==='joy'&&settings.showJoy&&joy.active){
     const r=cv.getBoundingClientRect(),bx=(joy.sx-r.left)*dpr,by=(joy.sy-r.top)*dpr,R=40*dpr,d=Math.hypot(joy.dx,joy.dy)||1,k=Math.min(1,40/d);
     cx.globalAlpha=0.35;cx.fillStyle='#14121a';cx.beginPath();cx.arc(bx,by,R,0,Math.PI*2);cx.fill();cx.strokeStyle='#c9a227';cx.lineWidth=2*dpr;cx.stroke();
     cx.globalAlpha=0.7;cx.fillStyle='#c9a227';cx.beginPath();cx.arc(bx+joy.dx*k*dpr,by+joy.dy*k*dpr,16*dpr,0,Math.PI*2);cx.fill();cx.globalAlpha=1;

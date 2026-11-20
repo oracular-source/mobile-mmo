@@ -249,8 +249,8 @@ function renderSettings(){
       seg('Pad size','padSize',[['S','Small'],['M','Medium'],['L','Large']])+
       seg('Flick distance','flick',[['short','Short'],['normal','Normal'],['long','Long']]):'')+
     seg('Hand','left',[['false','Right'],['true','Left']])+
-    seg('Movement','move',[['drag','Tap + drag'],['hold','Hold to move']])+
-    (settings.move==='drag'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
+    seg('Movement','move',[['tap','Tap to walk'],['joy','Joystick'],['hold','Hold to walk']])+
+    (settings.move==='joy'?seg('Drag stick','showJoy',[['false','Hidden'],['true','Visible']]):'')+
     grp('Combat')+
     seg('Tap an enemy (1st hit)','tapCast',[['true','Target + cast'],['false','Target only']])+
     seg('Keep casting (Auto)','autoCast',[['true','On'],['false','Off']])+
