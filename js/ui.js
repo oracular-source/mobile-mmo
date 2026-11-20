@@ -110,11 +110,13 @@ function sideBar(side,sitOnly){
 function autoPill(side,bottom,noNext){
   // Top left, under your portrait: the two toggles. Top right, under the target: Menu.
   const pills=document.createElement('div');pills.id='toggles';ctrl.appendChild(pills);
-  // v0.43: square grey buttons like the spell grid, with a small light that's lit gold when the toggle is on
+  // v0.45: square grey buttons like the spell grid, with a small light that's lit gold when the toggle is on
   // (easier to read at a glance than "on/off" text), and taller so they're easier to hit.
   const mk=(key,label,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='hudb tog'+(settings[key]?' on':'');
     b.innerHTML='<i></i>'+label;b.setAttribute('aria-pressed',settings[key]?'true':'false');
-    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
+    b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();settings[key]=!settings[key];saveSettings();
+      // Flip this button in place (v0.45): rebuilding every control made the row pop back to its default spot for a frame (shaky).
+      b.classList.toggle('on',settings[key]);b.setAttribute('aria-pressed',settings[key]?'true':'false');log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
     pills.appendChild(b);};
   mk('tapCast','1st hit','Auto first attack','firstpill');
   mk('autoCast','Auto','Auto attack','autopill');
