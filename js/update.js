@@ -12,7 +12,7 @@ function update(dt){
       if(Math.hypot(dx,dy)>5){mx=dx;my=dy}
     }else if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
-    const steering=mx!==0||my!==0;
+    const steering=mx!==0||my!==0;if(steering)player.lastMove={x:mx,y:my}; // which way you were heading when you took an exit
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
       // Still Water (Monk fork): health and mana come back fast while you lie there.
       if(player.fd>0&&player.fdStill){player.hp=Math.min(maxHP(player.lvl),player.hp+maxHP(player.lvl)*player.fdStill*dt);player.mp=Math.min(maxMP(player.lvl),player.mp+maxMP(player.lvl)*player.fdStill*dt)}

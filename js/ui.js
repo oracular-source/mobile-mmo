@@ -5,7 +5,8 @@
 // Ring order is clockwise from straight up, 72 degrees apart.
 const SLOT_LABELS={pad:['Tap center','Flick up','Flick up-right','Flick down-right','Flick down-left','Flick up-left','Side bar top','Side bar bottom'],grid:['Top row left (main)','Top row right','Row 2 left','Row 2 right','Row 3 left','Row 3 right','Bottom row left','Bottom row right']};
 // Grid button sizes (v0.29.1: owner found the v0.28 size, now Large, too big). Width, height, gap, font size.
-const GRID_LIFT=1;
+const GRID_LIFT=1.6; // v0.41 (owner): spells up a bit more off the bottom edge (was 1)
+const TGT_GAP=16; // v0.41 (owner): clear space between Back/Next and the spells so you don't hit a spell by mistake
 const GRID_PX={S:[44,36,5,9],M:[50,41,5,10],L:[58,48,6,11]};
 const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
@@ -38,10 +39,10 @@ function buildControls(){
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
-    const tb=MB+4*(H+G),tw=W,th=Math.round(H*0.72);
+    const tb=MB+4*(H+G)+TGT_GAP,tw=W,th=Math.round(H*0.72);
     [['tgtback','◀ Back',backTarget,settings.left?0:W+G],['nexttgt','Next ▶',nextTarget,settings.left?W+G:0]] /* Back always on the left, Next on the right */.forEach(([id,label,fn,off])=>{
       const t=document.createElement('button');t.id=id;t.className='gtb';t.textContent=label;
-      t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px;height:'+th+'px';
+      t.style.cssText='bottom:'+tb+'px;'+side+':'+(M+off)+'px;width:'+tw+'px;height:'+th+'px;font-size:'+FS+'px';
       t.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;fn();flash(t)});
       ctrl.appendChild(t);
     });
@@ -87,7 +88,7 @@ function sideBar(side,sitOnly){
   ctrl.appendChild(sit);
   // v0.34 pet orders (owner pick B): Attack and Back off, stacked above Sit at Sit's size. Built for everyone but only
   // shown while a pet is out (render.js), so non-pet classes never see them and nothing else on this side moves.
-  const G=g[2],pb0=sitOnly?base+H+G:base+3*(sz+gap); // the old pad layout has slots 7-8 above Sit, so go above those
+  const G=g[2],pb0=sitOnly?base+H+G+TGT_GAP:base+3*(sz+gap); // v0.41: a clear gap between Sit and the pet buttons // the old pad layout has slots 7-8 above Sit, so go above those
   [['bpetback','Back off',petBackOff,0],['bpetatk','Attack',petAttack,1]].forEach(([id,label,fn,k])=>{
     const b=document.createElement('button');b.id=id;b.className='gb petcmd';b.textContent=label;
     b.style.cssText='display:none;width:'+W+'px;height:'+H+'px;bottom:'+(pb0+k*(H+G))+'px;'+side+':10px;padding:0';

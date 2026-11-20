@@ -113,8 +113,11 @@ function finishRun(){
 function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;openModal('promptUI')}
 $('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');running=true;if(promptAction)promptAction();promptAction=null});
 // A free spot a couple of tiles from an exit (not on it, so you don't trigger it again on arrival).
-function areaSpot(A,ex){
-  for(const [dx,dy] of [[0,2],[0,-2],[2,0],[-2,0],[0,3],[0,-3],[3,0],[-3,0],[2,2],[-2,2],[2,-2],[-2,-2]]){const x=ex.tx+dx,y=ex.ty+dy;
+// dir (v0.41): the way you were walking. You come out on that side of the exit so you keep walking away from it, not back in.
+function areaSpot(A,ex,dir){
+  let offs=[[0,2],[0,-2],[2,0],[-2,0],[0,3],[0,-3],[3,0],[-3,0],[2,2],[-2,2],[2,-2],[-2,-2]];
+  if(dir&&(dir.x||dir.y)){const d=Math.hypot(dir.x,dir.y);offs=offs.map((o,i)=>[o,i]).sort((a,b)=>{const s=o=>(o[0]*dir.x+o[1]*dir.y)/(d*Math.hypot(o[0],o[1]));return (s(b[0])-s(a[0]))||(a[1]-b[1])}).map(o=>o[0])}
+  for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;
     if(x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0)return{x:x*T+8,y:y*T+8}}
   return A.start||null}
 // from: the map key of the area you came from, so you arrive at the matching exit (up the crypt stairs -> crypt mouth).
@@ -131,7 +134,7 @@ function enterZone(id,from,at){
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
-  else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.atSummon=null;
+  else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex,player.lastMove):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.exitGuard=ex||null;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
     log(id==='crypt'&&from==='wolfwood'?'You duck into the old tunnel. It slopes down into cold blue light.':id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'&&id==='wolf'?'You climb out of the tunnel into a hillside of mossy boulders. Firs all around.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
@@ -179,9 +182,11 @@ function checkPortals(){
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
   if(A){checkSummon(A);checkChests(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
-    if(ex!==player.atExit){player.atExit=ex;if(ex){
-      // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
-      if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id,ex.at)}
+    // The exit you just came out of stays quiet until you've walked 3 tiles from it, so you can't pop straight back in by accident (v0.41).
+    const G=player.exitGuard;if(G&&Math.hypot(G.tx-tx,G.ty-ty)>3)player.exitGuard=null;
+    if(ex!==player.atExit){player.atExit=ex;if(ex&&ex!==player.exitGuard){
+      // Built areas link straight through. You can leave with mobs on you (owner, Nov 19): reaching the edge is fair, and they reset behind you.
+      if(ZONE_OF[ex.to]){if(inCombat())log('You slip away. What was chasing you loses your trail.','#9aa');enterZone(ZONE_OF[ex.to],A.id,ex.at)}
       else if(ex.to==='town1')log('The road south leads to Town 1. It is not built yet.','#9aa');
       else if(ex.to==='chapel')log('The road north leads on to an old chapel. It is not built yet.','#9aa');
       else log('This way is not built yet.','#9aa');}}

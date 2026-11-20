@@ -505,9 +505,20 @@ function drawObj(g,R,o){
     R(X+W/2-6,Y+H-12,12,12,'#0c0a08');R(X+W/2-7,Y+H-13,14,1,AP.out);
     R(X+W-12,top+6,8,14,AP.out);R(X+W-11,top+7,6,12,'#8a6a4a');R(X+W-11,top+7,6,1,'#a88a64');return}
   if(k==='drying_rack'){
-    // Two forked posts and a pole with strips of hide drying on it.
-    shadow(X+1,Y+13,W-2,3);[2,W-4].forEach(x=>{R(X+x-1,Y-8,4,23,AP.out);R(X+x,Y-7,2,21,AP.wood)});R(X,Y-9,W,3,AP.out);R(X+1,Y-8,W-2,1,AP.woodHi);
-    [6,11,17,22].forEach((x,i)=>{R(X+x-1,Y-7,4,8+i%2*3,AP.out);R(X+x,Y-7,2,7+i%2*3,i%2?'#8a5a44':'#a8785a')});return}
+    // A tanning frame (v0.41, owner: the old pole rack didn't read): a square wooden frame standing on its feet,
+    // a wolf hide stretched inside it, laced to the frame at the edges.
+    const fx=X+3,fy=Y-14,fw=26,fh=26;shadow(X+2,Y+12,W-4,3);
+    R(fx-1,fy-1,4,fh+3,AP.out);R(fx+fw-3,fy-1,4,fh+3,AP.out);R(fx-1,fy-1,fw+1,4,AP.out);R(fx-1,fy+fh-5,fw+1,4,AP.out);
+    R(fx,fy,2,fh+1,AP.wood);R(fx+fw-2,fy,2,fh+1,AP.woodDk);R(fx,fy,fw-1,2,AP.woodHi);R(fx,fy+fh-4,fw-1,2,AP.wood);
+    R(fx-3,fy+fh,6,2,AP.out);R(fx+fw-4,fy+fh,6,2,AP.out); // feet
+    // the hide: wide in the middle, legs reaching to the corners
+    const hx=fx+fw/2-1,hy=fy+fh/2-2;
+    const rows=[[-4,4],[-6,6],[-8,8],[-7,7],[-7,7],[-7,7],[-6,6],[-7,7],[-8,8],[-6,6],[-4,4]];
+    rows.forEach(([a,b],r)=>{const y=hy-5+r;R(hx+a-1,y,b-a+2,1,AP.out)});
+    rows.forEach(([a,b],r)=>{const y=hy-5+r;R(hx+a,y,b-a,1,'#a8825c');R(hx+a,y,2,1,'#c49e74');if(r>3&&r<8)R(hx-1,y,2,1,'#8a6a4a')});
+    [[-9,-7],[8,-7],[-9,6],[8,6]].forEach(([dx,dy])=>{R(hx+dx,hy+dy,2,2,'#a8825c');R(hx+dx+(dx<0?-2:2),hy+dy+(dy<0?-2:2),2,1,'#d8c8a0')}); // legs and lacing
+    [[-11,0],[10,0],[0,-9],[0,8]].forEach(([dx,dy])=>R(hx+dx,hy+dy,1,1,'#d8c8a0'));
+    return}
   if(k==='trap'){
     // A sprung iron jaw trap, its teeth shut on nothing.
     R(X+3,Y+9,10,5,AP.out);R(X+4,Y+10,8,3,AP.iron);R(X+4,Y+10,8,1,AP.ironHi);[5,7,9,11].forEach(x=>R(X+x,Y+8,1,2,AP.ironTip));R(X+12,Y+11,4,1,AP.ironHi);return}
