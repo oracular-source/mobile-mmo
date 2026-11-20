@@ -69,7 +69,6 @@ function zoomSteps(){const lo=Math.max(2,Math.ceil(cv.width/ZOOM_MAX)-1),hi=Math
 function applyZoom(){
   const [lo,hi]=zoomSteps();
   S=Math.min(hi,Math.max(lo,Math.round(cv.width/settings.zoom)));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
-  low.width=VW;low.height=VH;
 }
 function resize(){
   const r=$('view').getBoundingClientRect();dpr=Math.min(3,window.devicePixelRatio||1);
@@ -107,12 +106,16 @@ function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
 let time=0;
 function render(){
-  const pxr=Math.round(player.x),pyr=Math.round(player.y);
+  // Smooth camera (v0.45, optimization lane): the camera and every moving sprite snap to a SCREEN pixel (1/S of a game pixel),
+  // not a whole game pixel. Art stays crisp (each game pixel is still an S x S block) but the world glides instead of
+  // stepping one game pixel at a time, which made diagonal walking jitter (x and y stepped on different frames).
+  const sn=v=>Math.round(v*S)/S,pxr=sn(player.x),pyr=sn(player.y);
   // The camera may scroll a little past the map's top edge so the top bars never cover you, and past the bottom edge
   // so the spell pad never covers you either (the crossroads starts at its bottom edge, v0.28).
   const topPad=Math.round(66*dpr/S),botPad=Math.round(VH*0.28);
   camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH+botPad,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
+  cx.setTransform(S,0,0,S,0,0);cx.imageSmoothingEnabled=false;cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
@@ -126,7 +129,7 @@ function render(){
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
-  if(t&&!t.dead){for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}}
+  if(t&&!t.dead){lx.save();lx.translate(sn(t.x)-Math.round(t.x),sn(t.y)-Math.round(t.y));for(let a=0;a<24;a++){if((a+Math.floor(time*6))%3===0)continue;const an=a/24*Math.PI*2;lx.fillStyle='#ffcc33';lx.fillRect(Math.round(t.x+Math.cos(an)*8),Math.round(t.y+Math.sin(an)*2.6),1,1)}lx.restore()}
   // Holy ground: a dotted gold ring on the floor that blinks out in its last 3 seconds.
   grounds.forEach(g=>{if(g.t<3&&Math.floor(time*6)%2)return;lx.fillStyle=g.col;for(let a=0;a<48;a++){if((a+Math.floor(time*4))%4===0)continue;const an=a/48*Math.PI*2;lx.fillRect(Math.round(g.x+Math.cos(an)*g.r),Math.round(g.y+Math.sin(an)*g.r*0.6),1,1)}});
   // Venom Totem: a little carved post in the middle of its ring. Spike Traps: grey spikes on the ground.
@@ -137,9 +140,7 @@ function render(){
   const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],pet2?[pet2]:[],decoy?[decoy]:[],[player],trees).sort((a,b)=>a.y-b.y);
   // A tree you (or your target) are behind fades so you never lose sight of the fight.
   const behind=(o,tr)=>o&&!o.dead&&o.y<tr.y&&o.x+6>tr.b[0]&&o.x-6<tr.b[2]&&o.y>tr.b[1]+4&&o.y-14<tr.b[3];
-  ents.forEach(e=>{
-    if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
-      lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
+  const drawEnt=e=>{
     if(e===player){
       if(player.dead>0)return;
       shadow(player.x,player.y,6);
@@ -175,7 +176,13 @@ function render(){
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark
     if(m.chill>0&&Math.floor(time*3+m.x)%2===0){lx.fillStyle='#bfe6ff';for(let i=0;i<m.chill;i++)lx.fillRect(Math.round(m.x)-4+i*3,Math.round(m.y)-1,1,1)}
     if(m.dots.length&&rng()<0.25)parts.push({x:m.x+rr(-4,4),y:m.y-rr(4,12),vx:0,vy:-10,t:0,life:0.5,col:'#6aa84f'});
-  });
+  };
+  // Each sprite and its little overlays (roots, marks, buff sparkles) are drawn at whole game pixels, then the lot is
+  // nudged by the leftover fraction so it moves as smoothly as the camera and the overlays stay stuck to it.
+  ents.forEach(e=>{
+    if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
+      lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
+    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.save();lx.translate(ox,oy);drawEnt(e);lx.restore()});
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();
@@ -183,20 +190,23 @@ function render(){
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
   const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
-  const lights=[{x:pxr,y:pyr-8,r:95,w:18}].concat(zl)
-    .map(l=>({x:Math.round(l.x-camX),y:Math.round(l.y-camY),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>-l.r&&l.x<VW+l.r&&l.y>-l.r&&l.y<VH+l.r);
-  if(dark.width!==VW||dark.height!==VH){dark.width=VW;dark.height=VH}
-  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,VW,VH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,VW,VH);
+  // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
+  // pools stay put on the ground while the camera glides.
+  const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
+  const lights=[{x:player.x,y:player.y-8,r:95,w:18}].concat(zl)
+    .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
+  if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
+  dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);
   dg.globalCompositeOperation='destination-out';
-  lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-l.r-1,l.y-l.r-1));
+  lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-ox-l.r-1,l.y-oy-l.r-1));
   dg.globalCompositeOperation='source-over';
-  lx.drawImage(dark,0,0);
+  lx.save();lx.translate(-camX,-camY);
+  lx.drawImage(dark,ox,oy);
   lx.globalCompositeOperation='lighter';
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
-  lx.globalAlpha=1;lx.globalCompositeOperation='source-over';
+  lx.restore();
   drawGlows();
-  cx.imageSmoothingEnabled=false;
-  cx.drawImage(low,0,0,VW*S,VH*S);
+  cx.setTransform(1,0,0,1,0,0); // back to screen pixels for the crisp text layer
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
