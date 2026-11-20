@@ -34,28 +34,36 @@ function mmPins(id){
 }
 const MM_PIN_COL={exit:'#7dffa6',dun:'#c8a0ff',camp:'#ffd27a',boss:'#ff6b6b'};
 
-// Build an area's map picture once: one pixel per tile, coloured from the painted ground underneath
-// (so the map looks like the place), brightened because the world is drawn dark and lit later.
+// Build an area's map picture once: one pixel per tile, one flat colour per kind of ground (v0.48, UI 14 option A).
+// Each area's grass, road and floor colours come from its own painted ground (averaged over the whole area), so
+// Wolfwood's dusk and the crossroads still look different, but every road is one clean colour that stands out.
 function mmZone(id){
   if(MM.z[id])return MM.z[id];
   let src;
   if(id==='over')src={w:40,h:30,world:overWorld,map:overMap,name:'Gate Road'};
   else if(id==='dun')src={w:DUN.w,h:DUN.h,world:DUN.world,map:DUN.map,name:'Dungeon 1'};
-  else if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);src={w:A.w,h:A.h,world:A.world,map:A.map,name:A.name}}
+  else if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);src={w:A.w,h:A.h,world:A.world,map:A.map,name:A.name,rows:A.rows}}
   else return null;
-  const w=src.w,h=src.h,pix=src.world.getContext('2d').getImageData(0,0,w*T,h*T).data,col=[];
+  const w=src.w,h=src.h,pix=src.world.getContext('2d').getImageData(0,0,w*T,h*T).data,under=!!MM_UNDER[id];
+  // Map-file areas say which tiles are road (the 'path' tag in tiles.js); the old Gate Road falls back to colour.
+  const isPath=(tx,ty,r,g)=>src.rows?((AREA_TILES[src.rows[ty][tx]]||{tags:[]}).tags.indexOf('path')>=0):(r>g*1.04&&r>40);
+  // 1) Sort every tile into a kind, using the painted colour to tell road from grass.
+  const kind=[],sum={grass:[0,0,0,0],path:[0,0,0,0]};
   for(let ty=0;ty<h;ty++)for(let tx=0;tx<w;tx++){
     let r=0,g=0,b=0,n=0;
     for(let y=ty*T;y<ty*T+T;y+=2)for(let x=tx*T;x<tx*T+T;x+=2){const o=(y*w*T+x)*4;r+=pix[o];g+=pix[o+1];b+=pix[o+2];n++}
     r/=n;g/=n;b/=n;
-    const t=src.map[ty][tx];let k=1.9;
-    if(t===3)k=1.1;                                          // trees and scenery: darker so paths stand out
-    if(t===7){r=g=b=12;k=1}                                  // solid rock underground: near black, so the rooms stand out
-    if(t===5){r=r*0.4+80;g=g*0.4+76;b=b*0.4+88;k=1.3}        // buildings and walls: pale stone
-    if(t===2){b+=20;k=1.7}                                   // water
-    if(t===10||t===8){r=150;g=110;b=200;k=1}                 // doors and exit circles
-    col.push('rgb('+Math.min(255,r*k|0)+','+Math.min(255,g*k|0)+','+Math.min(255,b*k|0)+')');
+    const t=src.map[ty][tx];let k;
+    if(t===3)k='tree';else if(t===2)k='water';else if(t===7)k='rock';else if(t===5)k='wall';else if(t===10||t===8)k='door';
+    else k=(!under&&isPath(tx,ty,r,g))?'path':'grass';   // underground floors are all 'grass' (one floor colour)
+    kind.push(k);if(sum[k]){sum[k][0]+=r;sum[k][1]+=g;sum[k][2]+=b;sum[k][3]++}
   }
+  // 2) One colour per kind. Brightened, because the world is drawn dark and lit later.
+  const avg=(k,f,d)=>{const q=sum[k];if(!q[3])return d;return q.slice(0,3).map(v=>Math.min(255,v/q[3]*f|0))};
+  const grass=avg('grass',under?2.0:1.7,[58,82,52]);
+  const C={grass:grass,path:avg('path',1.9,[176,146,104]),tree:grass.map(v=>v*0.5|0),water:[52,86,140],
+    rock:[12,12,14],wall:[120,118,128],door:[150,110,200]};
+  const col=kind.map(k=>'rgb('+C[k].join(',')+')');
   const c=document.createElement('canvas');c.width=w;c.height=h;
   const Z={id:id,name:src.name,w:w,h:h,col:col,c:c,g:c.getContext('2d'),seen:new Uint8Array(w*h),count:0,pins:mmPins(id)};
   // Load the saved bits.
@@ -84,27 +92,60 @@ function mmReveal(){
 }
 
 /* ---------- Drawing the minimap ---------- */
+// Minimap markers (v0.48, owner): plain shapes, not pictures; small, so the minimap stays clean. Each kind of
+// place has its own shape and colour, and the full map's list shows the same shape so they're easy to learn.
+// 5 x 5, one screen pixel per dot, black outline. Exits are an arrow turned to point out of the area.
+const MM_ICON={
+  arrow: ['..#..','..##.','#####','..##.','..#..'],
+  town:  ['#####','#####','#####','#####','#####'],   // square
+  cave:  ['.###.','#####','#####','#####','.###.'],   // circle (cave or dungeon door)
+  fire:  ['..#..','.###.','.###.','#####','#####'],   // triangle (campfire)
+  skull: ['..#..','.###.','#####','.###.','..#..'],   // diamond (named)
+  chest: ['#####','#...#','#...#','#...#','#####']};  // hollow square (hidden chest)
+const MM_GLYPH={arrow:'→',town:'■',cave:'●',fire:'▲',skull:'◆',chest:'□'}; // the same shapes in the full map's list
+function mmIconOf(p){if(p.name==='Hidden chest')return'chest';if(/^Town/.test(p.name))return'town';
+  return{exit:'arrow',dun:'cave',camp:'fire',boss:'skull'}[p.k]||'fire'}
+function mmIcon(g,cx,cy,name,hex,u,rot){
+  const G=MM_ICON[name],N=G.length;
+  const at=(x,y)=>{let X=x,Y=y;for(let r=0;r<(rot||0);r++){const t=X;X=N-1-Y;Y=t}return[X,Y]}; // turn a quarter at a time
+  const x0=Math.round(cx-N/2*u),y0=Math.round(cy-N/2*u),dots=[];
+  for(let y=0;y<N;y++)for(let x=0;x<N;x++)if(G[y][x]==='#')dots.push(at(x,y));
+  g.fillStyle='#000';dots.forEach(([X,Y])=>g.fillRect(x0+(X-1)*u,y0+(Y-1)*u,3*u,3*u)); // outline first
+  g.fillStyle=hex;dots.forEach(([X,Y])=>g.fillRect(x0+X*u,y0+Y*u,u,u));
+}
+// Which way an exit points: toward the nearest edge of the area (exits sit on or near an edge).
+function mmExitRot(Z,p){const d=[Z.w-1-p.x,Z.h-1-p.y,p.x,p.y];return d.indexOf(Math.min(...d))}
 const mmEl=$('mm'),mmg=mmEl.getContext('2d');
 function drawMinimap(){
   const show=settings.minimap&&MM_ZONES[zoneId];
   mmEl.style.display=show?'block':'none';if(!show)return;
   const Z=mmZone(zoneId),dpr=Math.min(2,window.devicePixelRatio||1),W=mmEl.clientWidth||86,H=mmEl.clientHeight||86;
   if(mmEl.width!==Math.round(W*dpr)){mmEl.width=Math.round(W*dpr);mmEl.height=Math.round(H*dpr)}
-  const s=MM_TILE*dpr,cxp=mmEl.width/2,cyp=mmEl.height/2,ptx=player.x/T,pty=player.y/T;
+  const strip=Math.round(13*dpr);                       // the area's name sits in a grey strip along the bottom
+  const s=MM_TILE*dpr,cxp=mmEl.width/2,cyp=(mmEl.height-strip)/2,ptx=player.x/T,pty=player.y/T,u=Math.max(1,Math.round(dpr));
   mmg.imageSmoothingEnabled=false;mmg.fillStyle='#07060a';mmg.fillRect(0,0,mmEl.width,mmEl.height);
   mmg.drawImage(Z.c,Math.round(cxp-ptx*s),Math.round(cyp-pty*s),Z.w*s,Z.h*s);
-  // Pins for places you've found. Exits off the edge get a small arrow on the rim, so you know which way to head.
-  const pad=4*dpr;
+  // Icons for places you've found. Exits off the edge get a small arrow on the rim, so you know which way to head.
+  const pad=5*dpr,bot=mmEl.height-strip;
   Z.pins.forEach(p=>{if(!p.found)return;
     const x=cxp+(p.x+0.5-ptx)*s,y=cyp+(p.y+0.5-pty)*s,col=MM_PIN_COL[p.k];
-    if(x>pad&&y>pad&&x<mmEl.width-pad&&y<mmEl.height-pad){mmg.fillStyle='#000';mmg.fillRect(x-2.5*dpr,y-2.5*dpr,5*dpr,5*dpr);mmg.fillStyle=col;mmg.fillRect(x-1.5*dpr,y-1.5*dpr,3*dpr,3*dpr);return}
+    if(x>pad&&y>pad&&x<mmEl.width-pad&&y<bot-pad){const ic=mmIconOf(p);mmIcon(mmg,x,y,ic,ic==='chest'?'#ffd27a':col,u,ic==='arrow'?mmExitRot(Z,p):0);return}
     if(p.k!=='exit'&&p.k!=='dun')return;
     const a=Math.atan2(y-cyp,x-cxp),r=Math.min((cxp-pad)/Math.abs(Math.cos(a)||1e-6),(cyp-pad)/Math.abs(Math.sin(a)||1e-6));
-    mmArrow(cxp+Math.cos(a)*r,cyp+Math.sin(a)*r,a,3.5*dpr,col);
+    mmArrow(cxp+Math.cos(a)*r,cyp+Math.sin(a)*r,a,3*dpr,col);
   });
-  // You: a gold dot with a dark ring.
-  mmg.fillStyle='#000';mmg.beginPath();mmg.arc(cxp,cyp,3*dpr,0,Math.PI*2);mmg.fill();
-  mmg.fillStyle='#ffd27a';mmg.beginPath();mmg.arc(cxp,cyp,2*dpr,0,Math.PI*2);mmg.fill();
+  // You: a gold arrow pointing the way you last moved.
+  mmYou(mmg,cxp,cyp,4.5*dpr,dpr);
+  // Name strip.
+  mmg.fillStyle='rgba(43,43,43,.95)';mmg.fillRect(0,bot,mmEl.width,strip);mmg.fillStyle='#8a8a8a';mmg.fillRect(0,bot,mmEl.width,dpr);
+  mmg.fillStyle='#ddd';mmg.font=(9*dpr)+'px monospace';mmg.textAlign='center';mmg.textBaseline='middle';
+  mmg.fillText(Z.name.length>16?Z.name.slice(0,15)+'…':Z.name,mmEl.width/2,bot+strip/2+dpr*0.5);
+}
+function mmYou(g,x,y,q,dpr){
+  const fa=Math.atan2(player.fy||0,player.fx||(player.fy?0:1));
+  g.save();g.translate(x,y);g.rotate(fa);
+  g.beginPath();g.moveTo(q,0);g.lineTo(-q*0.8,-q*0.75);g.lineTo(-q*0.35,0);g.lineTo(-q*0.8,q*0.75);g.closePath();
+  g.fillStyle='#ffd27a';g.fill();g.lineWidth=dpr;g.strokeStyle='#000';g.stroke();g.restore();
 }
 function mmArrow(x,y,a,r,col){
   mmg.save();mmg.translate(x,y);mmg.rotate(a);mmg.fillStyle='#000';mmg.beginPath();mmg.moveTo(r+1,0);mmg.lineTo(-r-1,-r-1);mmg.lineTo(-r-1,r+1);mmg.fill();
@@ -123,7 +164,7 @@ function renderMapScreen(){
   // You first, then the pins on top, so a numbered pin under you can still be read.
   const x=player.x/T*S,y=player.y/T*S;
   if(MAPZ>1){box.scrollLeft=x/dpr-box.clientWidth/2;box.scrollTop=y/dpr-box.clientHeight/2} // keep you in view when zoomed
-  g.fillStyle='#000';g.beginPath();g.arc(x,y,4.5*dpr,0,Math.PI*2);g.fill();g.fillStyle='#ffd27a';g.beginPath();g.arc(x,y,3*dpr,0,Math.PI*2);g.fill();
+  mmYou(g,x,y,6*dpr,dpr); // the same gold arrow as the minimap (v0.48)
   // v0.42: each found place gets a number on the map that matches its row in the list below (owner picked A),
   // so four green exits can be told apart.
   const found=Z.pins.filter(p=>p.found),r=6*dpr;
@@ -133,8 +174,8 @@ function renderMapScreen(){
     g.fillStyle='#000';g.fillRect(px-w-dpr,py-r-dpr,2*w+2*dpr,2*r+2*dpr);g.fillStyle=MM_PIN_COL[p.k];g.fillRect(px-w,py-r,2*w,2*r);
     g.fillStyle='#000';g.fillText(n,px,py+0.5*dpr)});
   $('maplegend').innerHTML='<div style="color:#9aa;margin-bottom:4px">Explored '+Math.round(100*Z.count/(Z.w*Z.h))+'%</div>'+
-    '<div class="mrow"><span class="mnum" style="background:#ffd27a;border-radius:50%;min-width:10px;width:10px;height:10px;margin:0 10px 0 3px"></span>You</div>'+
-    (found.length?found.map((p,i)=>'<div class="mrow"><span class="mnum" style="background:'+MM_PIN_COL[p.k]+'">'+(i+1)+'</span>'+p.name+'</div>').join(''):'<div style="color:#9aa">No places found yet. Walk around to fill in the map.</div>');
+    '<div class="mrow"><span style="color:#ffd27a;margin:0 9px 0 3px">➤</span>You</div>'+
+    (found.length?found.map((p,i)=>'<div class="mrow"><span class="mnum" style="background:'+MM_PIN_COL[p.k]+'">'+(i+1)+'</span><span style="color:'+(mmIconOf(p)==='chest'?'#ffd27a':MM_PIN_COL[p.k])+';width:18px;display:inline-block">'+MM_GLYPH[mmIconOf(p)]+'</span>'+p.name+'</div>').join(''):'<div style="color:#9aa">No places found yet. Walk around to fill in the map.</div>');
 }
 // Map zoom (v0.27.1): + / - buttons or pinch on the map. 1 = whole area fits; zoomed in, drag to scroll.
 let MAPZ=1;const MAPZ_MAX=4;
