@@ -64,6 +64,9 @@ obj torch 42 30
 obj torch 42 35
 obj candle 12 18
 obj candle 14 18
+# small stories (Heart pass, v0.49): someone still brings flowers; the gravedigger's spade stands by an open grave
+obj flowers 34 35
+obj shovel 21 28
 # ways in and out
 exit east 47 35 to=crossroads
 exit north 30 0 to=wolfwood
@@ -95,6 +98,24 @@ spawn corpse 6-7 20 25
 spawn corpse 6-7 17 22
 spawn corpse 5-6 25 13
 spawn corpse 6 14 21
+# critters (Heart pass, v0.49): crows on the fence, the tower, the angel and the open graves, frogs round the flooded
+# corner, moths at every light, an owl on the dead oak, bats round the belfry
+critter crow 13.5 5.1 1 high
+critter crow 37.3 5.1 1 high
+critter crow 22.5 4.9 1 high
+critter crow 25.5 27.2 1 high
+critter crow 16.3 32.6
+critter crow 19.6 27.4
+critter frog 33.4 9.6
+critter frog 39.8 11.5
+critter frog 29.4 13.8
+critter frog 38.6 14.4
+critter moth 7.5 27.6 3
+critter moth 42.5 29.6 2
+critter moth 42.5 34.6 2
+critter moth 13.5 18.6 2
+critter owl 17.5 14.9
+critter bat 23.5 6.4 2
 # secrets
 chest 27 41
 # fog banks (x y w h)

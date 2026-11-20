@@ -32,6 +32,7 @@ The goal is a game that feels thought about, not generated. Small details set ga
 - **Small stories:** a prop that hints at what happened (the dead adventurer in the rat tunnel, the hunter's camp, the fallen bell).
 - **Ways between areas look like something:** an entrance where something marks it (gate, cave mouth, stairs), or a path that just carries on into the next place; never a black box at the edge.
 - **Take it slow:** art passes go in chunks, one area at a time, and each chunk gets looked at on the phone before the next.
+- **Learned on the graveyard pass (v0.49):** every stone weathers on its own (lean, chip, crack, moss on the top and foot, lichen), never all the same; critters get a lighter back or pale eyes so they show against dark ground on a phone; a critter that hides when you come close (crows, frogs) makes the place feel aware of you; dead areas get dead reeds and leaves too, not just dead grass; the area's name should show up in the art (sunken headstones in the Sunken Graveyard's water). Critters go in the map file as `critter` lines (`map-format.md`).
 
 ## Natural placement, no mistakes
 - Everything looks like it would really be there. Nothing overlaps what it shouldn't: no gravestones on a tower, no props in walls, holes or each other, no mobs standing in scenery.

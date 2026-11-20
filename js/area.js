@@ -33,6 +33,7 @@ function buildArea(id){
         else if(TYPES[sp.type]&&TYPES[sp.type].pack){const mate=A.spawns.find(o=>o!==sp&&o.type===sp.type&&!o.follow&&Math.hypot(o.x-sp.x,o.y-sp.y)<=3*T);
           sp.group=mate?(mate.group=mate.group||'pk'+A.spawns.indexOf(mate)):null}}
     else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3),at:(p.find(s=>s.indexOf('at=')===0)||'at=').slice(3)}); // at = the exit you arrive by on the other side
+    else if(k==='critter')(A.critDefs=A.critDefs||[]).push({kind:p[1],x:+p[2]*T,y:+p[3]*T,n:+p[4]||1,high:p.indexOf('high')>0}); // small living things (v0.49, world.js)
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2]),tx:+p[1],ty:+p[2],open:false,at:0});
     // The area's named rare (v0.32): its own spot, empty until a spawn somewhere in the area rolls it (world.js rollRare). up = still out there.
@@ -48,6 +49,7 @@ function buildArea(id){
   A.objs.forEach(o=>{const cx=o.x*T+o.w*T/2;
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
     if(o.kind==='lantern'){A.lights.push({x:cx,y:o.y*T-4,r:44,w:26});A.flames.push({x:cx,y:o.y*T-1,big:0,lamp:1})}
+    if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
     if(o.kind==='crypt_mouth'){A.lights.push({x:cx,y:(o.y+o.h)*T-10,r:46,w:0})}
@@ -126,12 +128,15 @@ function paintArea(A){
       R(X,Y,8,8,col);
     }
     for(let i=0;i<6;i++){const r1=ah(tx,ty,10+i),r2=ah(tx,ty,30+i),x=bx+Math.floor(r1*15),y=by+Math.floor(r2*15);
-      if(gname==='dead_grass'){if(i<3){R(x,y,1,2,AP.dgTuft);if(i===0)R(x+1,y+1,1,1,AP.dgTuft)}else if(i===3&&r1<0.4)R(x,y,1,1,AP.dgDot)}
+      if(gname==='dead_grass'){if(i<3){R(x,y,1,2,AP.dgTuft);if(i===0)R(x+1,y+1,1,1,AP.dgTuft)}else if(i===3&&r1<0.4)R(x,y,1,1,AP.dgDot)
+        // Heart pass (v0.49): fallen leaves, a dry twig now and then, a pale pebble
+        else if(i===4&&r1<0.2){R(x,y,2,1,'#4a3424');R(x+1,y-1,1,1,'#5a3e28')}else if(i===5&&r1<0.06){R(x,y,3,1,AP.trunkHi);R(x+2,y-1,1,1,AP.trunkHi)}else if(i===5&&r1<0.1)R(x,y,1,1,AP.stone)}
       else if(gname==='grass'){if(i<4){R(x,y,1,2,i%2?AP.ggTuft:AP.ggTuft2);if(i===1)R(x+1,y,1,1,AP.ggTuft)}}
       else if(gname==='dirt_path'||gname==='gate'){if(i<3)R(x,y,1,1,AP.pebble);else if(i===3)R(x,y,2,1,'#4a3e32')}
       else if(gname==='road'){if(i<3)R(x,y,1,1,AP.roadHi);if(i===4)R(bx,by+4,16,1,AP.rut);if(i===5)R(bx,by+11,16,1,AP.rut)}
       else if(gname==='mud'){if(i<2)R(x,y,3,1,AP.mudDk);if(i===2&&r1<0.3)R(x,y,1,1,'#3a4a50')}
-      else if(gname==='marsh'){if(i<3){R(x,y-2,1,3,AP.reed);R(x,y-2,1,1,AP.reedHi)}else if(i===3)R(x,y,3,1,AP.water)}
+      else if(gname==='marsh'){const dead=A.tint==='moonlit'; // reeds inside the graveyard are dead and tan, with a few seed heads (v0.49)
+        if(i<3){R(x,y-2,1,3,dead?'#5e5638':AP.reed);R(x,y-2,1,1,dead?'#8a7d52':AP.reedHi);if(dead&&i===0&&r1<0.5)R(x,y-4,1,2,'#3b2a1e')}else if(i===3)R(x,y,3,1,AP.water)}
       else if(gname==='water'){if(i<2)R(x,y,3,1,AP.waterHi);if(i===2&&r1<0.15)R(x,y,1,1,AP.glint)}
       else if(gname==='floor'){if(i===0){R(bx,by+15,16,1,AP.flrLine);R(bx+((ty%2)?7:15),by,1,16,AP.flrLine)}else if(i===1&&r1<0.3)R(x,y,3,1,AP.flrLine);else if(i===2&&r1<0.2)R(x,y,1,1,AP.boneDk)}
       else if(gname==='cave_dirt'){const wallAbove=AREA_TILES[tile(tx,ty-1)||'d'].tags.indexOf('wall')>=0;
@@ -147,6 +152,16 @@ function paintArea(A){
       else if(gname==='fern'){if(i<3){const fx=x,fy=y;R(fx,fy,1,4,AP.fernDk);R(fx-2,fy+1,2,1,AP.fern);R(fx+1,fy+1,2,1,AP.fern);R(fx-1,fy+2,1,1,AP.fern);R(fx+1,fy+2,1,1,AP.fern);R(fx,fy-1,1,1,AP.fernHi)}}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }
+    // Heart pass (v0.49): leaves drift under the dead trees.
+    if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
+    // The Sunken Graveyard lives up to its name: old headstones lean up out of the flooded water, each with its waterline.
+    // Only in water with no living grass nearby, so none turn up in the creek outside the fence.
+    if(gname==='water'&&A.tint==='moonlit'&&ah(tx,ty,95)<0.12&&!(()=>{for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++)if(name(tx+dx,ty+dy)==='grass'||name(tx+dx,ty+dy)==='tree')return 1})()){
+      const lean=ah(tx,ty,96)<0.5?-1:1,X=bx+4,Y=by+3,cross=ah(tx,ty,97)<0.3;
+      const S=(x,y,w,h,col)=>{for(let j=0;j<h;j++)R(X+x+(y+j<3?lean:0),Y+y+j,w,1,col)};
+      if(cross){S(3,0,4,9,AP.out);S(1,2,8,3,AP.out);S(4,1,2,7,AP.stoneDk);S(2,3,6,1,AP.stoneDk);S(4,1,1,7,AP.stone)}
+      else{S(1,1,8,8,AP.out);S(2,0,6,1,AP.out);S(2,1,6,7,AP.stoneDk);S(2,1,2,7,AP.stone);if(ah(tx,ty,98)<0.6)S(3,1,3,1,AP.moss)}
+      R(bx+2,Y+8,12,1,AP.waterHi);R(bx+4,Y+9,8,1,'#0d1a22');R(bx+3,Y+10,4,1,'#1b3442')}
     // Ragged edges wherever two kinds of ground meet (path and grass, mud and marsh...), so nothing looks stamped on in squares.
     [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs'||gname==='cave_dirt'||gname==='dirt_slope'||n==='cave_dirt'||n==='dirt_slope')return;
       for(let i=0;i<16;i++){const r=ah(tx*16+i,ty*16,dx*3+dy*7+50);if(r>0.6)continue;const d=1+Math.floor(ah(tx+i,ty*16,dx+dy*5+60)*3),col=groundCol(n,ah(tx*16+i,ty,61));
@@ -173,7 +188,7 @@ function paintArea(A){
         g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+8,by+14,9,3,0,0,7);g.fill();A.trees.push(treeAt(im,bx,by,by+13))}
       else if(n==='boulder')drawBoulder(R,bx,by,name(tx,ty-1)!=='boulder',ah(tx,ty,16));
       else if(n==='bush'||n==='dead_bush')drawBush(R,bx,by,n==='dead_bush',ah(tx,ty,5));
-      else if(n==='grave')drawGrave(R,bx,by,ah(tx,ty,6));
+      else if(n==='grave')drawGrave(R,bx,by,ah(tx,ty,6),tx,ty);
       else if(n==='dug_grave')drawDug(R,bx,by,ah(tx,ty,7));
       else if(n==='rubble')drawRubble(R,bx,by,ah(tx,ty,8));
       else if(n==='rock')drawRock(R,bx,by,name(tx,ty+1)!=='rock'&&ty+1<A.h,name(tx,ty-1)!=='rock'&&ty>0,ah(tx,ty,9));
@@ -299,14 +314,31 @@ function drawBush(R,bx,by,dead,r){
   if(dead){const c=AP.twig;[[3,12,7,6],[8,12,6,5],[12,12,14,7],[8,12,9,4]].forEach(([x0,y0,x1,y1])=>{const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0));for(let i=0;i<=n;i++)R(bx+Math.round(x0+(x1-x0)*i/n),by+Math.round(y0+(y1-y0)*i/n),1,1,i<2?AP.trunk:c)});return}
   for(let y=-5;y<=4;y++)for(let x=-7;x<=7;x++){const d=x*x/49+y*y/25;if(d>1)continue;R(bx+8+x,by+10+y,1,1,d>0.75?AP.out:(x+y<-3?AP.leafHi:AP.leaf))}
 }
-function drawGrave(R,bx,by,r){
-  // Headstone on a low mound; three shapes so a row doesn't look stamped.
+function drawGrave(R,bx,by,r,tx,ty){
+  // Headstone on a low mound. Five shapes, and every stone weathers on its own (Heart pass, v0.49): some lean, some are
+  // chipped, cracked or broken off, moss sits on the tops and at the foot, pale lichen spots the faces, and now and then
+  // someone has left flowers that have long since died.
+  const a=ah(tx,ty,70),b=ah(tx,ty,71),c=ah(tx,ty,72),d=ah(tx,ty,73),e=ah(tx,ty,74);
   R(bx+3,by+12,10,3,AP.dirt);R(bx+3,by+12,10,1,AP.dirtHi);R(bx+2,by+15,12,1,'rgba(0,0,0,0.35)');
-  const k=Math.floor(r*3);
-  if(k===0){R(bx+4,by+2,8,11,AP.out);R(bx+5,by+1,6,1,AP.out);R(bx+5,by+2,6,10,AP.stone);R(bx+5,by+2,2,9,AP.stoneHi);R(bx+10,by+3,1,9,AP.stoneDk);R(bx+7,by+5,2,1,AP.stoneDk);R(bx+7,by+7,3,1,AP.stoneDk)}
-  else if(k===1){R(bx+6,by,4,13,AP.out);R(bx+3,by+3,10,4,AP.out);R(bx+7,by+1,2,11,AP.stone);R(bx+4,by+4,8,2,AP.stone);R(bx+7,by+1,1,10,AP.stoneHi);R(bx+4,by+4,3,1,AP.stoneHi)}
-  else{R(bx+3,by+5,10,8,AP.out);R(bx+4,by+6,8,6,AP.stone);R(bx+4,by+6,8,1,AP.stoneHi);R(bx+4,by+6,1,6,AP.stoneHi);R(bx+11,by+7,1,5,AP.stoneDk)}
-  if(r>0.6)R(bx+5+Math.floor(r*4),by+11,2,1,AP.moss);
+  const lean=a<0.2?-1:a>0.84?1:0;
+  // A leaning stone: its upper rows shift one pixel over, the top rows two, as if the ground gave way on one side.
+  const S=(x,y,w,h,col)=>{for(let j=0;j<h;j++){const yy=y+j,sh=lean*((yy<by+4)?2:(yy<by+8)?1:0);R(bx+x+sh,yy,w,1,col)}};
+  const P=(x,y,w,h,col)=>S(x,by+y,w,h,col),k=r<0.12?4:Math.floor((r-0.12)/0.88*4); // about 1 in 8 is broken
+  let top; // where moss settles: [x,y,w] on the top edge
+  if(k===0){P(4,2,8,11,AP.out);P(5,1,6,1,AP.out);P(5,2,6,10,AP.stone);P(5,2,2,9,AP.stoneHi);P(10,3,1,9,AP.stoneDk);P(7,5,2,1,AP.stoneDk);P(7,7,3,1,AP.stoneDk);top=[5,2,4]}
+  else if(k===1){P(6,0,4,13,AP.out);P(3,3,10,4,AP.out);P(7,1,2,11,AP.stone);P(4,4,8,2,AP.stone);P(7,1,1,10,AP.stoneHi);P(4,4,3,1,AP.stoneHi);top=[4,4,3]}
+  else if(k===2){P(3,5,10,8,AP.out);P(4,6,8,6,AP.stone);P(4,6,8,1,AP.stoneHi);P(4,6,1,6,AP.stoneHi);P(11,7,1,5,AP.stoneDk);P(6,8,4,1,AP.stoneDk);top=[4,6,5]}
+  else if(k===3){ // round-topped stone
+    P(6,0,4,1,AP.out);P(5,1,6,1,AP.out);P(4,2,8,11,AP.out);P(6,1,4,1,AP.stone);P(5,2,6,10,AP.stone);P(5,2,2,9,AP.stoneHi);P(10,3,1,9,AP.stoneDk);P(6,4,4,1,AP.stoneDk);P(7,6,2,1,AP.stoneDk);top=[6,1,3]}
+  else{ // snapped off, the top half lying in the grass beside it
+    P(4,6,8,7,AP.out);P(5,7,6,5,AP.stone);P(5,7,2,5,AP.stoneHi);P(10,7,1,5,AP.stoneDk);P(7,6,2,1,AP.out);P(9,6,1,1,AP.stone);P(5,6,1,1,AP.stone);
+    R(bx+10,by+11,6,4,AP.out);R(bx+11,by+12,4,2,AP.stoneDk);R(bx+11,by+12,4,1,AP.stone);top=[5,7,3]}
+  if(b<0.5)P(top[0],top[1],top[2],1,b<0.2?'#5f7a4a':AP.moss); // moss on the top edge
+  if(c<0.55){R(bx+4+Math.floor(c*6),by+12,3,1,AP.moss);R(bx+5+Math.floor(c*6),by+11,1,1,'#3e5434')} // moss at the foot
+  if(d<0.45&&k!==1){P(6+Math.floor(d*6),5+Math.floor(e*4),1,1,'#a8a48a');if(d<0.2)P(7+Math.floor(d*8),8,2,1,'#8f8c76')} // pale lichen
+  if(b>0.78&&k!==1&&k!==4){P(8,3,1,2,AP.stoneDk2);P(9,5,1,2,AP.stoneDk2);P(8,7,1,1,AP.stoneDk2)} // a crack down the face
+  if(c>0.82&&(k===0||k===2))P(k===0?10:11,k===0?2:5,1,1,AP.out); // a chipped corner
+  if(e>0.9){R(bx+4,by+12,1,2,'#4a5a3a');R(bx+6,by+12,1,2,'#4a5a3a');R(bx+3,by+11,2,1,'#7a5a62');R(bx+6,by+11,2,1,'#8a6a4a')} // dead flowers left on the mound
 }
 function drawDug(R,bx,by,r){
   R(bx+3,by+2,10,12,AP.out);R(bx+4,by+3,8,10,'#0e0c10');R(bx+4,by+3,8,1,'#2a2018');
@@ -375,7 +407,9 @@ function drawFence(R,bx,by,l,rt,up,dn,grate){
     return}
   const horiz=l||rt||!(up||dn);
   if(horiz){R(l?bx:bx+6,by+5,(l?8:2)+(rt?8:2),1,AP.out);R(l?bx:bx+6,by+6,(l?8:2)+(rt?8:2),1,AP.ironHi);R(l?bx:bx+6,by+10,(l?8:2)+(rt?8:2),1,AP.out);R(l?bx:bx+6,by+11,(l?8:2)+(rt?8:2),1,AP.ironHi);
-    [2,7,12].forEach(x=>{R(bx+x,by+2,2,12,AP.out);R(bx+x,by+3,1,10,AP.ironHi);R(bx+x,by+1,2,1,AP.ironTip)});R(bx,by+14,16,1,'rgba(0,0,0,0.3)')}
+    [2,7,12].forEach(x=>{R(bx+x,by+2,2,12,AP.out);R(bx+x,by+3,1,10,AP.ironHi);R(bx+x,by+1,2,1,AP.ironTip)});R(bx,by+14,16,1,'rgba(0,0,0,0.3)');
+    if(ah(bx,by,96)<0.35){const rx=bx+1+Math.floor(ah(bx,by,97)*12);R(rx,by+6,2,1,'#6a4636');R(rx+1,by+7,1,2,'#4a3028')} // rust running down from a rail (v0.49)
+    if(ah(bx,by,98)<0.12){R(bx+3,by+12,4,2,'#3e4a30');R(bx+4,by+11,1,1,'#3e4a30')}}
   if(up||dn){R(bx+6,up?by:by+4,4,(dn?16:12)-(up?0:4),AP.out);R(bx+7,up?by:by+4,1,(dn?16:12)-(up?0:4),AP.ironHi);R(bx+8,up?by:by+4,1,(dn?16:12)-(up?0:4),AP.iron);
     [1,9].forEach(y=>{R(bx+5,by+y,6,5,AP.out);R(bx+6,by+y+1,1,3,AP.ironHi);R(bx+6,by+y,1,1,AP.ironTip)})}
 }
@@ -403,9 +437,13 @@ function drawObj(g,R,o){
     R(X+20,top+22,9,7,AP.out);R(X+21,top+22,7,6,AP.bell);R(X+21,top+22,2,5,AP.bellHi);R(X+23,top+28,3,2,AP.bell);R(X+24,top+19,1,3,AP.woodDk);
     // slit window and wooden door at ground level
     R(X+8,Y-4,2,6,'#120f16');R(X+38,Y+2,2,6,'#120f16');
-    R(X+18,Y+H-17,12,17,AP.out);R(X+19,Y+H-16,10,16,AP.wood);R(X+19,Y+H-16,10,2,AP.woodDk);[21,24,27].forEach(x=>R(X+x,Y+H-14,1,14,AP.woodDk));R(X+26,Y+H-8,1,2,AP.bellHi);
-    R(X+17,Y+H-18,14,2,AP.stoneDk2);R(X+18,Y+H-18,12,1,AP.stone);
+    // (Heart pass, v0.49: the door is person-height now, 26 px for the 24 px characters, with an arched stone head)
+    R(X+17,Y+H-26,14,26,AP.out);R(X+18,Y+H-24,12,24,AP.wood);R(X+18,Y+H-24,12,2,AP.woodDk);[20,23,26].forEach(x=>R(X+x,Y+H-22,1,22,AP.woodDk));R(X+18,Y+H-15,12,1,AP.woodDk);R(X+27,Y+H-12,1,2,AP.bellHi);
+    R(X+16,Y+H-28,16,3,AP.stoneDk2);R(X+17,Y+H-28,14,1,AP.stone);R(X+19,Y+H-30,10,2,AP.stoneDk2);R(X+20,Y+H-30,8,1,AP.stone);
     // ivy on the shady side
+    // Heart pass (v0.49): a long crack running down from the broken corner, moss along the cornice and the foot.
+    treeLine(R,X+W-14,top+15,X+W-18,top+24,1,AP.stoneDk2);treeLine(R,X+W-18,top+24,X+W-15,top+33,1,AP.stoneDk2);R(X+W-16,top+28,2,1,AP.stoneDk2);
+    R(X+2,top+11,6,1,AP.moss);R(X+3,top+10,3,1,'#5f7a4a');R(X+2,Y+H-2,7,2,AP.moss);R(X+3,Y+H-3,3,1,'#5f7a4a');R(X+W-11,Y+H-2,6,2,AP.moss);
     for(let i=0;i<10;i++){const yy=Y+H-6-Math.floor(ah(o.x,i,11)*30),xx=X+W-6+Math.floor(ah(o.y,i,12)*5);R(xx,yy,2,1,AP.moss);R(xx,yy+1,1,1,'#33402c')}
     return}
   if(k==='crypt_mouth'){
@@ -419,28 +457,76 @@ function drawObj(g,R,o){
     for(let i=0;i<4;i++){R(dx+2+i,dy+H-14-i*4+3,20-i*2,2,i%2?'#2a3a6a':'#1d2a50')}
     R(dx+2,dy+1,20,4,'#3a55a0');R(dx+4,dy+2,16,1,'#6f8fe0');
     R(X+W/2-6,top+2,12,4,AP.out);R(X+W/2-5,top+3,10,2,AP.stoneDk);R(X+W/2-1,top+3,2,2,AP.bellHi); // carved crest with a gold glint
+
+    // Heart pass (v0.49): moss on the pediment and cornice, dead ivy hanging off the left pillar, a crack in the right one,
+    // and moss creeping up from the foot of both.
+    R(X+4,top+8,8,1,AP.moss);R(X+6,top+7,3,1,'#5f7a4a');R(X+W-14,top+5,6,1,AP.moss);R(X-1,top+10,6,1,AP.moss);R(X+W-6,top+10,5,1,AP.moss);
+    for(let i=0;i<9;i++){const yy=top+12+Math.floor(ah(o.x,i,93)*(H+1)),xx=X+5+Math.floor(ah(o.y,i,94)*4);R(xx,yy,1,2,i%3?'#5a5a3a':AP.moss)}
+    R(X+W-10,top+16,1,3,AP.stoneDk2);R(X+W-9,top+19,1,3,AP.stoneDk2);R(X+W-10,top+22,1,2,AP.stoneDk2);
+    R(X+5,Y+H-2,5,2,AP.moss);R(X+W-13,Y+H-2,4,2,AP.moss);R(X+W-12,Y+H-3,2,1,'#5f7a4a');
     return}
   if(k==='mausoleum'){
-    const top=Y-14;shadow(X+3,Y+H-3,W,4);
+    // Family tomb (Heart pass, v0.49): an iron-barred door you could walk through (the old one was waist-high), a carved
+    // lintel, rain streaks under the eaves, a crack, moss along the roof and the foot, and a stone urn of dead stalks.
+    const top=Y-14,cx=X+W/2,v=ah(o.x,o.y,90);shadow(X+3,Y+H-3,W,4);
     R(X-1,top+5,W+2,H+10,AP.out);bricks(X,top+6,W,H+8,AP.stoneDk,AP.stone);R(X,top+6,2,H+8,AP.stone);
     for(let i=0;i<W/2+3;i++)R(X+W/2-i-1,Math.floor(top+i/2.6-2),2*i+2,1,i>=W/2+2?AP.out:i%3===0?AP.stoneHi:AP.stone);
     R(X-2,top+5,W+4,2,AP.out);R(X-1,top+5,W+2,1,AP.stoneHi);
-    R(X+W/2-5,Y+H-14,10,14,AP.out);R(X+W/2-4,Y+H-13,8,13,AP.stoneDk2);R(X+W/2-4,Y+H-13,8,1,AP.stone);R(X+W/2,Y+H-13,1,13,AP.out);
-    R(X+3,Y+H-2,3,1,AP.moss);return}
+    [[5,9],[13,6],[34,11],[42,7]].forEach(([sx,l])=>R(X+sx,top+7,1,l,AP.stoneDk2)); // rain streaks
+    R(X+3,top+4,7,1,AP.moss);R(X+5,top+3,3,1,'#5f7a4a');R(X+W-12,top+4,6,1,AP.moss);R(X+18,top+1,4,1,AP.moss); // moss on the eaves
+    R(cx-9,Y+H-28,18,3,AP.out);R(cx-8,Y+H-27,16,2,AP.stoneHi);[-6,-2,2].forEach(x=>R(cx+x,Y+H-26,3,1,AP.stoneDk)); // lintel with worn letters
+    R(cx-7,Y+H-25,14,25,AP.out);R(cx-6,Y+H-24,12,24,'#0a080e');R(cx-5,Y+H-5,10,2,'#1c1826');R(cx-4,Y+H-9,8,2,'#16131e'); // dark inside, steps going down
+    [-5,-2,1,4].forEach(x=>{R(cx+x,Y+H-24,1,24,AP.ironHi);R(cx+x,Y+H-25,1,1,AP.ironTip)});R(cx-6,Y+H-18,12,1,AP.ironHi);R(cx-6,Y+H-17,12,1,AP.iron);
+    if(v<0.5){R(X+W-9,top+16,1,3,AP.stoneDk2);R(X+W-8,top+19,1,3,AP.stoneDk2);R(X+W-9,top+22,1,2,AP.stoneDk2)} // a crack
+    else{for(let i=0;i<7;i++){const yy=top+9+Math.floor(ah(o.x,i,91)*20),xx=X+2+Math.floor(ah(o.y,i,92)*4);R(xx,yy,2,1,AP.moss);R(xx,yy+1,1,1,'#33402c')}} // ivy
+    R(X+2,Y+H-2,5,2,AP.moss);R(X+3,Y+H-3,2,1,'#5f7a4a');R(X+W-6,Y+H-2,4,2,AP.moss);
+    const ux=v<0.5?cx+10:cx-15; // the urn sits to one side of the door
+    R(ux,Y+H-8,5,7,AP.out);R(ux+1,Y+H-7,3,5,AP.stone);R(ux+1,Y+H-7,1,5,AP.stoneHi);R(ux-1,Y+H-8,7,1,AP.out);
+    R(ux+1,Y+H-12,1,4,'#6a5a3a');R(ux+3,Y+H-11,1,3,'#6a5a3a');R(ux+2,Y+H-13,1,2,'#7a6a48');return}
   if(k==='shack'){
-    // Gravedigger's shack: plank walls under a sagging shingle roof, a lit window.
+    // Gravedigger's shack (Heart pass, v0.49): the door is sized for a person now (the old one came up to your waist),
+    // planks gone dark and damp at the foot, one sprung loose, a shuttered lit window with one shutter hanging off,
+    // moss and a missing shingle on the roof, a woodpile against the wall and his spade leaning by the door. Smoke from
+    // the chimney is drawn live (world.js, area critters).
     const top=Y-12;shadow(X+3,Y+H-3,W,4);
     R(X-1,top+11,W+2,H+2,AP.out);R(X,top+12,W,H,AP.wood);for(let x=0;x<W;x+=4){R(X+x,top+12,1,H,AP.woodDk);R(X+x+1,top+12,1,H,AP.woodHi)}
+    R(X,Y+H-5,W,5,'#463225');for(let x=0;x<W;x+=4)R(X+x,Y+H-5,1,5,AP.woodDk);
+    R(X+28,Y+9,1,13,AP.woodHi);R(X+29,Y+9,1,13,'#2a1c14'); // a sprung plank
     for(let i=0;i<16;i++){R(X-3+Math.floor(i/6),top+i,W+6-Math.floor(i/6)*2,1,i<1||i===15?AP.out:i%3===0?AP.roof:AP.roofHi)}
     for(let x=0;x<W+4;x+=5)R(X-2+x,top+2,1,12,AP.roof);
-    R(X+W/2-4,Y+H-13,9,13,AP.out);R(X+W/2-3,Y+H-12,7,12,AP.woodDk);R(X+W/2+1,Y+H-7,1,1,AP.bellHi);
-    R(X+6,Y+H-24,8,7,AP.out);R(X+7,Y+H-23,6,5,'#ffb860');R(X+9,Y+H-23,1,5,AP.out);R(X+7,Y+H-21,6,1,AP.out);
-    R(X+W-6,top+4,4,8,AP.out);R(X+W-5,top+2,2,9,AP.stoneDk);return} // chimney
+    R(X+39,top+5,6,4,AP.out);R(X+40,top+6,4,2,'#140d08'); // missing shingle
+    R(X+4,top+1,9,2,AP.moss);R(X+6,top,4,1,'#5f7a4a');R(X+20,top+13,7,2,AP.moss);R(X+52,top+10,6,2,AP.moss);R(X+54,top+9,2,1,'#5f7a4a');
+    // door: a full-height plank door with a Z brace, an iron ring, a lintel and a stone step
+    const dx=X+36,dy=Y+H-26;R(dx-1,dy-2,16,2,AP.woodDk);R(dx,dy,14,26,AP.out);R(dx+1,dy+1,12,25,AP.wood);R(dx+4,dy+1,1,25,AP.woodDk);R(dx+8,dy+1,1,25,AP.woodDk);
+    R(dx+1,dy+3,12,2,AP.woodHi);R(dx+1,dy+20,12,2,AP.woodHi);treeLine(R,dx+2,dy+19,dx+11,dy+6,1,AP.woodHi);R(dx+10,dy+12,2,2,AP.bellHi);
+    R(dx-1,Y+H,16,3,AP.out);R(dx,Y+H,14,2,AP.stone);R(dx,Y+H,14,1,AP.stoneHi);
+    // window with shutters (the right one hangs crooked from one hinge)
+    R(X+9,Y+12,12,10,AP.out);R(X+10,Y+13,10,8,'#ffb860');R(X+10,Y+17,10,4,'#e08a3a');R(X+14,Y+13,1,8,AP.out);R(X+10,Y+16,10,1,AP.out);
+    R(X+5,Y+12,4,10,AP.out);R(X+6,Y+13,2,8,AP.woodDk);R(X+21,Y+14,4,10,AP.out);R(X+22,Y+15,2,8,AP.woodDk);R(X+8,Y+22,14,1,AP.woodHi);
+    // woodpile against the wall: log ends stacked three high
+    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+2+i*5+j*2,ly=Y+H-5-j*4;R(lx2,ly,5,4,AP.out);R(lx2+1,ly+1,3,2,'#a88a64');R(lx2+2,ly+1,1,1,'#7a5a42')}
+    // the spade, leaning on the wall beside the door
+    treeLine(R,X+57,Y+H-26,X+54,Y+H-8,3,AP.out);treeLine(R,X+57,Y+H-25,X+54,Y+H-8,1,AP.woodHi);R(X+55,Y+H-27,5,2,AP.out);R(X+56,Y+H-27,3,1,AP.wood);
+    R(X+51,Y+H-9,6,8,AP.out);R(X+52,Y+H-8,4,6,AP.stone);R(X+52,Y+H-8,1,5,AP.stoneHi);R(X+53,Y+H-3,2,1,AP.stoneDk);
+    R(X+W-6,top+4,4,8,AP.out);R(X+W-5,top+2,2,9,AP.stoneDk);R(X+W-6,top+1,4,2,AP.out);return} // chimney
+  if(k==='flowers'){
+    // Small story (Heart pass, v0.49): fresh flowers and a stub of candle at the foot of one grave. Someone still visits.
+    R(X+2,Y+1,1,5,'#3e5a32');R(X+4,Y,1,6,'#3e5a32');R(X+6,Y+2,1,4,'#3e5a32');R(X+3,Y+5,4,1,'#6a3a4a'); // stems tied with a ribbon
+    [[1,0,'#e8e0f0'],[2,-1,'#e8e0f0'],[4,-2,'#c05a6a'],[5,-1,'#c05a6a'],[6,1,'#e8e0f0'],[7,0,'#d8c060']].forEach(([x,y,col])=>{R(X+x,Y+y,2,2,AP.out);R(X+x,Y+y,1,1,col)});
+    R(X+10,Y+1,4,6,AP.out);R(X+11,Y+2,2,4,'#e8dcc0');R(X+11,Y+5,2,1,'#b8ad90');R(X+9,Y+6,6,1,'#b8ad90');return}
+  if(k==='shovel'){
+    // The gravedigger's spade left standing in the dirt he dug out of the open grave beside it.
+    R(X+2,Y+9,12,6,AP.out);R(X+3,Y+10,10,4,AP.dirt);R(X+3,Y+10,10,1,AP.dirtHi);R(X+5,Y+9,6,1,AP.dirt);
+    R(X+7,Y-12,3,23,AP.out);R(X+8,Y-11,1,21,AP.woodHi);R(X+5,Y-14,7,3,AP.out);R(X+6,Y-13,5,1,AP.wood);
+    R(X+5,Y+8,7,3,AP.out);R(X+6,Y+8,5,2,AP.stone);R(X+6,Y+8,5,1,AP.stoneHi);return}
   if(k==='statue'){
-    // Weathered angel on a plinth.
+    // Weathered angel on a plinth (Heart pass, v0.49): its right wing has broken off at the tip (the piece lies on the
+    // plinth), dark rain streaks run down it, lichen on the robe, moss on the plinth and the wing tops.
     shadow(X+2,Y+13,14,3);R(X+1,Y+8,14,7,AP.out);R(X+2,Y+9,12,5,AP.stoneDk);R(X+2,Y+9,12,1,AP.stone);
     R(X+5,Y-10,6,19,AP.out);R(X+6,Y-9,4,17,AP.stone);R(X+6,Y-9,1,17,AP.stoneHi);R(X+6,Y-13,4,4,AP.out);R(X+7,Y-12,2,2,AP.stoneHi);
-    R(X,Y-8,6,8,AP.out);R(X+1,Y-7,4,6,AP.stoneHi);R(X+10,Y-8,6,8,AP.out);R(X+11,Y-7,4,6,AP.stone);R(X+3,Y+12,2,1,AP.moss);return}
+    R(X,Y-8,6,8,AP.out);R(X+1,Y-7,4,6,AP.stoneHi);R(X+10,Y-5,5,5,AP.out);R(X+11,Y-4,3,3,AP.stone);
+    R(X+8,Y-8,1,6,AP.stoneDk);R(X+9,Y-2,1,4,AP.stoneDk);R(X+7,Y+1,2,1,'#a8a48a');R(X+8,Y+4,1,1,'#a8a48a');
+    R(X+1,Y-8,3,1,AP.moss);R(X+2,Y+9,4,1,AP.moss);R(X+3,Y+12,2,1,AP.moss);R(X+11,Y+8,3,2,AP.out);R(X+12,Y+8,1,1,AP.stoneHi);return}
   if(k==='throne'){
     // The Skeleton King's throne: a high-backed stone seat on a dais, a skull on the crest.
     shadow(X+2,Y+H-3,W-2,4);R(X,Y+H-8,W,8,AP.out);R(X+1,Y+H-7,W-2,6,AP.stoneDk);R(X+1,Y+H-7,W-2,1,AP.stone);

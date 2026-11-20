@@ -25,6 +25,7 @@ exit east 47 35 to=crossroads lit
 exit sinkhole 38 23 to=rat_tunnel at=mouth   # at = which exit you arrive by on the other side (when a map has two ways to the same place)
 fog 9 24 13 13                 # x y width height
 label 23 5 Bell tower          # text on the overview picture only
+critter crow 22.5 4.9 1 high   # kind x y [how many] [high]: small living things (v0.49), tile units, decimals fine
 `
 };
 ```
@@ -33,6 +34,7 @@ label 23 5 Bell tower          # text on the overview picture only
 - `zone` is where the map's top-left tile sits on the Zone 1 layout (128 × 128).
 - `start` names the exit players arrive from; distances and the phone view are measured from there.
 - `named ... route=x,y;x,y;...` (optional): a wandering named's loop. The checker makes sure every point is open ground you can reach and draws the loop as a dashed line; `pack=N` is how many wolves walk with it.
+- `critter` (v0.49): looks only, never in the way. Kinds: `crow` (flies off when you come close, back once you've gone; `high` = perched up on a fence, roof or statue, drawn over everyone), `frog` (on open ground by water, plops in when you come close), `moth` (circles the light it's placed at; the number is how many), `owl` (sits on a branch, blinks, turns its head to watch you), `bat` (flutters round the spot). Ripples on open water and smoke from a shack's chimney need no line. The checker wants frogs on open ground with water near, and moths near a light.
 - `rules: 'dead-inside'` turns on the dead-area check for this map.
 - Coordinates count from 0 at the top-left; x goes right, y goes down. The overview picture has a ruler every 4 tiles, so notes like "move the shack to 2,20" work.
 

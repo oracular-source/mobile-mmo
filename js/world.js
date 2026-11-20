@@ -90,6 +90,7 @@ function drawGlows(){
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
     // Dust turning in the daylight shafts (rat tunnel) and rising out of the sinkhole (crossroads).
     (A.motes||[]).forEach((m,j)=>{for(let i=0;i<5;i++){const ph=(time*0.25+i/5+j*0.13)%1;lx.fillStyle=i%2?'#c8c0a8':'#8f8a76';lx.fillRect(Math.round(m.x-6+i*3+Math.sin(time*0.7+i+j)*3),Math.round(m.y-ph*26),1,1)}});
+    drawCritterGlows(A);
     A.objs.forEach(o=>{if(o.kind!=='sinkhole')return;const cx=o.x*T+o.w*T/2,cy=o.y*T+o.h*T/2;for(let i=0;i<6;i++){const ph=(time*0.35+i/6)%1;lx.fillStyle=i%2?'#8a7a62':'#6a5c4a';lx.fillRect(Math.round(cx-14+i*5+Math.sin(time*0.8+i)*3),Math.round(cy+2-ph*30),1,1)}});
     lx.restore();return}
   if(zoneId!=='over'){(zoneId==='arena'?ARENA:DUN).braziers.forEach(b=>flame(b.x,b.y-1,true));lx.restore();return}
@@ -302,3 +303,83 @@ function openChest(A,ch){
   ch.open=true;ch.at=time;burst(ch.x,ch.y-4,'#ffd27a',16,true);
   const c=Math.floor(rr(o.cu,o.cu*2));inv.copper+=c;log('You open a hidden chest: '+c+' copper.','#c9a227','loot');
   if(pool.length)giveItem(pick(pool),1,0);saveInv()}
+
+/* ---------- Area critters (Heart pass, v0.49): the small living things a map file places ---------- */
+// A map's things can hold "critter <kind> x y [n]" (tile units, decimals fine, docs/map-format.md):
+// crow (perches, flies off when you come close, comes back once you've gone), frog (sits by the water, plops in when you
+// come close), moth (n of them circling a light), owl (sits on a branch, blinks, turns its head to watch you), bat
+// (flutters round a belfry). Ripples on open water and smoke from a shack's chimney come with any area that has them.
+// Looks only: these use Math.random, never rng(), so they can't shift any game roll or sim result.
+const vr=(a,b)=>a+Math.random()*(b-a);
+function areaCritters(A){
+  if(A.crit)return A.crit;
+  A.crit=[];A.rip=[];A.smoke=[];A.ripT=0;A.smokeT=0;
+  (A.critDefs||[]).forEach(d=>{for(let i=0;i<d.n;i++){const c={kind:d.kind,hx:d.x,hy:d.y,x:d.x,y:d.y,ph:Math.random()*6.28,dir:Math.random()<0.5?1:-1,t:0,st:'sit',pk:vr(1,4),hop:vr(1,5),blink:vr(2,6),look:0};
+    if(d.kind==='moth'){c.r=vr(5,9)+i*2;c.sp=vr(0.8,1.6)}if(d.kind==='bat'){c.r=vr(13,19)+i*4;c.sp=vr(0.9,1.4)} // bats swing out past the tower's sides so they show against the sky and walls
+    // a crow standing where you could walk is on the ground; anywhere else it's perched up on something
+    if(d.kind==='crow')c.ground=!d.high;
+    A.crit.push(c)}});
+  // Open water for ripples: water tiles with water all round them, so rings never cross the shore.
+  A.waterSpots=[];for(let y=1;y<A.h-1;y++)for(let x=1;x<A.w-1;x++){const w=(a,b)=>A.rows[b][a]==='~';if(w(x,y)&&w(x-1,y)&&w(x+1,y)&&w(x,y-1)&&w(x,y+1))A.waterSpots.push({x:x*T+8,y:y*T+8})}
+  A.chimneys=A.objs.filter(o=>o.kind==='shack').map(o=>({x:o.x*T+o.w*T-4,y:o.y*T-11}));
+  return A.crit;
+}
+function updateAreaCritters(A,dt){
+  const cr=areaCritters(A),inView=(x,y)=>x>camX-16&&x<camX+VW+16&&y>camY-16&&y<camY+VH+16;
+  cr.forEach(c=>{const d=Math.hypot(c.x-player.x,c.y-player.y),home=Math.hypot(c.hx-player.x,c.hy-player.y);c.t+=dt;
+    if(c.kind==='crow'){
+      if(c.st==='sit'){c.pk-=dt;if(c.pk<=0){c.pk=vr(0.8,3);if(Math.random()<0.5)c.dir*=-1;else c.peck=0.25}if(c.peck>0)c.peck-=dt;
+        if(d<(c.ground?34:26)&&player.dead<=0){c.st='fly';c.t=0;c.vx=(c.x>player.x?1:-1)*vr(30,46);c.vy=-vr(22,36);c.dir=c.vx>0?1:-1}}
+      else if(c.st==='fly'){c.x+=c.vx*dt;c.y+=c.vy*dt;c.vy-=6*dt;if(c.t>3){c.st='gone';c.t=0}}
+      else if(c.t>12&&home>150){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}} // back on its perch once you're well away
+    else if(c.kind==='frog'){
+      if(c.st==='sit'){c.hop-=dt;if(c.hop<=0){c.hop=vr(2,6);const nx=c.hx+vr(-6,6),ny=c.hy+vr(-4,4);if(!blocked(nx,ny)){c.dir=nx>c.x?1:-1;c.x=nx;c.y=ny;c.jump=0.2}}if(c.jump>0)c.jump-=dt;
+        if(d<28&&player.dead<=0){c.st='gone';c.t=0;A.rip.push({x:c.x+c.dir*6,y:c.y,t:0,big:1})}} // plop
+      else if(c.t>8&&home>110){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
+  });
+  if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:0})}}}
+  A.rip.forEach(r=>r.t+=dt);A.rip=A.rip.filter(r=>r.t<1.6);
+  if(A.chimneys.length){A.smokeT-=dt;if(A.smokeT<=0){A.smokeT=0.4;A.chimneys.forEach(ch=>{if(inView(ch.x,ch.y))A.smoke.push({x:ch.x+vr(-1,1),y:ch.y,t:0})})}}
+  A.smoke.forEach(p=>{p.t+=dt;p.y-=7*dt;p.x+=(3+Math.sin(p.t*2))*dt});A.smoke=A.smoke.filter(p=>p.t<3.2);
+}
+// layer 0: on the ground, under everyone (frogs, crows on the ground, ripples). layer 1: up high, over everyone
+// (perched and flying crows, the owl, bats, chimney smoke). Both before the lighting, so the night darkens them.
+function drawAreaCritters(A,layer){
+  if(!A.crit)return;const f=(x,y,w,h,col)=>{lx.fillStyle=col;lx.fillRect(Math.round(x),Math.round(y),w,h)};
+  if(layer===0){
+    A.rip.forEach(r=>{const k=r.t/1.6,rad=1+k*(r.big?8:5);lx.globalAlpha=1-k;for(let a=0;a<14;a++){const an=a/14*6.283;f(r.x+Math.cos(an)*rad,r.y+Math.sin(an)*rad*0.45,1,1,k<0.4?AP.glint:AP.waterHi)}lx.globalAlpha=1});
+    A.crit.forEach(c=>{if(c.st==='gone')return;
+      if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.jump>0?2:0),c.dir);
+      if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)});
+    return}
+  A.crit.forEach(c=>{
+    if(c.kind==='crow'&&(c.st==='fly'||(!c.ground&&c.st==='sit'))){const flap=c.st==='fly'&&Math.floor(time*10)%2;critGrid(c.st==='fly'?(flap?CROW_FLY2:CROW_FLY):c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)}
+    else if(c.kind==='owl')drawOwl(c);
+    else if(c.kind==='bat'){const x=c.hx+Math.cos(time*c.sp+c.ph)*c.r*1.4,y=c.hy+Math.sin(time*c.sp*2+c.ph)*c.r*0.5,up=Math.floor(time*12+c.ph)%2;
+      f(x-1,y,3,1,'#120e16');if(up){f(x-3,y-1,2,1,'#120e16');f(x+2,y-1,2,1,'#120e16')}else{f(x-3,y+1,2,1,'#120e16');f(x+2,y+1,2,1,'#120e16')}}});
+  A.smoke.forEach(p=>{lx.globalAlpha=0.55*(1-p.t/3.2);f(p.x,p.y,p.t>1.2?3:2,2,'#8a8590');lx.globalAlpha=1});
+}
+// Critter pictures as little grids (bottom-middle on x,y; drawn facing right, mirrored for dir<0). A lighter back and
+// pale eyes so a frog shows up against the marsh, and a lighter wing edge so a crow reads against dark ground.
+const FROG=['.k...k.','kek.kek','kgGGGgk','kgGGGgk','kk.k.kk'],FROG_JUMP=['.k...k.','kek.kek','kgGGGgk','k.k.k.k'];
+const CROW=['..kkk..','.kbbbky','kbhhbk.','kbbbbk.','.k.k...'],CROW_PECK=['.......','..kkk..','kbbbbk.','kbhhbky','.k.k...'];
+const CROW_FLY=['k.....k','hk.k.kh','.kbbbky','..kbk..'],CROW_FLY2=['.......','.kkkkk.','hhbbbhy','..kbk..'];
+const CRIT_PAL={k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692'};
+function critGrid(G,x,y,dir){const w=G[0].length,x0=Math.round(x)-(w>>1),y0=Math.round(y)-G.length;
+  G.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[dir<0?w-1-i:i];if(ch==='.')continue;lx.fillStyle=CRIT_PAL[ch];lx.fillRect(x0+i,y0+j,1,1)}})}
+function drawOwl(c){
+  // A little barn-brown owl, 7 x 9: ear tufts, a pale face with two big eyes, a light chest, talons on the branch.
+  // Its head (the top five rows) turns a pixel toward you when you walk past.
+  const G=['k.....k','kbkkkbk','kFFbFFk','kFEbEFk','kbFyFbk','kbbbbbk','kbLLLbk','.kLLLk.','..ktk..'],P={k:'#0b0a0f',b:'#5a4636',F:'#b8a888',E:c.blink<0?'#b8a888':'#0b0a0f',y:'#c9a227',L:'#8a7258',t:'#c9a227'};
+  const x0=Math.round(c.x)-3,y0=Math.round(c.y)-9;
+  G.forEach((row,j)=>{const off=j<5?c.look:0;for(let i=0;i<7;i++){const ch=row[i];if(ch==='.')continue;lx.fillStyle=P[ch];lx.fillRect(x0+i+off,y0+j,1,1)}});
+}
+// After the lighting: moths circling their light (they catch it, so they show), and a glint in the owl's eyes.
+function drawCritterGlows(A){
+  if(!A.crit)return;
+  A.crit.forEach(c=>{
+    if(c.kind==='moth'){const x=Math.round(c.hx+Math.cos(time*c.sp*2+c.ph)*c.r),y=Math.round(c.hy-6+Math.sin(time*c.sp*3.1+c.ph)*c.r*0.6);
+      lx.fillStyle='#efe3c4';lx.fillRect(x,y,1,1);if(Math.floor(time*14+c.ph*3)%2){lx.fillStyle='#b8ad90';lx.fillRect(x-1,y,1,1);lx.fillRect(x+1,y,1,1)}}
+    if(c.kind==='owl'&&c.blink>=0){lx.fillStyle='#ffcf5a';const x0=Math.round(c.x)-3+c.look,y0=Math.round(c.y)-9;lx.fillRect(x0+2,y0+3,1,1);lx.fillRect(x0+4,y0+3,1,1)}});
+}

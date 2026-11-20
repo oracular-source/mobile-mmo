@@ -119,6 +119,7 @@ function render(){
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
+  if(curArea())drawAreaCritters(curArea(),0); // frogs, ripples, crows on the ground (v0.49)
   if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
   if(zoneId==='dun'&&run.portal){const p=run.portal;lx.fillStyle='#7dffa6';for(let a=0;a<24;a++){if((a+Math.floor(time*8))%3===0)continue;const an=a/24*Math.PI*2;lx.fillRect(Math.round(p.x+Math.cos(an)*7),Math.round(p.y+Math.sin(an)*4),1,1)}lx.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,2,2)}
@@ -183,6 +184,7 @@ function render(){
     if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
       lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
     const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.save();lx.translate(ox,oy);drawEnt(e);lx.restore()});
+  if(A0)drawAreaCritters(A0,1); // perched crows, owl, bats, chimney smoke (v0.49)
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();

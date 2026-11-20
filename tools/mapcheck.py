@@ -70,7 +70,7 @@ def check(m, tiles, objs):
 
     # objects and their footprints
     foot = {}   # (x,y) -> object index
-    placed, markers, fogs = [], [], []
+    placed, markers, fogs, critters = [], [], [], []
     for t in m['things']:
         k = t[0]
         if k == 'obj':
@@ -85,7 +85,17 @@ def check(m, tiles, objs):
         elif k == 'exit': markers.append(dict(k=k, type=t[1], x=int(t[2]), y=int(t[3]), extra=t[4:]))
         elif k == 'fog': fogs.append(tuple(int(v) for v in t[1:5]))
         elif k == 'label': pass
+        elif k == 'critter': critters.append(dict(kind=t[1], x=float(t[2]), y=float(t[3])))
         else: E.append(f'unknown line: {" ".join(t)}')
+    # critters (v0.49): known kinds, on the map; frogs on open ground by water, moths near a light
+    for c in critters:
+        cx, cy = int(c['x']), int(c['y'])
+        if c['kind'] not in ('crow', 'frog', 'moth', 'owl', 'bat'): E.append(f"unknown critter {c['kind']}"); continue
+        if not (0 <= cx < Wd and 0 <= cy < H): E.append(f"critter {c['kind']} at {c['x']},{c['y']} is off the map"); continue
+        if c['kind'] == 'frog':
+            if not tiles[g[cy][cx]]['walk']: E.append(f"frog at {c['x']},{c['y']} sits in scenery or water")
+            if not any(0 <= cy+dy < H and 0 <= cx+dx < Wd and g[cy+dy][cx+dx] == '~' for dy in range(-2, 3) for dx in range(-2, 3)): W.append(f"frog at {c['x']},{c['y']} has no water near it")
+        if c['kind'] == 'moth' and not any(o.get('light', 0) and abs(o['x'] + o['w']/2 - c['x']) < 3 and abs(o['y'] - c['y']) < 3 for o in placed): W.append(f"moth at {c['x']},{c['y']} has no light near it")
     for i, o in enumerate(placed):
         name = f"{o['kind']} at {o['x']},{o['y']}"
         for yy in range(o['y'], o['y'] + o['h']):

@@ -85,4 +85,6 @@ shrine       2 1 1      ground 1     S    3
 censer       1 1 1      ground 0     -    2
 banner       1 1 0      wall   0     -    0
 bedroll      1 1 0      ground 0     -    0
+flowers      1 1 0      ground 0     -    1
+shovel       1 1 0      ground 0     -    0
 `;
