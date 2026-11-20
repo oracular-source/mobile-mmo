@@ -27,6 +27,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 11. Start screen and class picker (done v0.38)
 12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
+17. Never pause: windows and the skill pick (options written, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -151,3 +152,13 @@ Claude leans **B**. Note: a shared shape on two similar colours (Rot and Plague)
 
 ## 16. Camera under the top bars (owner, Nov 20)
 Arriving at a northern way in or walking to a map's top edge put your character behind the top frames. Options: **A** stop the view under the bars (measure the real bottom of the top UI over you and scroll just far enough; only changes anything near map edges), **B** always centre you in the open space between the bars and the spell grid (shifts the view everywhere), **C** fade the bars when you're under them (still covers you). Claude leaned A. **Owner picked A** (Nov 20), and added: no black past the edge, the visuals should still show behind the bars. **Built v0.55**: `measureSafe()` in `render.js` (10 times a second, top and bottom UI over your sprite), eased camera limits, and a ground-only mirror of each area's top and bottom edge (`edgeTop` / `edgeBot` from `paintArea`) drawn past the map edge.
+
+## 17. Never pause: windows and the skill pick (owner, Nov 20)
+Now: Menu, Character screen, full Map, yes/no prompts (Summon is the live one) and Arrange all stop the game (`running=false`) behind a 90% black cover. Just un-pausing would mean fighting blind behind it.
+**Skill pick (decided):** reaching level 10, 12 or 14 opens nothing; the Menu button pulses gold and the Skills tab inside pulses until you pick (not the spell's own button). The level-up banner adds "Skill choice: open Menu". The pulse must look different from the steady gold light on the 1st hit / Auto toggles.
+**All options:** yes/no prompts become a small strip under the cast bar (two buttons; walking away cancels); Arrange keeps running; only the DEV panel and the start screen may still pause.
+Options for the windows:
+- **A See-through:** windows stay centred, the cover goes light so the world shows around them, your frame stays on top, the window edge flashes red on a hit. Smallest; but the window sits over your character.
+- **B Half window:** windows slide up from the bottom and take about half the screen; the camera shifts so you and what's near you stay in view in the top half; frames stay up. Spell grid hidden while open. The full Map stays full-screen.
+- **C Warn me:** windows stay dark and full-screen; a red "Under attack" strip with your health shows when you're hit; tap it to close. Cheap, but you learn of danger only after the hit.
+Claude leans **B** (the only one where you can see yourself and nearby mobs). Owner to pick.
