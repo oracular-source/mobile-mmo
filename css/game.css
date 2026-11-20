@@ -131,7 +131,7 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 .fb.empty{background:rgba(20,18,26,.45);border:1px dashed #4a4056;box-shadow:none}
 .pi.flash,.fb.flash,#nexttgt.flash{border-color:#ffe9a8;background:radial-gradient(circle,#6a5a28,#2a2316);box-shadow:0 0 10px rgba(255,210,122,.6)}
 .cd{background:rgba(0,0,0,.65)}
-#mm{border:2px solid #6b5a2e;box-shadow:0 0 0 1px #0b0a0f,0 2px 6px rgba(0,0,0,.6)}
+#mm{border:1px solid #8a8a8a;border-radius:0;box-shadow:0 0 0 1px #0b0a0f,0 2px 6px rgba(0,0,0,.6)} /* v0.42: square grey frame, like the other frames */
 .card{background:linear-gradient(180deg,#1b1822,#110f15);border:1px solid #6b5a2e;box-shadow:inset 0 0 0 1px #0b0a0f,0 6px 24px rgba(0,0,0,.7)}
 .card h1,.card h2{text-shadow:0 1px 0 #000;letter-spacing:.5px}
 .card h1{border-bottom:1px solid #3a3020;padding-bottom:6px}
@@ -230,3 +230,8 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 .fork.on b{color:#ffd27a}
 .fork.lock{opacity:.45}
 .forknew{color:#ffd27a;font-size:13px;margin:4px 0 8px}
+/* v0.42 Map window (UI breakdown 12, owner picked A): ✕ header like the Menu, square grey zoom buttons,
+   numbered pins with a matching numbered legend */
+.mapz button{border-radius:0;background:#2a2a2e;border:1px solid #55555c;color:#ccc;box-shadow:none}
+#maplegend .mrow{display:flex;align-items:center}
+#maplegend .mnum{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;font-size:10px;font-weight:700;color:#000;border:1px solid #000;margin-right:7px}

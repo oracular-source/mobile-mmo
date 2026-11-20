@@ -120,15 +120,21 @@ function renderMapScreen(){
   cv2.style.width=cw+'px';cv2.style.height=ch+'px';cv2.width=cw*dpr;cv2.height=ch*dpr;
   const g=cv2.getContext('2d'),S=s*dpr;g.imageSmoothingEnabled=false;
   g.fillStyle='#07060a';g.fillRect(0,0,cv2.width,cv2.height);g.drawImage(Z.c,0,0,Z.w*S,Z.h*S);
-  Z.pins.forEach((p,i)=>{if(!p.found)return;const x=(p.x+0.5)*S,y=(p.y+0.5)*S;
-    g.fillStyle='#000';g.fillRect(x-4*dpr,y-4*dpr,8*dpr,8*dpr);g.fillStyle=MM_PIN_COL[p.k];g.fillRect(x-3*dpr,y-3*dpr,6*dpr,6*dpr)});
+  // You first, then the pins on top, so a numbered pin under you can still be read.
   const x=player.x/T*S,y=player.y/T*S;
   if(MAPZ>1){box.scrollLeft=x/dpr-box.clientWidth/2;box.scrollTop=y/dpr-box.clientHeight/2} // keep you in view when zoomed
   g.fillStyle='#000';g.beginPath();g.arc(x,y,4.5*dpr,0,Math.PI*2);g.fill();g.fillStyle='#ffd27a';g.beginPath();g.arc(x,y,3*dpr,0,Math.PI*2);g.fill();
-  const found=Z.pins.filter(p=>p.found);
+  // v0.42: each found place gets a number on the map that matches its row in the list below (owner picked A),
+  // so four green exits can be told apart.
+  const found=Z.pins.filter(p=>p.found),r=6*dpr;
+  g.font='bold '+(9*dpr)+'px monospace';g.textAlign='center';g.textBaseline='middle';
+  found.forEach((p,i)=>{const n=String(i+1),w=n.length>1?r*1.4:r,cl=(v,a,b)=>Math.max(a,Math.min(b,v)),
+    px=cl((p.x+0.5)*S,w+dpr,cv2.width-w-dpr),py=cl((p.y+0.5)*S,r+dpr,cv2.height-r-dpr); // exits sit on the edge: keep the whole pin inside
+    g.fillStyle='#000';g.fillRect(px-w-dpr,py-r-dpr,2*w+2*dpr,2*r+2*dpr);g.fillStyle=MM_PIN_COL[p.k];g.fillRect(px-w,py-r,2*w,2*r);
+    g.fillStyle='#000';g.fillText(n,px,py+0.5*dpr)});
   $('maplegend').innerHTML='<div style="color:#9aa;margin-bottom:4px">Explored '+Math.round(100*Z.count/(Z.w*Z.h))+'%</div>'+
-    '<div><span class="mpin" style="background:#ffd27a;border-radius:50%"></span>You</div>'+
-    (found.length?found.map(p=>'<div><span class="mpin" style="background:'+MM_PIN_COL[p.k]+'"></span>'+p.name+'</div>').join(''):'<div style="color:#9aa">No places found yet. Walk around to fill in the map.</div>');
+    '<div class="mrow"><span class="mnum" style="background:#ffd27a;border-radius:50%;min-width:10px;width:10px;height:10px;margin:0 10px 0 3px"></span>You</div>'+
+    (found.length?found.map((p,i)=>'<div class="mrow"><span class="mnum" style="background:'+MM_PIN_COL[p.k]+'">'+(i+1)+'</span>'+p.name+'</div>').join(''):'<div style="color:#9aa">No places found yet. Walk around to fill in the map.</div>');
 }
 // Map zoom (v0.27.1): + / - buttons or pinch on the map. 1 = whole area fits; zoomed in, drag to scroll.
 let MAPZ=1;const MAPZ_MAX=4;

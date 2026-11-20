@@ -25,7 +25,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 9. Character screen (Gear, Bags, Journal) (done v0.36)
 10. Moments (level up, death, loot, run summary) (done v0.37)
 11. Start screen and class picker (done v0.38)
-12. Minimap and full map (checked Nov 19; Wolfwood bug fixed v0.41.2; options A–C, owner to pick)
+12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -108,3 +108,5 @@ Options (rough):
 - **B A plus a Zone tab:** square tabs **Area | Zone 1**; the Zone tab draws the five areas as boxes joined by their roads and tunnels, the one you're in outlined gold, ones you haven't been to as "?".
 - **C A, but names on the map:** short names written beside each pin instead of numbers (crowds at 1x on small areas; reads well zoomed in).
 Claude leans **A** (it's a check; small and finished), with B's zone view as a backlog card for when Zone 1 has its chapel and Town 1.
+**Owner picked A** (Nov 19). **Built v0.42:** the map window has the Menu's header with a ✕ (the green Back to game button is gone), square grey zoom buttons and a square map border; the minimap has a square grey frame. Found places are numbered on the map (a coloured square with the number in it, kept inside the frame when it sits on an edge) and the list below uses the same numbers and colours. Numbers follow the order places are listed, so they stay the same each time you open the map. B's zone view went to the backlog.
+Left after the list: **Log, Menu, 1st hit and Auto** are still the old rounded gold pills, the last bits of the old look on the play screen.
