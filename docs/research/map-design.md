@@ -116,4 +116,4 @@ Step 1 of `area-rules.md`. Nothing drawn or built yet.
 - **New:** wolf body (blight wolf, Greyfang, Old Scar), fir trees and the dead giant tree, needle/moss/blight ground, hunter's camp and den props, a 'wood' tint, wandering named with a pack, wolves fleeing at low health.
 - **Reused:** road, creek and bridge at the edge, chest, rares, summoning code (not needed here), map/minimap, fog.
 - **Owner answers (Nov 19):** second mob is the **thornback boar** (solo, charges). Build to **8–11** anyway; some classes may beat the top end early, most only once the cap rises. **The map chat draws the wolves** (blight wolf, Greyfang, Old Scar) and the boar. XP pace check across all classes before Wolfwood numbers lock (`docs/sim-results.md`).
-- **Style takes drawn (Nov 19):** canvas "Mobile MMO — Wolfwood style takes" (A Dusk hush, B Blight bloom, C Moon and eyes, D Rust and gold). **Next:** owner picks one, then the full text map.
+- **Style takes drawn (Nov 19):** canvas "Mobile MMO — Wolfwood style takes" (A Dusk hush, B Blight bloom, C Moon and eyes, D Rust and gold). **Owner picked A · Dusk hush (Nov 19).** **Next:** the full text map.
