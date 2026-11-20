@@ -86,6 +86,21 @@ Deep dive for the "Items and gold rethink" card on the board. Must be settled be
 5. Keep selling unwanted gear for copper, or replace it with breaking gear down into orb dust?
 6. Phase 3 (later): can orbs be traded between players?
 
+## Owner's answers (Nov 19, second pass)
+- **Track:** +5 per item to start.
+- **Where:** enchanting happens at a **forge in town** (you go back to town to do it; until Town 1 exists, the crossroads camp stands in).
+- **Teleport orbs:** drop from monsters **and** can be bought.
+- **Unwanted gear:** breaks down into **orb dust** (duplicates give a lot). No selling gear for copper.
+- **Gold's jobs:** forge fees, plus **orbs for sale at a very high price** as a backstop, so bad luck never leaves you grinding with no orbs at all.
+- **Trading:** undecided. Owner's thought: trade orbs only, no gear trading, gear breaks down into dust. Worry: items might feel like grind fodder, and players want things to spend gold on.
+
+### Claude's view on trading (for phase 3; nothing to build now)
+- **Lean: orbs tradable, gear bound to whoever looted it, dust bound.** Orbs are small, all the same and easy to price, so a player market for them is simple and gives gold a second use (buy orbs from other players below the shop price). Bound gear keeps loot personal (it's already personal loot) and stops gear farmers.
+- **The shop price is the ceiling.** Because the forge always sells orbs at a fixed high price, no player can charge more than that, and gold never becomes worthless: there's always something to turn it into until your gear is +5. New zones bring new gear and new orb tiers, so the sink refills.
+- **Items keep their meaning through what they do, not their price.** A named ring with its own effect is worth chasing because of the effect; enchanting multiplies the base item, so a better base is still the real upgrade. Duplicates and outgrown gear go to dust.
+- **Gold uses, all in one place:** forge fees, shop orbs, shop teleport orbs, moving enchants to new gear, and later cosmetic extras (like dye colours) that are looks only. Never bank space for gold (that's what the game sells for real money).
+- **Risk to watch:** if shop orbs are too cheap, gold becomes power you can grind without fighting new things. Keep the shop price well above what a normal session earns (e.g. one shop orb ≈ an hour of copper), and tune in the sim.
+
 ## Sources
 - Path of Exile dev diary, "Rethinking Gold as a Currency": https://pathofexile.com/forum/view-thread/55102
 - Path of Exile economy (Game Developer): https://gamedeveloper.com/design/path-of-exile-economy-currency-trading
