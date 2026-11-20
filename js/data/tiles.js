@@ -39,6 +39,12 @@ v    moss         1   #34452c living ground
 k    blight       1   #4e4c48 dead ground
 f    fern         1   #2e4a2a living ground
 O    boulder      0   #4a4a48 wall
+a    ash          1   #4a4644 ground
+q    gravel       1   #5e5a52 path ground
+s    flagstone    1   #5c5862 path ground
+W    stone_wall   0   #57535c border wall
+P    pillar       0   #6e6a74 wall
+e    herbs        1   #3e5432 living ground
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -72,4 +78,11 @@ trap         1 1 0      ground 0     -    0
 wolf_den     4 2 1      ground 1     S    0
 fallen_log   3 1 1      ground 0     -    0
 stump        1 1 1      ground 0     -    0
+chapel       7 9 1      ground 1     S    3
+fallen_bell  2 2 1      ground 1     -    0
+ash_circle   3 3 0      ground 0     -    1
+shrine       2 1 1      ground 1     S    3
+censer       1 1 1      ground 0     -    2
+banner       1 1 0      wall   0     -    0
+bedroll      1 1 0      ground 0     -    0
 `;

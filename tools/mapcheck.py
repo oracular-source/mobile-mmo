@@ -208,14 +208,17 @@ def font(sz, bold=False):
 
 SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt_rat': (220, 170, 130, 255), 'skeleton': (240, 234, 216, 255),
              'tunnel_rat': (220, 170, 130, 255), 'big_rat': (200, 140, 100, 255), 'beetle': (130, 170, 220, 255),
-             'blight_wolf': (170, 176, 184, 255), 'thornback_boar': (176, 120, 80, 255)}
-TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), '': (0, 0, 0, 0)}
+             'blight_wolf': (170, 176, 184, 255), 'thornback_boar': (176, 120, 80, 255),
+             'cult_zealot': (200, 90, 70, 255), 'cult_ashcaller': (170, 168, 176, 255), 'cult_chanter': (170, 110, 210, 255), 'ash_wisp': (255, 230, 160, 255)}
+TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), 'chapel': (50, 60, 100, 55), '': (0, 0, 0, 0)}
 OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030', 'mausoleum': '#6b6578', 'dead_oak': '#4a3e32',
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
            'throne': '#3a3446', 'brazier': '#ff9a3c', 'campfire': '#ff9a3c', 'signpost': '#8a6a4a', 'sinkhole': '#120d0a',
            'burrow': '#1a120c', 'light_shaft': '#cfd8dc', 'gnaw_pile': '#b9b0a0',
            'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'lean_to': '#6a5034', 'firepit': '#3a3430',
-           'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038'}
+           'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038',
+           'chapel': '#6a6672', 'fallen_bell': '#a08a50', 'ash_circle': '#2a2624', 'shrine': '#7a7480', 'censer': '#ffb060',
+           'banner': '#3a1418', 'bedroll': '#6a5a48'}
 
 def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
     g = m['tiles']; x1 = x1 or m['W']; y1 = y1 or m['H']
@@ -255,6 +258,15 @@ def ground_pass(d, m, tiles, s, x, y, px, py):
         for a in (0.2, 0.5, 0.8): d.line([px + s * a, py, px + s * a, py + s - 1], fill=hexc('#6c6880'))
     if t['name'] == 'floor' and (x + y) % 2 == 0:
         d.rectangle([px, py, px + s - 1, py + s - 1], fill=shade(col, 0.9))
+    if t['name'] == 'ash' and h < 2:
+        d.ellipse([px + s * 0.3 + h * 2, py + s * 0.4, px + s * 0.45 + h * 2, py + s * 0.55], fill=hexc('#6a6460'))
+    if t['name'] == 'gravel' and h < 3:
+        for a, b in ((0.25, 0.3), (0.65, 0.6)): d.rectangle([px + s * a, py + s * b, px + s * a + max(1, s // 8), py + s * b + max(1, s // 8)], fill=hexc('#7a766c'))
+    if t['name'] == 'flagstone':
+        d.rectangle([px, py, px + s - 1, py + s - 1], outline=hexc('#3a3640'))
+        if h == 0: d.line([px + s * 0.2, py + s * 0.3, px + s * 0.6, py + s * 0.7], fill=hexc('#3a3640'))
+    if t['name'] == 'herbs':
+        for a in (0.25, 0.5, 0.75): d.ellipse([px + s * a - s * 0.12, py + s * 0.35, px + s * a + s * 0.12, py + s * 0.65], fill=hexc('#5e7a40'))
     if t['name'] == 'stairs':
         for i in range(3): d.rectangle([px + 1, py + 2 + i * s // 3, px + s - 2, py + 2 + i * s // 3 + max(1, s // 8)], fill=hexc('#4a4560'))
 
@@ -320,6 +332,16 @@ def scenery_pass(d, m, tiles, s, x, y, px, py):
         d.ellipse([px + 1, py + s * 0.3, px + s - 2, py + s - 2], fill=col, outline=hexc('#0b0a0f'))
     if t['name'] == 'bridge':
         for i in range(0, s, max(2, s // 5)): d.line([px, py + i, px + s - 1, py + i], fill=hexc('#3e2c1e'))
+    if t['name'] == 'stone_wall':
+        d.rectangle([px, py + s * 0.15, px + s - 1, py + s - 1], fill=shade(col, 0.75))
+        d.rectangle([px, py, px + s - 1, py + s * 0.5], fill=col)
+        d.line([px, py + s * 0.5, px + s - 1, py + s * 0.5], fill=hexc('#2a2830'))
+        d.line([px + (s // 2 if y % 2 else 0), py + s * 0.5, px + (s // 2 if y % 2 else 0), py + s - 1], fill=hexc('#2a2830'))
+        if (x * 5 + y * 3) % 7 == 0: d.ellipse([px, py + s * 0.4, px + s * 0.6, py + s * 0.95], fill=hexc('#3e5a32'))  # ivy
+    if t['name'] == 'pillar':
+        d.ellipse([px + s * 0.15, py + s * 0.7, px + s * 0.85, py + s * 1.0], fill=(0, 0, 0, 90))
+        d.rectangle([px + s * 0.25, py - s * 0.4, px + s * 0.75, py + s * 0.9], fill=col, outline=hexc('#2a2830'))
+        d.rectangle([px + s * 0.15, py - s * 0.5, px + s * 0.85, py - s * 0.3], fill=shade(col, 1.2))
     if t['name'] == 'rock':
         if (x + y) % 4 == 0: d.rectangle([px + 2, py + 2, px + s // 3, py + s // 3], fill=hexc('#221f2a'))
 
@@ -366,6 +388,39 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
                 d.ellipse([px + s * 0.1, py + s * 0.3, px + s * 0.9, py + s * 0.9], fill=hexc('#6a6460'))
                 d.ellipse([px + s * 0.3, py + s * 0.45, px + s * 0.7, py + s * 0.75], fill=col)
             continue
+        if k == 'chapel':
+            # nave with a slate roof, the steeple at the front with its one lit window, the door at the foot
+            d.rectangle([px + s * 0.5, py + s * 2, px + w - s * 0.5, py + h - 1], fill=hexc('#0b0a0f'))
+            d.rectangle([px + s * 0.5 + 1, py + s * 2 + 1, px + w - s * 0.5 - 1, py + h - 2], fill=col)
+            d.polygon([(px + s * 0.3, py + s * 5), (px + w / 2, py + s * 1.4), (px + w - s * 0.3, py + s * 5)], fill=hexc('#3a3a48'), outline=hexc('#0b0a0f'))
+            for hx, hy in ((0.3, 0.45), (0.7, 0.4)): d.rectangle([px + w * hx, py + h * hy, px + w * hx + s * 0.5, py + h * hy + s * 0.4], fill=hexc('#14121a'))  # holes in the roof
+            tx = px + w / 2
+            d.rectangle([tx - s * 1.2, py + s * 3.5, tx + s * 1.2, py + h - 1], fill=shade(col, 1.15), outline=hexc('#0b0a0f'))
+            d.polygon([(tx - s * 1.4, py + s * 3.6), (tx, py - s * 1.2), (tx + s * 1.4, py + s * 3.6)], fill=hexc('#3a3a48'), outline=hexc('#0b0a0f'))
+            d.rectangle([tx - s * 0.3, py + s * 4.4, tx + s * 0.3, py + s * 5.3], fill=hexc('#ffd27a'))   # the lit window
+            d.rectangle([tx - s * 0.5, py + h - s * 1.3, tx + s * 0.5, py + h - 1], fill=hexc('#2a1a12'))   # the door
+            continue
+        if k == 'fallen_bell':
+            d.ellipse([px + 2, py + h * 0.55, px + w - 2, py + h - 1], fill=(0, 0, 0, 110))
+            d.polygon([(px + w * 0.25, py + h * 0.15), (px + w * 0.75, py + h * 0.15), (px + w * 0.95, py + h * 0.85), (px + w * 0.05, py + h * 0.85)], fill=col, outline=hexc('#2a2014'))
+            d.line([px + w * 0.45, py + h * 0.3, px + w * 0.6, py + h * 0.8], fill=hexc('#2a2014'), width=2)  # the crack
+            continue
+        if k == 'ash_circle':
+            d.ellipse([px + 2, py + 2, px + w - 3, py + h - 3], outline=hexc('#9a9490'), width=max(2, s // 4))
+            d.ellipse([px + w * 0.3, py + h * 0.3, px + w * 0.7, py + h * 0.7], fill=hexc('#ff7a3c')); continue
+        if k == 'censer':
+            d.line([px + s / 2, py, px + s / 2, py + s - 1], fill=hexc('#3a2a1c'), width=2)
+            d.ellipse([px + s * 0.25, py + s * 0.15, px + s * 0.75, py + s * 0.6], fill=col)
+            d.line([px + s / 2, py, px + s * 0.7, py - s * 0.8], fill=(180, 180, 190, 160), width=2); continue
+        if k == 'banner':
+            d.rectangle([px + s * 0.2, py, px + s * 0.8, py + s * 1.1], fill=col, outline=hexc('#0b0a0f'))
+            d.ellipse([px + s * 0.32, py + s * 0.3, px + s * 0.68, py + s * 0.66], outline=hexc('#c0302a'), width=max(1, s // 8)); continue
+        if k == 'bedroll':
+            d.rounded_rectangle([px + s * 0.1, py + s * 0.3, px + s * 0.9, py + s * 0.8], radius=s * 0.2, fill=col, outline=hexc('#1c1712')); continue
+        if k == 'shrine':
+            d.rectangle([px + 1, py - s * 0.6, px + w - 2, py + h - 1], fill=col, outline=hexc('#0b0a0f'))
+            d.polygon([(px, py - s * 0.5), (px + w / 2, py - s * 1.2), (px + w, py - s * 0.5)], fill=hexc('#3a3a48'), outline=hexc('#0b0a0f'))
+            d.rectangle([px + w * 0.4, py - s * 0.3, px + w * 0.6, py + h * 0.6], fill=hexc('#ffd27a')); continue
         if k == 'dead_oak':
             cx, cy = px + w / 2, py + h / 2
             for a, b in ((0.05, 0.1), (0.95, 0.0), (0.15, 0.55), (0.9, 0.5), (0.5, 0.0)):

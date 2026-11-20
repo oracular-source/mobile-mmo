@@ -24,6 +24,15 @@ Some art hasn't read as what it was meant to be (the crypt bones looked like lit
 - **Squint test at real game zoom** before showing or shipping: crop it from an in-game screenshot at the phone's zoom and ask "would someone name this right without being told?" If not, redraw.
 - **When it's new or unsure, show it first:** a crop of the object in game next to one reference image, so the owner can say yes before it ships.
 
+## Heart: the small details (owner, Nov 20)
+The goal is a game that feels thought about, not generated. Small details set games apart, so every area gets them on purpose:
+- **Something alive in every screen:** a critter, a flicker, a ripple, smoke, a moving plant. Frogs by water, crows on walls, moths at lights, owls in trees.
+- **Wear and age:** moss and ivy on old stone (the bell tower's moss is the bar), cracks, stains, worn paths, chipped edges.
+- **Right sizes:** doors, windows and props sized for the 20 × 24 characters, not left over from older art (the graveyard shack's door is too small).
+- **Small stories:** a prop that hints at what happened (the dead adventurer in the rat tunnel, the hunter's camp, the fallen bell).
+- **Ways between areas look like something:** an entrance where something marks it (gate, cave mouth, stairs), or a path that just carries on into the next place; never a black box at the edge.
+- **Take it slow:** art passes go in chunks, one area at a time, and each chunk gets looked at on the phone before the next.
+
 ## Natural placement, no mistakes
 - Everything looks like it would really be there. Nothing overlaps what it shouldn't: no gravestones on a tower, no props in walls, holes or each other, no mobs standing in scenery.
 - Every object has a footprint (the space it takes up); buildings and paths keep about a tile of space around them.
