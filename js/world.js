@@ -329,7 +329,8 @@ function areaCritters(A){
 // The closest point a few pixels inside open water, within about three tiles (for a fleeing frog), or null.
 function nearWater(A,x,y){let best=null,bd=1e9;const tx=Math.floor(x/T),ty=Math.floor(y/T);
   for(let j=-3;j<=3;j++)for(let i=-3;i<=3;i++){const a=tx+i,b=ty+j;if(b<0||b>=A.h||a<0||a>=A.w||A.rows[b][a]!=='~')continue;
-    const px=Math.max(a*T+4,Math.min(a*T+12,x)),py=Math.max(b*T+4,Math.min(b*T+12,y)),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best={x:px,y:py}}}
+    let px=Math.max(a*T+4,Math.min(a*T+12,x)),py=Math.max(b*T+4,Math.min(b*T+12,y));if(A.wetV&&A.wetV(px,py)<0.05){px=a*T+8;py=b*T+8} // banks curve (v0.52): land in the drawn water, never on a bit of bank
+    const d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best={x:px,y:py}}}
   return best}
 function updateAreaCritters(A,dt){
   const cr=areaCritters(A),inView=(x,y)=>x>camX-16&&x<camX+VW+16&&y>camY-16&&y<camY+VH+16;

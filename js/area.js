@@ -90,6 +90,59 @@ function groundCol(n,r){
   if(n==='dirt_path'||n==='gate'||n==='broken_fence')return r<0.5?AP.path:(r<0.8?'#54473a':AP.pathHi);
   if(n==='road')return r<0.6?AP.road:'#665443';if(n==='mud')return r<0.7?AP.mud:'#2c2820';if(n==='marsh')return r<0.6?AP.marsh:'#2a3a30';
   if(n==='water')return r<0.7?AP.water:'#16293a';if(n==='cave_dirt'||n==='dirt_slope')return AP.cave[Math.floor(r*4)];if(n==='bridge')return AP.road;if(n==='moss')return AP.mossG[Math.floor(r*4)];if(Array.isArray(AP[n]))return AP[n][Math.floor(r*4)];if(n==='fern')return AP.needles[Math.floor(r*4)];if(n==='floor'||n==='stairs')return r<0.5?AP.flr:(r<0.8?AP.flr2:AP.flrHi);return AP.dg[0]}
+/* ---------- Water with natural edges (v0.52, owner Nov 20: square water read like a path) ----------
+   Walking still uses the square tiles; only the look changes. Each tile is 1 (water) or 0 (land) at its centre; blending
+   those across the tile and adding two layers of slow wobble gives one smooth shape whose banks curve across tile lines.
+   v below 0 is land, above 0 is water; the bigger v, the deeper. Rules in docs/area-rules.md (Natural shapes). */
+function smoothNoise(x,y,p,s){const u=x/p,v=y/p,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy);
+  const a=ah(i,j,s),b=ah(i+1,j,s),c=ah(i,j+1,s),d=ah(i+1,j+1,s);return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy}
+function waterField(A,groundOf){
+  const wet=[];for(let y=0;y<A.h;y++){wet[y]=[];for(let x=0;x<A.w;x++)wet[y][x]=groundOf(x,y)==='water'?1:0}
+  const m=(x,y)=>wet[Math.max(0,Math.min(A.h-1,y))][Math.max(0,Math.min(A.w-1,x))];
+  const dry=new Set(['road','dirt_path','gate','floor','stairs']); // never let water creep onto a road or a built floor
+  const bl=(px,py)=>{const u=(px+0.5)/T-0.5,v=(py+0.5)/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
+    return m(i,j)*(1-fx)*(1-fy)+m(i+1,j)*fx*(1-fy)+m(i,j+1)*(1-fx)*fy+m(i+1,j+1)*fx*fy};
+  return (px,py)=>{const tx=Math.floor(px/T),ty=Math.floor(py/T);
+    if(!wet[ty]||wet[ty][tx]===undefined)return -1;
+    if(!wet[ty][tx]&&dry.has(groundOf(tx,ty)))return -1;
+    // Averaging a small square of blended samples turns a staircase of tiles into a slope.
+    let f=0;for(let sy=-6;sy<=6;sy+=6)for(let sx=-6;sx<=6;sx+=6)f+=bl(px+sx,py+sy);f/=9;
+    return f-0.5+(smoothNoise(px,py,40,201)-0.5)*0.5+(smoothNoise(px,py,13,202)-0.5)*0.22}}
+function paintWater(A,g,groundOf){
+  const V=waterField(A,groundOf);A.wetV=V;
+  const near=[];for(let y=0;y<A.h;y++)for(let x=0;x<A.w;x++){let n=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){const a=x+i,b=y+j;if(a>=0&&b>=0&&a<A.w&&b<A.h&&groundOf(a,b)==='water')n=1}if(n)near.push([x,y])}
+  if(!near.length)return;
+  const W=A.w*T,H=A.h*T,img=g.getImageData(0,0,W,H),d=img.data;
+  const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const C={};const col=h=>C[h]||(C[h]=rgb(h));
+  const put=(x,y,h)=>{const c=col(h),k=(y*W+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255};
+  const cave=A.tint==='earth';
+  // The land a water tile's dry bits belong to: the neighbour on that side, else any land next to it.
+  const bankOf=(tx,ty,ox,oy)=>{const sx=ox<8?-1:1,sy=oy<8?-1:1;for(const [dx,dy] of [[sx,0],[0,sy],[sx,sy],[-sx,0],[0,-sy],[-sx,-sy],[sx,-sy],[-sx,sy]]){const n=groundOf(tx+dx,ty+dy);if(n!=='water')return n}return cave?'cave_dirt':'mud'};
+  near.forEach(([tx,ty])=>{const isW=groundOf(tx,ty)==='water';
+    for(let oy=0;oy<T;oy++)for(let ox=0;ox<T;ox++){const px=tx*T+ox,py=ty*T+oy,v=V(px,py);
+      const bankW=0.07+0.13*smoothNoise(px,py,24,204); // the wet strip changes width along the bank
+      if(v<0){
+        if(v>-bankW)put(px,py,cave?(ah(px,py,5)<0.5?'#2a231b':'#241e17'):(ah(px,py,5)<0.6?AP.mud:(ah(px,py,6)<0.5?'#2c2820':AP.mudDk))); // wet mud
+        else if(isW)put(px,py,groundCol(bankOf(tx,ty,ox,oy),ah(px>>3,py>>3,1))); // land biting into a water tile
+        continue}
+      let c;
+      if(v<0.03)c='#0d1a22';                                               // dark wet rim right at the edge
+      else if(V(px,py-3)<0||V(px,py-2)<0)c='#0f1e28';                      // the north bank's shadow on the water (3/4 view)
+      else if(v<0.11)c=ah(px,py,7)<0.55?'#1d3842':'#1a333e';               // shallows, a touch lighter and greener
+      else if(v<0.2)c=ah(px,py,8)<0.5?'#16293a':AP.water;                  // stepping down
+      else c=v>0.42&&smoothNoise(px,py,9,205)<0.5?'#0f202b':(smoothNoise(px,py,11,206)<0.45?'#16293a':AP.water); // deep, in soft patches
+      put(px,py,c)}});
+  g.putImageData(img,0,0);
+  // Bank details on top: pebbles in the wet strip, reeds in clumps, lily pads in still water, light catching the deep.
+  const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};const dead=A.tint==='moonlit';
+  near.forEach(([tx,ty])=>{for(let i=0;i<8;i++){const x=tx*T+Math.floor(ah(tx,ty,300+i)*16),y=ty*T+Math.floor(ah(tx,ty,320+i)*16),v=V(x,y),r=ah(tx,ty,340+i);
+    if(v<0&&v>-0.12&&r<0.12){R(x,y+1,3,1,AP.out);R(x,y,3,1,AP.stoneDk);R(x,y,1,1,AP.stone)}                                  // a pebble at the waterline
+    else if(!cave&&v>-0.16&&v<0.06&&r>0.12&&r<0.34){const n=2+Math.floor(ah(x,y,9)*3);                                    // a clump of reeds
+      for(let k=0;k<n;k++){const rx=x+k*2-n,h=3+Math.floor(ah(x+k,y,10)*3);R(rx,y-h+1,1,h,dead?'#5e5638':AP.reed);R(rx,y-h+1,1,1,dead?'#8a7d52':AP.reedHi)}
+      if(dead&&r<0.18)R(x,y-6,1,2,'#3b2a1e')}
+    else if(!cave&&!dead&&v>0.14&&v<0.32&&r>0.9){R(x,y,4,2,'#2a4228');R(x+1,y,2,1,'#3d5a32');R(x+2,y+1,1,1,'#0f1e28')}   // a lily pad with its notch
+    else if(v>0.2&&r>0.5&&r<0.75){R(x,y,3,1,AP.waterHi);if(r<0.53)R(x+1,y,1,1,AP.glint)}}});
+}
 function paintArea(A){
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -162,26 +215,23 @@ function paintArea(A){
        for(let i=0;i<6;i++){R(x+i,y+Math.floor(i*fl/3),1,1,AP.out);R(x+i,y-1+Math.floor(i*fl/3),1,1,i<2?AP.trunkHi:AP.trunk)}R(x+3,y-2+(fl>0?1:-1),1,1,AP.twig)}} // a fallen branch
     // Heart pass (v0.49): leaves drift under the dead trees.
     if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
+    // Ragged edges wherever two kinds of ground meet (path and grass, mud and marsh...), so nothing looks stamped on in squares.
+    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs'||gname==='cave_dirt'||gname==='dirt_slope'||n==='cave_dirt'||n==='dirt_slope')return;
+      for(let i=0;i<16;i++){const r=ah(tx*16+i,ty*16,dx*3+dy*7+50);if(r>0.6)continue;const d=1+Math.floor(ah(tx+i,ty*16,dx+dy*5+60)*3),col=groundCol(n,ah(tx*16+i,ty,61));
+        if(dy===-1)R(bx+i,by,1,d,col);if(dy===1)R(bx+i,by+16-d,1,d,col);if(dx===-1)R(bx,by+i,d,1,col);if(dx===1)R(bx+16-d,by+i,d,1,col)}});
+  }
+
+  // 1b) Water with natural edges (v0.52): drawn over the square tiles as one smooth shape, then the bank details.
+  paintWater(A,g,groundOf);
+  for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const gname=groundOf(tx,ty),bx=tx*T,by=ty*T;
     // The Sunken Graveyard lives up to its name: old headstones lean up out of the flooded water, each with its waterline.
     // Only in water with no living grass nearby, so none turn up in the creek outside the fence.
-    if(gname==='water'&&A.tint==='moonlit'&&ah(tx,ty,95)<0.12&&!(()=>{for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++)if(name(tx+dx,ty+dy)==='grass'||name(tx+dx,ty+dy)==='tree')return 1})()){
+    if(gname==='water'&&A.tint==='moonlit'&&ah(tx,ty,95)<0.12&&A.wetV(bx+3,by+12)>0.08&&A.wetV(bx+13,by+12)>0.08&&A.wetV(bx+8,by+4)>0.08&&!(()=>{for(let dy=-3;dy<=3;dy++)for(let dx=-3;dx<=3;dx++)if(name(tx+dx,ty+dy)==='grass'||name(tx+dx,ty+dy)==='tree')return 1})()){
       const lean=ah(tx,ty,96)<0.5?-1:1,X=bx+4,Y=by+3,cross=ah(tx,ty,97)<0.3;
       const S=(x,y,w,h,col)=>{for(let j=0;j<h;j++)R(X+x+(y+j<3?lean:0),Y+y+j,w,1,col)};
       if(cross){S(3,0,4,9,AP.out);S(1,2,8,3,AP.out);S(4,1,2,7,AP.stoneDk);S(2,3,6,1,AP.stoneDk);S(4,1,1,7,AP.stone)}
       else{S(1,1,8,8,AP.out);S(2,0,6,1,AP.out);S(2,1,6,7,AP.stoneDk);S(2,1,2,7,AP.stone);if(ah(tx,ty,98)<0.6)S(3,1,3,1,AP.moss)}
       R(bx+2,Y+8,12,1,AP.waterHi);R(bx+4,Y+9,8,1,'#0d1a22');R(bx+3,Y+10,4,1,'#1b3442')}
-    // Ragged edges wherever two kinds of ground meet (path and grass, mud and marsh...), so nothing looks stamped on in squares.
-    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs'||gname==='cave_dirt'||gname==='dirt_slope'||n==='cave_dirt'||n==='dirt_slope')return;
-      for(let i=0;i<16;i++){const r=ah(tx*16+i,ty*16,dx*3+dy*7+50);if(r>0.6)continue;const d=1+Math.floor(ah(tx+i,ty*16,dx+dy*5+60)*3),col=groundCol(n,ah(tx*16+i,ty,61));
-        if(dy===-1)R(bx+i,by,1,d,col);if(dy===1)R(bx+i,by+16-d,1,d,col);if(dx===-1)R(bx,by+i,d,1,col);if(dx===1)R(bx+16-d,by+i,d,1,col)}});
-    // Dark shoreline where water meets land.
-    if(gname==='water'){[[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n!=='water'){
-      if(dy===-1){R(bx,by,16,1,'#0d1a22');R(bx,by+1,16,1,'#1b3442')}if(dy===1)R(bx,by+15,16,1,'#0d1a22');if(dx===-1)R(bx,by,1,16,'#0d1a22');if(dx===1)R(bx+15,by,1,16,'#0d1a22')}});
-      const land=(dx,dy)=>groundOf(tx+dx,ty+dy)!=='water';
-      [[-1,-1,0,0],[1,-1,15,0],[-1,1,0,15],[1,1,15,15]].forEach(([dx,dy,cx,cy])=>{if(!land(dx,0)||!land(0,dy))return;const col=groundCol(groundOf(tx+dx,ty),0.3);
-        for(let yy=0;yy<6;yy++)for(let xx=0;xx<6;xx++){if(xx*xx+yy*yy<26&&(5-xx)*(5-xx)+(5-yy)*(5-yy)>=16)continue;if((5-xx)*(5-xx)+(5-yy)*(5-yy)<20)continue;
-          R(bx+(dx<0?xx:15-xx),by+(dy<0?yy:15-yy),1,1,col)}
-        for(let k=0;k<6;k++){const ang=k/5*Math.PI/2,ex=Math.round(Math.cos(ang)*6),ey=Math.round(Math.sin(ang)*6);R(bx+(dx<0?6-ex:9+ex),by+(dy<0?6-ey:9+ey),1,1,'#0d1a22')}})}
   }
 
   // 2) Scenery and objects, row by row. Objects are drawn when we reach their bottom row so trees in front cover them.
