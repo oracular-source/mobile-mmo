@@ -26,6 +26,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 10. Moments (level up, death, loot, run summary) (done v0.37)
 11. Start screen and class picker (done v0.38)
 12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
+13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -110,3 +111,12 @@ Options (rough):
 Claude leans **A** (it's a check; small and finished), with B's zone view as a backlog card for when Zone 1 has its chapel and Town 1.
 **Owner picked A** (Nov 19). **Built v0.42:** the map window has the Menu's header with a ✕ (the green Back to game button is gone), square grey zoom buttons and a square map border; the minimap has a square grey frame. Found places are numbered on the map (a coloured square with the number in it, kept inside the frame when it sits on an edge) and the list below uses the same numbers and colours. Numbers follow the order places are listed, so they stay the same each time you open the map. B's zone view went to the backlog.
 Left after the list: **Log, Menu, 1st hit and Auto** are still the old rounded gold pills, the last bits of the old look on the play screen.
+
+## 13. Top pills (Log, Menu, 1st hit, Auto)
+Now (v0.42): four rounded gold-trimmed pills, 26px tall, the last old-look buttons on the play screen. **Top left** under your frame: "1st hit on" and "Auto on" (gold text when on). **Top right** under the target frame: Log and Menu. Problems: they don't match the grey square style everywhere else; "1st hit on / off" spells the state in words, so the pill changes width when you toggle it; 26px is under the 44px tap size, fine for between-fight buttons but easy to miss.
+Owner note (Nov 19): the minimap stays (fun to have); the full map gets another cleanup later (backlog).
+Options (rough):
+- **A Square, same spots:** grey square-cornered buttons in the grid's style, 32px tall, fixed width. 1st hit and Auto show **on** as a gold border and gold text, **off** as plain grey (no "on/off" words). Log and Menu unchanged in place.
+- **B Merge the toggles into one row with Log and Menu, top right:** `[1st] [Auto] [Log] [Menu]` under the target frame; the top left under your frame is left clear for buffs. One place for every small button.
+- **C Toggles become icons on your frame:** two small square chips inside the bottom-right corner of your frame (a sword for 1st hit, a loop for Auto), lit gold when on; Log and Menu go square (as A). Least clutter, but icons need art and must be learned.
+Claude leans **A** (small, finished, nothing moves so muscle memory holds).
