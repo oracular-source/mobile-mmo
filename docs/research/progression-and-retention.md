@@ -43,7 +43,7 @@ Owner notes (Nov 19): **forks are for the rest of the character's life, so judge
 - **Shaman · Drowsy:** *Torpor* (stronger attack slow on one) / *Drowsy Cloud* (weaker slow on every mob near the target).
 - **Bard · Crescendo:** *Finale* (bigger pulse, songs end) / *Encore* (smaller pulse, songs keep playing).
 
-### Level 12 forks, all 14 classes (drafted Nov 19, owner reviewing)
+### Level 12 forks, all 14 classes (approved Nov 19)
 Same rules as level 10: both sides a bit stronger than the base, about equal, different by situation (one mob vs many, solo vs group later). Picked a different ability from the level 10 fork for each class, and mixed templates so level 10 and 12 don't feel like the same choice twice.
 - **Necromancer · Siphon Plague:** *Leaping Plague* (when its mob dies, the rest of the plague jumps to the nearest mob) / *Twin Plague* (stacks twice on one mob).
 - **Druid · Creeping Rot:** *Sap Strength* (rotting mob hits about 15% softer) / *Blight Spores* (rot also lands on up to 2 mobs near the target, weaker).
