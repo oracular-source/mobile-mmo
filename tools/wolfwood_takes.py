@@ -1,5 +1,5 @@
 """Run: python3 tools/wolfwood_takes.py (writes out/wolfwood_take_A..D.png; needs Pillow and numpy).
-"""Wolfwood style takes: the same scene in four looks, drawn as pixel art at game scale.
+Wolfwood style takes: the same scene in four looks, drawn as pixel art at game scale.
 Scene: you walk north up the road from the crossroads; leafy trees give way to tall firs, the dead giant tree
 stands grey above the canopy, a wolf pack on the road, a boar off to the side, the hunter's camp in a clearing."""
 import random, math
