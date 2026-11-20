@@ -198,6 +198,7 @@ function paintGround(A,g,groundOf){
       d32[py*W+px]=pal[t][cell[((cy>>3)+1)*CW+(cx>>3)+1]]}}
   g.putImageData(img,0,0);
   return {types:types,at:at}}
+const EDGE_STRIP=160; // game pixels of edge ground kept for the mirror past the map edge (more than the camera ever shows)
 function paintArea(A){
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -272,6 +273,11 @@ function paintArea(A){
       else{S(1,1,8,8,AP.out);S(2,0,6,1,AP.out);S(2,1,6,7,AP.stoneDk);S(2,1,2,7,AP.stone);if(ah(tx,ty,98)<0.6)S(3,1,3,1,AP.moss)}
       R(bx+2,Y+8,12,1,AP.waterHi);R(bx+4,Y+9,8,1,'#0d1a22');R(bx+3,Y+10,4,1,'#1b3442')}
   }
+
+  // Ground-only copies of the top and bottom edges, taken before any scenery: render mirrors these past the map edge so the
+  // strip under the top bars (or the spell grid) shows ground carrying on, never black and never a doubled building (v0.55).
+  {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
+    c.edgeTop=cut(0);c.edgeBot=cut(H-E);}
 
   // 2) Scenery and objects, row by row. Objects are drawn when we reach their bottom row so trees in front cover them.
   const objsByRow={};A.objs.forEach(o=>{const r=o.y+o.h-1;(objsByRow[r]=objsByRow[r]||[]).push(o)});

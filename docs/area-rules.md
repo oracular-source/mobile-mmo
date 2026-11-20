@@ -83,6 +83,7 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Check the pace when an area is built:** clearing an area normally (plus its named) should take you up through most of its band. Too fast and you outlevel the next area; too slow and you grind. Tune spawns, XP or the band, and note it on the board.
 
 ## Phone readability
+- **You're never under the HUD (v0.55):** the camera keeps your character below the top bars and above the spell grid, scrolling past the map edge when it has to. Past the edge the area's ground carries on (a ground-only mirror of the edge), never black. Map edges still need their own scenery so that strip looks right (zone edges card).
 - Mobs and the player must stand out from the ground: different lightness, not just a different colour.
 - Effects (fog, rain, ash) never hide a mob or the target ring for long.
 

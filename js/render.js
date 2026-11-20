@@ -61,6 +61,18 @@ function walkFrame(img,walk,moving){
 
 /* ---------- Render ---------- */
 let S=3,VW=160,VH=200,camX=0,camY=0,dpr=1;
+// Screen space the top and bottom UI leave free over the player, in CSS pixels from the top of the view (ui() measures it,
+// render() eases toward it). SAFE_HEAD / SAFE_FEET: game pixels from your feet to just above your head / just below your feet.
+const camSafe={top:0,bot:0,wantTop:0,wantBot:0,t:0},SAFE_HEAD=30,SAFE_FEET=3;
+const SAFE_TOP_IDS=['pframe','tframe','toggles','topbtns','mm','devbtn'];
+function measureSafe(){
+  const vr=$('view').getBoundingClientRect(),g=S/dpr,px=vr.left+(player.x-camX)*g,half=12*g; // your sprite's left and right, with a little room
+  const over=r=>r.width>0&&r.height>0&&r.right>px-half&&r.left<px+half;
+  let top=0;SAFE_TOP_IDS.forEach(id=>{const el=$(id);if(!el||el.style.visibility==='hidden')return;const r=el.getBoundingClientRect();if(over(r))top=Math.max(top,r.bottom-vr.top)});
+  let bot=vr.height;[...ctrl.children,logEl].forEach(el=>{const r=el.getBoundingClientRect();if(over(r)&&r.top-vr.top>vr.height/2)bot=Math.min(bot,r.top-vr.top)});
+  camSafe.wantTop=top+4;camSafe.wantBot=bot-4; // nothing over you: just keep your head and feet on screen
+  if(!camSafe.ready){camSafe.top=camSafe.wantTop;camSafe.bot=camSafe.wantBot;camSafe.ready=1} // first measure: start where it should be
+}
 // Zoom: settings.zoom is how many game pixels wide the view should be (bigger = see more).
 // The game scales up by whole steps (S) so pixels stay crisp, so the real width snaps to the nearest step.
 // Resolution cap is 3x (was 2x) so phones get finer zoom steps.
@@ -115,10 +127,26 @@ function render(){
   const topPad=Math.round(66*dpr/S),botPad=Math.round(VH*0.28);
   camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH+botPad,pyr-Math.round(VH/2)-10));
   if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
+  // Never under the bars (v0.55, UI chat, owner picked A): the fixed pads above can't know how tall the top frames really
+  // are (buffs wrap, debuff tags pile up, the minimap sits lower). ui() measures the real bottom of whatever top UI sits
+  // over you and the real top of the spell grid / chat below you; if you'd be under either, the camera scrolls a bit further
+  // past the map edge (the empty strip ends up hidden behind the bars). Eased, so a buff wrapping never jolts the view.
+  if(camSafe.ready){const now=performance.now(),k=Math.min(1,(now-(camSafe.t||now))/90);camSafe.t=now;
+    camSafe.top+=(camSafe.wantTop-camSafe.top)*k;camSafe.bot+=(camSafe.wantBot-camSafe.bot)*k;
+    const g=S/dpr; // CSS pixels per game pixel
+    camY=Math.max(camY,pyr+SAFE_FEET-camSafe.bot/g); // feet stay above the spell grid and chat box
+    camY=Math.min(camY,pyr-SAFE_HEAD-camSafe.top/g); // head stays below the top bars (wins if a tiny screen can't fit both)
+    camY=sn(camY);}
   cx.setTransform(S,0,0,S,0,0);cx.imageSmoothingEnabled=false;cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
+  // Past the map's top or bottom edge (the strip the camera shows so you're never under the bars or the spell grid), the
+  // ground carries on as a mirror of the edge instead of black (owner, v0.55): roads run on, grass and moss keep going.
+  // Areas keep ground-only edge strips (no buildings to double up); the older built-in maps mirror the whole edge.
+  {const H=world.height,eT=world.edgeTop||world,eB=world.edgeBot||world,ht=Math.min(Math.ceil(-camY)+1,eT.height),hb=Math.min(Math.ceil(camY+VH-H)+1,eB.height);
+    if(ht>1){lx.save();lx.scale(1,-1);lx.drawImage(eT,0,0,eT.width,ht,0,0,eT.width,ht);lx.restore()}
+    if(hb>1){lx.save();lx.translate(0,2*H);lx.scale(1,-1);lx.drawImage(eB,0,eB.height-hb,eB.width,hb,0,H-hb,eB.width,hb);lx.restore()}}
   if(curArea())drawAreaCritters(curArea(),0); // frogs, ripples, crows on the ground (v0.49)
   if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
@@ -244,6 +272,7 @@ function render(){
 const BUFFS={sprint:{short:'Sprint',col:'#7dbbd0'},laststand:{short:'Last Stand',col:'#ffd27a'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,col:a.col}});
 function ui(){
   const L=player.lvl;
+  measureSafe();
   mmReveal();drawMinimap();
   $('plv').textContent='Lv '+L;
   // Your frame (v0.33.1): numbers on the left, percent on the right, same as the target frame.
