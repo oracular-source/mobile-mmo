@@ -103,9 +103,11 @@ function killMob(m){
     log('You have reached level '+player.lvl+'!','#ffd27a');
     const learned=AB.filter(a=>a.lvl===player.lvl);
     learned.forEach(a=>log('You have learned '+a.name+'! Check your Spells.','#7dffa6'));
-    banner('Level '+player.lvl,learned.length?'New: '+learned.map(a=>a.name).join(', '):'');
     applyForks();buildControls();
-    if(forkDue()){log('A new skill choice is waiting: open Menu → Skills.','#ffd27a');setTimeout(offerFork,1200)} // pick your new toy
+    // A new skill choice (level 10, 12, 14): never pause (v0.56), so no window; the banner says it and Menu pulses.
+    const fd=forkDue()&&forkDue().lvl===player.lvl;
+    banner('Level '+player.lvl,(learned.length?'New: '+learned.map(a=>a.name).join(', '):'')+(fd?(learned.length?' · ':'')+'Skill choice: open Menu':''));
+    if(fd)log('A new skill choice is waiting: open Menu → Skills.','#ffd27a');
   }
   save();
   setTimeout(()=>{const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1)},800);

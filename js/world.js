@@ -111,8 +111,14 @@ function finishRun(){
   const loot=run.loot.filter(n=>!/Whisker|Shell|Bone|Rag/.test(n));
   prompt('Dungeon 1 complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Return to the graveyard',()=>enterZone('gy'));
 }
-function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;openModal('promptUI')}
-$('pyes').addEventListener('click',()=>{$('promptUI').classList.remove('show');running=true;if(promptAction)promptAction();promptAction=null});
+// Never pause (v0.56): the prompt is a strip under the cast bar and the world keeps running. It remembers where you
+// stood; walk away (about two tiles) or change area and it cancels, so it never hangs around stale.
+let promptAt=null;
+function prompt(title,text,yes,action){$('ptitle').textContent=title;$('ptext').textContent=text;$('pyes').textContent=yes;promptAction=action;promptAt={x:player.x,y:player.y,z:zoneId};$('promptUI').classList.add('show')}
+function closePrompt(){$('promptUI').classList.remove('show');promptAction=null;promptAt=null}
+function promptWatch(){if(promptAt&&(promptAt.z!==zoneId||Math.hypot(player.x-promptAt.x,player.y-promptAt.y)>2*T))closePrompt()}
+$('pyes').addEventListener('click',()=>{const a=promptAction;closePrompt();if(a)a()});
+$('pno').addEventListener('click',closePrompt);
 // A free spot a couple of tiles from an exit (not on it, so you don't trigger it again on arrival).
 // dir (v0.41): the way you were walking. You come out on that side of the exit so you keep walking away from it, not back in.
 function areaSpot(A,ex,dir){

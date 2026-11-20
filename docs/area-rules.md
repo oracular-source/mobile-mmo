@@ -83,6 +83,7 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Check the pace when an area is built:** clearing an area normally (plus its named) should take you up through most of its band. Too fast and you outlevel the next area; too slow and you grind. Tune spawns, XP or the band, and note it on the board.
 
 ## Phone readability
+- **Never pause (owner, Nov 20; v0.56 look, owner picked A):** windows sit over a light cover (about 38% black) so the world shows around them, and open below the top frames, which stay on top. Something that needs the player never opens a window: it pulses. **How it's drawn:** a waiting choice is a slow gold breathing outline on its button (1.2 s, grey to #ffd27a with a 2 px soft ring), never the steady small gold light the toggles use; a hit while a window is open turns the window's border red (#e24b4a, 2 px) for about a third of a second; yes/no questions are a small grey strip under the cast bar (HUD frame style, gold title, two square buttons), never a window.
 - **You're never under the HUD (v0.55):** the camera keeps your character below the top bars and above the spell grid, scrolling past the map edge when it has to. Past the edge the area's ground carries on (a ground-only mirror of the edge), never black. Map edges still need their own scenery so that strip looks right (zone edges card).
 - Mobs and the player must stand out from the ground: different lightness, not just a different colour.
 - Effects (fog, rain, ash) never hide a mob or the target ring for long.

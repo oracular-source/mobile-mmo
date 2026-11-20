@@ -27,7 +27,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 11. Start screen and class picker (done v0.38)
 12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
-17. Never pause: windows and the skill pick (options written, owner to pick)
+17. Never pause: windows and the skill pick (owner picked A, built v0.56)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -161,4 +161,4 @@ Options for the windows:
 - **A See-through:** windows stay centred, the cover goes light so the world shows around them, your frame stays on top, the window edge flashes red on a hit. Smallest; but the window sits over your character.
 - **B Half window:** windows slide up from the bottom and take about half the screen; the camera shifts so you and what's near you stay in view in the top half; frames stay up. Spell grid hidden while open. The full Map stays full-screen.
 - **C Warn me:** windows stay dark and full-screen; a red "Under attack" strip with your health shows when you're hit; tap it to close. Cheap, but you learn of danger only after the hit.
-Claude leans **B** (the only one where you can see yourself and nearby mobs). Owner to pick.
+Claude leaned **B** (the only one where you can see yourself and nearby mobs). **Owner picked A** (Nov 20). **Built v0.56:** `.modal` cover 0.38 black (DEV and start screen keep 0.9 and still pause, `pausing()` in `ui.js`), windows padded below the measured top frames (`--hudH`), `#hud` above windows; `pauseWatch()` (10/s, with the HUD) flashes the open card's border red when health drops, toggles `.due` (gold pulse, `skpulse`) on Menu and the Skills tab while `forkDue()`, and runs `promptWatch()`. Prompt strip `#promptUI` (not a modal) cancels past two tiles or on an area change. `openModal` closes any other window and opens the Menu on Skills when a choice is waiting. B stays the fallback if the covered middle bites in play.

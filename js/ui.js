@@ -207,7 +207,7 @@ window.addEventListener('pointerup',e=>{
   arrDrag=null;
 });
 function setArranging(on){
-  arranging=on;arrSel=null;running=!on&&!document.querySelector('.modal.show');
+  arranging=on;arrSel=null;running=!pausing(); // never pause (v0.56): arranging keeps the world running
   if(on)log('Arrange: drag a spell onto another to swap, or tap two spells. Tap Done when finished.','#ffd27a');
   buildControls();
 }
@@ -316,11 +316,27 @@ $('forkbox').addEventListener('click',e=>{
   if(first)banner(nm,BASE_AB[f.ab].name+' changes');
   renderForks();
 });
-// Opens the Menu on the Skills tab (at the ding, or at the start of play if a choice is waiting).
-function offerFork(){if(!forkDue()||simState.busy)return;menuTab='skills';openModal('menuUI')}
+// Never pause (v0.56): a waiting skill choice no longer opens anything. Menu and its Skills tab pulse gold (in
+// pauseWatch, below) until you pick; opening the Menu then lands on Skills.
 
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
+// Never pause (v0.56, owner picked A): only the DEV panel and the start screen stop the world. Every other window
+// sits over a light cover with the world running behind it.
+const pausing=()=>!!document.querySelector('#devUI.show,#intro.show');
+let hpSeen=0;
+// Runs with the HUD (10 times a second): measures the top frames so windows open below them, flashes an open
+// window's edge red when you lose health, pulses Menu + Skills for a waiting skill choice, and cancels stale prompts.
+function pauseWatch(){
+  const h=$('hud');if(h)document.documentElement.style.setProperty('--hudH',Math.round(h.getBoundingClientRect().height)+'px');
+  const open=document.querySelector('.modal.show:not(#devUI):not(#intro) .card');
+  if(open&&player.hp<hpSeen){open.classList.add('hurt');clearTimeout(pauseWatch.t);pauseWatch.t=setTimeout(()=>open.classList.remove('hurt'),350)}
+  hpSeen=player.hp;
+  const due=!!forkDue()&&!simState.busy,bm=$('bmenu');
+  if(bm)bm.classList.toggle('due',due&&!arranging);
+  const sk=document.querySelector('#menuUI .tabs button[data-tab="skills"]');if(sk)sk.classList.toggle('due',due&&menuTab!=='skills');
+  promptWatch();
+}
 // Menu tab: remembered for this session so the Menu reopens where you left it.
 let menuTab='spells';
 function setMenuTab(t){menuTab=t;
@@ -328,8 +344,11 @@ function setMenuTab(t){menuTab=t;
   $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';$('paneSkills').style.display=t==='skills'?'':'none';
   selected=null;if(t==='spells')renderBook();else if(t==='skills')renderForks();else if(t==='settings')renderSettings();
   $('menuUI').querySelector('.card').scrollTop=0}
-function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='menuUI')setMenuTab(menuTab)}
-document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));
+// One window at a time (the frames stay tappable above windows now, so tapping yours while the Menu is open swaps).
+function openModal(id){if(arranging)setArranging(false);document.querySelectorAll('.modal.show').forEach(m=>{if(m.id!==id&&m.id!=='intro')m.classList.remove('show')});
+  if(id==='menuUI'&&forkDue())menuTab='skills'; // a waiting skill choice: open straight onto it
+  $(id).classList.add('show');running=!pausing();if(id==='charUI')renderChar();if(id==='menuUI')setMenuTab(menuTab)}
+document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!pausing();selected=null}));
 document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.addEventListener('click',()=>setMenuTab(b.dataset.tab)));
 $('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');setArranging(true)});
 

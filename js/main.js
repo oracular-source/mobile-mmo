@@ -5,7 +5,7 @@ let last=0,uiT=0;
 function loop(ts){
   const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
   if(running&&!document.hidden&&!simState.busy){time+=dt;botTick();update(dt);} // the sim runs its own fixed steps
-  render();uiT+=dt;if(uiT>0.1){ui();uiT=0}
+  render();uiT+=dt;if(uiT>0.1){ui();pauseWatch();uiT=0}
   requestAnimationFrame(loop);
 }
 resize();buildControls();
@@ -26,7 +26,7 @@ function renderPick(){
 }
 function openIntro(){pickCls=CLS;$('introx').style.display=started?'':'none';renderPick();$('intro').classList.add('show');running=false}
 function startGame(){$('intro').classList.remove('show');running=true;if(started)return; // Change class → same class just resumes where you were
-  started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross');setTimeout(offerFork,600)} // a level-10+ character with no fork picked yet gets the choice right away
+  started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross')} // a waiting skill choice shows as a pulsing Menu (pauseWatch), never a window
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
   renderPick();
