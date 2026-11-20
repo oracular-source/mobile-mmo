@@ -12,10 +12,29 @@ const PAD_PX={S:136,M:160,L:188}, FLICK_PX={short:22,normal:32,long:46};
 let gest=null, arranging=false, arrSel=null, arrDrag=null;
 const ctrl=$('controls'),ghost=$('ghost');
 const slotOf=el=>el.dataset.slot==='c'?0:+el.dataset.slot;
-function slotHTML(i,showMana){
+// Spell icons (v0.50, UI breakdown 15, option B): the ability's shape from ICON_SHAPES drawn in its own colour
+// with a near-black outline so it reads on the grey buttons. Abilities without an icon yet keep the old colour chip.
+const iconCache={};
+function iconURL(shape,col){
+  const k=shape+col;if(iconCache[k])return iconCache[k];
+  const c=[1,3,5].map(i=>parseInt(col.slice(i,i+2),16)),mix=(t,to)=>c.map(v=>Math.round(v+(to-v)*t));
+  const tint={'#':c,'+':mix(.55,255),'o':mix(.35,0)};
+  const cv=document.createElement('canvas');cv.width=cv.height=14;const x=cv.getContext('2d'),on=new Set();
+  ICON_SHAPES[shape].forEach((r,y)=>[...r].forEach((ch,i)=>{if(tint[ch]){x.fillStyle='rgb('+tint[ch]+')';x.fillRect(i+1,y+1,1,1);on.add((i+1)+','+(y+1))}}));
+  x.fillStyle='#101012'; // outline: every empty pixel touching the shape
+  on.forEach(p=>{const[a,b]=p.split(',').map(Number);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{if(!on.has((a+dx)+','+(b+dy)))x.fillRect(a+dx,b+dy,1,1)})});
+  return iconCache[k]=cv.toDataURL();
+}
+// px = room for the icon in CSS pixels; snapped so each icon pixel is a whole number of screen pixels (stays crisp).
+function iconHTML(a,px){
+  if(!a.icon||!ICON_SHAPES[a.icon])return '<span class="ic" style="background:'+a.col+'"></span>';
+  const d=window.devicePixelRatio||1,s=Math.max(14,Math.floor(px*d/14)*14)/d;
+  return '<img class="ic sp" src="'+iconURL(a.icon,a.col)+'" style="width:'+s+'px;height:'+s+'px" alt="">';
+}
+function slotHTML(i,showMana,px){
   const a=ABI[loadout[i]];
   if(!a)return '<span style="color:#5a5363">empty</span>';
-  return '<span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span>'+(showMana&&a.mana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
+  return iconHTML(a,px||18)+'<span>'+a.short+'</span>'+(showMana&&a.mana?'<small class="nm">'+a.mana+'</small>':'')+'<span class="cd"></span><span class="cdt"></span>';
 }
 let ctrlEls=[];
 function buildControls(){
@@ -35,7 +54,7 @@ function buildControls(){
       const fromEdge=(side==='right')===onLeft?1:0; // distance in columns from the screen edge the grid hugs
       const b=document.createElement('div');b.className='gb'+(i===0?' main':'');b.dataset.slot=i;
       b.style.cssText='width:'+W+'px;height:'+H+'px;font-size:'+FS+'px;bottom:'+(MB+(3-row)*(H+G))+'px;'+side+':'+(M+fromEdge*(W+G))+'px';
-      b.innerHTML=slotHTML(i,true);
+      b.innerHTML=slotHTML(i,true,H-Math.ceil(FS*1.2)-3);
       b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)return;castSlot(i);flash(b)});
       ctrl.appendChild(b);
     }
@@ -173,7 +192,7 @@ window.addEventListener('pointermove',e=>{
   if(!arrDrag||e.pointerId!==arrDrag.id)return;
   if(!arrDrag.moved&&Math.hypot(e.clientX-arrDrag.sx,e.clientY-arrDrag.sy)>8){
     arrDrag.moved=true;const a=ABI[loadout[arrDrag.slot]];
-    ghost.innerHTML=a?'<div class="pi" style="position:static;width:46px;height:46px"><span class="ic" style="background:'+a.col+'"></span><span>'+a.short+'</span></div>':'<div class="pi" style="position:static;width:46px;height:46px">empty</div>';ghost.style.display='block';
+    ghost.innerHTML=a?'<div class="pi" style="position:static;width:46px;height:46px">'+iconHTML(a,24)+'<span>'+a.short+'</span></div>':'<div class="pi" style="position:static;width:46px;height:46px">empty</div>';ghost.style.display='block';
   }
   if(arrDrag.moved){const r=$('view').getBoundingClientRect();ghost.style.left=(e.clientX-r.left-23)+'px';ghost.style.top=(e.clientY-r.top-23)+'px'}
 });
@@ -195,7 +214,7 @@ function setArranging(on){
 
 /* ---------- Spellbook (drag and drop loadout) ---------- */
 let selected=null,drag=null;
-function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+(a.fork?': '+a.fork:'')+'</b><small>'+a.tag+' · '+(a.mana?a.mana+' mana':'no cost')+' · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
+function chipHTML(a){const locked=player.lvl<a.lvl;return iconHTML(a,28)+'<span><b>'+a.name+(a.fork?': '+a.fork:'')+'</b><small>'+a.tag+' · '+(a.mana?a.mana+' mana':'no cost')+' · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
 function renderBook(){
   const book=$('book'),slots=$('slots');
   book.innerHTML='';slots.innerHTML='';

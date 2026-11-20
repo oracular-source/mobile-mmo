@@ -10,3 +10,4 @@ Every asset in the game is listed here with its source and license.
 | Tunnel rat and big tunnel rat, Old Gnawbone's own sprite (`js/data/sprites.js`), and the crossroads and rat tunnel art drawn in `js/area.js` (earth walls, rat holes, dirt piles, plank bridge, campfire, signpost, sinkhole, back hole, light shafts, Gnawbone's bone pile) (v0.29) | Original, made for this project | Owned by the project |
 | Minimap marker shapes in `js/minimap.js`, and the UI draft sheets `art/drafts/ui-minimap-options.png` and `art/drafts/ui-icon-styles.png` (drawn by `tools/ui_drafts.py`) (v0.48) | Original, made for this project | Owned by the project |
 | Fonts | System monospace fonts on the player's device | Not bundled |
+| `js/data/icons.js` (spell icon shapes) | Made for this game (Claude, Nov 20) | Original |
