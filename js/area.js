@@ -152,6 +152,14 @@ function paintArea(A){
       else if(gname==='fern'){if(i<3){const fx=x,fy=y;R(fx,fy,1,4,AP.fernDk);R(fx-2,fy+1,2,1,AP.fern);R(fx+1,fy+1,2,1,AP.fern);R(fx-1,fy+2,1,1,AP.fern);R(fx+1,fy+2,1,1,AP.fern);R(fx,fy-1,1,1,AP.fernHi)}}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }
+    // Tree variety (v0.50): seedlings, small ferns and fallen twigs on open ground beside trees, so a wood has something growing between the trunks.
+    // Ground only: you walk over them, and the trees still draw over them.
+    {const nb=m=>[[0,1],[0,-1],[1,0],[-1,0]].some(([dx,dy])=>name(tx+dx,ty+dy)===m);const here=name(tx,ty);
+     if(here==='grass'&&nb('tree')&&ah(tx,ty,120)<0.3){const x=bx+2+Math.floor(ah(tx,ty,121)*11),y=by+4+Math.floor(ah(tx,ty,122)*9);
+       if(ah(tx,ty,123)<0.5){R(x,y-3,1,4,AP.out);R(x,y-2,1,3,AP.trunkHi);R(x-2,y-4,2,2,AP.leafHi);R(x+1,y-5,2,2,AP.leafTop);R(x-1,y-6,2,1,AP.leafHi)} // a seedling
+       else{R(x-2,y,5,1,AP.fernDk);R(x-3,y-1,2,1,AP.fern);R(x+2,y-1,2,1,AP.fern);R(x-1,y-2,1,2,AP.fernHi);R(x+1,y-2,1,2,AP.fern);R(x,y-3,1,3,AP.fernHi)}} // a little fern
+     else if(here==='dead_grass'&&nb('dead_tree')&&ah(tx,ty,124)<0.18){const x=bx+3+Math.floor(ah(tx,ty,125)*8),y=by+5+Math.floor(ah(tx,ty,126)*8),fl=ah(tx,ty,127)<0.5?1:-1;
+       for(let i=0;i<6;i++){R(x+i,y+Math.floor(i*fl/3),1,1,AP.out);R(x+i,y-1+Math.floor(i*fl/3),1,1,i<2?AP.trunkHi:AP.trunk)}R(x+3,y-2+(fl>0?1:-1),1,1,AP.twig)}} // a fallen branch
     // Heart pass (v0.49): leaves drift under the dead trees.
     if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
     // The Sunken Graveyard lives up to its name: old headstones lean up out of the flooded water, each with its waterline.
@@ -181,11 +189,9 @@ function paintArea(A){
   for(let ty=0;ty<A.h;ty++){
     for(let tx=0;tx<A.w;tx++){
       const n=name(tx,ty),bx=tx*T,by=ty*T;
-      if(n==='tree'||n==='dead_tree'){const live=n==='tree',im=treeImg(live?'tree':'dead',Math.floor(ah(tx,ty,live?3:4)*TREE_VARIANTS));
-        g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+9,by+14,live?12:8,live?4:3,0,0,7);g.fill();
+      if(n==='tree'||n==='dead_tree'||n==='fir'){const im=pickTree(A,n,tx,ty); // v0.50: kinds, sizes and shades per area (tree variety)
+        g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+8+im.shx,by+14,im.sh,Math.max(2,Math.round(im.sh/3)),0,0,7);g.fill();
         A.trees.push(treeAt(im,bx,by,by+13))}
-      else if(n==='fir'){const im=treeImg('fir',Math.floor(ah(tx,ty,15)*TREE_VARIANTS));
-        g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+8,by+14,9,3,0,0,7);g.fill();A.trees.push(treeAt(im,bx,by,by+13))}
       else if(n==='boulder')drawBoulder(R,bx,by,name(tx,ty-1)!=='boulder',ah(tx,ty,16));
       else if(n==='bush'||n==='dead_bush')drawBush(R,bx,by,n==='dead_bush',ah(tx,ty,5));
       else if(n==='grave')drawGrave(R,bx,by,ah(tx,ty,6),tx,ty);
@@ -217,49 +223,126 @@ function paintArea(A){
   return c;
 }
 
-/* ---------- Trees (v0.30): drawn bigger, on their own pictures, and sorted with characters so you walk behind them ---------- */
+/* ---------- Trees (v0.30, variety v0.50): drawn on their own pictures and sorted with characters so you walk behind them ---------- */
 // Each tree picture has an anchor: (ox,oy) is where its trunk tile's top-left corner sits inside the picture.
 // A tree's sort line (sy) is the foot of its trunk: anyone standing north of it is behind the tree.
-const TREE_VARIANTS=8,TREE_IMGS={};
-const TREE_BOX={tree:[56,64,20,42],dead:[60,84,22,64],oak:[96,112,40,80],fir:[36,78,10,58],giant:[150,176,43,156]}; // picture width, height, ox, oy
-function treeImg(kind,v){
-  const key=kind+v;if(TREE_IMGS[key])return TREE_IMGS[key];
-  const [w,h,ox,oy]=TREE_BOX[kind],c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
-  const R=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh)},r=(v+0.5)/TREE_VARIANTS;
-  if(kind==='tree')drawTree(R,ox,oy,r,v);else if(kind==='dead')drawDeadTree(R,ox,oy,r);else if(kind==='fir')drawFir(R,ox,oy,r,v);else if(kind==='giant')drawGiant(R,ox,oy);else drawDeadOak(R,ox,oy);
+// v0.50 (owner: "it's literally the same trees surrounding us"): a wood is now several kinds of tree growing in stands,
+// in three sizes, each crown a touch warmer or cooler than its neighbours. Everything is picked from the tile's position,
+// so the map files don't change and a tree always looks the same.
+const TREE_IMGS={};
+const TREE_BOX={live:[92,104,38,80],dead:[92,104,38,80],oak:[96,112,40,80],giant:[150,176,43,156]}; // picture width, height, ox, oy
+// Which living trees grow in each area's light, and how common each is.
+const TREE_MIX={dusk:[['oak',0.5],['birch',0.25],['poplar',0.25]],moonlit:[['oak',0.55],['poplar',0.3],['birch',0.15]],wood:[['oak',0.6],['birch',0.4]]};
+const TREE_MIX_DEF=[['oak',0.5],['birch',0.25],['poplar',0.25]];
+// Leaf colours per kind: [dark, base, lit, top].
+const LEAVES={oak:['#1a2618','#223020','#3a4d33','#56704a'],birch:['#1e2a1a','#2b3a22','#4a5e36','#6e8450'],poplar:['#152119','#1d2d21','#31473a','#4b654f']};
+// Small shade shifts from tree to tree (never a rainbow): none, warmer, cooler, a yellowing crown.
+const SHADE=[[0,0,0],[6,3,-2],[-3,1,2],[11,7,-4]];
+function shiftCol(hex,d){const n=parseInt(hex.slice(1),16),c=[n>>16,(n>>8)&255,n&255].map((v,i)=>Math.max(0,Math.min(255,v+d[i]+(d[i]&&v>60?Math.round(d[i]*(v-60)/120):0))));
+  return '#'+c.map(v=>v.toString(16).padStart(2,'0')).join('')}
+function pickByWeight(list,r){for(const [k,w] of list){if(r<w)return k;r-=w}return list[list.length-1][0]}
+function pickTree(A,n,tx,ty){
+  // Stands: neighbouring trees mostly share a kind (cells about 5 tiles across, edges wobbled), with one tree in four mixed in.
+  const cx=Math.floor((tx+ah(ty,0,71)*3)/5),cy=Math.floor((ty+ah(tx,0,72)*3)/5),stand=ah(tx,ty,73)<0.75?ah(cx,cy,70):ah(tx,ty,74);
+  const sz=ah(tx,ty,31),size=sz<0.14?0:sz>0.88?2:1,hr=ah(tx,ty,32),shade=hr<0.58?0:hr<0.77?1:hr<0.9?2:3,v=Math.floor(ah(tx,ty,33)*4);
+  if(n==='tree')return treeImg('live',pickByWeight(TREE_MIX[A.tint]||TREE_MIX_DEF,stand),size,shade,v);
+  if(n==='fir')return treeImg('fir','fir',size,shade,v);
+  // Dead: mostly crooked, some leaning or forked, a few snapped-off snags and stumps.
+  const d=ah(tx,ty,34);return treeImg('dead',d<0.38?'crooked':d<0.6?'lean':d<0.78?'forked':d<0.92?'snag':'stump',size,0,v);
+}
+function treeImg(kind,sp,size,shade,v){
+  sp=sp||'';size=size===undefined?1:size;shade=shade||0;v=v||0;
+  const key=[kind,sp,size,shade,v].join('|');if(TREE_IMGS[key])return TREE_IMGS[key];
+  const [w,h,ox,oy]=TREE_BOX[kind==='fir'?'live':kind],c=document.createElement('canvas');c.width=w;c.height=h;const g=c.getContext('2d');
+  const R=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh)},r=(v+0.5)/4;
+  let sh=10,shx=1;
+  if(kind==='live'){const L=LEAVES[sp].map(col=>shiftCol(col,SHADE[shade]));sh=drawLiving(R,ox,oy,sp,size,L,v)}
+  else if(kind==='fir'){const sc=[0.55,0.95,1.22][size]+r*0.08,P={firDk:shiftCol(AP.firDk,SHADE[shade]),fir:shiftCol(AP.fir,SHADE[shade]),firHi:shiftCol(AP.firHi,SHADE[shade]),firTop:shiftCol(AP.firTop,SHADE[shade])};
+    drawFir(R,ox,oy,r,v,sc,P);sh=Math.round(5+4*sc);shx=0}
+  else if(kind==='dead')sh=drawDeadTree(R,ox,oy,r,sp,size,v);
+  else if(kind==='giant')drawGiant(R,ox,oy);else drawDeadOak(R,ox,oy);
   // Find the drawn part (for the "are you behind it?" check).
   const d=g.getImageData(0,0,w,h).data;let x0=w,x1=0,y0=h,y1=0;
   for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(d[(y*w+x)*4+3]){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
-  return TREE_IMGS[key]={c:c,ox:ox,oy:oy,box:[x0,y0,x1,y1]};
+  return TREE_IMGS[key]={c:c,ox:ox,oy:oy,box:[x0,y0,x1,y1],sh:sh,shx:shx};
 }
 function treeAt(im,bx,by,sy){const x=bx-im.ox,y=by-im.oy;return{tree:im,x:x,y:sy,px:x,py:y,b:[x+im.box[0],y+im.box[1],x+im.box[2],y+im.box[3]],a:1}}
-function drawTree(R,bx,by,r,v){
-  // Living tree in 3/4 view, about 1.6x the old size: a round crown on a taller trunk, lit from the upper left.
-  const cx=bx+8,rad=15+Math.floor(r*4),cy=by-rad+5;
-  R(cx-3,by-2,6,17,AP.out);R(cx-2,by-2,4,16,AP.trunk);R(cx-2,by-2,1,15,AP.trunkHi);R(cx-5,by+13,3,2,AP.out);R(cx+2,by+13,4,2,AP.out);R(cx-4,by+13,2,1,AP.trunk);R(cx+2,by+13,3,1,AP.trunk); // roots
-  for(let y=-rad-1;y<=rad+1;y++)for(let x=-rad-1;x<=rad+1;x++){
-    const wob=Math.sin((Math.atan2(y,x)*6)+r*9)*1.8,d=Math.sqrt(x*x+y*y*1.15)-wob;
-    if(d>rad+1)continue;
-    let col;
-    if(d>rad)col=AP.out;
-    else{const lit=(-x-y)/rad+(ah(x+v*97,y,2)-0.5)*0.7;col=lit>0.95?AP.leafTop:lit>0.25?AP.leafHi:lit<-0.55?AP.leafDk:AP.leaf}
-    R(cx+x,cy+y,1,1,col);
-  }
-  // Leaf clumps so the crown reads as foliage, not a ball.
-  for(let i=0;i<9;i++){const a=ah(v,i,40)*6.28,dd=ah(v,i,50)*rad*0.65,x=Math.round(cx+Math.cos(a)*dd),y=Math.round(cy+Math.sin(a)*dd);if(x+y<cx+cy)R(x,y,3,1,AP.leafTop);else R(x,y,3,1,AP.leafDk)}
+// A leafy crown from overlapping round clumps. Each pixel takes the front-most clump over it and is lit from the upper left,
+// both across the whole crown and on each clump, so the crown reads as bunches of leaves rather than one ball.
+function crown(cells,blobs,L,v,gx,gy,gr){
+  const put=(x,y,c)=>cells.set(x+','+y,c);
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;blobs.forEach(b=>{x0=Math.min(x0,b[0]-b[2]-1);x1=Math.max(x1,b[0]+b[2]+1);y0=Math.min(y0,b[1]-b[3]-1);y1=Math.max(y1,b[1]+b[3]+1)});
+  for(let y=Math.floor(y0);y<=y1;y++)for(let x=Math.floor(x0);x<=x1;x++){
+    let hit=-1;for(let i=blobs.length-1;i>=0;i--){const b=blobs[i],dx=(x-b[0])/b[2],dy=(y-b[1])/b[3],wob=Math.sin(Math.atan2(dy,dx)*5+i*2.1+v)*0.09;if(dx*dx+dy*dy<=(1+wob)*(1+wob)){hit=i;break}}
+    if(hit<0)continue;const b=blobs[hit];
+    const own=(-(x-b[0])/b[2]-(y-b[1])/b[3])*0.55,all=(-(x-gx)-(y-gy))/gr*0.6,lit=own+all+(ah(x+v*97,y+hit*13,2)-0.5)*0.55;
+    put(x,y,lit>0.95?L[3]:lit>0.3?L[2]:lit<-0.6?L[0]:L[1])}
+}
+function drawLiving(R,bx,by,sp,size,L,v){
+  // One living tree. Returns how wide its ground shadow should be.
+  const cells=new Map(),put=(x,y,c)=>cells.set(x+','+y,c),cx=bx+8,base=by+14,j=(i)=>ah(v,i,60+size); // j = this tree's own small differences
+  const trunk=(x,yTop,w,col,hi,lean)=>{for(let y=yTop;y<=base;y++){const sx=Math.round(x+(lean||0)*(base-y));for(let k=0;k<w;k++)put(sx+k,y,k===0?hi:col)}};
+  if(sp==='oak'){
+    // Round oak: a broad, lumpy crown wider than it is tall, on a thick trunk with roots. Old oaks are big and gnarled; young ones a slim stem.
+    const rad=[7,14,19][size]+Math.floor(j(1)*3),tw=[2,4,6][size],cy=base-rad-[6,11,13][size];
+    trunk(cx-(tw>>1),cy,tw,AP.trunk,AP.trunkHi);
+    if(size>0){put(cx-(tw>>1)-1,base,AP.trunk);put(cx+(tw>>1)+(tw&1),base,AP.trunk);if(size===2){put(cx-(tw>>1)-2,base,AP.trunk);put(cx+(tw>>1)+1,base,AP.trunk);put(cx-(tw>>1)-1,base-1,AP.trunk)}}
+    const n=size===0?2:size===1?5:7,blobs=[];
+    for(let i=0;i<n;i++){const a=i/n*6.28+j(2)*6,dd=rad*(0.38+j(10+i)*0.2);blobs.push([cx+Math.cos(a)*dd*1.15,cy+Math.sin(a)*dd*0.75,rad*(0.52+j(20+i)*0.14),rad*(0.48+j(30+i)*0.12)])}
+    blobs.sort((p,q)=>p[1]-q[1]);blobs.unshift([cx,cy,rad*0.8,rad*0.7]);crown(cells,blobs,L,v,cx-2,cy-2,rad);
+    outlined(R,cells);return [5,11,15][size]}
+  if(sp==='birch'){
+    // Birch: slim white trunks with black marks (often two stems leaning apart), and a light, open crown of small clumps you can see through.
+    const tall=[20,32,40][size]+Math.floor(j(1)*5),stems=size>0&&j(3)<0.55?2:1,tw=size===2?3:2;
+    const tops=[];
+    for(let s=0;s<stems;s++){const lean=stems===2?(s?0.12:-0.1):(j(4)-0.5)*0.12,x=cx-1+(stems===2?(s?1:-1):0),yTop=base-tall+(s?4:0);
+      for(let y=yTop;y<=base;y++){const sx=Math.round(x+lean*(base-y));for(let k=0;k<tw;k++){const mark=ah(sx,y,61+s)<0.16&&k<tw;put(sx+k,y,mark?'#2a2620':k===0?'#e4dfd2':'#bdb7a8')}}
+      tops.push([Math.round(x+lean*tall),yTop])}
+    const blobs=[];tops.forEach(([tx,ty],s)=>{const m=size===0?3:size===1?6:7;for(let i=0;i<m;i++)blobs.push([tx+1+(j(40+i+s*9)-0.5)*[7,13,17][size],ty+3+(j(50+i+s*9)-0.25)*[8,14,17][size],[3.5,5.5,6.5][size]+j(70+i)*1.5,[3,4.8,5.8][size]+j(80+i)*1.2])});
+    blobs.sort((p,q)=>p[1]-q[1]);
+    // thin dark twigs reaching into the gaps first, so the leaves sit on them
+    tops.forEach(([tx,ty])=>{for(let i=0;i<3;i++){const ex=tx+Math.round((j(90+i)-0.5)*16),ey=ty+Math.round(j(95+i)*6)-3;const st=Math.max(Math.abs(ex-tx),Math.abs(ey-ty-6))||1;for(let k=0;k<=st;k++)put(Math.round(tx+(ex-tx)*k/st),Math.round(ty+6+(ey-ty-6)*k/st),'#3b3128')}});
+    crown(cells,blobs,L,v,cx-2,base-tall,[8,12,15][size]);outlined(R,cells);return [4,8,11][size]}
+  // Poplar: a tall, narrow column of leaves on a short trunk; the one that breaks up a row of round crowns.
+  const H=[22,38,50][size]+Math.floor(j(1)*6),hw=[4,6.5,8][size],top=base-H-[4,6,7][size];
+  trunk(cx-1,base-[7,9,10][size],size===2?3:2,AP.trunk,AP.trunkHi);
+  const blobs=[],m=size===0?3:size===1?5:6;
+  for(let i=0;i<m;i++){const f=i/(m-1);blobs.push([cx+(j(20+i)-0.5)*3,top+H*(0.15+f*0.62),hw*(0.62+0.38*Math.sin(f*2.6+0.4)),H*0.2])}
+  crown(cells,blobs,L,v,cx-2,top+H*0.35,hw*2);outlined(R,cells);return [4,7,9][size];
 }
 // Line of pixels between two points, w wide (used by the bare trees).
 function treeLine(R,x0,y0,x1,y1,w,col){const n=Math.max(Math.abs(x1-x0),Math.abs(y1-y0))||1;for(let i=0;i<=n;i++)R(Math.round(x0+(x1-x0)*i/n)-Math.floor(w/2),Math.round(y0+(y1-y0)*i/n),w,1,col)}
-function drawDeadTree(R,bx,by,r){
-  // Bare, crooked tree (1.6x the old one): dark outline under a lighter bark line, branches reaching well above its tile.
-  const k=1.6,base=by+14,cx=bx+7+Math.floor(r*3),P=(dx,dy)=>[Math.round(cx+dx*k),Math.round(base+dy*k)];
-  const tdx=Math.round((r-0.5)*4),top=-28-Math.floor(r*6); // offsets from the foot of the trunk
-  const seg=[[0,0,tdx,top+10,4],[tdx,top+10,tdx-7-Math.floor(r*3),top+2,3],[tdx,top+12,tdx+7+Math.floor(r*2),top+3,3],[tdx,top+10,tdx+1,top-2,3],
-    [tdx-4,top+6,tdx-9,top+7,1],[tdx+4,top+7,tdx+10,top+9,1],[tdx+1,top+2,tdx-3,top-4,1],[0,-10,5,-15,2],[-1,0,-4,1,2],[1,0,4,1,2]];
-  const L=(s,extra,col)=>{const a=P(s[0],s[1]),b=P(s[2],s[3]);treeLine(R,a[0],a[1],b[0],b[1],s[4]+extra,col)};
-  seg.forEach(s=>L(s,2,AP.out));seg.forEach(s=>L(s,0,AP.trunk));
-  const a=P(-1,-1),b=P(tdx-1,top+11);treeLine(R,a[0],a[1],b[0],b[1],1,AP.trunkHi);
-  seg.slice(4,7).forEach(s=>{const e=P(s[2],s[3]);R(e[0],e[1],1,1,AP.twig)});
+function drawDeadTree(R,bx,by,r,sp,size,v){
+  // Dead trees. Returns the ground shadow width.
+  //  crooked: the bare crooked tree from v0.30. lean: the same, tipped over to one side. forked: splits low into two big limbs.
+  //  snag: snapped off part way up, a jagged pale break at the top. stump: cut or rotted down to the roots.
+  sp=sp||'crooked';size=size===undefined?1:size;
+  const base=by+14,cx=bx+7+Math.floor(r*3);
+  if(sp==='snag'||sp==='stump'){
+    const cells=new Map(),put=(x,y,c)=>cells.set(x+','+y,c),hgt=sp==='stump'?5+size:16+size*7+Math.floor(r*5),hw=sp==='stump'?4+(size>1?1:0):2+(size>0?1:0);
+    for(let y=0;y<=hgt;y++){const flare=y<3?3-y:0;for(let x=-hw-flare;x<=hw+flare;x++)put(cx+x,base-y,x<=-hw+0?AP.trunkHi:ah(x,y+v*7,63)<0.1?'#2e2620':AP.trunk)}
+    // the top: a pale break (jagged on a snag, flat with a ring on a stump)
+    const ty=base-hgt;
+    if(sp==='stump'){for(let x=-hw;x<=hw;x++){const e=Math.abs(x)===hw;put(cx+x,ty-2,e?AP.trunk:'#9a8a6c');put(cx+x,ty-1,e?AP.trunk:Math.abs(x)===hw-2?'#6e604a':'#a8987a');put(cx+x,ty,e?AP.trunkHi:'#8a7a60')}put(cx,ty-1,'#6e604a')} // flat pale top with a ring
+    else{for(let x=-hw;x<=hw;x++){const up=Math.round(ah(x,v,64)*4+(x===-hw+1?3:0));for(let k=0;k<=up;k++)put(cx+x,ty-k,k>=up-1&&Math.abs(x)<hw?'#a8987a':AP.trunk)}
+      // one broken stub of a branch, and on a big snag a shelf fungus
+      const sd=v%2?1:-1;for(let k=1;k<=3+size;k++)put(cx+sd*(hw+k),ty+5+Math.floor(r*4)-Math.floor(k/2),AP.trunk);
+      if(size>0){const fy=base-Math.round(hgt*0.45);for(let k=0;k<3;k++)put(cx-sd*(hw+1+k),fy,k?'#8f8a76':'#c9c2a8')}}
+    outlined(R,cells);return sp==='stump'?5:6}
+  // the bare-branch shapes, scaled by size, tipped by lean
+  const k=[1.15,1.6,1.9][size],lean=sp==='lean'?(v%2?1:-1)*(0.28+r*0.12):(r-0.5)*0.08;
+  const P=(dx,dy)=>[Math.round(cx+(dx-lean*dy)*k),Math.round(base+dy*k)];
+  const tdx=Math.round((r-0.5)*4),top=-28-Math.floor(r*6);
+  const seg=sp==='forked'?
+    [[0,0,0,-9,4],[0,-9,-7,top+4,3],[0,-9,7,top+2,3],[-7,top+4,-12,top-2,2],[-5,top+10,-11,top+9,1],[7,top+2,11,top-4,2],[6,top+8,12,top+10,1],[-7,top+4,-4,top-3,1],[7,top+2,4,top-5,1],[-1,0,-4,1,2],[1,0,4,1,2]]:
+    [[0,0,tdx,top+10,4],[tdx,top+10,tdx-7-Math.floor(r*3),top+2,3],[tdx,top+12,tdx+7+Math.floor(r*2),top+3,3],[tdx,top+10,tdx+1,top-2,3],
+     [tdx-4,top+6,tdx-9,top+7,1],[tdx+4,top+7,tdx+10,top+9,1],[tdx+1,top+2,tdx-3,top-4,1],[0,-10,5,-15,2],[-1,0,-4,1,2],[1,0,4,1,2]];
+  const wd=w=>Math.max(1,Math.round(w*(size===0?0.7:size===2?1.2:1)));
+  const Ln=(s,extra,col)=>{const a=P(s[0],s[1]),b=P(s[2],s[3]);treeLine(R,a[0],a[1],b[0],b[1],wd(s[4])+extra,col)};
+  seg.forEach(s=>Ln(s,2,AP.out));seg.forEach(s=>Ln(s,0,AP.trunk));
+  const a=P(-1,-1),b=sp==='forked'?P(-1,-9):P(tdx-1,top+11);treeLine(R,a[0],a[1],b[0],b[1],1,AP.trunkHi);
+  seg.filter(s=>s[4]===1).forEach(s=>{const e=P(s[2],s[3]);R(e[0],e[1],1,1,AP.twig)});
+  return [6,8,10][size];
 }
 function drawDeadOak(R,bx,by){
   // A huge dead oak (1.5x the old one): the graveyard's second landmark, big enough to see over the graves. (bx,by) = its 2x2 footprint's bottom-left tile.
@@ -274,14 +357,15 @@ function drawDeadOak(R,bx,by){
 function outlined(R,cells){const key=(x,y)=>x+','+y;
   cells.forEach((c,k)=>{const [x,y]=k.split(',').map(Number);[[1,0],[-1,0],[0,1],[0,-1]].forEach(([dx,dy])=>{if(!cells.has(key(x+dx,y+dy)))R(x+dx,y+dy,1,1,AP.out)})});
   cells.forEach((c,k)=>{const [x,y]=k.split(',').map(Number);R(x,y,1,1,c)})}
-function drawFir(R,bx,by,r,v){
-  // Tall dark fir: four drooping tiers of boughs on a short trunk, lit from the upper left, about three tiles tall.
-  const cx=bx+8,base=by+14,top=by-46-Math.floor(r*8),bot=base-5,H=bot-top,cells=new Map(),tiers=4;
-  for(let y=top;y<=bot;y++){const f=(y-top)/H,tp=(f*tiers)%1,tier=Math.floor(f*tiers);
-    const hw=Math.max(1,Math.round((1.5+f*11.5)*(0.55+0.45*tp)+(ah(v,y,20)-0.5)*1.4));
+function drawFir(R,bx,by,r,v,sc,P){
+  // Tall dark fir: four drooping tiers of boughs on a short trunk, lit from the upper left. sc = size (young 0.55 .. old 1.25), P = its shade.
+  sc=sc||1;P=P||AP;
+  const cx=bx+8,base=by+14,top=base-Math.round((60+Math.floor(r*8))*sc),bot=base-Math.max(3,Math.round(5*sc)),H=bot-top,cells=new Map(),tiers=sc<0.7?3:4;
+  for(let y=top;y<=bot;y++){const f=(y-top)/H,tp=(f*tiers)%1;
+    const hw=Math.max(1,Math.round((1.5+f*11.5*Math.min(1.15,0.45+sc*0.6))*(0.55+0.45*tp)+(ah(v,y,20)-0.5)*1.4));
     for(let x=-hw;x<=hw;x++){const lit=(-x/hw)*0.9+(tp<0.3?0.25:0)-(tp>0.82?0.9:0)+(ah(x+v*31,y,21)-0.5)*0.5;
-      cells.set((cx+x)+','+y,lit>0.75?AP.firTop:lit>0.1?AP.firHi:lit<-0.6?AP.firDk:AP.fir)}}
-  for(let y=bot+1;y<=base;y++)for(let x=-1;x<=1;x++)cells.set((cx+x)+','+y,x<0?AP.trunkHi:AP.trunk);
+      cells.set((cx+x)+','+y,lit>0.75?P.firTop:lit>0.1?P.firHi:lit<-0.6?P.firDk:P.fir)}}
+  const tw=sc>1.1?2:1;for(let y=bot+1;y<=base;y++)for(let x=-tw;x<=tw;x++)cells.set((cx+x)+','+y,x<0?AP.trunkHi:AP.trunk);
   outlined(R,cells);
 }
 function drawGiant(R,bx,by){
