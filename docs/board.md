@@ -219,11 +219,8 @@ Value: H/M/L. Effort: S/M/L. Phase: when it fits.
 - **Rares are placeholders:** Ironshell is the beetle drawn at 2x (chunky pixels, like Boss 1), the Pale Rat is the big rat in white, the Weeping Bride is a quick veiled recolour of the corpse. Redrawn in the character design pass.
 
 ## Changelog
-<<<<<<< Updated upstream
 - **Docs (Nov 19)** UI chat: breakdown 13 (the Log, Menu, 1st hit and Auto pills) written up in `docs/research/ui.md` with three options; Claude leans A. New backlog card: full map cleanup (later); minimap stays. No game changes.
-=======
 - **Docs (Nov 20)** Map chat: **Ruined Chapel brief** (step 1 of `area-rules.md`) at the end of `docs/research/map-design.md`: levels 10–14, smoky candlelit monastery grounds, the steeple's lit window as the landmark, fen cultist camps of three (zealot, ashcaller, chanter) that call for help, the Ashen Acolyte rare who flees to the chapel door, the fallen bell's hidden chest, a wayside shrine rest spot, and the east shortcut home. Owner to answer the open questions. No game changes.
->>>>>>> Stashed changes
 - **Docs (Nov 19)** Gold and items: owner decided orbs are tradable between players (phase 3), and shop orbs go away if trading is popular enough. No game changes.
 - **Docs (Nov 19)** Gold and items: owner's answers recorded in `docs/research/gold-and-items.md` and the board card, plus Claude's view on trading. No game changes.
 - **Docs (Nov 19)** Gold and items deep dive: `docs/research/gold-and-items.md` (PoE orbs, WoW crests, Last Epoch, Diablo 2/3/4, Lost Ark, MapleStory, Vampire Survivors, OSRS teleports; three options, Claude leans B; six questions for the owner). New backlog card: teleport orbs. No game changes.
