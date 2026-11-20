@@ -299,13 +299,20 @@ function paintArea(A){
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
       else if(n==='coffin')drawCoffin(R,bx,by,ah(tx,ty,12));
       else if(n==='iron_fence'||n==='fence_grate'){const isF=(x,y)=>{const m=name(x,y);return m==='iron_fence'||m==='fence_grate'||m==='gate'||m==='broken_fence'};
-        drawFence(R,bx,by,isF(tx-1,ty),isF(tx+1,ty),isF(tx,ty-1),isF(tx,ty+1),n==='fence_grate')}
+        drawFence(R,bx,by,isF(tx-1,ty),isF(tx+1,ty),isF(tx,ty-1),isF(tx,ty+1),n==='fence_grate',tx,ty);
+        // A fence panel that came down in the creek lies half-sunk in the water just outside the grate (owner, Nov 20).
+        if(n==='fence_grate'&&name(tx+1,ty)==='water')drawSunkPanel(R,bx+16,by)}
       else if(n==='gate'){const pillarUp=name(tx,ty-1)==='iron_fence',pillarDn=name(tx,ty+1)==='iron_fence',pL=name(tx-1,ty)==='iron_fence',pR=name(tx+1,ty)==='iron_fence';
         if(pillarUp)drawPillar(R,bx+4,by-10);if(pL)drawPillar(R,bx-3,by-6);if(pR)drawPillar(R,bx+11,by-6);
         if(pillarDn){drawPillar(R,bx+4,by+4);R(bx+3,by+14,1,1,AP.out)}
         // An open gate leaf swung back against the fence.
         if(pillarUp){R(bx+7,by-2,1,10,AP.ironHi);R(bx+9,by-2,1,10,AP.ironHi);R(bx+7,by-2,3,1,AP.ironTip)}}
-      else if(n==='broken_fence'){R(bx+2,by+10,13,1,AP.iron);R(bx+3,by+8,11,1,AP.ironHi);R(bx+4,by+11,1,2,AP.ironTip);R(bx+9,by+12,1,2,AP.ironTip);R(bx+13,by+5,2,6,AP.ironHi);R(bx+13,by+4,2,1,AP.ironTip)}
+      else if(n==='broken_fence'){const isF=(x,y)=>{const m=name(x,y);return m==='iron_fence'||m==='fence_grate'||m==='broken_fence'};
+        const isI=(x,y)=>{const m=name(x,y);return m==='iron_fence'||m==='fence_grate'},isB=(x,y)=>name(x,y)==='broken_fence';
+        // Panel goes on one tile of the gap: a gap one tile long always has it; in a longer gap the seed of its first tile picks.
+        const hz=isI(tx-1,ty)||isI(tx+1,ty)||isB(tx-1,ty)||isB(tx+1,ty),first=hz?!isB(tx-1,ty):!isB(tx,ty-1),solo=hz?!isB(tx-1,ty)&&!isB(tx+1,ty):!isB(tx,ty-1)&&!isB(tx,ty+1);
+        const g0=first?ah(tx,ty,80):(hz?ah(tx-1,ty,80):ah(tx,ty-1,80)),panel=solo||(first?g0<0.5:g0>=0.5);
+        drawBrokenFence(R,bx,by,isI(tx-1,ty),isI(tx+1,ty),isI(tx,ty-1),isI(tx,ty+1),hz,panel)}
     }
     (objsByRow[ty]||[]).forEach(o=>{
       if(o.kind==='dead_oak'){const X=o.x*T,Y=o.y*T,base=Y+o.h*T-1;g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(X+T+2,base,20,6,0,0,7);g.fill();
@@ -574,8 +581,11 @@ function drawBridge(R,bx,by,topEnd,botEnd){
 function drawRubble(R,bx,by,r){
   [[3,9,4,3],[8,11,5,3],[6,6,3,2],[11,7,3,3],[2,13,3,2]].forEach(([x,y,w,h],i)=>{if(i===4&&r<0.5)return;R(bx+x-1,by+y-1,w+2,h+2,AP.out);R(bx+x,by+y,w,h,i%2?AP.stoneDk:AP.stone);R(bx+x,by+y,w,1,AP.stoneHi)});
 }
-function drawFence(R,bx,by,l,rt,up,dn,grate){
-  // Iron fence: spear-topped posts joined by two rails; runs up and down the screen show as a post column.
+function drawFence(R,bx,by,l,rt,up,dn,grate,tx,ty){
+  // Iron fence: spear-topped bars joined by two rails; runs up and down the screen show as a post column.
+  // Fences join (owner, Nov 20): bars only stand where the rails are, so a run never sticks out past a turn or an end,
+  // and every corner or end gets one thick post with a cap that both runs meet. Old fences sag: here and there a bar is
+  // bent, snapped off or missing, a spear tip leans, the top rail dips (fence rules in area-rules.md).
   if(grate){
     // Where the creek runs out under the fence: the fence keeps standing in the water (same line as the fence around it),
     // its bars go down into the stream, and the water ripples where it flows past them (v0.30; the old flat grate looked knocked over).
@@ -584,14 +594,76 @@ function drawFence(R,bx,by,l,rt,up,dn,grate){
       [2,7,12].forEach(y=>{R(bx+1,y+by,4,1,AP.waterHi);R(bx+4,y+by+1,2,1,AP.glint);R(bx+10,y+by+1,2,1,AP.glint);R(bx+11,y+by+2,4,1,AP.waterHi)})}
     else{R(bx,by+5,16,1,AP.out);R(bx,by+6,16,1,AP.ironHi);[2,7,12].forEach(x=>{R(bx+x,by+2,2,11,AP.out);R(bx+x,by+3,1,9,AP.ironHi);R(bx+x,by+1,2,1,AP.ironTip);R(bx+x-1,by+12,4,1,AP.waterHi)})}
     return}
-  const horiz=l||rt||!(up||dn);
-  if(horiz){R(l?bx:bx+6,by+5,(l?8:2)+(rt?8:2),1,AP.out);R(l?bx:bx+6,by+6,(l?8:2)+(rt?8:2),1,AP.ironHi);R(l?bx:bx+6,by+10,(l?8:2)+(rt?8:2),1,AP.out);R(l?bx:bx+6,by+11,(l?8:2)+(rt?8:2),1,AP.ironHi);
-    [2,7,12].forEach(x=>{R(bx+x,by+2,2,12,AP.out);R(bx+x,by+3,1,10,AP.ironHi);R(bx+x,by+1,2,1,AP.ironTip)});R(bx,by+14,16,1,'rgba(0,0,0,0.3)');
-    if(ah(bx,by,96)<0.35){const rx=bx+1+Math.floor(ah(bx,by,97)*12);R(rx,by+6,2,1,'#6a4636');R(rx+1,by+7,1,2,'#4a3028')} // rust running down from a rail (v0.49)
-    if(ah(bx,by,98)<0.12){R(bx+3,by+12,4,2,'#3e4a30');R(bx+4,by+11,1,1,'#3e4a30')}}
-  if(up||dn){R(bx+6,up?by:by+4,4,(dn?16:12)-(up?0:4),AP.out);R(bx+7,up?by:by+4,1,(dn?16:12)-(up?0:4),AP.ironHi);R(bx+8,up?by:by+4,1,(dn?16:12)-(up?0:4),AP.iron);
-    [1,9].forEach(y=>{R(bx+5,by+y,6,5,AP.out);R(bx+6,by+y+1,1,3,AP.ironHi);R(bx+6,by+y,1,1,AP.ironTip)})}
+  const h=ah(tx,ty,90),h2=ah(tx,ty,91),horiz=l||rt||!(up||dn),vert=up||dn,mid=l&&rt&&!vert;
+  // A corner or an end (anything but a straight run) gets the thick post.
+  const post=!(l&&rt&&!vert)&&!(up&&dn&&!l&&!rt);
+  if(horiz){
+    const x0=l?0:7,x1=rt?16:9,w=x1-x0,sag=mid&&h2<0.08;
+    // Rails: the top one dips a pixel in the middle on a sagging panel.
+    if(sag){R(bx,by+5,5,1,AP.out);R(bx,by+6,5,1,AP.ironHi);R(bx+5,by+6,6,1,AP.out);R(bx+5,by+7,6,1,AP.ironHi);R(bx+11,by+5,5,1,AP.out);R(bx+11,by+6,5,1,AP.ironHi)}
+    else{R(bx+x0,by+5,w,1,AP.out);R(bx+x0,by+6,w,1,AP.ironHi)}
+    R(bx+x0,by+10,w,1,AP.out);R(bx+x0,by+11,w,1,AP.ironHi);
+    // Which bar (if any) is damaged on this panel: 0 bent, 1 snapped off short, 2 gone.
+    const bad=mid&&h<0.26?Math.floor(ah(tx,ty,92)*3):-1,badX=[2,7,12][Math.floor(ah(tx,ty,93)*3)];
+    [2,7,12].forEach(x=>{
+      if(x<x0-1||x>x1-1)return; // no bar out past the end of the rails
+      if(post&&x===7)return; // the thick post stands here
+      if(x===badX&&bad===2)return;
+      if(x===badX&&bad===1){R(bx+x,by+8,2,6,AP.out);R(bx+x,by+9,1,4,AP.ironHi);R(bx+x+1,by+8,1,1,AP.ironHi);return} // snapped, jagged top
+      if(x===badX&&bad===0){const d=ah(tx,ty,94)<0.5?-1:1; // bent: straight below the top rail, kinked over above it
+        R(bx+x,by+6,2,8,AP.out);R(bx+x,by+7,1,6,AP.ironHi);R(bx+x+d,by+3,2,4,AP.out);R(bx+x+d+(d>0?0:0),by+4,1,2,AP.ironHi);R(bx+x+2*d,by+2,2,1,AP.out);R(bx+x+2*d,by+1,2,1,AP.ironTip);return}
+      const lean=mid&&ah(tx,ty,95+x)<0.1?(h<0.5?-1:1):0; // a spear tip knocked a pixel off true
+      R(bx+x,by+2,2,12,AP.out);R(bx+x,by+3,1,10,AP.ironHi);R(bx+x+lean,by+1,2,1,AP.ironTip)});
+    R(bx+x0,by+14,w,1,'rgba(0,0,0,0.3)');
+    if(mid&&ah(tx,ty,96)<0.35){const rx=bx+1+Math.floor(ah(tx,ty,97)*12);R(rx,by+6,2,1,'#6a4636');R(rx+1,by+7,1,2,'#4a3028')} // rust running down from a rail (v0.49)
+    if(mid&&ah(tx,ty,98)<0.12){R(bx+3,by+12,4,2,'#3e4a30');R(bx+4,by+11,1,1,'#3e4a30')}}
+  if(vert){
+    const top=up?0:5,bot=dn?16:13;
+    R(bx+6,by+top,4,bot-top,AP.out);R(bx+7,by+top,1,bot-top,AP.ironHi);R(bx+8,by+top,1,bot-top,AP.iron);
+    const tipLean=up&&dn&&h<0.12?(h2<0.5?-1:1):0;
+    [1,9].forEach((y,i)=>{if(post&&i===0&&!up)return;const lx=i===0?tipLean:0;R(bx+5+lx,by+y,6,5,AP.out);R(bx+6+lx,by+y+1,1,3,AP.ironHi);R(bx+6+lx,by+y,1,1,AP.ironTip)});
+    if(up&&dn&&ah(tx,ty,96)<0.3)R(bx+8,by+4+Math.floor(h2*8),1,3,'#6a4636')} // rust streak on the bar
+  if(post){
+    // Thick corner/end post with a stone foot and a capped top: both runs meet here, so the turn reads as one joint.
+    R(bx+5,by+0,6,15,AP.out);R(bx+6,by+2,3,12,AP.ironHi);R(bx+9,by+2,1,12,AP.iron);R(bx+5,by+1,6,2,AP.out);R(bx+6,by+0,4,1,AP.ironTip);R(bx+7,by-1,2,1,AP.ironTip);
+    R(bx+4,by+13,8,3,AP.out);R(bx+5,by+13,6,2,AP.stoneDk);R(bx+5,by+13,6,1,AP.stone);
+    if(ah(tx,ty,99)<0.5)R(bx+5,by+14,2,1,AP.moss)}
 }
+function drawBrokenFence(R,bx,by,l,rt,up,dn,inHoriz,panel){
+  // A gap where the fence came down (owner, Nov 20: fallen fences make the world feel lived in). Whatever was standing
+  // next to it ends in a snapped stub, and the panel lies flat on the ground outside the line where it fell, one bar bent
+  // up off it. In a gap two tiles long only one tile holds the panel; the other gets a loose bar, so it never repeats.
+  const dk='rgba(0,0,0,0.35)';
+  const bar=(x,y,w,h,c)=>R(x,y,w,h,c);
+  if(inHoriz){ // gap in a run across the screen: stubs left and right; the panel fell outward, down the screen
+    if(l){bar(bx,by+5,2,1,AP.out);bar(bx,by+10,3,1,AP.out);bar(bx,by+11,3,1,AP.ironHi);bar(bx+2,by+7,2,7,AP.out);bar(bx+2,by+8,1,5,AP.ironHi)}
+    if(rt){bar(bx+14,by+5,2,1,AP.out);bar(bx+13,by+10,3,1,AP.out);bar(bx+13,by+11,3,1,AP.ironHi);bar(bx+12,by+9,2,5,AP.out);bar(bx+13,by+10,1,3,AP.ironHi)}
+    if(panel){ // seen from above it's a short ladder lying on the grass: two rails across, bars running down to their spear tips
+      bar(bx+1,by+21,15,1,dk);
+      [14,19].forEach(y=>{bar(bx,by+y,16,2,AP.out);bar(bx+1,by+y,14,1,AP.ironHi);bar(bx+2,by+y,4,1,AP.ironTip)});
+      [2,6,10,14].forEach(x=>{if(x===10)return;bar(bx+x,by+12,1,10,AP.out);bar(bx+x,by+22,1,1,AP.ironTip)});
+      bar(bx+10,by+15,1,4,AP.out);bar(bx+11,by+12,1,3,AP.out);bar(bx+12,by+10,1,2,AP.ironHi);bar(bx+12,by+9,1,1,AP.ironTip)} // the bent bar
+    else{bar(bx+3,by+15,9,1,AP.out);bar(bx+4,by+14,8,1,AP.ironHi);bar(bx+11,by+14,1,1,AP.ironTip);bar(bx+3,by+16,9,1,dk)}
+    return}
+  // Gap in a run up and down the screen: stubs above and below; the panel fell outward (to the left) and lies there,
+  // its rails still running up and down, its bars pointing out at their spear tips.
+  if(up){bar(bx+6,by,4,5,AP.out);bar(bx+7,by,1,4,AP.ironHi);bar(bx+8,by+4,1,1,AP.ironHi)}
+  if(dn){bar(bx+6,by+11,4,5,AP.out);bar(bx+7,by+12,1,4,AP.ironHi);bar(bx+7,by+11,1,1,AP.ironHi)}
+  if(panel){
+    bar(bx-7,by+15,13,1,dk);
+    [3,-2].forEach(x=>{bar(bx+x,by-1,1,16,AP.out);bar(bx+x+1,by,1,14,x===3?AP.iron:AP.ironHi)}); // the two rails
+    [1,6,11].forEach((y,i)=>{if(i===1){bar(bx-4,by+y,8,1,AP.out);bar(bx-6,by+y-1,2,1,AP.out);bar(bx-7,by+y-2,1,1,AP.ironTip);return} // bent
+      bar(bx-7,by+y,12,1,AP.out);bar(bx-6,by+y,10,1,AP.ironHi);bar(bx-8,by+y,1,1,AP.ironTip)})}
+  else{bar(bx-4,by+8,10,1,AP.out);bar(bx-3,by+7,9,1,AP.ironHi);bar(bx-5,by+8,1,1,AP.ironTip);bar(bx-4,by+9,10,1,dk)}
+}
+function drawSunkPanel(R,x,y){
+  // A fence panel that fell into the creek: it lies askew, one rail and the tops of its bars above the water, the rest
+  // gone under; the current laps across it.
+  const S=(a,b,w,h,c)=>R(x+a,y+b,w,h,c);
+  for(let i=-1;i<15;i++){const yy=3+Math.floor(i/3);S(i,yy,1,2,AP.out);S(i,yy,1,1,AP.ironHi)} // top rail, slanting down to the right
+  [0,4,8,12].forEach((bx,i)=>{const top=4+Math.floor(bx/3),len=i===2?3:7;S(bx,top,2,len,AP.out);S(bx,top,1,len-1,AP.ironHi);if(i!==2)S(bx,top+len,2,1,AP.ironTip)});
+  for(let i=0;i<10;i++)S(i,10+Math.floor(i/3),1,1,AP.out); // the second rail just breaking the surface
+  S(-2,8,3,1,AP.waterHi);S(5,10,3,1,AP.waterHi);S(9,13,5,1,AP.waterHi);S(2,14,3,1,AP.waterHi);S(14,9,2,1,AP.glint);S(-1,2,2,1,AP.glint)}
 function drawPillar(R,x,y){R(x,y,8,14,AP.out);R(x+1,y+2,6,11,AP.brick);R(x+1,y+2,2,11,AP.brickHi);R(x,y,8,3,AP.stoneDk2);R(x+1,y,6,1,AP.stone);R(x+1,y+6,6,1,AP.mortar);R(x+1,y+10,6,1,AP.mortar)}
 
 function drawObj(g,R,o){
