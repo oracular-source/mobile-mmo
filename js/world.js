@@ -324,6 +324,11 @@ function areaCritters(A){
   A.chimneys=A.objs.filter(o=>o.kind==='shack').map(o=>({x:o.x*T+o.w*T-4,y:o.y*T-11}));
   return A.crit;
 }
+// The closest point a few pixels inside open water, within about three tiles (for a fleeing frog), or null.
+function nearWater(A,x,y){let best=null,bd=1e9;const tx=Math.floor(x/T),ty=Math.floor(y/T);
+  for(let j=-3;j<=3;j++)for(let i=-3;i<=3;i++){const a=tx+i,b=ty+j;if(b<0||b>=A.h||a<0||a>=A.w||A.rows[b][a]!=='~')continue;
+    const px=Math.max(a*T+4,Math.min(a*T+12,x)),py=Math.max(b*T+4,Math.min(b*T+12,y)),d=Math.hypot(px-x,py-y);if(d<bd){bd=d;best={x:px,y:py}}}
+  return best}
 function updateAreaCritters(A,dt){
   const cr=areaCritters(A),inView=(x,y)=>x>camX-16&&x<camX+VW+16&&y>camY-16&&y<camY+VH+16;
   cr.forEach(c=>{const d=Math.hypot(c.x-player.x,c.y-player.y),home=Math.hypot(c.hx-player.x,c.hy-player.y);c.t+=dt;
@@ -334,7 +339,12 @@ function updateAreaCritters(A,dt){
       else if(c.t>12&&home>150){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}} // back on its perch once you're well away
     else if(c.kind==='frog'){
       if(c.st==='sit'){c.hop-=dt;if(c.hop<=0){c.hop=vr(2,6);const nx=c.hx+vr(-6,6),ny=c.hy+vr(-4,4);if(!blocked(nx,ny)){c.dir=nx>c.x?1:-1;c.x=nx;c.y=ny;c.jump=0.2}}if(c.jump>0)c.jump-=dt;
-        if(d<28&&player.dead<=0){c.st='gone';c.t=0;A.rip.push({x:c.x+c.dir*6,y:c.y,t:0,big:1})}} // plop
+        if(d<28&&player.dead<=0){const w=nearWater(A,c.x,c.y);
+          // Leap for the nearest water and plop in where it lands (v0.49.1, owner: they used to splash on dry ground).
+          // A frog with no water within reach just hides in the reeds.
+          if(w){c.st='leap';c.t=0;c.fx=c.x;c.fy=c.y;c.tx=w.x;c.ty=w.y;c.dir=w.x>c.x?1:-1}else{c.st='gone';c.t=0}}}
+      else if(c.st==='leap'){const k=Math.min(1,c.t/0.35);c.x=c.fx+(c.tx-c.fx)*k;c.y=c.fy+(c.ty-c.fy)*k;c.jump=Math.sin(k*Math.PI)*6;
+        if(k>=1){c.st='gone';c.t=0;c.jump=0;A.rip.push({x:c.tx,y:c.ty,t:0,big:1})}}
       else if(c.t>8&&home>110){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
     else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
   });
@@ -350,7 +360,7 @@ function drawAreaCritters(A,layer){
   if(layer===0){
     A.rip.forEach(r=>{const k=r.t/1.6,rad=1+k*(r.big?8:5);lx.globalAlpha=1-k;for(let a=0;a<14;a++){const an=a/14*6.283;f(r.x+Math.cos(an)*rad,r.y+Math.sin(an)*rad*0.45,1,1,k<0.4?AP.glint:AP.waterHi)}lx.globalAlpha=1});
     A.crit.forEach(c=>{if(c.st==='gone')return;
-      if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.jump>0?2:0),c.dir);
+      if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.st==='leap'?c.jump:c.jump>0?2:0),c.dir);
       if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)});
     return}
   A.crit.forEach(c=>{

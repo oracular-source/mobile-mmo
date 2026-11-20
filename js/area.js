@@ -431,10 +431,20 @@ function drawObj(g,R,o){
     [[W-12,0,13,6],[W-8,6,9,5],[W-4,11,5,4]].forEach(([dx,dy,w,h])=>t2.clearRect(dx+1,dy,w+1,h+1));
     TR(X+W-13,top+6,1,1,AP.out);TR(X+W-12,top+6,4,1,AP.out);TR(X+W-9,top+11,5,1,AP.out);TR(X+W-5,top+15,5,1,AP.out);TR(X+W-13,top,1,6,AP.out);TR(X+W-9,top+6,1,5,AP.out);TR(X+W-5,top+11,1,4,AP.out);
     g.drawImage(tc,X-1,top-1);
-    // cornice band and belfry arch with the tilted bell
+    // cornice band and belfry arch with the bell
     R(X-1,top+12,W-8,3,AP.stoneDk2);R(X,top+12,W-10,1,AP.stone);
     R(X+16,top+17,16,17,AP.out);R(X+17,top+19,14,14,'#120f16');R(X+18,top+18,12,1,AP.out);
-    R(X+20,top+22,9,7,AP.out);R(X+21,top+22,7,6,AP.bell);R(X+21,top+22,2,5,AP.bellHi);R(X+23,top+28,3,2,AP.bell);R(X+24,top+19,1,3,AP.woodDk);
+    // The bell (redrawn v0.49.1, owner: the old tilted lump didn't read): an old bronze bell hanging from a wooden beam,
+    // round-shouldered crown, a waist, a flared lip and the clapper showing under it. Light on the left, green patina
+    // spots and one crack up from the lip, so it reads as a bell first and an old one second.
+    R(X+17,top+20,14,3,AP.out);R(X+17,top+21,14,1,AP.wood);R(X+23,top+22,2,2,AP.out);
+    const bx0=X+24;[[2,0],[3,1],[3,2],[3,3],[4,4],[4,5],[5,6],[5,7]].forEach(([hw,j],_,a)=>{const y=top+23+j;R(bx0-hw-1,y,hw*2+2,1,AP.out)});
+    R(bx0-6,top+31,12,1,AP.out);
+    [[2,0],[3,1],[3,2],[3,3],[4,4],[4,5],[5,6]].forEach(([hw,j])=>{const y=top+23+j;R(bx0-hw,y,hw*2,1,AP.bell);R(bx0-hw,y,2,1,AP.bellHi);R(bx0+hw-1,y,1,1,'#5a4810')});
+    R(bx0-5,top+30,10,1,'#6e5814');R(bx0-5,top+30,2,1,AP.bell); // the lip band
+    R(bx0-1,top+23,2,1,AP.bellHi);R(bx0+2,top+26,1,1,'#4f7a5a');R(bx0-2,top+28,2,1,'#4f7a5a');R(bx0+3,top+29,1,1,'#4f7a5a'); // shine and patina
+    R(bx0+1,top+27,1,1,'#2a2008');R(bx0+2,top+28,1,2,'#2a2008'); // the crack
+    R(bx0-1,top+32,2,1,'#5a4810'); // the clapper's tip under the lip
     // slit window and wooden door at ground level
     R(X+8,Y-4,2,6,'#120f16');R(X+38,Y+2,2,6,'#120f16');
     // (Heart pass, v0.49: the door is person-height now, 26 px for the 24 px characters, with an arched stone head)
@@ -504,10 +514,12 @@ function drawObj(g,R,o){
     R(X+9,Y+12,12,10,AP.out);R(X+10,Y+13,10,8,'#ffb860');R(X+10,Y+17,10,4,'#e08a3a');R(X+14,Y+13,1,8,AP.out);R(X+10,Y+16,10,1,AP.out);
     R(X+5,Y+12,4,10,AP.out);R(X+6,Y+13,2,8,AP.woodDk);R(X+21,Y+14,4,10,AP.out);R(X+22,Y+15,2,8,AP.woodDk);R(X+8,Y+22,14,1,AP.woodHi);
     // woodpile against the wall: log ends stacked three high
-    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+2+i*5+j*2,ly=Y+H-5-j*4;R(lx2,ly,5,4,AP.out);R(lx2+1,ly+1,3,2,'#a88a64');R(lx2+2,ly+1,1,1,'#7a5a42')}
+    R(X+1,Y+H+3,21,1,'rgba(0,0,0,0.45)');R(X+2,Y+H+2,19,1,'rgba(0,0,0,0.3)'); // the pile sits out on the ground (v0.49.1), with its shadow
+    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+2+i*5+j*2,ly=Y+H-1-j*4;R(lx2,ly,5,4,AP.out);R(lx2+1,ly+1,3,2,'#a88a64');R(lx2+2,ly+1,1,1,'#7a5a42')}
     // the spade, leaning on the wall beside the door
-    treeLine(R,X+57,Y+H-26,X+54,Y+H-8,3,AP.out);treeLine(R,X+57,Y+H-25,X+54,Y+H-8,1,AP.woodHi);R(X+55,Y+H-27,5,2,AP.out);R(X+56,Y+H-27,3,1,AP.wood);
-    R(X+51,Y+H-9,6,8,AP.out);R(X+52,Y+H-8,4,6,AP.stone);R(X+52,Y+H-8,1,5,AP.stoneHi);R(X+53,Y+H-3,2,1,AP.stoneDk);
+    R(X+50,Y+H+3,9,1,'rgba(0,0,0,0.45)'); // its foot on the ground in front of the wall, top leaning on the wall (v0.49.1)
+    treeLine(R,X+57,Y+H-23,X+54,Y+H-5,3,AP.out);treeLine(R,X+57,Y+H-22,X+54,Y+H-5,1,AP.woodHi);R(X+55,Y+H-24,5,2,AP.out);R(X+56,Y+H-24,3,1,AP.wood);
+    R(X+51,Y+H-6,6,9,AP.out);R(X+52,Y+H-5,4,7,AP.stone);R(X+52,Y+H-5,1,6,AP.stoneHi);R(X+53,Y+H+1,2,1,AP.stoneDk);
     R(X+W-6,top+4,4,8,AP.out);R(X+W-5,top+2,2,9,AP.stoneDk);R(X+W-6,top+1,4,2,AP.out);return} // chimney
   if(k==='flowers'){
     // Small story (Heart pass, v0.49): fresh flowers and a stub of candle at the foot of one grave. Someone still visits.
@@ -516,9 +528,14 @@ function drawObj(g,R,o){
     R(X+10,Y+1,4,6,AP.out);R(X+11,Y+2,2,4,'#e8dcc0');R(X+11,Y+5,2,1,'#b8ad90');R(X+9,Y+6,6,1,'#b8ad90');return}
   if(k==='shovel'){
     // The gravedigger's spade left standing in the dirt he dug out of the open grave beside it.
-    R(X+2,Y+9,12,6,AP.out);R(X+3,Y+10,10,4,AP.dirt);R(X+3,Y+10,10,1,AP.dirtHi);R(X+5,Y+9,6,1,AP.dirt);
-    R(X+7,Y-12,3,23,AP.out);R(X+8,Y-11,1,21,AP.woodHi);R(X+5,Y-14,7,3,AP.out);R(X+6,Y-13,5,1,AP.wood);
-    R(X+5,Y+8,7,3,AP.out);R(X+6,Y+8,5,2,AP.stone);R(X+6,Y+8,5,1,AP.stoneHi);return}
+    // (v0.49.1, owner: it floated) the blade is driven into the pile, so the dirt is drawn over its lower half,
+    // and the pile casts a shadow on the grass.
+    R(X+1,Y+15,14,1,'rgba(0,0,0,0.45)');
+    R(X+7,Y-10,3,18,AP.out);R(X+8,Y-9,1,17,AP.woodHi);R(X+5,Y-12,7,3,AP.out);R(X+6,Y-11,5,1,AP.wood);
+    R(X+5,Y+5,7,6,AP.out);R(X+6,Y+6,5,4,AP.stone);R(X+6,Y+6,5,1,AP.stoneHi);
+    R(X+4,Y+7,8,1,AP.out);R(X+2,Y+8,12,1,AP.out);R(X+1,Y+9,14,5,AP.out);R(X+2,Y+14,12,1,AP.out); // a rounded heap, not a box
+    R(X+5,Y+8,6,1,AP.dirtHi);R(X+3,Y+9,10,1,AP.dirtHi);R(X+2,Y+10,12,4,AP.dirt);R(X+4,Y+10,4,1,AP.dirtHi);
+    R(X+3,Y+12,2,1,'#2a221c');R(X+10,Y+11,2,1,'#2a221c');R(X+7,Y+13,1,1,AP.dirtHi);return}
   if(k==='statue'){
     // Weathered angel on a plinth (Heart pass, v0.49): its right wing has broken off at the tip (the piece lies on the
     // plinth), dark rain streaks run down it, lichen on the robe, moss on the plinth and the wing tops.
