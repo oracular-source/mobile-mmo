@@ -40,7 +40,9 @@ function engage(m,byPet){
   if(m.dead||player.dead)return;
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
-  if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&!(o.calm>0)&&dist(o,m)<70){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
+  // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
+  const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;floatText(m.x,m.y-26,'HOWL!','#ffb37a',true);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
+  if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&!(o.calm>0)&&dist(o,m)<reach){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
 }
 // src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
 function hitMob(m,dmg,kind,label,src){
@@ -275,6 +277,7 @@ function rollLoot(m){
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
   if(m.def.rare){got.push(pick(UNCOMMONS));if(rng()<0.25&&RARES.length)got.push(pick(RARES));} // a rare always pays: an uncommon for your class, sometimes a rare
   if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
+  if(m.type==='greyfang'){got.push('fangring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }
 function giveItem(id,n,k){

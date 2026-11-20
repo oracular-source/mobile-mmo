@@ -21,6 +21,16 @@ const TYPES={
   palerat:{name:'the Pale Rat',img:'palerat',lv:[5,5],hp:90,hpl:28,dmg:3.4,dmgl:1.6,spd:37,aggro:52,armor:0.05,rare:1,callAt:0.3,zone:'Rat tunnel'},
   bride:{name:'the Weeping Bride',img:'bride',lv:[8,8],hp:110,hpl:34,dmg:5.2,dmgl:2,spd:25,aggro:50,undead:1,armor:0,rare:1,zone:'Sunken Graveyard',
     adds:[{at:0.5,type:'dead',n:2,lv:6,from:'ground',shout:'WAIL!',say:'lets out a long wail, and the dead claw their way out of the ground!',col:'#3a3727'}]},
+  // Wolfwood (v0.40, levels 8-11). pack = spawns of this type close together on the map fight as one pack.
+  // flee = at that share of health it turns tail for a few seconds (snare or root it to stop that); anything idle it runs past joins in.
+  // charge = when you're a little way off it lowers its head (seen coming), then rushes you and hits at once.
+  wolf:{name:'a blight wolf',img:'wolf',lv:[8,11],hp:47,hpl:19,dmg:3.3,dmgl:1.5,spd:34,aggro:52,armor:0,pack:1,flee:0.2},
+  boar:{name:'a thornback boar',img:'boar',lv:[8,11],hp:56,hpl:23,dmg:3.5,dmgl:1.65,spd:27,aggro:44,armor:0.15,charge:1},
+  // Greyfang (named, 11): walks a loop round the middle of the wood with two pack wolves (route on the map). howl = when it's pulled,
+  // its whole pack comes from much farther off. Never flees. No summon key: it comes back on its own timer.
+  greyfang:{name:'Greyfang',img:'greyfang',lv:[11,11],hp:138,hpl:34,dmg:4.9,dmgl:1.95,spd:34,aggro:60,armor:0.1,named:1,howl:1,zone:'Wolfwood'},
+  // Old Scar (rare, 11): an old one-eyed wolf, alone, hits hard.
+  oldscar:{name:'Old Scar',img:'oldscar',lv:[11,11],hp:112,hpl:32,dmg:5.6,dmgl:2.1,spd:36,aggro:56,armor:0.05,rare:1,zone:'Wolfwood'},
   boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:

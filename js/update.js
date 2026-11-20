@@ -99,8 +99,10 @@ function update(dt){
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1)*(1-0.12*(m.chill||0)); // each chill stack: -12% speed
     if(m.state==='idle'){
-      m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
-      moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);
+      if(m.sp.route)walkRoute(m,dt); // Greyfang walks his loop
+      else if(m.sp.follow&&m.sp.follow.mob&&!m.sp.follow.mob.dead){const L=m.sp.follow.mob;m.wx=L.x+m.sp.fo.x;m.wy=L.y+m.sp.fo.y;moveToward(m,m.wx,m.wy,m.def.spd*0.5,dt);m.hx=m.x;m.hy=m.y} // pack wolves keep at his side
+      else{m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
+      moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);}
       if(!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
       else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
@@ -114,11 +116,13 @@ function update(dt){
       if(m.def.adds)namedAdds(m);
       if(m.def.callAt&&rareCall(m,dt,spd))return; // the Pale Rat running for help
       if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
+      if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
+      if(m.def.charge&&boarCharge(m,v,d,dt,spd))return; // the boar lowering its head or rushing in
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0}
+      if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.fled=false;m.fleeT=0;m.rush=false;m.wind=0;m.howled=false}
     }
   });
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}

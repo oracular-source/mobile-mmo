@@ -21,15 +21,16 @@ Rules for every new monster: black outline, faces right, its own family colours 
 | 7 | Old Gnawbone | Rat tunnel (den) | Rat (named) | about 24×12 | — | **Own sprite in game (v0.29, map chat, owner asked):** 32×17, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth, step frame |
 | 8 | Earth and fire elementals | Magician pets | Elemental | 12×12 | One shape in two colours | To do |
 | 9 | Floating sword | Enchanter pet | Object | 5×10 | Tiny sprite | To do (low) |
+| 10 | Blight wolf | Wolfwood | Wolf | 24×14 | — | **In game (v0.40, map chat, owner OK Nov 19):** grey, red eyes, a blight patch, step frame. Packs of 2–3, flees at 20% health |
+| 11 | Greyfang | Wolfwood | Wolf (named) | 30×17 | — | **In game (v0.40):** the wolf at 1.25× in silver, raised ruff, ice-blue eyes. Walks a loop with two pack wolves, howls them in |
+| 12 | Old Scar | Wolfwood | Wolf (rare) | 24×14 | — | **In game (v0.40):** browner, torn ear, pink scar through a blind eye. Alone, hits hard |
+| 13 | Thornback boar | Wolfwood | Boar | 23×12 | — | **In game (v0.40):** brown, pale thorn ridge, tusk out past the snout curving up (owner, Nov 19). Charges |
 
 ## Planned for Zone 1 (not built yet)
 Drawn when their area is built, so the list stays in step with the map chat.
 
 | Monster | Area | Family | Look notes (from `design.md`) |
 | --- | --- | --- | --- |
-| Blight wolf | Wolfwood | Wolf | Packs of 2–3, flee at low health. **Draft 3 (Nov 19, map chat)**: `tools/wolfwood_mobs.py`, owner to OK (Greyfang, Old Scar and the thornback boar drafted there too) |
-| Greyfang (named) | Wolfwood | Wolf | Silver coat, glowing eyes, leads the pack |
-| Old Scar (rare) | Wolfwood | Wolf | One-eyed grey wolf, torn ear |
 | Fen cultist | Ruined Chapel | Humanoid | Camps of three, a healer in each |
 | The Ashen Acolyte (rare) | Ruined Chapel | Humanoid | Grey robes trailing smoke |
 | Brother Malrec (boss) | Dungeon 1 | Humanoid (boss) | Censer trailing smoke, candles light around him |

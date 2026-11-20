@@ -77,17 +77,18 @@ def oldscar(step=False):
     return put(g, [(17, 2), (17, 3), (16, 4)], 'S')
 
 # Boar: drawn with its outline by hand (the thorns sit in it). Legs come from legs().
+# Tusk (w) runs out past the snout and curves up at the tip (owner, Nov 19: a little longer, protruding).
 BOAR = [
-    "........T.T.T........",
-    ".....T.kTkTkTk.......",
-    "....kTkAAAAAAAkk.....",
-    "...kAAaaaaaaaaAAkk...",
-    "..kAaaaaaaaaaaaaAAk..",
-    "kkAaaaaaaaaaaaaaaeAk.",
-    "kkaaaaaaaaaaaaaaaaapk",
-    ".kaaaaaaaaaaaaaaawwpk",
-    ".kdaaaaaaaaaaaaaadkk.",
-    "..kddddddddddddddk...",
+    "........T.T.T..........",
+    ".....T.kTkTkTk.........",
+    "....kTkAAAAAAAkk.......",
+    "...kAAaaaaaaaaAAkk.....",
+    "..kAaaaaaaaaaaaaAAk....",
+    "kkAaaaaaaaaaaaaaaeAkk..",
+    "kkaaaaaaaaaaaaaaaaapkwk",
+    ".kaaaaaaaaaaaaaaawwwwk.",
+    ".kdaaaaaaaaaaaaaadkkk..",
+    "..kddddddddddddddk.....",
 ]
 BOAR_LEGS = [2, 6, 11, 15]
 
@@ -153,7 +154,7 @@ def sheet(path):
              ('oldscar', 'Old Scar (rare)'), ('boar', 'Thornback boar (8-11), charges')]
     W = 1100; H = 1560
     im = Image.new('RGBA', (W, H), bg); d = ImageDraw.Draw(im); f = font(26); fs = font(20)
-    d.text((30, 20), 'Wolfwood monsters - draft 3 (stand | step)', font=f, fill=(235, 230, 215))
+    d.text((30, 20), 'Wolfwood monsters - draft 4 (stand | step)', font=f, fill=(235, 230, 215))
     y = 70
     for key, label in names:
         a, b = frames(key); pal = PALS[key]

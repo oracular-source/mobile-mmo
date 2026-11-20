@@ -133,7 +133,7 @@ function enterZone(id,from,at){
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
   else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
-    log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
+    log(id==='crypt'&&from==='wolfwood'?'You duck into the old tunnel. It slopes down into cold blue light.':id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'&&id==='wolf'?'You climb out of the tunnel into a hillside of mossy boulders. Firs all around.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   run.cryptT0=id==='crypt'?time:null;
@@ -183,7 +183,7 @@ function checkPortals(){
       // Built areas link straight through (the crypt is open and shared, so mobs chasing you just stay behind).
       if(ZONE_OF[ex.to]){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else enterZone(ZONE_OF[ex.to],A.id,ex.at)}
       else if(ex.to==='town1')log('The road south leads to Town 1. It is not built yet.','#9aa');
-      else if(ex.to==='wolfwood'||ex.to==='wolfwood_edge')log('The way ahead leads into Wolfwood. It is not built yet.','#9aa');
+      else if(ex.to==='chapel')log('The road north leads on to an old chapel. It is not built yet.','#9aa');
       else log('This way is not built yet.','#9aa');}}
     return}
   const t=tileAt(player.x,player.y);
@@ -232,11 +232,38 @@ function namedAdds(m){
   }
 }
 
+/* ---------- Wolfwood (v0.40): a wandering named, wolves that flee, a boar that charges ---------- */
+// Greyfang walks his route point to point at a stroll. If something blocks him for a few seconds he skips to the next point.
+function walkRoute(m,dt){const R=m.sp.route;if(m.ri===undefined){m.ri=0;m.stuck=0}
+  const p=R[m.ri],ox=m.x,oy=m.y;
+  if(moveToward(m,p.x,p.y,m.def.spd*0.4,dt)||Math.hypot(m.x-p.x,m.y-p.y)<4){m.ri=(m.ri+1)%R.length;m.stuck=0}
+  else if(Math.hypot(m.x-ox,m.y-oy)<0.05){m.stuck+=dt;if(m.stuck>3){m.ri=(m.ri+1)%R.length;m.stuck=0}}
+  m.hx=m.x;m.hy=m.y} // home is wherever he left the path, so a reset doesn't walk him through the trees
+// Below its flee share of health a wolf runs from you for a few seconds (once per fight). Anything idle it runs past joins in.
+// A snare slows the run; a root stops it.
+const FLEE_TIME=4;
+function wolfFlee(m,dt,spd){
+  if(!m.fled&&m.hp<=m.maxhp*m.def.flee){m.fled=true;m.fleeT=FLEE_TIME;floatText(m.x,m.y-20,'flees!','#ffb37a');log(cap(m.def.name)+' turns tail and runs!','#ffb37a')}
+  if(!(m.fleeT>0))return false;
+  m.fleeT-=dt;const dx=m.x-player.x,dy=m.y-player.y,dd=Math.hypot(dx,dy)||1;if(spd>0)moveToward(m,m.x+dx/dd*20,m.y+dy/dd*20,spd*1.05,dt);
+  mobs.forEach(o=>{if(o!==m&&!o.dead&&o.state==='idle'&&Math.hypot(o.x-m.x,o.y-m.y)<40){engage(o);log(cap(o.def.name)+' is drawn in by the fleeing wolf!','#ffb37a')}});
+  return true}
+// The boar: when you're a little way off it stops and lowers its head (you see it coming), then rushes you at three times its speed
+// and hits the moment it arrives. A root or stun during the wind-up wastes it. Every 8 seconds at most.
+const CHARGE={min:34,max:120,wind:0.7,cd:8,spd:3.2};
+function boarCharge(m,v,d,dt,spd){
+  m.chargeCd=Math.max(0,(m.chargeCd===undefined?1.5:m.chargeCd)-dt);
+  if(m.rush){m.rushT=(m.rushT||0)+dt;if(spd<=0||m.rushT>1.5){m.rush=false;m.rushT=0;return false} // rooted, or a tree in the way: give up the rush
+    moveToward(m,v.x,v.y,m.def.spd*CHARGE.spd,dt);if(dist(m,v)<=11){m.rush=false;m.rushT=0;m.atk=0;floatText(m.x,m.y-18,'CHARGE!','#ffb37a');burst(v.x,v.y-4,'#c8b89a',8)}return true}
+  if(m.wind>0){m.wind-=dt;m.dir=v.x>m.x?1:-1;if(m.wind<=0)m.rush=true;return true}
+  if(m.chargeCd<=0&&d>=CHARGE.min&&d<=CHARGE.max&&spd>0){m.wind=CHARGE.wind;m.chargeCd=CHARGE.cd;floatText(m.x,m.y-18,'lowers its head','#ffd27a');return true}
+  return false}
+
 /* ---------- Named rares (v0.32) ---------- */
 // About 1 in 100 spawns in an area brings out that area's rare, at its own spot off the main path (owner, Nov 17).
 // Rolled when a mob respawns, not when you walk in, so leaving and coming back can't fish for it. Only one out at a time.
 const RARE_CHANCE=0.01;
-const RARE_TEXT={ironshell:'Something big and heavy shifts in the marsh reeds.',palerat:'A thin, high squeak echoes from somewhere off the warren.',bride:'A woman\'s sobbing drifts across the graves.'};
+const RARE_TEXT={ironshell:'Something big and heavy shifts in the marsh reeds.',palerat:'A thin, high squeak echoes from somewhere off the warren.',bride:'A woman\'s sobbing drifts across the graves.',oldscar:'A low, ragged growl carries from the east, off the deer trail.'};
 function rollRare(A){if(!A||!A.rare||A.rare.sp.up||rng()>=RARE_CHANCE)return;spawnRare(A)}
 function spawnRare(A){const sp=A.rare.sp;if(sp.mob&&!sp.mob.dead)return sp.mob;sp.up=true;const m=spawn(sp);
   log(RARE_TEXT[sp.type]||'Something rare stirs nearby.',(AREA_TINT[A.tint]||{}).text||'#c8a0ff');return m}

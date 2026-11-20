@@ -22,6 +22,8 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.
   bride:mk(SPR.bride,Object.assign({},PAL,RARE_PAL.bride)),
   skel:mk(SPR.dead,Object.assign({},PAL,{z:'#cfc8b2',Z:'#9a9282',r:'#3a3442'})),
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
+// Wolfwood (v0.40): blight wolf, Greyfang, Old Scar and the thornback boar, each with a step frame.
+['wolf','greyfang','oldscar','boar'].forEach(k=>{IMG[k]=mkWalk(WOLF_SPR[k],WOLF_SPR[k+'step'],Object.assign({},PAL,WOLF_PAL[k]))});
 
 // Default skin: lay each weapon over the shared body, then colour it from the class's SKINS entry.
 function mkSkin(id){

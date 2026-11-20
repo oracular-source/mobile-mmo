@@ -1,7 +1,7 @@
 // Wolfwood, levels 8-11: the north spoke of Zone 1. Old dark forest going sick: leafy trees by the crossroads give way
 // to tall firs; grey blight spreads from the dead giant tree. Style A Dusk hush (docs/area-rules.md, look sheet).
 // Format: docs/map-format.md. Check: python3 tools/mapcheck.py js/data/maps/*.js
-// Not loaded by the game yet (step 3 of area-rules.md: the owner reviews this map first).
+// In the game since v0.40 (monsters in js/data/mobs.js, behaviour in js/world.js).
 'use strict';
 MAPS.wolfwood = {
   name: 'Wolfwood', zone: [20, 16], tint: 'wood', start: 'south', rules: '',

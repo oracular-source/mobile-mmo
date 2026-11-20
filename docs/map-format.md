@@ -1,6 +1,6 @@
 # Map format: maps as text, checked by a script
 
-Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`). In the game now: `crossroads` (where the game starts), `rat_tunnel`, `graveyard` and `crypt` (`wolfwood` is drawn and checked but not loaded yet); `?area=<map>` starts in one, DEV → Teleport reaches each.
+Since Nov 18, 2026, every area map is a plain-text file. One character is one tile, so Claude can design, edit and review a map the way it edits any other file, and a checker script catches placement mistakes before the owner sees anything. **The game loads them** (since v0.22, `js/area.js`). In the game now: `crossroads` (where the game starts), `rat_tunnel`, `graveyard`, `crypt` and `wolfwood` (since v0.40); `?area=<map>` starts in one, DEV → Teleport reaches each.
 
 ## Where things live
 - `js/data/tiles.js`: the shared tables. `TILESET` (each tile character: name, walkable or not, colour, tags) and `OBJECTS` (buildings and props: size in tiles, how much open ground they need around them, which side the door is on, light radius). Add a tile or object here once and every map can use it.
@@ -28,7 +28,7 @@ label 23 5 Bell tower          # text on the overview picture only
 `
 };
 ```
-- `enter` (optional): the chat line when you arrive. `tint`: the area's light, from `AREA_TINT` in `js/area.js` (`moonlit`, `crypt`, `dusk`, `earth`).
+- `enter` (optional): the chat line when you arrive. `tint`: the area's light, from `AREA_TINT` in `js/area.js` (`moonlit`, `crypt`, `dusk`, `earth`, `wood`).
 - Rat holes (`h`) are earth wall with a burrow in its face; the floor tile below each one is where Old Gnawbone's rats come out. Put them where the wall has floor directly below.
 - `zone` is where the map's top-left tile sits on the Zone 1 layout (128 × 128).
 - `start` names the exit players arrive from; distances and the phone view are measured from there.

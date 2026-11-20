@@ -20,6 +20,7 @@ function devAct(a){
   else if(a==='gy'){enterZone('gy');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='cross'){enterZone('cross');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='wolf'){enterZone('wolf');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='den'){if(zoneId!=='tunnel')enterZone('tunnel');player.x=26*T+8;player.y=29*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='rarespawn'){const A=curArea();if(!A||!A.rare){log('Dev: this area has no rare.','#ff8a80')}else{const m=spawnRare(A),p=areaSpot(A,{tx:A.rare.x,ty:A.rare.y+3})||areaSpot(A,{tx:A.rare.x,ty:A.rare.y});if(p){player.x=p.x;player.y=p.y}log('Dev: '+m.def.name+' is up. You are next to its spot.','#ff8a80')}}
@@ -47,7 +48,7 @@ function renderDev(){
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
     sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Boss 1 item'),b('copper','+500 copper')))+
-    sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard')))+
+    sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('wolf','Wolfwood')))+
     sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'),b('pace','Zone 1 pace'))+
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
       '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.lastPace&&simState.lastPace.cls===CLS&&(!simState.last||simState.lastPaceAt>simState.lastAt)?paceSummary(simState.lastPace):simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+
