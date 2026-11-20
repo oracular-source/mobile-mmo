@@ -92,8 +92,17 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .dgrid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
 .dgrid button{min-height:38px;font-size:12px;padding:4px 6px;line-height:1.2}
 /* Start screen class picker: 14 classes in a 3-wide grid so every name fits and is easy to tap */
-#clspick{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
-#clspick button{min-height:40px;font-size:11.5px;padding:4px 2px;line-height:1.2}
+/* v0.38 start screen (UI breakdown 11, A): plain grey class squares, tap selects (gold outline), details below */
+#clspick{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:4px}
+#clspick button{min-height:44px;font-size:11.5px;padding:3px 2px;line-height:1.2;border-radius:0;background:#2a2a2e;border:1px solid #55555c;color:#ddd}
+#clspick button small{display:block;font-size:10px;color:#9aa}
+#clspick button.sel{border-color:#c9a227;box-shadow:inset 0 0 0 1px #c9a227;background:#3a3a40;color:#fff}
+#clsinfo{display:flex;gap:8px;align-items:center;margin-top:8px;padding:6px;border:1px solid #55555c;background:#222225;min-height:84px}
+#clsinfo .dfig{flex:none;height:76px}
+#clsinfo canvas{width:60px;height:72px;image-rendering:pixelated}
+#clsdesc{margin-top:2px}
+#paneHelp ul{padding-left:18px;margin:4px 0 8px}
+#paneHelp li{margin-bottom:5px}
 /* DEV: default skin gallery */
 .skingal{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0}
 .skingal figure{margin:0;width:60px;text-align:center}

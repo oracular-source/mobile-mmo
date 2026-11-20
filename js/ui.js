@@ -264,7 +264,7 @@ function renderSettings(){
 }
 $('setbox').addEventListener('click',e=>{
   if(e.target.id==='devon'||e.target.id==='devoff'){const on=e.target.id==='devon';if(on!==dev.on){store.set('ashfen-dev',on);location.reload()}return}
-  if(e.target.id==='chgcls'){$('menuUI').classList.remove('show');$('intro').classList.add('show');running=false;return}
+  if(e.target.id==='chgcls'){$('menuUI').classList.remove('show');openIntro();return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
   settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();if(b.dataset.k==='zoom')applyZoom();
@@ -276,8 +276,8 @@ let running=false;
 let menuTab='spells';
 function setMenuTab(t){menuTab=t;
   document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
-  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';
-  selected=null;if(t==='spells')renderBook();else renderSettings();
+  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';
+  selected=null;if(t==='spells')renderBook();else if(t==='settings')renderSettings();
   $('menuUI').querySelector('.card').scrollTop=0}
 function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='menuUI')setMenuTab(menuTab)}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));

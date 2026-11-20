@@ -11,15 +11,33 @@ function loop(ts){
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
 if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,runPace:runPace,simTable:simTable,simSummary:simSummary,seedRng:seedRng,zone:()=>zoneId,arenaMob:arenaMob,update:update,grounds:grounds,getDecoy:()=>decoy};
-// Class pick: switching saves the choice and reloads, so each class keeps its own level, bags and loadout.
+// Start screen (v0.38, UI breakdown 11, owner picked A). Tapping a class only shows it; Play does the work.
+// Switching class still saves the choice and reloads (each class keeps its own level, bags and loadout), and a
+// one-time flag in sessionStorage starts the game straight after the reload so it doesn't take a second Play.
+let pickCls=CLS,started=false;
+function progOf(k){const pg=store.get(k==='druid'?'ashfen-druid':'ashfen-prog-'+k,null);return pg&&pg.v===2?pg:null}
+function renderPick(){
+  $('clspick').innerHTML=Object.keys(CLASSES).map(k=>{const c=CLASSES[k],pg=progOf(k);
+    return '<button data-cls="'+k+'" class="'+(k===pickCls?'sel':'')+'"'+(c.name.length>10&&c.name.indexOf(' ')<0?' style="font-size:10px"':'')+'>'+c.name+'<small>'+(pg?'Lv '+pg.lvl:c.role)+'</small></button>'}).join('');
+  const c=CLASSES[pickCls],pg=progOf(pickCls);
+  $('clsname').textContent=c.name+(pg?' · Lv '+pg.lvl:'');$('clstag').textContent=c.role+' · Solo: '+c.solo;$('clsdesc').textContent=c.blurb||c.desc;
+  const cv=$('clscv'),im=mkRags(pickCls)||IMG.druid,x=cv.getContext('2d');cv.width=im.w;cv.height=im.h;x.imageSmoothingEnabled=false;x.drawImage(im.c,0,0);
+  $('start').textContent=started&&pickCls===CLS?'Back to game':'Play '+c.name;
+}
+function openIntro(){pickCls=CLS;$('introx').style.display=started?'':'none';renderPick();$('intro').classList.add('show');running=false}
+function startGame(){$('intro').classList.remove('show');running=true;if(started)return; // Change class → same class just resumes where you were
+  started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross')}
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
-  $('clspick').innerHTML=Object.keys(CLASSES).map(k=>{const pg=store.get(k==='druid'?'ashfen-druid':'ashfen-prog-'+k,null);return '<button data-cls="'+k+'" class="'+(k===CLS?'active':'')+'">'+CLASSES[k].name+(pg&&pg.v===2?'<br><small style="color:#9aa">Lv '+pg.lvl+'</small>':'')+'</button>'}).join('');
-  $('clsdesc').textContent=C.desc;
-  $('clspick').addEventListener('click',e=>{const b=e.target.closest('button[data-cls]');if(!b||b.dataset.cls===CLS)return;store.set('ashfen-class',b.dataset.cls);location.reload()});
-  $('start').textContent='Play '+C.name;
+  renderPick();
+  $('clspick').addEventListener('click',e=>{const b=e.target.closest('button[data-cls]');if(!b)return;pickCls=b.dataset.cls;renderPick()});
+  $('introx').addEventListener('click',()=>{$('intro').classList.remove('show');running=true});
   if(!C.mana)document.querySelector('.bar.mp').style.display='none';
 })();
 // The game starts at the crossroads (v0.28); ?area=graveyard, crypt, rat_tunnel or crossroads starts in that area.
-$('start').addEventListener('click',()=>{$('intro').classList.remove('show');running=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross')});
+$('start').addEventListener('click',()=>{
+  if(pickCls!==CLS){store.set('ashfen-class',pickCls);try{sessionStorage.setItem('ashfen-go','1')}catch(e){}location.reload();return}
+  startGame()});
+// After a class switch reload, go straight in.
+(function(){let go=false;try{go=sessionStorage.getItem('ashfen-go')==='1';sessionStorage.removeItem('ashfen-go')}catch(e){}if(go)startGame()})();
 requestAnimationFrame(t=>{last=t;loop(t)});

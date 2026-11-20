@@ -5,7 +5,7 @@
 // cast: seconds standing still (0 = instant, usable while moving). cd: [start, floor, seconds shaved per level].
 // dur: [seconds, extra seconds per level after learning it]. Spells grow a little stronger every level.
 const CLASSES={
-  druid:{name:'Druid',sprite:'druid',hp:[40,12],mana:[40,10],ac:0,regen:1,desc:'Nature caster. Kites with snares, roots and rot.',
+  druid:{name:'Druid',role:'Caster',solo:'Steady',blurb:'Nature caster. Kites with snares, roots and rot.',sprite:'druid',hp:[40,12],mana:[40,10],ac:0,regen:1,desc:'Nature caster. Kites with snares, roots and rot.',
     loadout:['thorn','mend','snare','rot','root','bark'],abilities:[
     {id:'thorn',name:'Thornlash',short:'Thorn',lvl:1,mana:5,cast:0,cd:null,range:80,col:'#7dbb4a',tgt:1,tag:'Nuke',kind:'nuke',dmg:[8,3],beam:'#9be37a'},
     {id:'mend',name:'Mending Touch',short:'Mend',lvl:1,mana:9,cd:[8,4,0.5],cast:1.2,col:'#7dffa6',tgt:0,tag:'Heal',kind:'heal',heal:[15,6]},
@@ -13,7 +13,7 @@ const CLASSES={
     {id:'rot',name:'Creeping Rot',short:'Rot',lvl:2,mana:8,cd:[12,6,0.75],cast:0,range:80,col:'#6aa84f',tgt:1,tag:'DoT',kind:'dot',dmg:[3,1.6],dur:[18,0.5]},
     {id:'root',name:'Rootgrip',short:'Root',lvl:6,mana:7,cd:[24,12,1.5],cast:0.6,range:80,col:'#9b7b3a',tgt:1,tag:'Root',kind:'root',dur:[12,0.5]},
     {id:'bark',name:'Barkskin',short:'Bark',lvl:8,mana:10,cd:[30,15,1.5],cast:0,col:'#a07850',tgt:0,tag:'Armor',kind:'buff',buff:'bark',dur:[120,0]}]},
-  warrior:{name:'Warrior',sprite:'warrior',hp:[60,16],mana:null,ac:12,regen:1.5,holdLine:0.2,holdMax:3,lastStand:{dr:0.75,dur:5},desc:'Armored tank. No mana; skills on cooldowns. Hold the Line: takes 20% less damage for each mob on you (up to 3). Last Stand: once a fight, a killing blow leaves you at 1 HP and you can\'t die for 5s (damage cut by 75%). Hardest class to kill.',
+  warrior:{name:'Warrior',role:'Tank',solo:'Hard',blurb:'Hardest class to kill. No mana, skills on cooldowns; best with a group.',sprite:'warrior',hp:[60,16],mana:null,ac:12,regen:1.5,holdLine:0.2,holdMax:3,lastStand:{dr:0.75,dur:5},desc:'Armored tank. No mana; skills on cooldowns. Hold the Line: takes 20% less damage for each mob on you (up to 3). Last Stand: once a fight, a killing blow leaves you at 1 HP and you can\'t die for 5s (damage cut by 75%). Hardest class to kill.',
     loadout:['strike','bandage','bash','ham','stance','cleave'],abilities:[
     {id:'strike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,3],melee:1},
     {id:'bandage',name:'Bandage',short:'Bandage',lvl:1,mana:0,cast:2,cd:[20,12,1],col:'#e8e2cf',tgt:0,tag:'Heal',kind:'heal',heal:[12,5],melee:1},
@@ -22,7 +22,7 @@ const CLASSES={
     {id:'ham',name:'Hamstring',short:'Hamstr',lvl:3,mana:0,cast:0,cd:[18,10,1],range:18,col:'#a3252f',tgt:1,tag:'Snare',kind:'snare',dur:[16,1],melee:1},
     {id:'stance',name:'Defensive Stance',short:'Stance',lvl:6,mana:0,cast:0,cd:[45,30,1.5],col:'#c9a227',tgt:0,tag:'Defense',kind:'buff',buff:'stance',dur:[10,0.5]},
     {id:'cleave',name:'Cleave',short:'Cleave',lvl:8,mana:0,cast:0,cd:[10,6,0.5],col:'#ffb37a',tgt:0,tag:'Area',kind:'cleave',dmg:[6,2.5],radius:24,melee:1}]},
-  rogue:{name:'Rogue',sprite:'rogue',hp:[50,15],mana:null,ac:8,regen:1.2,dodge:0.25,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Dodges a quarter of melee hits, but has no heal: best with a tank.',
+  rogue:{name:'Rogue',role:'Melee',solo:'Hard',blurb:'Huge Backstab from Hide, Evade to drop aggro. No heal: best with a tank.',sprite:'rogue',hp:[50,15],mana:null,ac:8,regen:1.2,dodge:0.25,desc:'Sneaky melee damage. Open from Hide with a huge Backstab, hit hard from behind, Evade to drop aggro. Dodges a quarter of melee hits, but has no heal: best with a tank.',
     loadout:['stab','backstab','hide','gouge','evade','rend','knife','sprint'],abilities:[
     {id:'stab',name:'Stab',short:'Stab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#d8dde6',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'backstab',name:'Backstab',short:'Backst',lvl:1,mana:0,cast:0,cd:[10,6,0.4],range:18,col:'#e05a5a',tgt:1,tag:'Backstab',kind:'backstab',dmg:[10,6],melee:1},
@@ -32,7 +32,7 @@ const CLASSES={
     {id:'rend',name:'Rend',short:'Rend',lvl:3,mana:0,cast:0,cd:[12,6,0.6],range:18,col:'#a3252f',tgt:1,tag:'Bleed',kind:'dot',dmg:[4,2],dur:[15,0.5],melee:1},
     {id:'evade',name:'Evade',short:'Evade',lvl:5,mana:0,cast:0,cd:[30,18,1.2],col:'#8d8692',tgt:0,tag:'Drop aggro',kind:'evade',dur:[3,0.15],melee:1},
     {id:'sprint',name:'Sprint',short:'Sprint',lvl:7,mana:0,cast:0,cd:[40,25,1.5],col:'#7dbbd0',tgt:0,tag:'Speed',kind:'buff',buff:'sprint',dur:[8,0.3],melee:1}]},
-  necro:{name:'Necromancer',sprite:'necro',hp:[36,11],mana:[44,11],ac:0,regen:1,caster:1,desc:'Dark caster with an undead pet that tanks for you. Lifetaps, plague, fear and feign death.',
+  necro:{name:'Necromancer',role:'Pet',solo:'Easy',blurb:'Undead pet tanks while you lifetap, plague and fear.',sprite:'necro',hp:[36,11],mana:[44,11],ac:0,regen:1,caster:1,desc:'Dark caster with an undead pet that tanks for you. Lifetaps, plague, fear and feign death.',
     loadout:['tap','plague','dread','raise','feign','mendb'],abilities:[
     {id:'tap',name:'Lifetap',short:'Tap',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[6,2.4],beam:'#b48cff'},
     {id:'raise',name:'Raise Bones',short:'Raise',lvl:4,mana:15,cast:3,cd:[30,15,1.5],col:'#cfc8b2',tgt:0,tag:'Pet',kind:'pet'},
@@ -43,7 +43,7 @@ const CLASSES={
   // ---- Batch 1 (v0.17). New ability fields: undead (x damage vs undead), undeadOnly, holy (share of a heal that burns
   // nearby undead), hpCost (share of your max health), chill, shatter, aslow (slows attacks too), full (full heal),
   // pet:{...} (which pet a summon makes), and area kinds that can stun, root or heal per mob hit.
-  cleric:{name:'Cleric',hp:[44,13],mana:[44,11],ac:6,regen:1,gear:['cleric'],desc:'Healer with a hammer. Slow kills, almost never dies. Every heal also burns nearby undead. Solo: slow but safe.',
+  cleric:{name:'Cleric',role:'Healer',solo:'Steady',blurb:'Healer with a hammer. Slow kills, almost never dies; heals burn undead.',hp:[44,13],mana:[44,11],ac:6,regen:1,gear:['cleric'],desc:'Healer with a hammer. Slow kills, almost never dies. Every heal also burns nearby undead. Solo: slow but safe.',
     loadout:['smite','mheal','renew','hlight','daze','turn','gheal','aura'],abilities:[
     {id:'smite',name:'Smite',short:'Smite',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#e8e2cf',tgt:1,tag:'Melee',kind:'nuke',dmg:[6,2.6],melee:1},
     {id:'mheal',name:'Minor Heal',short:'Heal',lvl:1,mana:8,cast:1.5,cd:[6,3,0.4],col:'#ffe9a8',tgt:0,tag:'Heal',kind:'heal',heal:[14,6],holy:0.6},
@@ -53,7 +53,7 @@ const CLASSES={
     {id:'turn',name:'Turn Undead',short:'Turn',lvl:5,mana:8,cast:0,cd:[20,12,0.8],range:80,col:'#fff3c4',tgt:1,tag:'Fear undead',kind:'fear',dur:[6,0.3],undeadOnly:1},
     {id:'gheal',name:'Greater Heal',short:'GHeal',lvl:6,mana:22,cast:2.5,cd:[12,8,0.5],col:'#fff3c4',tgt:0,tag:'Big heal',kind:'heal',heal:[40,12],holy:0.6},
     {id:'aura',name:'Divine Aura',short:'Aura',lvl:8,mana:10,cast:0,cd:[120,90,3],col:'#ffd27a',tgt:0,tag:'Immune',kind:'buff',buff:'aura',dur:[4,0]}]},
-  enchanter:{name:'Enchanter',hp:[34,9],mana:[48,12],ac:0,regen:1,caster:1,desc:'Crowd control. Puts extra mobs to sleep, slows the one you fight, and lets a floating sword or a charmed mob do the hitting. Solo: fine if you keep control.',
+  enchanter:{name:'Enchanter',role:'CC',solo:'Steady',blurb:'Puts extra mobs to sleep and slows the one you fight. Keep control.',hp:[34,9],mana:[48,12],ac:0,regen:1,caster:1,desc:'Crowd control. Puts extra mobs to sleep, slows the one you fight, and lets a floating sword or a charmed mob do the hitting. Solo: fine if you keep control.',
     loadout:['mlash','mrot','mez','blade','slow','charm','flash','phantasm'],abilities:[
     {id:'mlash',name:'Mind Lash',short:'Lash',lvl:1,mana:3,cast:0,cd:null,range:80,col:'#e0c3ff',tgt:1,tag:'Nuke',kind:'nuke',dmg:[5,2],beam:'#e0c3ff'},
     {id:'mrot',name:'Mind Rot',short:'Rot',lvl:1,mana:6,cast:0,cd:[8,5,0.4],range:80,col:'#c8a0ff',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[12,0.5]},
@@ -64,7 +64,7 @@ const CLASSES={
     {id:'charm',name:'Charm',short:'Charm',lvl:5,mana:15,cast:1,cd:[40,25,1.5],range:60,col:'#ff9de2',tgt:1,tag:'Charm',kind:'charm',dur:[24,1.5]},
     {id:'flash',name:'Color Flash',short:'Flash',lvl:7,mana:12,cast:0,cd:[30,20,1],col:'#ffffff',tgt:0,tag:'Area stun',kind:'cleave',radius:30,stun:[3,0.1]},
     {id:'phantasm',name:'Phantasm',short:'Phantm',lvl:8,mana:12,cast:0,cd:[45,30,1.5],col:'#c8a0ff',tgt:0,tag:'Decoy',kind:'decoy',dur:[5,0.2]}]},
-  paladin:{name:'Paladin',hp:[54,15],mana:[24,6],ac:10,regen:1.3,gear:['warrior','knight'],desc:'Holy tank. Heals, stuns, and lays holy ground that heals you and burns the undead. Very strong in the crypt. Solo: steady.',
+  paladin:{name:'Paladin',role:'Tank',solo:'Steady',blurb:'Holy tank. Heals, stuns and holy ground. Strong in the crypt.',hp:[54,15],mana:[24,6],ac:10,regen:1.3,gear:['warrior','knight'],desc:'Holy tank. Heals, stuns, and lays holy ground that heals you and burns the undead. Very strong in the crypt. Solo: steady.',
     loadout:['pstrike','pmend','hbash','loh','smiteu','taunt','consec','dstrike'],abilities:[
     {id:'pstrike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'loh',name:'Lay on Hands',short:'LoH',lvl:5,mana:0,cast:0,cd:[180,120,4],col:'#ffd27a',tgt:0,tag:'Full heal',kind:'heal',heal:[0,0],full:1},
@@ -74,7 +74,7 @@ const CLASSES={
     {id:'taunt',name:'Taunt',short:'Taunt',lvl:5,mana:0,cast:0,cd:[8,6,0.2],range:40,col:'#ffb37a',tgt:1,tag:'Taunt',kind:'taunt'},
     {id:'consec',name:'Consecrate',short:'Consec',lvl:6,mana:14,cast:0,cd:[30,20,1],col:'#ffd27a',tgt:0,tag:'Holy ground',kind:'ground',radius:26,dur:[15,0],heal:[2,0.8],dmg:[3,1.2]},
     {id:'dstrike',name:'Divine Strike',short:'Divine',lvl:8,mana:6,cast:0,cd:[10,6,0.5],col:'#ffe9a8',tgt:0,tag:'Area',kind:'cleave',dmg:[7,2.8],undead:1.6,radius:24,melee:1}]},
-  shadowknight:{name:'Shadow Knight',hp:[52,14],mana:[26,7],ac:10,regen:1.2,gear:['warrior','knight'],desc:'Dark tank. Lifetaps, a small skeleton, fear, and a Harm Touch paid for in blood. Likes two mobs at once: Dark Cleave heals per mob. Solo: good.',
+  shadowknight:{name:'Shadow Knight',role:'Tank',solo:'Steady',blurb:'Dark tank. Lifetaps, a small skeleton, fear. Likes two mobs at once.',hp:[52,14],mana:[26,7],ac:10,regen:1.2,gear:['warrior','knight'],desc:'Dark tank. Lifetaps, a small skeleton, fear, and a Harm Touch paid for in blood. Likes two mobs at once: Dark Cleave heals per mob. Solo: good.',
     loadout:['sstrike','siphon','disease','terror','minion','dcleave','sfeign','harm'],abilities:[
     {id:'sstrike',name:'Strike',short:'Strike',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#a3252f',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'siphon',name:'Siphon',short:'Siphon',lvl:1,mana:6,cast:0,cd:[6,4,0.25],range:60,col:'#b48cff',tgt:1,tag:'Lifetap',kind:'lifetap',dmg:[5,2],beam:'#a3252f'},
@@ -84,7 +84,7 @@ const CLASSES={
     {id:'dcleave',name:'Dark Cleave',short:'DCleave',lvl:5,mana:6,cast:0,cd:[10,6,0.5],col:'#a3252f',tgt:0,tag:'Area lifetap',kind:'cleave',dmg:[6,2.4],tapPer:[4,1.5],radius:24,melee:1},
     {id:'sfeign',name:'Feign Death',short:'Feign',lvl:6,mana:5,cast:0,cd:[60,35,2.5],col:'#9a9a9a',tgt:0,tag:'Escape',kind:'feign'},
     {id:'harm',name:'Harm Touch',short:'Harm',lvl:8,mana:0,cast:0,cd:[90,60,2],range:30,col:'#a3252f',tgt:1,tag:'Big hit',kind:'nuke',dmg:[40,14],hpCost:0.2,beam:'#a3252f'}]},
-  wizard:{name:'Wizard',hp:[32,10],mana:[50,13],ac:0,regen:1,caster:1,desc:'Glass cannon. Frost Bolt chills, Freeze holds, Shatter hits huge. Blink to get around, Gate home. Solo: strong on one mob, weak on two.',
+  wizard:{name:'Wizard',role:'Caster',solo:'Steady',blurb:'Glass cannon. Freeze and Shatter, Blink away. Strong on one mob, weak on two.',hp:[32,10],mana:[50,13],ac:0,regen:1,caster:1,desc:'Glass cannon. Frost Bolt chills, Freeze holds, Shatter hits huge. Blink to get around, Gate home. Solo: strong on one mob, weak on two.',
     loadout:['frost','blink','freeze','shatter','fireball','nova','mshield','gate'],abilities:[
     {id:'frost',name:'Frost Bolt',short:'Frost',lvl:1,mana:6,cast:0,cd:null,range:80,col:'#9fd8ff',tgt:1,tag:'Nuke + chill',kind:'nuke',dmg:[8,3.2],chill:1,beam:'#9fd8ff'},
     {id:'blink',name:'Blink',short:'Blink',lvl:1,mana:5,cast:0,cd:[12,6,0.6],col:'#c8e8ff',tgt:0,tag:'Teleport',kind:'blink',range:50},
@@ -98,7 +98,7 @@ const CLASSES={
   // mark, trap, detonate, petbuff, canni (health for mana). New fields: dash, hits, knock, petHeal, shot, back (Disengage),
   // split (Monk's Feign Death), all/totem/tick (ground circles that hit any mob), val (a buff's strength, e.g. Flame Shield),
   // pet:{threat, burn, boom, boomStun, say}. Class field dotStack: each DoT ticks this much harder per other DoT on the mob (Shaman).
-  magician:{name:'Magician',hp:[34,10],mana:[48,12],ac:0,regen:1,caster:1,desc:'Summoner. Pick an elemental for the fight (Earth tanks, Fire burns), then blow it up with Detonate and call the next. Solo: strong, like the Necro.',
+  magician:{name:'Magician',role:'Pet',solo:'Easy',blurb:'Summons an elemental for each fight, then blows it up and calls the next.',hp:[34,10],mana:[48,12],ac:0,regen:1,caster:1,desc:'Summoner. Pick an elemental for the fight (Earth tanks, Fire burns), then blow it up with Detonate and call the next. Solo: strong, like the Necro.',
     loadout:['lash','earth','fire','mende','burnout','detonate','fshield','elink'],abilities:[
     {id:'lash',name:'Elemental Lash',short:'Lash',lvl:1,mana:4,cast:0,cd:null,range:40,col:'#ff9a4a',tgt:1,tag:'Short-range hit, heals pet',kind:'nuke',dmg:[5,2],petHeal:[2,1],beam:'#ffb37a'},
     {id:'earth',name:'Summon Earth',short:'Earth',lvl:1,mana:15,cast:3,cd:[8,5,0.3],col:'#8a6a48',tgt:0,tag:'Pet: tank, stone fist',kind:'pet',pet:{name:'earth elemental',img:'earth',hp:[34,15],dmg:[2.5,1.3],ac:10,atk:2,threat:5,boom:0.5,boomStun:2.5,bash:{cd:10,dur:0.5},say:'An earth elemental heaves itself up out of the ground.'}},
@@ -108,7 +108,7 @@ const CLASSES={
     {id:'detonate',name:'Detonate',short:'Boom',lvl:5,mana:10,cast:0,cd:[20,12,0.8],col:'#ff5a2a',tgt:0,tag:'Pet explodes',kind:'detonate',dmg:[20,8],radius:30},
     {id:'fshield',name:'Flame Shield',short:'FShield',lvl:6,mana:12,cast:1,cd:[10,10,0],col:'#ff9a4a',tgt:0,tag:'Damage shield',kind:'buff',buff:'fshield',dur:[99999,0],val:[2,0.8]},
     {id:'elink',name:'Elemental Link',short:'Link',lvl:8,mana:10,cast:0,cd:[45,30,1.5],col:'#ffd27a',tgt:0,tag:'Pet takes half your damage',kind:'buff',buff:'link',dur:[10,0]}]},
-  ranger:{name:'Ranger',hp:[44,13],mana:[20,5],ac:6,regen:1.1,gear:['ranger'],desc:'Archer who never stops moving. Shoots while walking, lays traps, and drags mobs through them. Solo: good if you keep moving.',
+  ranger:{name:'Ranger',role:'Hybrid',solo:'Steady',blurb:'Archer who shoots on the move and drags mobs through traps.',hp:[44,13],mana:[20,5],ac:6,regen:1.1,gear:['ranger'],desc:'Archer who never stops moving. Shoots while walking, lays traps, and drags mobs through them. Solo: good if you keep moving.',
     loadout:['shoot','mark','ensnare','trap','disengage','salve','volley','rapid'],abilities:[
     {id:'shoot',name:'Shoot',short:'Shoot',lvl:1,mana:0,cast:0,cd:null,range:80,col:'#e8e2cf',tgt:1,tag:'Ranged, on the move',kind:'nuke',dmg:[7,2.8],melee:1,shot:1,beam:'#e8e2cf'},
     {id:'mark',name:"Hunter's Mark",short:'Mark',lvl:1,mana:4,cast:0,cd:[6,4,0.2],range:80,col:'#ffb37a',tgt:1,tag:'+20% damage on it',kind:'mark',mark:1.2},
@@ -118,7 +118,7 @@ const CLASSES={
     {id:'salve',name:'Salve',short:'Salve',lvl:5,mana:8,cast:1.5,cd:[8,5,0.3],col:'#7dffa6',tgt:0,tag:'Heal',kind:'heal',heal:[16,6]},
     {id:'volley',name:'Volley',short:'Volley',lvl:6,mana:10,cast:0,cd:[20,12,0.8],range:80,col:'#e8e2cf',tgt:1,tag:'Area over time',kind:'ground',all:1,radius:22,dur:[4,0],tick:1,dmg:[4,1.6],melee:1,msg:'Arrows rain down on the area.'},
     {id:'rapid',name:'Rapid Fire',short:'Rapid',lvl:8,mana:0,cast:0,cd:[40,25,1.5],col:'#ffd27a',tgt:0,tag:'Shoot 2x faster',kind:'buff',buff:'rapid',dur:[6,0],melee:1}]},
-  monk:{name:'Monk',hp:[50,14],mana:null,ac:4,regen:1.4,gear:['monk'],desc:'Fast fists, no armor. Pull a group, then Feign Death: everything walks home except your target. Solo: good, one mob at a time.',
+  monk:{name:'Monk',role:'Melee',solo:'Steady',blurb:'Fast fists, no armor. Pull a group, Feign Death, fight the one that stays.',hp:[50,14],mana:null,ac:4,regen:1.4,gear:['monk'],desc:'Fast fists, no armor. Pull a group, then Feign Death: everything walks home except your target. Solo: good, one mob at a time.',
     loadout:['palm','mmend','fkick','mfeign','sweep','flurry','deflect','dragon'],abilities:[
     {id:'palm',name:'Palm Strike',short:'Palm',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#ffd27a',tgt:1,tag:'Melee',kind:'nuke',dmg:[8,3.2],melee:1},
     {id:'mmend',name:'Mend',short:'Mend',lvl:1,mana:0,cast:0,cd:[40,25,1.5],col:'#7dffa6',tgt:0,tag:'Instant heal',kind:'heal',heal:[18,7],melee:1},
@@ -128,7 +128,7 @@ const CLASSES={
     {id:'flurry',name:'Flurry',short:'Flurry',lvl:5,mana:0,cast:0,cd:[14,9,0.5],range:18,col:'#ffe9a8',tgt:1,tag:'Five punches',kind:'nuke',dmg:[3,1.2],hits:5,melee:1},
     {id:'deflect',name:'Deflect',short:'Deflct',lvl:6,mana:0,cast:0,cd:[40,28,1.2],col:'#cfd6e0',tgt:0,tag:'Dodge all hits',kind:'buff',buff:'deflect',dur:[3,0.1],melee:1},
     {id:'dragon',name:'Dragon Strike',short:'Dragon',lvl:8,mana:0,cast:0,cd:[16,10,0.6],range:18,col:'#ff9a4a',tgt:1,tag:'Big hit + knockback',kind:'nuke',dmg:[18,6],knock:22,melee:1}]},
-  shaman:{name:'Shaman',hp:[40,12],mana:[42,11],ac:4,regen:1,caster:1,gear:['shaman'],dotStack:0.1,desc:'Never casts a bolt. Slows the mob so it barely hurts, stacks poisons (each one a bit stronger with the other on), drops a totem and walks away. Solo: strong and safe.',
+  shaman:{name:'Shaman',role:'Hybrid',solo:'Easy',blurb:'Slows the mob so it barely hurts, stacks poisons, drops a totem.',hp:[40,12],mana:[42,11],ac:4,regen:1,caster:1,gear:['shaman'],dotStack:0.1,desc:'Never casts a bolt. Slows the mob so it barely hurts, stacks poisons (each one a bit stronger with the other on), drops a totem and walks away. Solo: strong and safe.',
     loadout:['jab','sicken','sheal','drowsy','wolf','swarm','totem','canni'],abilities:[
     {id:'jab',name:'Spear Jab',short:'Jab',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[6,2.4],melee:1},
     {id:'sicken',name:'Sicken',short:'Sicken',lvl:1,mana:6,cast:0,cd:[8,5,0.4],range:80,col:'#7a9a3a',tgt:1,tag:'DoT',kind:'dot',dmg:[4,2],dur:[18,0.5]},
@@ -139,7 +139,7 @@ const CLASSES={
     {id:'totem',name:'Venom Totem',short:'Totem',lvl:5,mana:10,cast:0,cd:[24,16,0.8],col:'#7a9a3a',tgt:0,tag:'Poison totem',kind:'ground',all:1,totem:1,radius:26,dur:[20,0],tick:2,dmg:[4,1.6],msg:'You plant a Venom Totem. Mobs that come near it are poisoned.'},
     {id:'ward',name:'Spirit Ward',short:'Ward',lvl:6,mana:14,cast:1.5,cd:[10,10,0],col:'#c9a227',tgt:0,tag:'Armor + health',kind:'buff',buff:'ward',dur:[99999,0]},
     {id:'canni',name:'Cannibalize',short:'Canni',lvl:8,mana:0,cast:0,cd:[8,5,0.3],col:'#a3252f',tgt:0,tag:'Health for mana',kind:'canni',hpCost:0.15,ratio:1.2}]},
-  bard:{name:'Bard',hp:[46,13],mana:[26,6],ac:5,regen:1.2,gear:['bard'],desc:'Light melee who is always playing. Two songs pulse around you on their own: heal, hurt, run fast, swing faster, or slow the mobs. Solo: steady.',
+  bard:{name:'Bard',role:'Hybrid',solo:'Steady',blurb:'Light melee. Two songs pulse on their own: heal, hurt, speed, slow.',hp:[46,13],mana:[26,6],ac:5,regen:1.2,gear:['bard'],desc:'Light melee who is always playing. Two songs pulse around you on their own: heal, hurt, run fast, swing faster, or slow the mobs. Solo: steady.',
     loadout:['slash','smend','dirge','travel','lullaby','chant','discord','crescendo'],abilities:[
     {id:'slash',name:'Slash',short:'Slash',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'smend',name:'Song of Mending',short:'Mending',lvl:1,mana:5,cast:0,cd:[2,2,0],col:'#7dffa6',tgt:0,tag:'Song: heal',kind:'song',song:'heal',heal:[3,1.2]},

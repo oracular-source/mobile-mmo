@@ -24,7 +24,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 8. Menu screens (Spells, Arrange, Settings) (done v0.35)
 9. Character screen (Gear, Bags, Journal) (done v0.36)
 10. Moments (level up, death, loot, run summary) (done v0.37)
-11. Start screen and class picker
+11. Start screen and class picker (done v0.38)
 12. Minimap and full map (check only)
 
 ## 1. Spell pad and Next ⟳
@@ -93,3 +93,4 @@ Options:
 - **B EverQuest two-step:** first a **character select** page: the classes you've played as rows (picture, name, level, where you left off) with Play, plus **New character** → the class picker from A. Feels most like an MMO and is ready for real characters and names later; one extra tap for someone new.
 - **C One class at a time:** a big picture of the class (rags, 4x) with ◀ ▶ arrows or a swipe, role + solo rating + description under it, a row of 14 small chips on top to jump. Best for reading each class; slowest to compare.
 Claude leans **A** now (small, finished; fixes the reload and the stale text), with B's character list as a later card once characters have names.
+**Owner picked A** (Nov 19). **Built v0.38:** grey window, 4-wide grid of square class buttons (role, or Lv once played; one long word like Necromancer gets smaller text), tap selects with a gold outline and fills the info box (rags picture at 3x, name, role · Solo: X, `blurb`), Play switches class via `store` + reload with a one-time `sessionStorage` flag (`ashfen-go`) that starts the game after the reload. Change class opens it with a ✕; same class = Back to game (resumes, no `enterZone`). How-to list rewritten as Menu → **How to play**. B parked as a backlog card (character select list).
