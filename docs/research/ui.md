@@ -119,10 +119,10 @@ Options (rough):
 - **B Merge the toggles into one row with Log and Menu, top right:** `[1st] [Auto] [Log] [Menu]` under the target frame; the top left under your frame is left clear for buffs. One place for every small button.
 - **C Toggles become icons on your frame:** two small square chips inside the bottom-right corner of your frame (a sword for 1st hit, a loop for Auto), lit gold when on; Log and Menu go square (as A). Least clutter, but icons need art and must be learned.
 Claude leans **A** (small, finished, nothing moves so muscle memory holds).
-**Built v0.44 (owner, Nov 19: "fix up those buttons", A):** all four are grey squares in the grid's style (4px corners), 32px tall. 1st hit and Auto have a small light at the left, lit gold (and gold border and text) when on, dim grey when off; no on/off words, so the width never changes. Log has the gold border while the Log panel is open; Menu reads Done (gold) while arranging. The minimap, Log panel and DEV button moved down 6px.
+**Built v0.45 (owner, Nov 19: "fix up those buttons", A):** all four are grey squares in the grid's style (4px corners), 32px tall. 1st hit and Auto have a small light at the left, lit gold (and gold border and text) when on, dim grey when off; no on/off words, so the width never changes. Log has the gold border while the Log panel is open; Menu reads Done (gold) while arranging. The minimap, Log panel and DEV button moved down 6px.
 
 ## 14. Minimap look (owner, Nov 19: "the minimap doesn't look great")
-Now (v0.44): each tile is the average colour of the painted ground under it, brightened, so it reads as blurry green with soft tan roads; pins are plain coloured squares; you're a gold dot (no facing); no area name.
+Now (v0.45): each tile is the average colour of the painted ground under it, brightened, so it reads as blurry green with soft tan roads; pins are plain coloured squares; you're a gold dot (no facing); no area name.
 Drafts: `art/drafts/ui-minimap-options.png` (made by `tools/ui_drafts.py` from the real crossroads map).
 - **A Flat colours:** one clean colour per kind of ground (road, grass, trees, water, stone), so roads stand out; pins become the small map icons (15); you're a gold arrow that shows which way you face; the area name in a grey strip under it.
 - **B Roads only:** dark ground, only roads, water and walls drawn. Quietest and easiest to read; loses the forest shapes.
