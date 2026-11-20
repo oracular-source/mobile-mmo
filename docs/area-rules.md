@@ -55,6 +55,7 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 ## Layout
 - Main road plus small side paths that reward curiosity.
 - Loops, not dead ends; a shortcut back to the hub where it fits.
+- **Not every area needs two ways out (owner, Nov 20):** a cave or burrow can have one way in and out when that fits what it is (the rat tunnel: just the sinkhole). Never put two entrances to the same place right next to each other.
 - Harder with distance and depth, never with locked doors.
 - 1–2 secrets per area off the main road (a hidden chest, a side path, a rare spawn spot).
 - Light as breadcrumbs: torches at entrances, one lit marker in view at a time.

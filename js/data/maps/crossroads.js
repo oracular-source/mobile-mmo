@@ -22,8 +22,8 @@ MAPS.crossroads = {
     'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,,TTTT',
     'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,,TTTT',
     '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,,,,TTT',
-    '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,:,,,TT',
-    'wwb,,,,,,TT,,TTTTTTTTT,,,==,,,TT,TTTTTTT,:,,,TTT',
+    '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,,,,,TT',
+    'wwb,,,,,,TT,,TTTTTTTTT,,,==,,,TT,TTTTTTT,,,,,TTT',
     ',,,,,TTTTTTT,TTTTT,TTT,,,==,,,T,TTT,T,,,,:,,TTTT',
     'TTTTTTTTT,,,TTTTTTTTTT,,,==,,,TTTT,T,,,,:,,,bTTT',
     'T,TTT,T,,,,,TTTTTTTTTT,,,==,,,TT,,,bT,,:,,,,,,TT',
@@ -55,7 +55,6 @@ obj campfire 20 25
 obj signpost 27 29
 obj sinkhole 39 22
 obj lantern 37 21
-obj burrow 41 15
 obj torch 20 40
 obj torch 26 41
 obj torch 2 28
@@ -64,7 +63,6 @@ exit south 23 43 to=town1 lit
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
-exit burrow 42 17 to=rat_tunnel at=back_hole
 # by the town road: the easiest rats
 spawn rat 1 21 37
 spawn rat 1 26 35
