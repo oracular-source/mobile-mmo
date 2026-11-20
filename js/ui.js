@@ -403,3 +403,6 @@ function toggleLogPanel(open){
 }
 $('logtabs').addEventListener('pointerdown',e=>{const b=e.target.closest('button[data-f]');if(!b)return;e.preventDefault();logFilter=b.dataset.f;renderLogPanel()});
 $('logclose').addEventListener('pointerdown',e=>{e.preventDefault();toggleLogPanel(false)});
+
+// Death panel (v0.37): Respawn gets you up at the area's start (half health and mana, as before).
+$('drespawn').addEventListener('click',()=>{if(player.dead>0)respawnPlayer()});

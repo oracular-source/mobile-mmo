@@ -2,8 +2,8 @@
 'use strict';
 /* ---------- Update ---------- */
 function update(dt){
-  if(player.dead>0){player.dead-=dt;if(player.dead<=0)respawnPlayer();}
-  else{
+  // Dead: you stay down until you tap Respawn on the death panel (v0.37; was 3 seconds).
+  if(!(player.dead>0)){
     // Movement: joystick drag or keyboard steers; otherwise walk to a tapped point.
     let mx=0,my=0;
     if(settings.move==='hold'&&joy.id!==null&&(joy.active||performance.now()-joy.t0>HOLD_MS)){

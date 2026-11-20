@@ -103,7 +103,7 @@ function drawGlows(){
 /* ---------- Zones: the overworld and the Dungeon 1 instance ---------- */
 let promptAction=null;
 // Stats for the current dungeon run, shown on the ending screen.
-const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null};
+const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null,cryptT0:null}; // cryptT0: when you came down the crypt stairs (for "Crypt cleared in m:ss")
 function finishRun(){
   const secs=Math.round(time-run.t0),mm=Math.floor(secs/60),ss=String(secs%60).padStart(2,'0');
   const loot=run.loot.filter(n=>!/Whisker|Shell|Bone|Rag/.test(n));
@@ -135,6 +135,7 @@ function enterZone(id,from,at){
     log(id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
+  run.cryptT0=id==='crypt'?time:null;
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   decoy=null;grounds.length=0;traps.length=0;

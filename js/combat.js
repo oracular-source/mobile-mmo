@@ -81,14 +81,18 @@ function killMob(m){
   if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
     run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!(m.def.named||m.def.rare),first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
-    if(m.def.named&&k.count===1)log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');}
+    if((m.def.named||m.def.rare)&&k.count===1){log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');banner('Journal: first kill',cap(m.def.name),'#ff9de2')}}
+  // The crypt boss (v0.37): one banner with how long the visit took. Once per visit; the clock starts at the stairs.
+  if(m.def.boss&&zoneId==='crypt'&&run.cryptT0!=null){const s=Math.round(time-run.cryptT0),mm=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');banner('Crypt cleared','in '+mm);log('Crypt cleared in '+mm+'.','#ffd27a');run.cryptT0=null}
   if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<10&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
     floatText(player.x,player.y-26,'LEVEL '+player.lvl+'!','#ffd27a',true);burst(player.x,player.y-8,'#ffd27a',24,true);
     log('You have reached level '+player.lvl+'!','#ffd27a');
-    AB.forEach(a=>{if(a.lvl===player.lvl)log('You have learned '+a.name+'! Check your Spells.','#7dffa6')});
+    const learned=AB.filter(a=>a.lvl===player.lvl);
+    learned.forEach(a=>log('You have learned '+a.name+'! Check your Spells.','#7dffa6'));
+    banner('Level '+player.lvl,learned.length?'New: '+learned.map(a=>a.name).join(', '):'');
     buildControls();
   }
   save();
@@ -137,9 +141,11 @@ function tankMods(dmg){
   return dmg;
 }
 function playerDie(m){
-  player.hp=0;player.dead=3;player.cast=null;player.tx=null;player.target=null;player.sit=false;
+  player.hp=0;player.dead=1;player.cast=null;player.tx=null;player.target=null;player.sit=false;
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
-  const loss=Math.floor(need(player.lvl)*0.1);player.xp=Math.max(0,player.xp-loss);save();
+  const loss=Math.min(player.xp,Math.floor(need(player.lvl)*0.1));player.xp-=loss;save();
+  // The death panel (v0.37) shows these; you stay down until you tap Respawn.
+  $('dkiller').textContent='Slain by '+m.def.name;$('dxp').textContent=loss>0?'−'+loss+' XP':'';
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
   mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
   player.buffs={};player.bval={};player.lsUsed=false;player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
@@ -252,9 +258,12 @@ function giveItem(id,n,k){
   const it=ITEMS[id];n=n||1;
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
   if(i>=0)inv.bags[i].n+=n;
-  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80','loot');return false}inv.bags[i]={id:id,n:n}}
+  else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');banner('Bags full',it.name+' left behind','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
   if(zoneId==='dun')run.loot.push(it.name);
-  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar],'loot');
+  // Junk and commons stay in the Log; anything better shows in the chat box and gets a banner (v0.37). Bags full shows in both too.
+  const good=it.rar!=='junk'&&it.rar!=='common';
+  log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar],good?'main':'loot');
+  if(good)banner(cap(it.rar)+' drop',it.name,RAR[it.rar]);
   floatText(player.x,player.y-30-(k||0)*8,it.name,RAR[it.rar]);
   return true;
 }

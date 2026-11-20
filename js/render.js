@@ -222,7 +222,7 @@ function render(){
     cx.fillStyle='rgba(20,18,26,0.92)';cx.strokeStyle='#c9a227';cx.lineWidth=1*dpr;cx.beginPath();cx.rect(bx,by,w,h);cx.fill();cx.stroke();
     cx.fillStyle='#e8e2cf';ls.forEach((l,i)=>cx.fillText(l,bx+w/2,by+pad+fs*0.6+i*fs*1.25));cx.globalAlpha=1;
   });
-  if(player.dead>0){cx.fillStyle='rgba(60,0,0,0.35)';cx.fillRect(0,0,cv.width,cv.height);cx.font='700 '+Math.round(16*dpr)+'px ui-monospace,Menlo,monospace';cx.fillStyle='#ff6b6b';cx.fillText('You have died',cv.width/2,cv.height/2)}
+  if(player.dead>0){cx.fillStyle='rgba(60,0,0,0.35)';cx.fillRect(0,0,cv.width,cv.height);}
 }
 
 /* ---------- HUD ---------- */
@@ -263,6 +263,7 @@ function ui(){
     const fh=fx.join('');if($('tfx').dataset.h!==fh){$('tfx').dataset.h=fh;$('tfx').innerHTML=fh}}
   else tf.style.visibility='hidden';
   // Boss and named casts at you: big bar in the middle of the screen, whoever you're targeting (never in the target frame).
+  {const d=$('deathUI'),on=player.dead>0&&!simState.busy?'block':'none';if(d.style.display!==on)d.style.display=on} // the sim's arena deaths never show it
   const bc=$('bcast'),cm=mobs.find(m=>!m.dead&&m.casting&&(m.def.boss||m.def.named));
   if(cm){bc.style.display='block';$('bcastname').textContent=cap(cm.def.name)+': '+cm.casting.name;$('bcastfill').style.width=Math.min(100,100*cm.casting.t/cm.casting.dur)+'%'}else bc.style.display='none';
   // Log, Menu, the minimap and DEV sit under the top frames and move down when the frames grow (debuff tags, buffs wrapping).

@@ -16,6 +16,12 @@ function floatText(x,y,txt,col,big,kind){
   floats.push({x0:x,y0:y,x:x+dx,y:y+dy,txt:txt,col:col,t:0,big:!!big,kind:kind,life:FLOAT[kind].life})}
 function burst(x,y,col,n,up){for(let i=0;i<n;i++)parts.push({x:x+rr(-4,4),y:y+rr(-4,2),vx:rr(-12,12),vy:up?rr(-28,-12):rr(-18,8),t:0,life:rr(0.4,0.9),col:col})}
 const logEl=$('log'),lines=[],logHist=[];
+// Moments banner (v0.37): one small grey box under the cast bar. Shows ~2.5s; if two things happen at once they queue.
+const banQ=[];let banT=null;
+function banner(title,sub,col){if(logMute)return;banQ.push({title:title,sub:sub||'',col:col||'#ffd27a'});if(!banT)banNext()}
+function banNext(){const b=banQ.shift(),el=$('banner');if(!b){el.style.display='none';banT=null;return}
+  $('bantitle').textContent=b.title;$('bantitle').style.color=b.col;$('bansub').textContent=b.sub;el.style.display='block';
+  banT=setTimeout(banNext,banQ.length?1800:2600)} // shorter when more are waiting
 let logMute=false; // the sim runs thousands of fights; it mutes the chat box meanwhile
 let logPanelOpen=false; // the Log panel (top right button) shows the full history; see ui.js
 // kind: 'fight' = routine hits, misses and heals (the numbers already float over heads), kept in the Log panel only;

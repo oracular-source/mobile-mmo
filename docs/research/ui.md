@@ -23,7 +23,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 7. Pet bar (done v0.34)
 8. Menu screens (Spells, Arrange, Settings) (done v0.35)
 9. Character screen (Gear, Bags, Journal) (done v0.36)
-10. Moments (level up, death, loot, run summary)
+10. Moments (level up, death, loot, run summary) (done v0.37)
 11. Start screen and class picker
 12. Minimap and full map (check only)
 
@@ -79,3 +79,9 @@ Now (before v0.36): the old rounded card with a Done button and three tabs. Gear
 Options: **A** same three tabs in the grey window, stats in a small block, tap a slot for details + Take off; **B** EverQuest paper doll: gear slots around your picture, stats beside it, bags below, one details strip; Journal its own tab; **C** one scrolling list (worn, then bags), text only.
 Claude leaned B. **Owner picked B** (Nov 19). **Built v0.36:** grey window with ✕ and square tabs **Character | Journal** (the menu window's style). Doll: Head, Chest, Legs, Feet left; Ring, Hands, Weapon, Off-hand right; your rags picture in the middle at 4x; stats column on the right. Bags: 16 squares, two rows of 8, short name = the item's last word (smaller text for long words), rarity as the border colour, ×n for stacks. First tap selects (gold outline), the strip below does the rest: bags get Equip / Sell (near Marrow) / Destroy with the stat comparison; worn slots get Take off. After Equip the selection follows the item to its slot; after Take off it follows it to the bag. Journal adds a **Rares** section. Same saves.
 Later: item icons replace the short names once the art pass draws them; the middle picture will show gear once gear shows on the character.
+
+## 10. Moments (level up, death, loot, run summary)
+Now (before v0.37): level up was gold floating text for about a second plus chat lines; death was a red screen and "You have died" for 3 seconds, then an automatic respawn, with the 10% XP loss never shown; drops floated their name and went only to the Log, so an uncommon looked like junk; **"bags full, item left behind" went only to the Log** (a bug: drops could vanish unseen); the crypt had no run summary (only the old Dungeon 1 did).
+Options: **A** quiet, everything in the chat box; **B** one banner slot up top for big moments, a small death panel with Respawn, a small run summary panel; **C** full screens that pause the game.
+Claude leaned B. **Owner picked B** (Nov 19), with changes: **no run summary panel** (no Stay / Leave), just a banner "Crypt cleared in m:ss"; **don't show junk** like rat tails.
+**Built v0.37:** `banner(title,sub,col)` in `js/fx.js` (grey box under the cast bar, ~2.6s, queues, 1.8s each when more are waiting, muted during the sim). Banners: Level N + New: spells; Uncommon / Rare / Named / Key drop; Journal: first kill (named or rare); Bags full + item left behind; Crypt cleared in m:ss (`run.cryptT0` set on entering the crypt, cleared after the banner, so once per visit). Uncommon-or-better drops and bags full also go to the chat box; junk and commons stay in the Log. Death panel (`#deathUI`): Slain by X, −N XP, Respawn button; `player.dead` stays up until the button (no timer); hidden while the sim runs.
