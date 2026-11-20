@@ -61,6 +61,24 @@ Same rules as level 10: both sides a bit stronger than the base, about equal, di
 - **Bard · Chant of Blades:** *Bladesong* (your swings also hit one mob next to your target) / *Battle Tempo* (swing speed keeps building through a long fight, up to double).
 - **Sim check (when built):** each side in a single fight, a pack and a long named fight at levels 12–15, DPS tracked; if one side wins everywhere, redesign. Watch for: Leaping Plague / Locust Swarm chaining forever through a big pull, Thrall chain-sleeping, Whirlwind threat with Challenge-style tanks in groups later.
 
+### Level 14 forks, all 14 classes (approved Nov 19)
+Same rules again. Each class forks an ability that had no fork yet, and classes that already had "one mob vs many" at 10 or 12 get a different kind of choice here (tank vs hit back, offense vs sustain, burst vs over time, you vs your pet).
+- **Necromancer · Lifetap:** *Bone Tap* (also heals your skeleton for half) / *Twin Tap* (also hits a second mob for half).
+- **Druid · Mending Touch:** *Wild Regrowth* (instant heal over 8s, cast while kiting) / *Verdant Touch* (slower cast, bigger heal; overheal becomes a short shield).
+- **Warrior · Defensive Stance:** *Iron Stance* (longer, blocks much more, you hit softer) / *Retaliation* (shorter, every blocked hit strikes back).
+- **Rogue · Rend:** *Garrote* (from Hide: stops casters casting 3s and bleeds double) / *Lacerate* (stacks up to 3 times for long fights).
+- **Cleric · Divine Aura:** *Divine Shelter* (heals you over time while immune) / *Divine Wrath* (blasts every mob near you when it ends).
+- **Enchanter · Slow Mind:** *Deep Slow* (stronger, and slowed mobs take more from Mind Rot) / *Mind Drain* (normal slow, you regain mana while it lasts).
+- **Paladin · Divine Strike:** *Crusader Strike* (one heavy hit, heals you for 30% of the damage) / *Divine Storm* (wider circle all around you, lighter hits).
+- **Shadow Knight · Raise Minion:** *Ghoul* (tougher, holds one mob) / *Wraith* (fragile, its hits heal you).
+- **Wizard · Fireball:** *Pyroblast* (longer cast, huge hit) / *Living Bomb* (fast cast, burns over time, then explodes onto nearby mobs).
+- **Magician · Flame Shield:** *Inferno Shield* (stronger shield on you) / *Shared Flames* (goes on your pet, so mobs hitting the pet burn).
+- **Ranger · Disengage:** *Recoil Shot* (hop back and fire a free shot that snares) / *Double Hop* (two hops stored, for long kites).
+- **Monk · Flying Kick:** *Tiger Leap* (cooldown resets if the leaped-at mob dies) / *Crane Kick* (landing stuns every mob near you 1.5s).
+- **Shaman · Venom Totem:** *Toxic Totem* (stronger poison on every mob near it) / *Mending Totem* (heals you while you stand near it; poisons one mob).
+- **Bard · Dirge:** *Dirge of Ruin* (damage builds the longer a mob stays near you) / *Requiem* (weaker, each mob it kills heals you).
+- **Sim check (when built):** same as level 12, at levels 14–15. Watch for: Tiger Leap chaining through a whole pull, Retaliation plus Iron Stance on tanks in groups later, Wraith healing on packs.
+
 ### Example: Necromancer (draft)
 - **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
 - **Major at 20, "what kind of necro":** *Bone Lord* (skeletons cleave, the main one taunts: solo pet build) / *Plaguebringer* (DoTs spread to every mob near your target: group pulls) / *Blood Pact* (lifetaps heal your group a little: group support).
