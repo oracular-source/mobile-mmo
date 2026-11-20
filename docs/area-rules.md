@@ -31,7 +31,6 @@ The goal is a game that feels thought about, not generated. Small details set ga
 - **Right sizes:** doors, windows and props sized for the 20 × 24 characters, not left over from older art (the graveyard shack's door is too small).
 - **Small stories:** a prop that hints at what happened (the dead adventurer in the rat tunnel, the hunter's camp, the fallen bell).
 - **Ways between areas look like something:** an entrance where something marks it (gate, cave mouth, stairs), or a path that just carries on into the next place; never a black box at the edge.
-- **Woods are mixed (v0.51, tree variety):** never one tree repeated. 2–3 kinds per area growing in stands (neighbours mostly match, a few mixed in), young, mid and old sizes, small shade shifts from crown to crown, and something growing between the trunks (seedlings, ferns, fallen branches). New areas pick their own mix in `TREE_MIX` (`js/area.js`), or draw new kinds when the setting calls for it.
 - **Take it slow:** art passes go in chunks, one area at a time, and each chunk gets looked at on the phone before the next.
 - **Learned on the graveyard pass (v0.49):** every stone weathers on its own (lean, chip, crack, moss on the top and foot, lichen), never all the same; critters get a lighter back or pale eyes so they show against dark ground on a phone; a critter that hides when you come close (crows, frogs) makes the place feel aware of you; dead areas get dead reeds and leaves too, not just dead grass; the area's name should show up in the art (sunken headstones in the Sunken Graveyard's water). Critters go in the map file as `critter` lines (`map-format.md`).
 
@@ -41,6 +40,17 @@ The goal is a game that feels thought about, not generated. Small details set ga
 - Things sit where they'd really be: graves in rows on open ground, rubble at the foot of what it fell from, paths worn where people walk, puddles in low spots.
 - Buildings have believable openings: doors at ground level, windows only where a building would have them.
 - Every mock-up gets checked for overlaps before the owner sees it (`tools/mapcheck.py` does this for map files). When a new rule can be checked by a script, add it to the checker too.
+
+## Natural shapes: nothing looks like the tile grid (owner, Nov 20)
+The map is made of square tiles, but the world shouldn't look like it. Square water in the crossroads and the graveyard read almost like a path. These rules apply to every area, old and new:
+- **Water has natural edges:** banks curve and bite across tile lines, corners are rounded, never a straight run longer than a couple of tiles. A darker wet rim at the edge, then mud, stones and reeds; shallows fade in before the deep water. Creeks wander and change width; ponds are blobs, not boxes.
+- **Every edge between two grounds is soft:** grass into dirt, path into grass, moss into blight: ragged, uneven lines, never a ruler edge along the tiles.
+- **Woods are mixed:** never one tree repeated. 2–3 kinds per area growing in stands (neighbours mostly match, a few mixed in), young, mid and old sizes, small shade shifts from crown to crown, and something growing between the trunks (seedlings, ferns, fallen branches). Each area sets its mix in `TREE_MIX` (`js/area.js`), or gets new kinds when the setting calls for it (v0.51).
+- **Drawing, not map changes:** these are fixed in how tiles are drawn, so map files, walking and saves stay the same.
+- **Check it on the in-game view:** if a shape looks like it follows the grid, redraw it.
+
+## Every look decision gets saved here (owner, Nov 20)
+Whenever the owner makes a call on how things should look or feel (in any chat), write it into this file in the section it fits, with the date, in the same push. This file is how every chat keeps the world consistent; the board only tracks the work.
 
 ## Layout
 - Main road plus small side paths that reward curiosity.
