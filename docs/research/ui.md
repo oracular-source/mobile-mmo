@@ -28,6 +28,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
 17. Never pause: windows and the skill pick (owner picked A, built v0.56)
+18. Buff and debuff icons with timers (options written, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -162,3 +163,13 @@ Options for the windows:
 - **B Half window:** windows slide up from the bottom and take about half the screen; the camera shifts so you and what's near you stay in view in the top half; frames stay up. Spell grid hidden while open. The full Map stays full-screen.
 - **C Warn me:** windows stay dark and full-screen; a red "Under attack" strip with your health shows when you're hit; tap it to close. Cheap, but you learn of danger only after the hit.
 Claude leaned **B** (the only one where you can see yourself and nearby mobs). **Owner picked A** (Nov 20). **Built v0.56:** `.modal` cover 0.38 black (DEV and start screen keep 0.9 and still pause, `pausing()` in `ui.js`), windows padded below the measured top frames (`--hudH`), `#hud` above windows; `pauseWatch()` (10/s, with the HUD) flashes the open card's border red when health drops, toggles `.due` (gold pulse, `skpulse`) on Menu and the Skills tab while `forkDue()`, and runs `promptWatch()`. Prompt strip `#promptUI` (not a modal) cancels past two tiles or on an area change. `openModal` closes any other window and opens the Menu on Skills when a choice is waiting. B stays the fallback if the covered middle bites in play.
+
+## 18. Buff and debuff icons with timers (Nov 20)
+Unblocked now that every spell has an icon (v0.53); this is the board's "Buff and debuff icons with timers" card.
+**Now:** your buffs are small coloured word tags under your frame ("Sprint 9"); effects on the target are full-word tags with seconds ("Rooted 6", "Rot 14", "Chilled x3"), mixed in with traits that never run out (Rare, Undead, Armored, Marked). With 4+ up they wrap to a second and third line, which pushes Log, Menu and the minimap down and is hard to read mid-fight.
+**Same in every option:** each effect becomes its 16px spell icon (the same shapes and tints as the spell grid) in one row; DoTs use their spell's icon, states use the shared ones (roots, boot, star, ghost for fear, mez for sleep, frost for Chilled with a small x3 for stacks). Traits leave the row and sit as plain grey words after the level ("Lv 8  Undead"). Tap an icon to see its name for a moment (nothing pauses). Long buffs (no timer) show no number.
+Options, draft `art/drafts/ui-buff-icons.png` (made by `tools/ui_buff_icons.py`):
+- **A Number under:** seconds under every timed icon, red at 3 and under. Most exact; adds a line of height to both frames.
+- **B Dark shade fills down:** the icon darkens from the top as it runs out (like a cooldown), a small number in the corner only under 10s, red edge blinking in the last 3s. Same height as one row of icons.
+- **C Thin bar under:** a 2px bar under each icon drains, no numbers, red in the last 3s. Calmest; you guess the seconds.
+Claude leans **B**: the row stays one line high, you can read "about half left" at a glance, and exact seconds show only when they start to matter (re-rooting, re-snaring). Risk: the shade must look different from a spell cooldown on the grid; it reads differently because these sit on the frames, not the grid, and have no grey-out. Owner to pick.
