@@ -94,11 +94,14 @@ function groundCol(n,r){
    Walking still uses the square tiles; only the look changes. Each tile is 1 (water) or 0 (land) at its centre; blending
    those across the tile and adding two layers of slow wobble gives one smooth shape whose banks curve across tile lines.
    v below 0 is land, above 0 is water; the bigger v, the deeper. Rules in docs/area-rules.md (Natural shapes). */
-function smoothNoise(x,y,p,s){const u=x/p,v=y/p,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy);
-  const a=ah(i,j,s),b=ah(i+1,j,s),c=ah(i,j+1,s),d=ah(i+1,j+1,s);return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy}
+// The same smooth noise from a pre-filled grid of lattice values: far faster when a whole area is painted pixel by pixel.
+function noiseGrid(W,H,p,s){const nx=Math.ceil(W/p)+2,ny=Math.ceil(H/p)+2,L=new Float32Array(nx*ny);for(let j=0;j<ny;j++)for(let i=0;i<nx;i++)L[j*nx+i]=ah(i,j,s);
+  return (x,y)=>{const u=x/p,v=y/p,i=u|0,j=v|0,fx=u-i,fy=v-j,sx=fx*fx*(3-2*fx),sy=fy*fy*(3-2*fy),k=j*nx+i,a=L[k],b=L[k+1],c=L[k+nx],d=L[k+nx+1];
+    return a+(b-a)*sx+(c-a)*sy+(a-b-c+d)*sx*sy}}
 function waterField(A,groundOf){
   const wet=[];for(let y=0;y<A.h;y++){wet[y]=[];for(let x=0;x<A.w;x++)wet[y][x]=groundOf(x,y)==='water'?1:0}
   const m=(x,y)=>wet[Math.max(0,Math.min(A.h-1,y))][Math.max(0,Math.min(A.w-1,x))];
+  const N1=noiseGrid(A.w*T+16,A.h*T+16,40,201),N2=noiseGrid(A.w*T+16,A.h*T+16,13,202);
   const dry=new Set(['road','dirt_path','gate','floor','stairs']); // never let water creep onto a road or a built floor
   const bl=(px,py)=>{const u=(px+0.5)/T-0.5,v=(py+0.5)/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
     return m(i,j)*(1-fx)*(1-fy)+m(i+1,j)*fx*(1-fy)+m(i,j+1)*(1-fx)*fy+m(i+1,j+1)*fx*fy};
@@ -107,7 +110,7 @@ function waterField(A,groundOf){
     if(!wet[ty][tx]&&dry.has(groundOf(tx,ty)))return -1;
     // Averaging a small square of blended samples turns a staircase of tiles into a slope.
     let f=0;for(let sy=-6;sy<=6;sy+=6)for(let sx=-6;sx<=6;sx+=6)f+=bl(px+sx,py+sy);f/=9;
-    return f-0.5+(smoothNoise(px,py,40,201)-0.5)*0.5+(smoothNoise(px,py,13,202)-0.5)*0.22}}
+    return f-0.5+(N1(px,py)-0.5)*0.5+(N2(px,py)-0.5)*0.22}}
 function paintWater(A,g,groundOf){
   const V=waterField(A,groundOf);A.wetV=V;
   const near=[];for(let y=0;y<A.h;y++)for(let x=0;x<A.w;x++){let n=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){const a=x+i,b=y+j;if(a>=0&&b>=0&&a<A.w&&b<A.h&&groundOf(a,b)==='water')n=1}if(n)near.push([x,y])}
@@ -115,22 +118,22 @@ function paintWater(A,g,groundOf){
   const W=A.w*T,H=A.h*T,img=g.getImageData(0,0,W,H),d=img.data;
   const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const C={};const col=h=>C[h]||(C[h]=rgb(h));
   const put=(x,y,h)=>{const c=col(h),k=(y*W+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255};
-  const cave=A.tint==='earth';
+  const cave=A.tint==='earth',NB=noiseGrid(W+16,H+16,24,204),N9=noiseGrid(W+16,H+16,9,205),N11=noiseGrid(W+16,H+16,11,206);
   // The land a water tile's dry bits belong to: the neighbour on that side, else any land next to it.
   const bankOf=(tx,ty,ox,oy)=>{const sx=ox<8?-1:1,sy=oy<8?-1:1;for(const [dx,dy] of [[sx,0],[0,sy],[sx,sy],[-sx,0],[0,-sy],[-sx,-sy],[sx,-sy],[-sx,sy]]){const n=groundOf(tx+dx,ty+dy);if(n!=='water')return n}return cave?'cave_dirt':'mud'};
   near.forEach(([tx,ty])=>{const isW=groundOf(tx,ty)==='water';
     for(let oy=0;oy<T;oy++)for(let ox=0;ox<T;ox++){const px=tx*T+ox,py=ty*T+oy,v=V(px,py);
-      const bankW=0.07+0.13*smoothNoise(px,py,24,204); // the wet strip changes width along the bank
+      const bankW=0.07+0.13*NB(px,py); // the wet strip changes width along the bank
       if(v<0){
         if(v>-bankW)put(px,py,cave?(ah(px,py,5)<0.5?'#2a231b':'#241e17'):(ah(px,py,5)<0.6?AP.mud:(ah(px,py,6)<0.5?'#2c2820':AP.mudDk))); // wet mud
-        else if(isW)put(px,py,groundCol(bankOf(tx,ty,ox,oy),ah(px>>3,py>>3,1))); // land biting into a water tile
+        else if(isW)put(px,py,groundPatch(bankOf(tx,ty,ox,oy),px,py)); // land biting into a water tile
         continue}
       let c;
       if(v<0.03)c='#0d1a22';                                               // dark wet rim right at the edge
       else if(V(px,py-3)<0||V(px,py-2)<0)c='#0f1e28';                      // the north bank's shadow on the water (3/4 view)
       else if(v<0.11)c=ah(px,py,7)<0.55?'#1d3842':'#1a333e';               // shallows, a touch lighter and greener
       else if(v<0.2)c=ah(px,py,8)<0.5?'#16293a':AP.water;                  // stepping down
-      else c=v>0.42&&smoothNoise(px,py,9,205)<0.5?'#0f202b':(smoothNoise(px,py,11,206)<0.45?'#16293a':AP.water); // deep, in soft patches
+      else c=v>0.42&&N9(px,py)<0.5?'#0f202b':(N11(px,py)<0.45?'#16293a':AP.water); // deep, in soft patches
       put(px,py,c)}});
   g.putImageData(img,0,0);
   // Bank details on top: pebbles in the wet strip, reeds in clumps, lily pads in still water, light catching the deep.
@@ -143,6 +146,58 @@ function paintWater(A,g,groundOf){
     else if(!cave&&!dead&&v>0.14&&v<0.32&&r>0.9){R(x,y,4,2,'#2a4228');R(x+1,y,2,1,'#3d5a32');R(x+2,y+1,1,1,'#0f1e28')}   // a lily pad with its notch
     else if(v>0.2&&r>0.5&&r<0.75){R(x,y,3,1,AP.waterHi);if(r<0.53)R(x+1,y,1,1,AP.glint)}}});
 }
+/* ---------- Ground with natural edges (v0.54, owner Nov 20: give the ground the same treatment as the water) ----------
+   Same idea as the water: each tile's ground counts fully at its centre and fades toward its neighbours; a little wobble
+   plus a nudge per ground decides which one shows at each pixel. Natural ground (grass, dead grass, mud, marsh, needles,
+   moss, blight, worn paths) meets in loose curves; built ground (roads, floors, stairs, flagstones) keeps a near-straight,
+   tidy edge, because people made it. Walking still uses the tiles. Rules in docs/area-rules.md (Natural shapes). */
+const BUILT_GROUND=new Set(['road','floor','stairs','flagstone','dirt_slope','bridge']);
+// One ground's colour at a pixel: the 8 x 8 colour patches are wobbled a little so they never line up in a checker grid
+// (built floors keep their tidy patches).
+let PATCH_NX=null,PATCH_NY=null; // set per area by paintGround (noise grids sized to the area)
+function groundPatch(n,px,py){if(BUILT_GROUND.has(n)||!PATCH_NX)return groundCol(n,ah(px>>3,py>>3,1));
+  const qx=px+Math.round((PATCH_NX(px,py)-0.5)*7),qy=py+Math.round((PATCH_NY(px,py)-0.5)*7);return groundCol(n,ah(qx>>3,qy>>3,1))}
+// A ground's small detail (tuft, pebble, reed...) for the bits of ground that spill over a tile line.
+function groundDetail(R,n,x,y,r){
+  if(n==='grass')R(x,y,1,2,r<0.5?AP.ggTuft:AP.ggTuft2);else if(n==='dead_grass')R(x,y,1,2,AP.dgTuft);
+  else if(n==='dirt_path'||n==='gate'||n==='broken_fence')R(x,y,1,1,AP.pebble);else if(n==='road')R(x,y,1,1,AP.roadHi);
+  else if(n==='mud')R(x,y,3,1,AP.mudDk);else if(n==='marsh'){R(x,y-2,1,3,AP.reed);R(x,y-2,1,1,AP.reedHi)}
+  else if(n==='needles')R(x,y,2,1,AP.needleHi);else if(n==='moss')R(x,y,3,2,AP.mossHi);else if(n==='blight')R(x,y,1,1,AP.ash);
+  else if(n==='cave_dirt')R(x,y,1,1,AP.caveHi)}
+function paintGround(A,g,groundOf){
+  const W=A.w*T,H=A.h*T,types=[],tid={},id=n=>tid[n]!==undefined?tid[n]:(tid[n]=types.push(n)-1);
+  const tt=[];for(let y=0;y<A.h;y++){tt[y]=[];for(let x=0;x<A.w;x++)tt[y][x]=id(groundOf(x,y))}
+  const WATER=id('water'),tm=(x,y)=>tt[y<0?0:y>=A.h?A.h-1:y][x<0?0:x>=A.w?A.w-1:x];
+  // Each ground's colours, looked up by patch roll in 20 steps (exact for groundCol's thresholds), packed for a fast write.
+  const pack=h=>(255<<24)|(parseInt(h.slice(5,7),16)<<16)|(parseInt(h.slice(3,5),16)<<8)|parseInt(h.slice(1,3),16);
+  const pal=types.map(n=>{const a=new Uint32Array(20);for(let b=0;b<20;b++)a[b]=pack(groundCol(n,(b+0.5)/20));return a});
+  const built=types.map(n=>BUILT_GROUND.has(n));
+  // Paths and roads are thin: a small head start keeps a one-tile path joined where its tiles only touch at the corners.
+  const thin=types.map(n=>n==='dirt_path'||n==='gate'||n==='broken_fence'||n==='road'||n==='bridge'?0.16:0);
+  const at=new Uint8Array(W*H),img=g.createImageData(W,H),d32=new Uint32Array(img.data.buffer);
+  const NX=noiseGrid(W,H,18,401),NY=noiseGrid(W,H,18,402),NT=types.map((n,c)=>noiseGrid(W+16,H+16,12,500+c));
+  const PX=noiseGrid(W+16,H+16,10,403),PY=noiseGrid(W+16,H+16,10,404);PATCH_NX=PX;PATCH_NY=PY;
+  const wsum=new Float32Array(types.length),seen=new Int32Array(4);
+  const CW=(W>>3)+4,CH=(H>>3)+4,cell=new Uint8Array(CW*CH);for(let j=0;j<CH;j++)for(let i=0;i<CW;i++)cell[j*CW+i]=Math.floor(ah(i-1,j-1,1)*20); // patch rolls, one per 8 x 8 cell
+  const OFF=new Int8Array(((W>>1)+1)*((H>>1)+1)*2),OW=(W>>1)+1;for(let j=0;j*2<H;j++)for(let i=0;i*2<W;i++){const k=(j*OW+i)*2;OFF[k]=Math.round((PX(i*2,j*2)-0.5)*7);OFF[k+1]=Math.round((PY(i*2,j*2)-0.5)*7)} // patch wobble every 2 px
+  for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const t0=tt[ty][tx];
+    // Only tiles with a different ground next to them need the blend (water is left to the water pass).
+    let edge=false;if(t0!==WATER)for(let j=-1;j<=1&&!edge;j++)for(let i=-1;i<=1;i++){const n=tm(tx+i,ty+j);if(n!==t0&&n!==WATER){edge=true;break}}
+    const anyB=built[t0]||built[tm(tx-1,ty)]||built[tm(tx+1,ty)]||built[tm(tx,ty-1)]||built[tm(tx,ty+1)],aw=anyB?2:4;
+    for(let oy=0;oy<T;oy++)for(let ox=0;ox<T;ox++){const px=tx*T+ox,py=ty*T+oy;let t=t0;
+      if(edge){
+        const qx=px+(NX(px,py)-0.5)*2*aw,qy=py+(NY(px,py)-0.5)*2*aw,u=(qx+0.5)/T-0.5,v=(qy+0.5)/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
+        let ns=0;
+        for(let k=0;k<4;k++){let c=tm(i+(k&1),j+(k>>1));if(c===WATER)c=t0;const w=(k&1?fx:1-fx)*(k>>1?fy:1-fy);
+          let f=-1;for(let q=0;q<ns;q++)if(seen[q]===c)f=q;if(f<0){seen[ns++]=c;wsum[c]=0}wsum[c]+=w}
+        if(ns>1){let best=-9;for(let q=0;q<ns;q++){const c=seen[q],amp=built[c]||built[t0]?0.2:thin[c]||thin[t0]?0.3:0.5,sc=wsum[c]+thin[c]+(NT[c](px,py)-0.5)*amp;if(sc>best){best=sc;t=c}}}
+        else t=seen[0]}
+      at[py*W+px]=t;
+      // The colour patch: 8 x 8 blocks, wobbled for natural ground so they don't form a checker grid.
+      let cx=px,cy=py;if(!built[t]){const k=((py>>1)*OW+(px>>1))*2;cx+=OFF[k];cy+=OFF[k+1]}
+      d32[py*W+px]=pal[t][cell[((cy>>3)+1)*CW+(cx>>3)+1]]}}
+  g.putImageData(img,0,0);
+  return {types:types,at:at}}
 function paintArea(A){
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -159,27 +214,12 @@ function paintArea(A){
     return 'dead_grass'};
   const groundOf=(x,y)=>{x=Math.max(0,Math.min(A.w-1,x));y=Math.max(0,Math.min(A.h-1,y));const t=AREA_TILES[tile(x,y)];return t.name==='bridge'?'water':t.walk||t.name==='water'?t.name:under(x,y)};
 
-  // 1) Ground: 8 x 8 patches in a few close shades (the mock-up's look), with tufts and pebbles.
+  // 1) Ground (v0.54): every pixel picks its ground from a smooth blend of the tiles around it, so grounds meet in natural
+  // curves instead of tile squares; colour patches are wobbled so they don't line up in a checker grid. Then tufts and pebbles.
+  const eg=paintGround(A,g,groundOf);const egAt=(x,y)=>eg.types[eg.at[Math.max(0,Math.min(A.h*T-1,y))*A.w*T+Math.max(0,Math.min(A.w*T-1,x))]];
   for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){
     const gname=groundOf(tx,ty),bx=tx*T,by=ty*T;
-    for(let qy=0;qy<2;qy++)for(let qx=0;qx<2;qx++){
-      const r=ah(tx*2+qx,ty*2+qy,1),X=bx+qx*8,Y=by+qy*8;
-      let col;
-      if(gname==='dead_grass')col=AP.dg[Math.floor(r*4)];
-      else if(gname==='grass')col=AP.gg[Math.floor(r*4)];
-      else if(gname==='dirt_path'||gname==='gate'||gname==='broken_fence')col=r<0.5?AP.path:(r<0.8?'#54473a':AP.pathHi);
-      else if(gname==='road')col=r<0.6?AP.road:'#665443';
-      else if(gname==='mud')col=r<0.7?AP.mud:'#2c2820';
-      else if(gname==='marsh')col=r<0.6?AP.marsh:'#2a3a30';
-      else if(gname==='water')col=r<0.7?AP.water:'#16293a';
-      else if(gname==='floor'||gname==='stairs')col=groundCol('floor',r);
-      else if(gname==='cave_dirt'||gname==='dirt_slope')col=AP.cave[Math.floor(r*4)];
-      else if(gname==='needles'||gname==='blight')col=AP[gname][Math.floor(r*4)];
-      else if(gname==='moss')col=AP.mossG[Math.floor(r*4)];
-      else if(gname==='fern')col=AP.needles[Math.floor(r*4)];
-      else col=AP.dg[0];
-      R(X,Y,8,8,col);
-    }
+    const R0=R;{const R=(x,y,w,h,col)=>{if(w>2||h>4||egAt(x,y)===gname)R0(x,y,w,h,col)}; // a tuft only where its own ground shows
     for(let i=0;i<6;i++){const r1=ah(tx,ty,10+i),r2=ah(tx,ty,30+i),x=bx+Math.floor(r1*15),y=by+Math.floor(r2*15);
       if(gname==='dead_grass'){if(i<3){R(x,y,1,2,AP.dgTuft);if(i===0)R(x+1,y+1,1,1,AP.dgTuft)}else if(i===3&&r1<0.4)R(x,y,1,1,AP.dgDot)
         // Heart pass (v0.49): fallen leaves, a dry twig now and then, a pale pebble
@@ -205,6 +245,9 @@ function paintArea(A){
       else if(gname==='fern'){if(i<3){const fx=x,fy=y;R(fx,fy,1,4,AP.fernDk);R(fx-2,fy+1,2,1,AP.fern);R(fx+1,fy+1,2,1,AP.fern);R(fx-1,fy+2,1,1,AP.fern);R(fx+1,fy+2,1,1,AP.fern);R(fx,fy-1,1,1,AP.fernHi)}}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }
+    }
+    // Where a neighbour's ground spills into this tile, give it that ground's own little details too.
+    for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,60+i)*16),y=by+Math.floor(ah(tx,ty,70+i)*16),e=egAt(x,y);if(e!==gname)groundDetail(R,e,x,y,ah(tx,ty,80+i))}
     // Tree variety (v0.50): seedlings, small ferns and fallen twigs on open ground beside trees, so a wood has something growing between the trunks.
     // Ground only: you walk over them, and the trees still draw over them.
     {const nb=m=>[[0,1],[0,-1],[1,0],[-1,0]].some(([dx,dy])=>name(tx+dx,ty+dy)===m);const here=name(tx,ty);
@@ -215,10 +258,6 @@ function paintArea(A){
        for(let i=0;i<6;i++){R(x+i,y+Math.floor(i*fl/3),1,1,AP.out);R(x+i,y-1+Math.floor(i*fl/3),1,1,i<2?AP.trunkHi:AP.trunk)}R(x+3,y-2+(fl>0?1:-1),1,1,AP.twig)}} // a fallen branch
     // Heart pass (v0.49): leaves drift under the dead trees.
     if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
-    // Ragged edges wherever two kinds of ground meet (path and grass, mud and marsh...), so nothing looks stamped on in squares.
-    [[0,-1],[0,1],[-1,0],[1,0]].forEach(([dx,dy])=>{const n=groundOf(tx+dx,ty+dy);if(n===gname||n==='water'||gname==='water'||gname==='floor'||gname==='stairs'||gname==='cave_dirt'||gname==='dirt_slope'||n==='cave_dirt'||n==='dirt_slope')return;
-      for(let i=0;i<16;i++){const r=ah(tx*16+i,ty*16,dx*3+dy*7+50);if(r>0.6)continue;const d=1+Math.floor(ah(tx+i,ty*16,dx+dy*5+60)*3),col=groundCol(n,ah(tx*16+i,ty,61));
-        if(dy===-1)R(bx+i,by,1,d,col);if(dy===1)R(bx+i,by+16-d,1,d,col);if(dx===-1)R(bx,by+i,d,1,col);if(dx===1)R(bx+16-d,by+i,d,1,col)}});
   }
 
   // 1b) Water with natural edges (v0.52): drawn over the square tiles as one smooth shape, then the bank details.
