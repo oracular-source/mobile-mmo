@@ -182,3 +182,21 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 .sgrp{border-bottom:1px solid #2a2531;padding-bottom:3px}
 .srow{margin-bottom:7px}
 .slbl{font-size:11.5px;color:#bbb;margin-bottom:3px}
+/* v0.36 Character screen: paper doll (8 gear slots around your picture), stats beside it, 16 bags in two rows of 8,
+   details strip at the bottom. Plain grey squares like the spell grid; a coloured border shows rarity. */
+.doll{display:flex;gap:4px;align-items:stretch;margin-bottom:8px}
+.dcol{display:flex;flex-direction:column;gap:4px}
+.dslot,.bc8{border:1px solid #55555c;background:#2a2a2e;border-radius:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;font-size:10px;line-height:1.1;overflow:hidden;cursor:pointer;position:relative}
+.dslot{width:50px;height:44px}
+.dslot.sel,.bc8.sel{outline:2px solid #ffd27a;outline-offset:-2px;background:#3a3420}
+.dfig{width:72px;border:1px solid #55555c;background:#1a1a1d;display:flex;align-items:center;justify-content:center}
+.dfig canvas{width:60px;height:72px;image-rendering:pixelated}
+.dstats{flex:1;font-size:11.5px;color:#bbb;line-height:1.55;padding-left:4px;min-width:0}
+.dstats b{color:#eee;font-weight:600}.dstats .cop{color:#c9a227;margin-top:2px}
+.bhead{display:flex;justify-content:space-between;font-size:11.5px;color:#ccc;margin-bottom:4px}
+.sellall{width:100%;height:34px;margin-bottom:6px;border-radius:0}
+.bag8{display:grid;grid-template-columns:repeat(8,1fr);gap:3px}
+.bc8{aspect-ratio:1;min-height:36px;font-size:9.5px;padding:1px}
+.bc8 small{position:absolute;right:2px;bottom:1px;font-size:9px;color:#ccc}
+#charUI .idet{min-height:62px;border-radius:0;background:#222225;border-color:#55555c}
+#charUI .idet .acts button{border-radius:0}

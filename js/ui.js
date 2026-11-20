@@ -284,55 +284,78 @@ document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',
 document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.addEventListener('click',()=>setMenuTab(b.dataset.tab)));
 $('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');setArranging(true)});
 
-$('pframe').addEventListener('click',()=>{charTab='gear';openModal('charUI')});
-let charTab='gear',bagSel=null;
+/* ---------- Character screen (v0.36, owner picked B: EverQuest paper doll) ----------
+   One page: your picture in the middle with the 8 gear slots around it, stats beside it, all 16 bags below.
+   Tap a worn slot or a bag item to select it; the strip at the bottom shows details, the comparison with what you
+   wear, and the actions. Nothing happens on the first tap, so a stray thumb never strips your weapon. */
+$('pframe').addEventListener('click',()=>{charTab='char';charSel=null;openModal('charUI')});
+let charTab='char',charSel=null; // charSel: {bag:i} or {slot:'head'}
+const DOLL_L=['head','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];
 const nearMerchant=()=>{const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
-$('ctabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;charTab=b.dataset.tab;bagSel=null;renderChar()});
+// Bag cells only fit a word, so show the item's last word ("Brittle Bone" -> "Bone"), which is usually the noun.
+const shortName=n=>{const w=n.replace(/^the /i,'').split(' ');return w[w.length-1]};
+// Longer words get smaller text so "Leggings" fits a bag square instead of being cut off.
+const fitPx=w=>w.length<=5?9.5:w.length<=7?8.5:7.5;
+$('ctabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;charTab=b.dataset.tab;charSel=null;renderChar()});
+function slotCell(sl){const id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x[0]===sl)[1],sel=charSel&&charSel.slot===sl;
+  return '<div class="dslot'+(sel?' sel':'')+'" data-act="pickslot" data-slot="'+sl+'"'+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+
+    (it?'<span style="color:'+RAR[it.rar]+'">'+shortName(it.name)+'</span>':'<span class="q">'+nm+'</span>')+'</div>'}
 function renderChar(){
   document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
-  const L=player.lvl;let h='';
-  if(charTab==='gear'){
-    h+='<p class="hint">Level '+L+' '+C.name+' · HP '+maxHP(L)+(C.mana?' · Mana '+maxMP(L):'')+' · '+STAT_KEYS.map(k=>k[1]+' '+stat(k[0])).join(' · ')+' · '+inv.copper+' copper</p>';
-    SLOTS.forEach(sl=>{const id=inv.equip[sl[0]],it=id&&ITEMS[id];
-      h+='<div class="jrow" data-act="unequip" data-slot="'+sl[0]+'" style="cursor:pointer"><span class="q">'+sl[1]+'</span><span'+(it?' style="color:'+RAR[it.rar]+'"':' class="q"')+'>'+(it?it.name+' <small class="q">'+itemStats(it)+'</small>':'Empty')+'</span></div>'});
-    h+='<p class="hint" style="margin-top:8px">Tap a worn item to take it off. Equip gear from your Bags.</p>';
-  }else if(charTab==='bags'){
+  const L=player.lvl;$('ctitle').textContent=C.name+' '+L;let h='';
+  if(charTab==='char'){
     const near=nearMerchant();
-    h+='<p class="hint">'+inv.copper+' copper'+(near?' · Marrow is buying.':' · Stand near Marrow the Peddler to sell.')+'</p>';
-    if(near)h+='<button data-act="selljunk" style="width:100%;height:34px;margin-bottom:8px">Sell all junk</button>';
-    h+='<div class="bagg">';
-    inv.bags.forEach((b,i)=>{const it=b&&ITEMS[b.id];h+='<div class="bc'+(bagSel===i?' sel':'')+'" data-act="pick" data-i="'+i+'">'+(it?'<span style="color:'+RAR[it.rar]+'">'+it.name+'</span>'+(b.n>1?'<small>×'+b.n+'</small>':''):'<small>·</small>')+'</div>'});
+    h+='<div class="doll"><div class="dcol">'+DOLL_L.map(slotCell).join('')+'</div><div class="dfig"><canvas id="dollcv" width="15" height="18"></canvas></div><div class="dcol">'+DOLL_R.map(slotCell).join('')+'</div>';
+    h+='<div class="dstats"><div>HP <b>'+maxHP(L)+'</b></div>'+(C.mana?'<div>Mana <b>'+maxMP(L)+'</b></div>':'')+
+      STAT_KEYS.map(k=>'<div>'+k[1]+' <b>'+stat(k[0])+'</b></div>').join('')+'<div class="cop">'+inv.copper+' copper</div></div></div>';
+    const used=inv.bags.filter(Boolean).length;
+    h+='<div class="bhead"><span>Bags '+used+'/'+inv.bags.length+'</span><span class="q">'+(near?'Marrow is buying':'Sell near Marrow')+'</span></div>';
+    if(near)h+='<button data-act="selljunk" class="sellall">Sell all junk</button>';
+    h+='<div class="bag8">';
+    inv.bags.forEach((b,i)=>{const it=b&&ITEMS[b.id],sel=charSel&&charSel.bag===i;
+      h+='<div class="bc8'+(sel?' sel':'')+'" data-act="pick" data-i="'+i+'"'+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+
+        (it?'<span style="color:'+RAR[it.rar]+';font-size:'+fitPx(shortName(it.name))+'px">'+shortName(it.name)+'</span>'+(b.n>1?'<small>×'+b.n+'</small>':''):'')+'</div>'});
     h+='</div>';
-    if(bagSel!==null&&inv.bags[bagSel]){
-      const b=inv.bags[bagSel],it=ITEMS[b.id];
-      h+='<div class="idet"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
-      if(it.slot){h+='<br>'+(itemStats(it)||'No stats');const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
-        const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
-        h+='<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');}
-      h+='<div class="acts">'+(it.slot?'<button data-act="equip">Equip</button>':'')+(near?'<button data-act="sell">Sell</button>':'')+'<button data-act="destroy">Destroy</button></div></div>';
-    }
+    h+='<div class="idet">'+detailStrip(near)+'</div>';
   }else{
-    const named=Object.keys(TYPES).filter(k=>TYPES[k].named).map(k=>TYPES[k]);
-    h+='<h2>Named</h2>';
-    named.forEach(t=>{const k=kills[t.name];h+='<div class="jrow"><span>'+t.name+' <small class="q">'+(t.zone||'')+'</small></span><span class="q">'+(k?'Slain ×'+k.count+' · first '+k.first:'Not yet slain')+'</span></div>'});
+    const sect=(title,list)=>{h+='<h2>'+title+'</h2>';list.forEach(t=>{const k=kills[t.name];h+='<div class="jrow"><span>'+cap(t.name)+' <small class="q">'+(t.zone||'')+'</small></span><span class="q">'+(k?'Slain ×'+k.count+' · first '+k.first:'Not yet slain')+'</span></div>'})};
+    const all=Object.keys(TYPES).map(k=>TYPES[k]);
+    sect('Named',all.filter(t=>t.named));
+    sect('Rares',all.filter(t=>t.rare));
     h+='<h2>Creatures</h2>';
     const rest=Object.keys(kills).filter(n=>!kills[n].named).sort((a,b)=>kills[b].count-kills[a].count);
     if(!rest.length)h+='<div class="jrow"><span class="q">Nothing slain yet.</span></div>';
     rest.forEach(n=>{h+='<div class="jrow"><span>'+cap(n.replace(/^an? /,''))+'</span><span class="q">×'+kills[n].count+'</span></div>'});
   }
   $('cbox').innerHTML=h;
+  const cv=$('dollcv');if(cv){const x=cv.getContext('2d');x.imageSmoothingEnabled=false;const im=playerImg();cv.width=im.w;cv.height=im.h;x.drawImage(im.c,0,0)} // drawn at 1x, scaled up 4x by CSS so pixels stay crisp
+}
+// The strip under the bags: what's selected, its stats, how it compares to what you wear, and what you can do with it.
+function detailStrip(near){
+  if(!charSel)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
+  if(charSel.slot){const sl=charSel.slot,id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x[0]===sl)[1];
+    if(!it)return '<b>'+nm+'</b> <span class="q">· empty. Equip something from your bags.</span>';
+    return '<b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span><br>'+(itemStats(it)||'No stats')+
+      '<div class="acts"><button data-act="unequip">Take off</button></div>'}
+  const b=inv.bags[charSel.bag];if(!b)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
+  const it=ITEMS[b.id];let h='<b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
+  if(it.slot){h+='<br>'+(itemStats(it)||'No stats');const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
+    const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
+    h+='<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');}
+  return h+'<div class="acts">'+(it.slot?'<button data-act="equip">Equip</button>':'')+(near?'<button data-act="sell">Sell</button>':'')+'<button data-act="destroy">Destroy</button></div>';
 }
 $('cbox').addEventListener('click',e=>{
-  const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act;
-  if(act==='pick'){const i=+el.dataset.i;bagSel=inv.bags[i]?(bagSel===i?null:i):null}
-  else if(act==='unequip'){const sl=el.dataset.slot,id=inv.equip[sl];if(!id)return;const i=inv.bags.indexOf(null);if(i<0){log('Your bags are full.','#ff8a80');return}
-    inv.bags[i]={id:id,n:1};delete inv.equip[sl];log('You remove the '+ITEMS[id].name+'.','#9aa')}
-  else if(act==='equip'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],old=inv.equip[it.slot];
-    inv.equip[it.slot]=b.id;inv.bags[bagSel]=old?{id:old,n:1}:null;log('You equip the '+it.name+'.',RAR[it.rar]);bagSel=old?bagSel:null}
-  else if(act==='sell'&&bagSel!==null){const b=inv.bags[bagSel],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bagSel]=null;bagSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
-  else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}},'loot');bagSel=null;
+  const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act;const bi=charSel&&charSel.bag!=null?charSel.bag:null;
+  if(act==='pick'){const i=+el.dataset.i;charSel=inv.bags[i]&&!(charSel&&charSel.bag===i)?{bag:i}:null}
+  else if(act==='pickslot'){const sl=el.dataset.slot;charSel=charSel&&charSel.slot===sl?null:{slot:sl}}
+  else if(act==='unequip'&&charSel&&charSel.slot){const sl=charSel.slot,id=inv.equip[sl];if(!id)return;const i=inv.bags.indexOf(null);if(i<0){log('Your bags are full.','#ff8a80');return}
+    inv.bags[i]={id:id,n:1};delete inv.equip[sl];log('You remove the '+ITEMS[id].name+'.','#9aa');charSel={bag:i}}
+  else if(act==='equip'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],old=inv.equip[it.slot];
+    inv.equip[it.slot]=b.id;inv.bags[bi]=old?{id:old,n:1}:null;log('You equip the '+it.name+'.',RAR[it.rar]);charSel=old?{bag:bi}:{slot:it.slot}}
+  else if(act==='sell'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bi]=null;charSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
+  else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}});charSel=null;
     log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227','loot');inv.copper+=c}
-  else if(act==='destroy'&&bagSel!==null){log('You destroy the '+ITEMS[inv.bags[bagSel].id].name+'.','#9aa');inv.bags[bagSel]=null;bagSel=null}
+  else if(act==='destroy'&&bi!==null){log('You destroy the '+ITEMS[inv.bags[bi].id].name+'.','#9aa');inv.bags[bi]=null;charSel=null}
   player.hp=Math.min(player.hp,maxHP(player.lvl));player.mp=Math.min(player.mp,maxMP(player.lvl));
   saveInv();renderChar();
 });

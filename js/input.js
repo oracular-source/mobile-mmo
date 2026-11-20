@@ -55,7 +55,7 @@ cv.addEventListener('pointerup',endJoy);cv.addEventListener('pointercancel',e=>{
 function tapWorld(clientX,clientY,targetOnly){
   if(player.dead)return;
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
-  if(zoneId==='over')for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){if(n.kind==='peddler'&&nearMerchant()){say(n,'Let us see what you have found.',true);charTab='bags';bagSel=null;openModal('charUI')}else say(n,pick(LINES[n.kind]),true);return}}
+  if(zoneId==='over')for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){if(n.kind==='peddler'&&nearMerchant()){say(n,'Let us see what you have found.',true);charTab='char';charSel=null;openModal('charUI')}else say(n,pick(LINES[n.kind]),true);return}}
   if(zoneId==='over'&&Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});

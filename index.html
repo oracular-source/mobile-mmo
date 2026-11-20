@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.35.1">
+<link rel="stylesheet" href="css/game.css?v=0.36">
 </head>
 <body>
 <div id="app">
@@ -48,7 +48,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <h1>Ashfen Hollow</h1>
-        Prototype v0.35.1: the crossroads, the rat tunnel, the Sunken Graveyard and its crypt.
+        Prototype v0.36: the crossroads, the rat tunnel, the Sunken Graveyard and its crypt.
         <p class="hint" style="margin:10px 0 4px">Pick your class:</p>
         <div id="clspick"></div>
         <p id="clsdesc" class="hint" style="margin:0 0 4px"></p>
@@ -68,12 +68,12 @@
       </div>
     </div>
 
+    <!-- Character screen (v0.36, owner picked B): EverQuest-style paper doll. Gear, stats and bags on one page; Journal on its own tab. -->
     <div id="charUI" class="modal">
       <div class="card">
-        <h1 id="ctitle">Druid</h1>
-        <div class="seg" id="ctabs"><button data-tab="gear">Gear</button><button data-tab="bags">Bags</button><button data-tab="journal">Journal</button></div>
+        <div class="mhead"><h1 id="ctitle">Druid</h1><button class="mx" data-close="charUI" aria-label="Close">✕</button></div>
+        <div class="tabs" id="ctabs"><button data-tab="char">Character</button><button data-tab="journal">Journal</button></div>
         <div id="cbox"></div>
-        <button class="go" data-close="charUI">Done</button>
       </div>
     </div>
 
@@ -127,32 +127,32 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.35.1"></script>
-<script src="js/data/sprites.js?v=0.35.1"></script>
-<script src="js/rng.js?v=0.35.1"></script>
-<script src="js/save.js?v=0.35.1"></script>
-<script src="js/map.js?v=0.35.1"></script>
-<script src="js/data/classes.js?v=0.35.1"></script>
-<script src="js/data/mobs.js?v=0.35.1"></script>
-<script src="js/data/items.js?v=0.35.1"></script>
-<script src="js/data/tiles.js?v=0.35.1"></script>
-<script src="js/data/maps/graveyard.js?v=0.35.1"></script>
-<script src="js/data/maps/crypt.js?v=0.35.1"></script>
-<script src="js/data/maps/crossroads.js?v=0.35.1"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.35.1"></script>
-<script src="js/state.js?v=0.35.1"></script>
-<script src="js/spawns.js?v=0.35.1"></script>
-<script src="js/fx.js?v=0.35.1"></script>
-<script src="js/combat.js?v=0.35.1"></script>
-<script src="js/input.js?v=0.35.1"></script>
-<script src="js/ui.js?v=0.35.1"></script>
-<script src="js/world.js?v=0.35.1"></script>
-<script src="js/area.js?v=0.35.1"></script>
-<script src="js/update.js?v=0.35.1"></script>
-<script src="js/render.js?v=0.35.1"></script>
-<script src="js/sim.js?v=0.35.1"></script>
-<script src="js/dev.js?v=0.35.1"></script>
-<script src="js/minimap.js?v=0.35.1"></script>
-<script src="js/main.js?v=0.35.1"></script>
+<script src="js/core.js?v=0.36"></script>
+<script src="js/data/sprites.js?v=0.36"></script>
+<script src="js/rng.js?v=0.36"></script>
+<script src="js/save.js?v=0.36"></script>
+<script src="js/map.js?v=0.36"></script>
+<script src="js/data/classes.js?v=0.36"></script>
+<script src="js/data/mobs.js?v=0.36"></script>
+<script src="js/data/items.js?v=0.36"></script>
+<script src="js/data/tiles.js?v=0.36"></script>
+<script src="js/data/maps/graveyard.js?v=0.36"></script>
+<script src="js/data/maps/crypt.js?v=0.36"></script>
+<script src="js/data/maps/crossroads.js?v=0.36"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.36"></script>
+<script src="js/state.js?v=0.36"></script>
+<script src="js/spawns.js?v=0.36"></script>
+<script src="js/fx.js?v=0.36"></script>
+<script src="js/combat.js?v=0.36"></script>
+<script src="js/input.js?v=0.36"></script>
+<script src="js/ui.js?v=0.36"></script>
+<script src="js/world.js?v=0.36"></script>
+<script src="js/area.js?v=0.36"></script>
+<script src="js/update.js?v=0.36"></script>
+<script src="js/render.js?v=0.36"></script>
+<script src="js/sim.js?v=0.36"></script>
+<script src="js/dev.js?v=0.36"></script>
+<script src="js/minimap.js?v=0.36"></script>
+<script src="js/main.js?v=0.36"></script>
 </body>
 </html>

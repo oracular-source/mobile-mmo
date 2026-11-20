@@ -22,7 +22,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 6. Floating text over heads (done v0.33)
 7. Pet bar (done v0.34)
 8. Menu screens (Spells, Arrange, Settings) (done v0.35)
-9. Character screen (Gear, Bags, Journal)
+9. Character screen (Gear, Bags, Journal) (done v0.36)
 10. Moments (level up, death, loot, run summary)
 11. Start screen and class picker
 12. Minimap and full map (check only)
@@ -73,3 +73,9 @@ Options: **A** pet frame under yours (name, health, what it's hitting), no butto
 Now (before v0.35): Menu opened a small list (Spells, Arrange buttons, Settings, Back to game), each opening its own window, so every change took two taps. Settings was one long list of 13 rows in no order: Change class at the top, Developer tools mixed in, long labels, pad-only rows appearing in the middle.
 Options: **A** one window with two tabs (Spells, Settings), Arrange as a button on the Spells tab, Settings in four groups; **B** Settings in folding sections; **C** Settings as sub-pages.
 **Owner picked A** (Nov 19). **Built v0.35:** Menu opens straight into one window with a ✕ and square grey tabs **Spells | Settings** (remembers the last tab for the session). Spells tab: **Arrange buttons on screen** at the top, then the spellbook and loadout as before. Settings in four groups with short labels: **Controls** (Layout, Grid size or Pad size + Flick distance, Hand, Movement, Drag stick), **Combat** (Tap an enemy (1st hit), Keep casting (Auto)), **Display** (Zoom, Minimap), **Game** (Change class, Developer tools). Same settings, same saves. Classic fan layout stays parked.
+
+## 9. Character screen (Gear, Bags, Journal)
+Now (before v0.36): the old rounded card with a Done button and three tabs. Gear: stats in one long grey sentence, then 8 text rows; **tapping a worn item took it off straight away** (easy to strip your weapon by accident). Bags: 4 × 4 cells with 9.5px names, details opening under the grid (often a scroll away). Equipping meant Bags to equip, Gear to see the result. Journal: Named and Creatures; rares mixed in with named.
+Options: **A** same three tabs in the grey window, stats in a small block, tap a slot for details + Take off; **B** EverQuest paper doll: gear slots around your picture, stats beside it, bags below, one details strip; Journal its own tab; **C** one scrolling list (worn, then bags), text only.
+Claude leaned B. **Owner picked B** (Nov 19). **Built v0.36:** grey window with ✕ and square tabs **Character | Journal** (the menu window's style). Doll: Head, Chest, Legs, Feet left; Ring, Hands, Weapon, Off-hand right; your rags picture in the middle at 4x; stats column on the right. Bags: 16 squares, two rows of 8, short name = the item's last word (smaller text for long words), rarity as the border colour, ×n for stacks. First tap selects (gold outline), the strip below does the rest: bags get Equip / Sell (near Marrow) / Destroy with the stat comparison; worn slots get Take off. After Equip the selection follows the item to its slot; after Take off it follows it to the bag. Journal adds a **Rares** section. Same saves.
+Later: item icons replace the short names once the art pass draws them; the middle picture will show gear once gear shows on the character.
