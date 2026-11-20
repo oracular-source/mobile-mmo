@@ -25,7 +25,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 9. Character screen (Gear, Bags, Journal) (done v0.36)
 10. Moments (level up, death, loot, run summary) (done v0.37)
 11. Start screen and class picker (done v0.38)
-12. Minimap and full map (check only)
+12. Minimap and full map (checked Nov 19; Wolfwood bug fixed v0.41.2; options A–C, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -94,3 +94,17 @@ Options:
 - **C One class at a time:** a big picture of the class (rags, 4x) with ◀ ▶ arrows or a swipe, role + solo rating + description under it, a row of 14 small chips on top to jump. Best for reading each class; slowest to compare.
 Claude leans **A** now (small, finished; fixes the reload and the stale text), with B's character list as a later card once characters have names.
 **Owner picked A** (Nov 19). **Built v0.38:** grey window, 4-wide grid of square class buttons (role, or Lv once played; one long word like Necromancer gets smaller text), tap selects with a gold outline and fills the info box (rags picture at 3x, name, role · Solo: X, `blurb`), Play switches class via `store` + reload with a one-time `sessionStorage` flag (`ashfen-go`) that starts the game after the reload. Change class opens it with a ✕; same class = Back to game (resumes, no `enterZone`). How-to list rewritten as Menu → **How to play**. B parked as a backlog card (character select list).
+
+## 12. Minimap and full map (check)
+Now (v0.41.1): 86px minimap top right (2px a tile, you in the middle, pins for places found, arrows on the rim toward exits off the edge); tap it for the full map (fills in as you explore, + / − zoom and pinch, Explored %, a legend of found places).
+Found in the check:
+- **Bug: Wolfwood had no minimap or map at all** (it was missing from a hand-kept list of areas). **Fixed v0.41.2:** every area built from a map file now gets a map automatically, so new areas can't be missed.
+- **Last old-look window:** the map screen is still the rounded gold card with a gold title and a green "Back to game" button, and no ✕; the minimap has a rounded gold frame. (Log, Menu, 1st hit and Auto are still rounded gold pills too; outside this breakdown.)
+- **Pins don't say which is which:** every exit is the same green square, and the names are only in the legend below, so with four exits you can't tell which square is the crypt tunnel.
+- **No zone view:** each area only shows itself; nothing shows how the crossroads, tunnel, graveyard, crypt and Wolfwood connect.
+- Fine as is: size, fill-in, rim arrows, zoom, explored %.
+Options (rough):
+- **A Tidy:** grey window with ✕ (menu style), square grey frame on the minimap, and each found pin on the map gets a **number** that matches a numbered legend row (1 Crossroads, 2 Crypt tunnel...).
+- **B A plus a Zone tab:** square tabs **Area | Zone 1**; the Zone tab draws the five areas as boxes joined by their roads and tunnels, the one you're in outlined gold, ones you haven't been to as "?".
+- **C A, but names on the map:** short names written beside each pin instead of numbers (crowds at 1x on small areas; reads well zoomed in).
+Claude leans **A** (it's a check; small and finished), with B's zone view as a backlog card for when Zone 1 has its chapel and Town 1.

@@ -3,8 +3,11 @@
 /* ---------- What you've explored ----------
    One bit per tile per area, saved per character as hex text (a 48 x 44 area is about 530 characters).
    New key, no change to any old save shape, so no save version bump: a missing key just means "nothing explored yet". */
-const MM_ZONES={over:1,gy:1,dun:1,crypt:1,cross:1,tunnel:1}; // the arena (testing grounds) never shows a map
-const MM_SEE={over:7,gy:7,dun:5,crypt:5,cross:7,tunnel:5};    // how many tiles around you get revealed (less underground)
+// Every area built from a map file gets a map automatically (v0.41.2: Wolfwood was left off a hand-kept list and had none).
+// The arena (testing grounds) never shows a map.
+const MM_ZONES={over:1,dun:1};for(const id in AREA_OF)MM_ZONES[id]=1;
+const MM_UNDER={dun:1,crypt:1,tunnel:1};
+const MM_SEE={};for(const id in MM_ZONES)MM_SEE[id]=MM_UNDER[id]?5:7; // how many tiles around you get revealed (less underground)
 const MM_TILE=2;                     // minimap: CSS pixels per tile (shows about 43 tiles across; was 3)
 const mmSaved=store.get(KEY('explored'),{});
 const MM={z:{},dirty:false,saveT:0};
