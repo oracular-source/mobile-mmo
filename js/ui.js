@@ -193,7 +193,7 @@ function setArranging(on){
 
 /* ---------- Spellbook (drag and drop loadout) ---------- */
 let selected=null,drag=null;
-function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+'</b><small>'+a.tag+' · '+(a.mana?a.mana+' mana':'no cost')+' · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
+function chipHTML(a){const locked=player.lvl<a.lvl;return '<span class="ic" style="background:'+a.col+'"></span><span><b>'+a.name+(a.fork?': '+a.fork:'')+'</b><small>'+a.tag+' · '+(a.mana?a.mana+' mana':'no cost')+' · '+(a.cast?a.cast+'s cast':'instant')+(a.cd?' · '+Math.round(cdFor(a))+'s cooldown':'')+(locked?' · Lv '+a.lvl:'')+'</small></span>'}
 function renderBook(){
   const book=$('book'),slots=$('slots');
   book.innerHTML='';slots.innerHTML='';
@@ -270,14 +270,42 @@ $('setbox').addEventListener('click',e=>{
   settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();if(b.dataset.k==='zoom')applyZoom();
 });
 
+/* ---------- Skills tab: skill tree forks (v0.38) ---------- */
+// Each fork shows its ability and the two versions side by side. A new fork is picked for free wherever you are
+// ("pick your new toy" at the ding); after that, swapping only works by a campfire (owner, Nov 19, until Town 1).
+function renderForks(){
+  const box=$('forkbox'),due=forkDue(),fire=nearFire();
+  if(!MYFORKS.length){box.innerHTML='<p class="hint">No skill choices for this class yet.</p>';return}
+  box.innerHTML=(due?'<p class="forknew">New at level '+due.lvl+': pick one version of '+BASE_AB[due.ab].name+'.</p>':
+      '<p class="hint">'+(fire?'You are by a campfire: tap the other version to swap.':'To change a choice, stand by any campfire.')+'</p>')+
+    MYFORKS.map(f=>{const lock=player.lvl<f.lvl,pick=forkPick[f.lvl];
+      return '<h2>Level '+f.lvl+' · '+BASE_AB[f.ab].name+'</h2><div class="forkrow">'+f.opts.map(o=>
+        '<button class="fork'+(pick===o.id?' on':'')+(lock?' lock':'')+'" data-l="'+f.lvl+'" data-o="'+o.id+'"><b>'+o.name+'</b><span>'+o.desc+'</span></button>').join('')+'</div>'+
+        (lock?'<p class="hint">Unlocks at level '+f.lvl+'.</p>':'');}).join('');
+}
+$('forkbox').addEventListener('click',e=>{
+  const b=e.target.closest('button.fork');if(!b)return;
+  const L=+b.dataset.l,o=b.dataset.o,f=MYFORKS.find(f=>f.lvl===L);if(!f)return;
+  if(player.lvl<L){log('That choice unlocks at level '+L+'.','#9aa');return}
+  if(forkPick[L]===o)return;
+  if(forkPick[L]&&!nearFire()){log('Swap your choice at any campfire.','#ffb347');floatText(player.x,player.y-24,'Swap at a campfire','#ffb347');renderForks();return}
+  const first=!forkPick[L];forkPick[L]=o;saveForks();applyForks();buildControls();
+  const nm=f.opts.find(x=>x.id===o).name;
+  log((first?'You learn ':'You swap to ')+nm+' ('+BASE_AB[f.ab].name+').','#7dffa6');
+  if(first)banner(nm,BASE_AB[f.ab].name+' changes');
+  renderForks();
+});
+// Opens the Menu on the Skills tab (at the ding, or at the start of play if a choice is waiting).
+function offerFork(){if(!forkDue()||simState.busy)return;menuTab='skills';openModal('menuUI')}
+
 /* ---------- Modals and utility buttons ---------- */
 let running=false;
 // Menu tab: remembered for this session so the Menu reopens where you left it.
 let menuTab='spells';
 function setMenuTab(t){menuTab=t;
   document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
-  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';
-  selected=null;if(t==='spells')renderBook();else if(t==='settings')renderSettings();
+  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';$('paneSkills').style.display=t==='skills'?'':'none';
+  selected=null;if(t==='spells')renderBook();else if(t==='skills')renderForks();else if(t==='settings')renderSettings();
   $('menuUI').querySelector('.card').scrollTop=0}
 function openModal(id){if(arranging)setArranging(false);$(id).classList.add('show');running=false;if(id==='charUI')renderChar();if(id==='menuUI')setMenuTab(menuTab)}
 document.querySelectorAll('[data-close]').forEach(b=>b.addEventListener('click',()=>{$(b.dataset.close).classList.remove('show');running=!arranging;selected=null}));

@@ -8,7 +8,12 @@ let pet=null; // your one pet: Necro skeleton, Shadow Knight minion, Enchanter s
 let decoy=null; // Enchanter's Phantasm: a see-through copy of you that nearby mobs attack for a few seconds
 const grounds=[]; // circles on the floor: Paladin's Consecrate, Shaman's Venom Totem, Ranger's Volley
 const traps=[]; // Ranger's Spike Traps: wait at a spot and go off on the first mob that steps in
-const victim=m=>(decoy&&dist(m,decoy)<110)?decoy:(pet&&m.threat.pet>m.threat.p)?pet:player;
+let pet2=null; // v0.38: the Necro's second skeleton (Bone Pair fork). It runs through the same pet code by swapping in (withPet2).
+// A mob that's after "the pet" goes for the skeleton that last hit it (m.petT).
+const victim=m=>(decoy&&dist(m,decoy)<110)?decoy:((pet||pet2)&&m.threat.pet>m.threat.p)?(pet2&&m.petT===pet2?pet2:(pet||pet2)):player;
+// Runs fn with the second skeleton standing in as "pet", then puts both back (pet2 becomes null if it died meanwhile).
+function withPet2(fn){if(!pet2)return;const keep=pet;pet=pet2;try{fn()}finally{pet2=pet;pet=keep}}
+let petOther=null; // while withPet2 runs: the main pet, so the second skeleton can pick a different mob
 const petName=()=>pet?(pet.name||'skeleton'):'skeleton';
 // Songs the Bard is playing right now (ability ids, oldest first, two at most).
 const songOn=id=>!!(player.songs&&player.songs.indexOf(id)>=0);
@@ -43,10 +48,11 @@ function hitMob(m,dmg,kind,label,src){
   if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
-  else if(src==='pet'){m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
+  else if(src==='pet'){m.petT=pet;m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
   // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
-  if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
+  if(m.mez>0&&m.mezDeep){m.mezDeep=0;floatText(m.x,m.y-26,'stirs','#e0c3ff')} // Deep Sleep: the first hit only stirs it
+  else if(m.mez>0){m.mez=0;floatText(m.x,m.y-26,'awake!','#ffb37a');log(cap(m.def.name)+' wakes up!','#ffb37a')}
   if(m.def.shell&&kind==='direct'&&!m.shellHint){m.shellHint=1;log('Your hit glances off '+m.def.name+"'s shell. Damage over time gets through.",'#c8b89a')}
   if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
@@ -93,7 +99,8 @@ function killMob(m){
     const learned=AB.filter(a=>a.lvl===player.lvl);
     learned.forEach(a=>log('You have learned '+a.name+'! Check your Spells.','#7dffa6'));
     banner('Level '+player.lvl,learned.length?'New: '+learned.map(a=>a.name).join(', '):'');
-    buildControls();
+    applyForks();buildControls();
+    if(forkDue()){log('A new skill choice is waiting: open Menu → Skills.','#ffd27a');setTimeout(offerFork,1200)} // pick your new toy
   }
   save();
   setTimeout(()=>{const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1)},800);
@@ -109,9 +116,12 @@ function hurtPlayer(m){
   if(player.buffs.bark>0)dmg*=0.75;
   if(player.buffs.stance>0)dmg*=0.5;
   dmg=tankMods(dmg);
+  if(grounds.some(g=>g.sanct&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r))dmg*=grounds.find(g=>g.sanct).sanct; // Sanctuary (Paladin fork)
   dmg*=100/(100+(stat('ac')+C.ac+(player.buffs.ward>0?8:0))*4); // AC from gear (and Warrior plate, and Spirit Ward) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
   dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;
+  // Warding Renew (Cleric fork): the next big hit (a tenth of your health or more) is blocked.
+  if(player.ward>0&&dmg>=maxHP(player.lvl)*0.1){player.ward=0;floatText(player.x,player.y-20,'WARDED','#fff3c4');log('Your ward blocks '+m.def.name+"'s hit.",'#fff3c4','fight');return}
   // Magician's Elemental Link: the pet takes half of the hit.
   if(player.buffs.link>0&&pet&&!pet.charm&&dmg>1){const h=Math.floor(dmg/2);dmg-=h;damagePet(h)}
   dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;
@@ -151,8 +161,10 @@ function playerDie(m){
   player.buffs={};player.bval={};player.lsUsed=false;player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
   if(pet&&pet.charm)releaseCharm(true);
   else if(pet){log('Your '+petName()+' is gone.','#9aa');pet=null;}
+  pet2=null;player.ward=0;player.ambush=0;player.freeSummon=0;
 }
-function hurtPet(m){
+function hurtPet(m,v){
+  if(v&&v===pet2&&v!==pet){withPet2(()=>hurtPet(m));return}
   const dmg=(m.def.dmg+m.def.dmgl*m.lv)*rr(0.7,1.25)*100/(100+pet.ac*4);
   damagePet(Math.max(1,Math.round(dmg)));
 }
@@ -162,7 +174,7 @@ function damagePet(dmg){
   if(pet.hp<=0){burst(pet.x,pet.y-6,'#cfc8b2',12);
     if(pet.charm){const cm=pet.charm;cm.dead=true;cm.sp.mob=null;cm.sp.timer=cm.sp.noRespawn?Infinity:respawnTime(cm);log('Your charmed '+cm.def.name.replace(/^an? /,'')+' is slain.','#ffb37a')}
     else log('Your '+petName()+' is destroyed.','#ffb37a');
-    pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});}
+    const gone=pet;pet=null;mobs.forEach(o=>{if(o.threat&&(!pet2||o.petT===gone||!o.petT))o.threat.pet=0});}
 }
 // A summon's numbers come from its ability's pet:{} data (no data = the Necro's skeleton). One pet at a time.
 function raisePet(def){
@@ -170,14 +182,15 @@ function raisePet(def){
   if(pet&&pet.charm)releaseCharm();
   else if(pet&&pet.name!==def.name)log('Your '+petName()+' returns to where it came from.','#9aa'); // Magician: one elemental at a time
   const hp=Math.round(def.hp[0]+def.hp[1]*L);
-  pet={kind:'pet',name:def.name,img:def.img,x:player.x-12*player.dir,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:def.dmg[0]+def.dmg[1]*L,ac:def.ac+L,atk:0,rate:def.atk||1.8,life:def.life||0,target:null,threat:def.threat||3,burn:def.burn?def.burn[0]+def.burn[1]*L:0,boom:def.boom||1,boomStun:def.boomStun||0,bash:def.bash||null,bashT:0};
-  if(blocked(pet.x,pet.y)){pet.x=player.x;pet.y=player.y}
-  burst(pet.x,pet.y-6,'#7dffa6',16,true);
+  const mk=side=>{const p={kind:'pet',name:def.name,img:def.img,x:player.x-12*player.dir*side,y:player.y+4,dir:player.dir,walk:0,hp:hp,maxhp:hp,dmg:def.dmg[0]+def.dmg[1]*L,ac:def.ac+L,atk:0,rate:def.atk||1.8,life:def.life||0,target:null,threat:def.threat||3,burn:def.burn?def.burn[0]+def.burn[1]*L:0,boom:def.boom||1,boomStun:def.boomStun||0,bash:def.bash||null,bashT:0,taunt:def.taunt||0,tauntT:0};
+    if(blocked(p.x,p.y)){p.x=player.x;p.y=player.y}burst(p.x,p.y-6,'#7dffa6',16,true);return p};
+  pet=mk(1);pet2=def.pair?mk(-1):null; // Bone Pair: two skeletons from one cast
+  if(def.pair){log('Two skeletons claw their way out of the ground to serve you.','#b48cff');return}
   log(def.say||(def.img==='blade'?'A sword lifts into the air and floats beside you.':'A '+def.name+' claws its way out of the ground to serve you.'),'#b48cff');
 }
 // Charm: the mob leaves the enemy list and becomes your pet until the charm runs out. Then it breaks free and always comes for you.
 function charmMob(m,dur){
-  if(pet&&pet.charm)releaseCharm();
+  if(pet&&pet.charm)releaseCharm();pet2=null;
   const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1);
   mobs.forEach(o=>{if(o.threat)o.threat.pet=0});
   if(player.target===m)player.target=null;
@@ -197,8 +210,15 @@ function releaseCharm(quiet){
 }
 // The skeleton follows you, attacks whatever you're fighting, and holds aggro: its hits count triple for threat, plus a bonus on its first hit.
 function updatePet(dt){
+  if(!pet&&pet2){pet=pet2;pet2=null} // Bone Pair: if the first skeleton falls, the second becomes your pet
+  updatePetOne(dt);if(pet2){petOther=pet;withPet2(()=>updatePetOne(dt,true));petOther=null}
+}
+function updatePetOne(dt,second){
   if(!pet)return;
   pet.atk=Math.max(0,pet.atk-dt);
+  // Bone Knight (Necro fork): every 8s it taunts back one mob that turned on you.
+  if(pet.taunt){pet.tauntT-=dt;if(pet.tauntT<=0){const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&m.threat.p>=m.threat.pet&&dist(m,pet)<60).sort((a,b)=>dist(a,player)-dist(b,player))[0];
+    if(m){pet.tauntT=pet.taunt;m.threat.pet=m.threat.p+30;m.petT=pet;if(!pet.target||pet.target.dead)pet.target=m;floatText(m.x,m.y-26,'TAUNT','#ffb37a');log('Your '+petName()+' taunts '+m.def.name+'.','#cfc8b2','fight')}}}
   // Pet bash (Earth elemental's Stone Fist): saved for a cast. When the mob it's fighting starts casting, the pet slams it
   // (a short stun breaks the spell), then waits out its cooldown. Works like a player's stun, on its own timer.
   if(pet.bash){pet.bashT=Math.max(0,pet.bashT-dt);const bt=pet.target;
@@ -207,6 +227,9 @@ function updatePet(dt){
   if(pet.life){pet.life-=dt;if(pet.life<=0){burst(pet.x,pet.y-6,'#cfd6e0',8);log('Your '+petName()+' falls to the ground.','#9aa');pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});return}}
   if(pet.target&&(pet.target.dead||pet.target.mez>0||mobs.indexOf(pet.target)<0))pet.target=null; // never wake a sleeping mob
   // Held (Back off): picks nothing on its own until you press Attack.
+  // Bone Pair's second skeleton goes for a mob that's hitting you and that the first one isn't fighting.
+  if(second&&!pet.hold){const o=petOther&&petOther.target;const want=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&m!==o&&m.threat.p>=m.threat.pet&&dist(m,player)<90).sort((a,b)=>dist(a,player)-dist(b,player))[0];
+    if(want&&(!pet.target||pet.target===o))pet.target=want;}
   if(!pet.target&&!pet.hold){const pt=player.target;
     if(pt&&!pt.dead&&pt.state==='chase'&&!(pt.mez>0))pet.target=pt;
     else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
@@ -225,14 +248,14 @@ function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.s
 // Pet orders (v0.34, owner): Attack sends the pet at your target, even one that isn't fighting you yet (so it can pull),
 // and lets it pick its own fights again. Back off pulls it out and keeps it out until you press Attack.
 function petAttack(){
-  if(!pet||player.dead)return;pet.hold=false;const t=player.target;
+  if(!pet||player.dead)return;pet.hold=false;if(pet2)pet2.hold=false;const t=player.target;
   if(t&&!t.dead&&t.kind!=='pet'&&mobs.indexOf(t)>=0){
     if(t.mez>0){log(cap(t.def.name)+' is asleep; your '+petName()+' leaves it be.','#9aa');return}
     pet.target=t;pet.follow=false;log('Your '+petName()+' goes for '+t.def.name+'.','#cfc8b2');
   }else log('Your '+petName()+' is ready to fight.','#cfc8b2');
 }
 function petBackOff(){
-  if(!pet||player.dead)return;pet.hold=true;pet.target=null;pet.follow=true;log('Your '+petName()+' backs off.','#cfc8b2');
+  if(!pet||player.dead)return;pet.hold=true;pet.target=null;pet.follow=true;if(pet2){pet2.hold=true;pet2.target=null;pet2.follow=true}log('Your '+petName()+' backs off.','#cfc8b2');
 }
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
@@ -278,9 +301,10 @@ function cast(a,quiet){
   const own=player.cds[a.id]||0;
   // Tapping the spell that's already queued cancels it (a different spell just swaps in).
   if(!quiet&&player.queued&&player.queued.a===a&&(own>0||player.cast||player.gcd>0)){player.queued=null;log(a.name+' unqueued.','#9aa','fight');return false}
-  if(own>0){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa','fight');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
+  const free=a.kind==='pet'&&player.freeSummon; // Magician's Rebirth: the next summon is instant and free
+  if(own>0&&!free){if(!quiet){if(own<1)player.queued={a:a,until:time+2};else{log(a.name+' is ready in '+Math.ceil(own)+'s.','#9aa','fight');floatText(player.x,player.y-24,a.short+' '+Math.ceil(own)+'s','#9aa')}}return false}
   if(player.cast||player.gcd>0){if(!quiet){player.queued={a:a,until:time+2};}return false}
-  if(a.mana&&player.mp<a.mana){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
+  if(a.mana&&player.mp<a.mana&&!free){if(!quiet)log('Not enough mana for '+a.name+'.','#ff8a80');return false}
   let t=null;
   if(player.fd>0&&a.kind!=='feign'){if(!quiet)log('You are playing dead. Move to get up.','#9aa');return false}
   // Rogue: attacking from Hide with your main attack opens with Backstab when it's ready.
@@ -295,6 +319,9 @@ function cast(a,quiet){
   if(player.buffs.aura>0&&!/^(heal|hot|buff)$/.test(a.kind)){if(!quiet)log("You can't attack inside Divine Aura.",'#9aa');return false}
   if(a.hpCost&&player.hp<=maxHP(player.lvl)*a.hpCost+1){if(!quiet)log('Not enough health for '+a.name+'.','#ff8a80');return false}
   if(a.kind==='cleave'&&!mobs.some(m=>!m.dead&&dist(m,player)<=a.radius)){if(!quiet)log('No enemies close enough to '+a.name+'.','#9aa');return false}
+  // Reaping Cleave (Shadow Knight fork) needs two or more mobs next to you; Rending Blow needs your target next to you.
+  if(a.need2&&mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius).length<2){if(!quiet)log(a.fork+' needs two or more enemies next to you.','#9aa');return false}
+  if(a.single&&!(player.target&&!player.target.dead&&dist(player.target,player)<=a.radius)){if(!quiet)log(a.fork+' needs your target next to you.','#9aa');return false}
   if(a.tgt){
     t=player.target;
     // Mesmerize goes on the closest awake mob coming at you that you are NOT fighting, so you can keep hitting your target.
@@ -316,6 +343,7 @@ function cast(a,quiet){
   player.gcd=GCD*(a.shot&&player.buffs.rapid>0?0.5:1)*(a.melee&&songKind('haste')?0.8:1);
   // Using anything but Hide brings you out of hiding (Backstab still gets its stealth bonus).
   const fromHide=hidden();if(a.kind!=='stealth')unhide();
+  if(free){player.freeSummon=0;applyAbility(a,t,fromHide);log('Rebirth: your summon comes instantly, at no cost.','#ff9a4a');return true}
   if(a.cast<=0){player.mp-=a.mana;player.cds[a.id]=cdFor(a);applyAbility(a,t,fromHide);return true}
   player.tx=null; // cast-time spells stop a tap-to-move walk
   player.cast={a:a,t:t,time:0};
@@ -333,7 +361,7 @@ function applyAbility(a,t,fromHide){
   // A Backstab from Hide never misses: they didn't see you coming.
   // An Evaded mob counts as an ambush too: Evade, then Backstab.
   if(a.kind==='backstab'&&t&&t.lost>0)fromHide=true;
-  if(a.tgt&&a.kind!=='taunt'&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
+  if(a.tgt&&a.kind!=='taunt'&&!a.sure&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
     floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
     log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff',a.melee?'fight':'main');engage(t);return;}
   if(a.kind==='nuke'||a.kind==='stun'){
@@ -350,15 +378,24 @@ function applyAbility(a,t,fromHide){
     // Chill: each Frost Bolt slows a bit more (up to 4 stacks), wearing off 8s after the last one.
     if(a.chill&&!t.dead){t.chill=Math.min(4,(t.chill||0)+1);t.chillT=8}
     if(a.kind==='stun'&&!t.dead){t.stun=at(a.dur,a)*durMult(t);log(cap(t.def.name)+' is stunned ('+t.stun.toFixed(1)+'s).','#9fb8e0')}
+    // Shield Sweep (Warrior fork): every other mob in front of you takes the hit and a shorter stun.
+    if(a.sweep){mobs.filter(m=>m!==t&&!m.dead&&dist(m,player)<=a.sweep&&(m.x-player.x)*player.dir>=-4).forEach(m=>{hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name);if(!m.dead){m.stun=at(a.dur,a)*a.sweepX*durMult(m);m.mez=0}})}
+    // Shatter Burst (Wizard fork): splashes onto every mob near the target and chills them.
+    if(a.burstR){mobs.filter(m=>m!==t&&!m.dead&&dist(m,t)<=a.burstR).forEach(m=>{hitMob(m,at(a.dmg)*a.burstX*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name);if(!m.dead){m.chill=Math.min(4,(m.chill||0)+1);m.chillT=8}})}
   }else if(a.kind==='heal'){const h=a.full?maxHP(L)-player.hp:Math.round(at(a.heal)*rr(0.9,1.1)*mult);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6','fight');
     if(a.holy)holyPulse(Math.max(at(a.heal)*mult,h)*a.holy,a.name);}
-  else if(a.kind==='hot'){player.hots=(player.hots||[]).filter(o=>o.id!==a.id);player.hots.push({id:a.id,name:a.name,t:at(a.dur,a),next:2,heal:at(a.heal,a)*mult,holy:a.holy||0});burst(player.x,player.y-6,a.col,10,true);log(a.name+' is on you ('+Math.round(at(a.dur,a))+'s).','#7dffa6');}
+  else if(a.kind==='hot'){player.hots=(player.hots||[]).filter(o=>o.id!==a.id);player.hots.push({id:a.id,name:a.name,t:at(a.dur,a),next:2,heal:at(a.heal,a)*mult,holy:a.holy||0,holyAll:a.holyAll||0});if(a.ward)player.ward=at(a.dur,a);/* Warding Renew: blocks the next big hit while it lasts */burst(player.x,player.y-6,a.col,10,true);log(a.name+' is on you ('+Math.round(at(a.dur,a))+'s).','#7dffa6');}
   else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
   else if(a.kind==='snare'){if(a.dmg){if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult,'direct',a.name);if(t.dead)return}
-    t.snare=at(a.dur,a)*durMult(t);if(a.aslow){t.aslow=t.snare;t.aslowX=1.6;t.slowCast=1}burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);}
+    t.snare=at(a.dur,a)*durMult(t);if(a.aslow){t.aslow=t.snare;t.aslowX=1.6;t.slowCast=1}burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is slowed by your '+a.name+' ('+Math.round(t.snare)+'s).','#9fd0d0');engage(t);
+    // Thornsnare (Druid fork): thorns tick while the mob walks (update.js skips the tick while it stands and swings).
+    if(a.thorns){t.dots=t.dots.filter(d=>d.id!=='thorns');t.dots.push({id:'thorns',name:'Thornsnare',t:t.snare,next:3,dmg:at(a.thorns,a)*mult,walk:1})}
+    // Tangle Field: every other mob near the target is snared too, for a shorter time.
+    if(a.splash){let n=0;mobs.filter(m=>m!==t&&!m.dead&&dist(m,t)<=a.splash).forEach(m=>{m.snare=at(a.dur,a)*a.splashX*durMult(m);burst(m.x,m.y,a.col,5);engage(m);n++});if(n)log(n+' more '+(n===1?'enemy is':'enemies are')+' tangled.','#9fd0d0')}}
   else if(a.kind==='dot'){t.dots=t.dots.filter(d=>d.id!==a.id);const dur=at(a.dur,a)*durMult(t);t.dots.push({id:a.id,name:a.name,t:dur,next:3,dmg:at(a.dmg)*mult});burst(t.x,t.y-6,a.col,8,true);log(cap(t.def.name)+' is afflicted by '+a.name+' ('+Math.round(dur)+'s).','#9be37a');engage(t);}
   // Attack slow (Shaman's Drowsy): the mob swings slower but still runs at full speed.
-  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;t.slowCast=0;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks '+Math.round((1-1/t.aslowX)*100)+'% slower for '+Math.round(t.aslow)+'s.','#9fd0d0');engage(t);}
+  else if(a.kind==='slow'){t.aslow=at(a.dur,a)*durMult(t);t.aslowX=a.aslowX||1.4;t.slowCast=0;burst(t.x,t.y-6,a.col,8);log(cap(t.def.name)+' grows drowsy: it attacks '+Math.round((1-1/t.aslowX)*100)+'% slower for '+Math.round(t.aslow)+'s.','#9fd0d0');engage(t);
+    if(a.splash)mobs.filter(m=>m!==t&&!m.dead&&dist(m,t)<=a.splash).forEach(m=>{m.aslow=at(a.dur,a)*durMult(m);m.aslowX=a.aslowX;burst(m.x,m.y-6,a.col,5);engage(m)});} // Drowsy Cloud
   // Ranger's Hunter's Mark: your hits on it do more until it dies.
   else if(a.kind==='mark'){t.mark=a.mark||1.2;burst(t.x,t.y-10,a.col,8);floatText(t.x,t.y-26,'MARKED','#ffb37a');log(cap(t.def.name)+' is marked. Your hits on it do '+Math.round((t.mark-1)*100)+'% more.','#ffb37a');engage(t);}
   else if(a.kind==='buff'){player.buffs[a.buff]=at(a.dur,a);if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');}
@@ -368,28 +405,34 @@ function applyAbility(a,t,fromHide){
     const h=Math.max(1,Math.round(dmg*LIFETAP_HEAL));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff');}
   else if(a.kind==='backstab'){
     // x3 damage from Hide, x2 from behind.
-    const x=fromHide?3:2;burst(t.x,t.y-6,a.col,fromHide?14:9);
+    let x=fromHide?3:2;if(player.ambush){x*=player.ambush;player.ambush=0;floatText(t.x,t.y-34,'CRIT!','#ffd27a')}burst(t.x,t.y-6,a.col,fromHide?14:9); // Ambush (Rogue fork): next Backstab crits
     if(fromHide){floatText(t.x,t.y-28,'AMBUSH!','#ffd27a')}
     hitMob(t,at(a.dmg)*x*rr(0.9,1.1)*(1-t.def.armor)*mult,'direct',a.name+(fromHide?' (from hiding)':''));}
   else if(a.kind==='stealth'){player.buffs.hide=9999;burst(player.x,player.y-6,a.col,10,true);log('You melt into the shadows. Mobs won\'t notice you; attacking or getting hit ends it.','#bdbdbd');}
   else if(a.kind==='evade'){let n=0;const d=at(a.dur,a);
     fightingMe().forEach(m=>{m.threat.p=0;m.lost=m.def.boss?d*0.5:d;n++});
+    // Ambush: your target is stunned 2s and the next Backstab crits. Feint: every mob around you is dazed 2s
+    // (a daze is a stun, so it holds even when you hit one of them, unlike Evade's confusion).
+    if(a.evStun){const tg=player.target;if(tg&&!tg.dead&&dist(tg,player)<40){tg.stun=a.evStun*(tg.def.boss?0.5:1)*durMult(tg);tg.mez=0}player.ambush=a.evCrit}
+    if(a.evDaze)mobs.filter(m=>!m.dead&&m.state==='chase'&&dist(m,player)<=30).forEach(m=>{m.stun=Math.max(m.stun||0,a.evDaze*(m.def.boss?0.5:1)*durMult(m));m.mez=0});
     burst(player.x,player.y-6,a.col,10,true);
     log('You slip away. '+n+(n===1?' foe loses':' foes lose')+' track of you for a moment: Hide now to escape, or get behind to Backstab.','#bdbdbd');}
   else if(a.kind==='pet'){raisePet(a.pet);}
-  else if(a.kind==='mez'){t.mez=at(a.dur,a)*durMult(t);t.stun=0;if(pet&&pet.target===t)pet.target=null;burst(t.x,t.y-10,a.col,10,true);floatText(t.x,t.y-26,'Zz','#e0c3ff');log(cap(t.def.name)+' falls asleep ('+Math.round(t.mez)+'s). Anything that hits it wakes it.','#e0c3ff');}
+  else if(a.kind==='mez'){t.mez=at(a.dur,a)*durMult(t);t.stun=0;t.mezDeep=a.deep?1:0;if(pet&&pet.target===t)pet.target=null;
+    // Mass Mez (Enchanter fork): up to 2 more awake mobs near the first one fall asleep too (never your target or a boss).
+    if(a.mass){mobs.filter(m=>m!==t&&m!==player.target&&!m.dead&&!m.def.boss&&!(m.mez>0)&&dist(m,t)<=40).slice(0,a.mass-1).forEach(m=>{m.mez=at(a.dur,a)*durMult(m);m.stun=0;m.mezDeep=0;if(pet&&pet.target===m)pet.target=null;floatText(m.x,m.y-26,'Zz','#e0c3ff');engage(m)})}burst(t.x,t.y-10,a.col,10,true);floatText(t.x,t.y-26,'Zz','#e0c3ff');log(cap(t.def.name)+' falls asleep ('+Math.round(t.mez)+'s). Anything that hits it wakes it.','#e0c3ff');}
   else if(a.kind==='charm'){charmMob(t,at(a.dur,a));}
   else if(a.kind==='taunt'){t.threat.p=Math.max(t.threat.p,t.threat.pet+40);engage(t);burst(t.x,t.y-8,a.col,8);floatText(t.x,t.y-26,'TAUNT','#ffb37a');log(cap(t.def.name)+' turns its attention to YOU.','#ffb37a');}
   else if(a.kind==='decoy'){decoy={x:player.x+12*player.dir,y:player.y,dir:player.dir,t:at(a.dur,a)};burst(decoy.x,decoy.y-6,a.col,14,true);log('A see-through copy of you appears. Nearby enemies attack it instead ('+Math.round(decoy.t)+'s).','#c8a0ff');}
   // Ground circles: at your feet (Consecrate, Venom Totem) or on your target (Volley). "all" = hurts any mob, not just undead.
   else if(a.kind==='ground'){const gx=a.tgt&&t?t.x:player.x,gy=a.tgt&&t?t.y:player.y;grounds.length=0;
-    grounds.push({x:gx,y:gy,r:a.radius,t:at(a.dur,a),next:a.tick||1,every:a.tick||1,heal:a.heal?at(a.heal,a)*mult:0,dmg:at(a.dmg,a)*mult,all:!!a.all,totem:!!a.totem,name:a.name,col:a.col});
+    grounds.push({x:gx,y:gy,r:a.radius,t:at(a.dur,a),next:a.tick||1,every:a.tick||1,heal:a.heal?at(a.heal,a)*mult:0,dmg:at(a.dmg,a)*mult,all:!!a.all,totem:!!a.totem,sanct:a.sanct||0,name:a.name,col:a.col});
     burst(gx,gy,a.col,16,true);log(a.msg||'You consecrate the ground. Stand in it to heal; undead that step in burn.',a.col);if(a.tgt&&t)engage(t);}
   // Ranger's Spike Trap: set at your feet; the first mob to step in takes a big hit and bleeds. Two at most.
-  else if(a.kind==='trap'){if(traps.length>=2)traps.shift();traps.push({x:player.x,y:player.y,t:60,dmg:at(a.dmg,a)*mult,bleed:at(a.bleed,a)*mult,name:a.name});burst(player.x,player.y,a.col,8);log('You set a '+a.name+' at your feet. Lead a mob over it.','#cfc8b2');}
+  else if(a.kind==='trap'){if(traps.length>=2)traps.shift();traps.push({x:player.x,y:player.y,t:60,dmg:at(a.dmg,a)*mult,bleed:at(a.bleed,a)*mult,bleedT:a.bleedT||12,blast:a.blast||0,knock:a.knock||0,name:a.name});burst(player.x,player.y,a.col,8);log('You set a '+a.name+' at your feet. Lead a mob over it.','#cfc8b2');}
   // Magician's Detonate: the pet blows up. Fire hits hardest; Earth hits less but stuns.
   else if(a.kind==='detonate'){const px=pet.x,py=pet.y,boom=pet.boom,st=pet.boomStun,nm=petName();
-    pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});burst(px,py-6,'#ff9a4a',22,true);log('Your '+nm+' explodes!','#ff9a4a');
+    pet=null;mobs.forEach(o=>{if(o.threat)o.threat.pet=0});burst(px,py-6,'#ff9a4a',22,true);log('Your '+nm+' explodes!','#ff9a4a');if(a.rebirth)player.freeSummon=1;
     mobs.filter(m=>!m.dead&&Math.hypot(m.x-px,m.y-py)<=a.radius).forEach(m=>{hitMob(m,at(a.dmg)*boom*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name);if(!m.dead&&st){m.stun=st*durMult(m);m.mez=0}});}
   // Magician's Burnout: a short pet buff (the pet attacks faster).
   else if(a.kind==='petbuff'){player.buffs[a.buff]=at(a.dur,a);burst(pet.x,pet.y-6,a.col,12,true);log('Your '+petName()+' surges with '+a.name+durTxt(player.buffs[a.buff])+'.',a.col);}
@@ -399,26 +442,27 @@ function applyAbility(a,t,fromHide){
   else if(a.kind==='song'){player.songs=player.songs||[];if(player.songs.length>=2){const old=player.songs.shift();log('You stop playing '+ABI[old].name+'.','#9aa')}
     player.songs.push(a.id);if(!(player.songNext>0))player.songNext=3;songPulse(a,1);log('You start playing '+a.name+'.',a.col);}
   // Crescendo: both songs end in one big pulse of whatever they were.
-  else if(a.kind==='crescendo'){const ss=player.songs.slice();player.songs=[];burst(player.x,player.y-6,a.col,20,true);floatText(player.x,player.y-30,'CRESCENDO!','#ffd27a',true);
+  else if(a.kind==='crescendo'){const ss=player.songs.slice();if(!a.keep)player.songs=[]; /* Encore (Bard fork): the songs keep playing */burst(player.x,player.y-6,a.col,20,true);floatText(player.x,player.y-30,'CRESCENDO!','#ffd27a',true);
     ss.forEach(id=>songPulse(ABI[id],a.power||4,true));}
   else if(a.kind==='blink'){
     // Disengage hops backward, away from the nearest thing fighting you (or your target).
     if(a.back){const m=fightingMe().sort((x,y)=>dist(x,player)-dist(y,player))[0]||player.target;if(m&&!m.dead){const dx=player.x-m.x,dy=player.y-m.y,d=Math.hypot(dx,dy)||1;player.fx=dx/d;player.fy=dy/d}}
     blink(a.range,a.back);burst(player.x,player.y-6,a.col,10,true);}
   else if(a.kind==='gate'){gateHome();}
-  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult);pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#7dffa6');burst(pet.x,pet.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight');}
+  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult),tp=pet2&&pet2.hp/pet2.maxhp<pet.hp/pet.maxhp?pet2:pet; // Bone Pair: mends the more hurt skeleton
+    tp.hp=Math.min(tp.maxhp,tp.hp+h);floatText(tp.x,tp.y-20,'+'+h,'#7dffa6');burst(tp.x,tp.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight');}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
   // Feign Death. The Monk's version ("split") sends every mob home except your target, which keeps coming:
   // a pack becomes a single. With only one mob on you, it drops that one too (an escape).
   else if(a.kind==='feign'){player.cast=null;player.tx=null;let n=0;
     const fight=mobs.filter(m=>!m.dead&&m.state==='chase'),tg=player.target;
     const keep=a.split&&tg&&!tg.dead&&fight.length>1&&fight.indexOf(tg)>=0?tg:null;
-    player.fd=keep?1.5:4;player.fdKeep=keep;
+    player.fd=keep?1.5:(a.still?6:4);player.fdKeep=keep;player.fdStand=a.standStun||0;player.fdStill=a.still||0; // forks: Perfect Split stuns on standing, Still Water rests
     fight.forEach(m=>{if(m===keep)return;m.threat.p=0;if(a.split){m.state='return';m.threat.pet=0;m.calm=10}n++}); // calm: won't notice you or rejoin for 10s
     log(keep?'You drop to the ground. Everything but '+keep.def.name+' loses interest and walks home.':'You fall to the ground, feigning death.'+(n?' Your foes lose interest in you.':''),'#bdbdbd');}
   // Area: hits every mob around you. Depending on the ability it also stuns (Color Flash), freezes (Frost Nova),
   // hits undead harder (Divine Strike) or heals you per mob hit (Dark Cleave).
-  else if(a.kind==='cleave'){const hits=mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius);burst(player.x,player.y-6,a.col,14);let healed=0;
+  else if(a.kind==='cleave'){const hits=a.single?[player.target]:mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius); /* Rending Blow: target only */burst(player.x,player.y-6,a.col,14);let healed=0;
     hits.forEach(m=>{if(rng()<resistChance(m)){floatText(m.x,m.y-18,a.melee?'MISS':'RESIST','#cfd6e0');engage(m);return}
       if(a.dmg)hitMob(m,at(a.dmg)*rr(0.85,1.15)*(1-m.def.armor)*mult*(a.undead&&isUndead(m)?a.undead:1),'direct',a.name);else engage(m);
       if(m.dead)return;
@@ -431,11 +475,12 @@ function applyAbility(a,t,fromHide){
 }
 
 // Cleric's twist: holy power from a heal burns every undead fighting near you.
-function holyPulse(amount,name){
-  const near=mobs.filter(m=>!m.dead&&isUndead(m)&&m.state==='chase'&&dist(m,player)<=40);
+// Radiant Renew (fork): "all" is the share that also burns mobs that aren't undead.
+function holyPulse(amount,name,all){
+  const near=mobs.filter(m=>!m.dead&&(all||isUndead(m))&&m.state==='chase'&&dist(m,player)<=40);
   if(!near.length)return;
   burst(player.x,player.y-6,'#fff3c4',10,true);
-  near.forEach(m=>hitMob(m,amount*rr(0.9,1.1)*(1-m.def.armor),'holy',name+' (holy)'));
+  near.forEach(m=>hitMob(m,amount*(isUndead(m)?1:all)*rr(0.9,1.1)*(1-m.def.armor),'holy',name+' (holy)'));
 }
 // Bard songs: what one pulse does. power > 1 is Crescendo's big final pulse.
 function songPulse(a,power,finale){
@@ -455,8 +500,9 @@ function dashTo(t){
   player.x+=dx/d*n;player.y+=dy/d*n;player.tx=null;burst(player.x,player.y-6,'#ffd27a',6);
 }
 // Dragon Strike: shove the mob straight back from you, stopping at a wall.
-function knockBack(m,px){
-  const dx=m.x-player.x,dy=m.y-player.y,d=Math.hypot(dx,dy)||1;let n=0;
+function knockBack(m,px,ox,oy){ // ox,oy: push away from this point instead of you (Blast Trap)
+  if(ox==null){ox=player.x;oy=player.y}
+  const dx=m.x-ox,dy=m.y-oy,d=Math.hypot(dx,dy)||1;let n=0;
   for(let s=2;s<=px;s+=2){if(blocked(m.x+dx/d*s,m.y+dy/d*s))break;n=s}
   m.x+=dx/d*n;m.y+=dy/d*n;burst(m.x,m.y-6,'#ffd27a',6);
 }
@@ -474,5 +520,6 @@ function gateHome(){
   if(zoneId!=='cross')enterZone('cross');
   player.x=AREAS.crossroads.start.x;player.y=AREAS.crossroads.start.y;player.target=null;
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null}
+  if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null}
   burst(player.x,player.y-6,'#c8a0ff',16,true);
 }

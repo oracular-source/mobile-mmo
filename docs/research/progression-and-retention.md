@@ -24,7 +24,7 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 
 ### Necromancer level 10 fork: Raise Bones (approved Nov 19)
 - **Bone Pair:** one cast raises two skeletons, each about 60% of today's health and damage (a bit stronger together). The second skeleton picks up any extra mob that hits you, so each holds its own mob. Weaker on Boss 1 and Gnawbone (they die one at a time; Mend Bones heals one). For camps and big pulls.
-- **Bone Knight:** one skeleton with about 150% health, more armor and slightly less damage. **Taunts every 8s**, pulling back any mob that turned on you, so sitting mid-fight is safer. With two mobs one still comes for you unless you Dread it. For long single fights and named.
+- **Bone Knight:** one skeleton with about 150% health, more armor and about the same damage (tuned v0.39). **Taunts every 8s**, pulling back any mob that turned on you, so sitting mid-fight is safer. With two mobs one still comes for you unless you Dread it. For long single fights and named.
 - **Sim check:** both in a single fight, a pack and a long named fight at levels 10–15 (not tuned to one boss), with DPS tracked. Target: Bone Pair wins packs, Bone Knight wins long named fights; if either wins everywhere, redesign. Watch for exploits (taunt stacking, two pets splitting threat oddly).
 
 ### Level 10 forks, the other 13 classes (approved Nov 19)
@@ -42,6 +42,8 @@ Owner notes (Nov 19): **forks are for the rest of the character's life, so judge
 - **Monk · Feign Death:** *Perfect Split* (target stunned 2s when you stand) / *Still Water* (you regenerate fast while feigned, a mid-fight rest).
 - **Shaman · Drowsy:** *Torpor* (stronger attack slow on one) / *Drowsy Cloud* (weaker slow on every mob near the target).
 - **Bard · Crescendo:** *Finale* (bigger pulse, songs end) / *Encore* (smaller pulse, songs keep playing).
+
+**Built (v0.39, Nov 19):** all 14 level 10 forks are in the game (Menu → Skills; pick at the ding, swap at any campfire). Numbers tuned once after the sim (Bone Knight damage up, Thornsnare thorns halved, Tangle Field wider and longer, Volatile 120%, Rebirth's blast 90%). Results and redesign candidates (Bone Pair vs Bone Knight, Thornsnare vs Tangle Field, Volatile vs Rebirth) in `docs/sim-results.md`.
 
 ### Level 12 forks, all 14 classes (approved Nov 19)
 Same rules as level 10: both sides a bit stronger than the base, about equal, different by situation (one mob vs many, solo vs group later). Picked a different ability from the level 10 fork for each class, and mixed templates so level 10 and 12 don't feel like the same choice twice.

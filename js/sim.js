@@ -312,6 +312,7 @@ const BOTS={
       if(!B.dot(t,'disease')&&B.can('disease')){B.use('disease',t);return}
       // 6. Two or more next to you: Dark Cleave.
       if(B.live().filter(m=>dist(m,player)<=24).length>=2&&B.can('dcleave')){B.use('dcleave');return}
+      if(ABI.dcleave&&ABI.dcleave.single&&dist(t,player)<=24&&B.can('dcleave')){B.use('dcleave',t);return} // Rending Blow fork: a single-target hit, so use it on one mob too
       if(dist(player,t)>18)return;
       if(B.can('sstrike'))B.use('sstrike',t);
     }
@@ -517,12 +518,14 @@ function resetPlayer(L){
   player.lvl=L;player.xp=-1e9; // no level-ups mid-sim
   player.hp=maxHP(L);player.mp=maxMP(L);player.buffs={};player.cds={};player.gcd=0;player.cast=null;player.queued=null;
   player.sit=false;player.fd=0;player.dead=0;player.target=null;player.tx=null;player.hots=[];player.songs=[];player.bval={};player.fdKeep=null;decoy=null;grounds.length=0;traps.length=0;
+  player.ward=0;player.ambush=0;player.freeSummon=0;player.fdStand=0;player.fdStill=0;
+  applyForks(); // forks follow the sim's level (a level-10 fork only counts from 10)
 }
 // On a loss: how much health the mobs had left, all together (0.33 = a third).
 const hpLeft=()=>{const a=mobs.filter(m=>m.maxhp);return a.reduce((s,m)=>s+Math.max(0,m.dead?0:m.hp),0)/(a.reduce((s,m)=>s+m.maxhp,0)||1)};
 function simFight(f,L,seed,mode){
   seedRng(seed);
-  pet=null;enterZone('arena');resetPlayer(L);
+  pet=null;pet2=null;enterZone('arena');resetPlayer(L);
   const bot=BOTS[CLS],st={mode:mode,fight:f.id};
   // Before the pull: raise the pet, hide. Then top up, as if you'd rested.
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
@@ -543,11 +546,12 @@ function simFight(f,L,seed,mode){
     if(mobs.every(m=>m.dead)&&!(pet&&pet.charm))break;
   }
   const win=mobs.every(m=>m.dead)&&!(pet&&pet.charm); // a charmed mob still counts as alive
+  const hpTot=mobs.reduce((s,m)=>s+(m.maxhp||0),0); // every mob's health, adds included: for damage per second
   // Rest to 80% health and mana before the next pull (sitting).
   let rest=0;
   if(win){player.target=null;player.tx=null;player.buffs.hide=0;
     while(rest<600&&(B.hp()<0.8||B.mp()<0.8)){player.sit=true;update(SIM_DT);rest+=SIM_DT}}
-  return{win:win,death:false,timeout:!win,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:rest,left:win?0:hpLeft()};
+  return{win:win,death:false,timeout:!win,t:t,dmg:dmg,mana:mana,petDied:petDied,rest:rest,left:win?0:hpLeft(),hpTot:hpTot};
 }
 
 /* ---------- A full run for the class you're playing ---------- */
@@ -560,10 +564,11 @@ function simBegin(){
   return keep;
 }
 function simEnd(keep){
-  seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;
+  seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;pet2=null;
   const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;
   Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));
-  enterZone('arena');player.lvl=keep.lvl;player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);
+  if(keep.forks){forkPick=keep.forks}
+  enterZone('arena');player.lvl=keep.lvl;applyForks();player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);
   player.buffs={};player.cds={};player.dead=0;player.target=null;
   floats.length=0;parts.length=0;beams.length=0;
   simState.busy=false;
@@ -592,6 +597,43 @@ function runSim(opts){
     };
     step();
   });
+}
+/* ---------- Fork check (v0.38): both sides of each fork against the base ability ---------- */
+// The plan's rule: both sides a bit stronger than the base, about equal, better in different situations. So each side
+// fights a single, a pack of three and two long named fights at the fork's level; if one side wins everywhere, redesign.
+const FORK_FIGHTS=[
+  {id:'single',name:'Single skeleton',mobs:['cskel']},
+  {id:'pack',name:'Pack of 3 skeletons',mobs:['cskel','cskel','cskel']},
+  {id:'gnaw',name:'Old Gnawbone (even level)',mobs:['gnaw'],named:1},
+  {id:'king',name:'Skeleton King (even level)',mobs:['boss1'],named:1}
+];
+function runForkSim(opts){
+  opts=opts||{};
+  if(simState.busy||!BOTS[CLS])return Promise.resolve(null);
+  const forks=MYFORKS.filter(f=>f.lvl<=10); // only forks you can reach under the current level cap
+  const keep=simBegin();keep.forks=forkPick;
+  const seeds=opts.seeds||SIM_SEEDS,jobs=[];
+  forks.forEach(f=>[{id:'',name:'Base '+BASE_AB[f.ab].name}].concat(f.opts).forEach(o=>FORK_FIGHTS.forEach(fi=>jobs.push({f:f,o:o,fi:fi}))));
+  const rows=[];let i=0;
+  return new Promise(resolve=>{
+    const step=()=>{
+      if(i<jobs.length){const j=jobs[i++],rs=[],L=opts.level||j.f.lvl;
+        forkPick=Object.assign({},keep.forks);if(j.o.id)forkPick[j.f.lvl]=j.o.id;else delete forkPick[j.f.lvl];
+        for(let s=0;s<seeds;s++)rs.push(simFight(Object.assign({lv:L},j.fi),L,2000+s,''));
+        const w=rs.filter(r=>r.win),avg=(a,k)=>a.length?a.reduce((x,r)=>x+r[k],0)/a.length:0;
+        rows.push({lvl:L,side:j.o.name,fight:j.fi.name,runs:rs.length,wins:w.length,deaths:rs.filter(r=>r.death).length,kill:avg(w,'t'),
+          dps:w.length?w.reduce((x,r)=>x+r.hpTot/r.t,0)/w.length:0,dmg:avg(rs,'dmg'),mana:avg(rs,'mana'),left:avg(rs.filter(r=>!r.win),'left'),petDied:rs.filter(r=>r.petDied).length});
+        if(opts.onProgress)opts.onProgress(i,jobs.length);
+        setTimeout(step,0);return}
+      simEnd(keep);
+      const res={cls:CLS,name:C.name,seeds:seeds,rows:rows};simState.lastFork=res;resolve(res);
+    };
+    step();
+  });
+}
+function forkTable(res){
+  const n=v=>Math.round(v),head=['Side','Fight','Win','Deaths','Kill (s)','DPS','Dmg taken','Mob HP left (losses)'];
+  return '| '+head.join(' | ')+' |\n|'+head.map(()=>' --- ').join('|')+'|\n'+res.rows.map(r=>'| '+[r.side,r.fight,r.wins+'/'+r.runs,r.deaths,r.wins?n(r.kill):'–',r.wins?r.dps.toFixed(1):'–',n(r.dmg),r.wins<r.runs?n(r.left*100)+'%':'–'].join(' | ')+' |').join('\n');
 }
 // Results as a table: kill time, damage taken, mana used, rest time, deaths.
 function simTable(res,html){

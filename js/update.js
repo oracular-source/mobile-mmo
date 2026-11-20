@@ -13,7 +13,11 @@ function update(dt){
     }else if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     const steering=mx!==0||my!==0;
-    if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}}
+    if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
+      // Still Water (Monk fork): health and mana come back fast while you lie there.
+      if(player.fd>0&&player.fdStill){player.hp=Math.min(maxHP(player.lvl),player.hp+maxHP(player.lvl)*player.fdStill*dt);player.mp=Math.min(maxMP(player.lvl),player.mp+maxMP(player.lvl)*player.fdStill*dt)}
+      // Perfect Split (Monk fork): standing up stuns the mob you kept.
+      if(!(player.fd>0)&&player.fdStand){const k=player.fdKeep;if(k&&!k.dead){k.stun=player.fdStand*durMult(k);k.mez=0;floatText(k.x,k.y-26,'STUNNED','#9fb8e0')}player.fdStand=0}}
     if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.fx=mx/d;player.fy=my/d;player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,pSpeed(),dt);}
     else if(player.tx!==null){const fd=Math.hypot(player.tx-player.x,player.ty-player.y);if(fd>1){player.fx=(player.tx-player.x)/fd;player.fy=(player.ty-player.y)/fd}if(moveToward(player,player.tx,player.ty,pSpeed(),dt))player.tx=null;}
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
@@ -44,10 +48,11 @@ function update(dt){
     else player.mp=Math.min(maxMP(L),player.mp+maxMP(L)*(player.sit?0.12:0.05)*fire*clar*dt);
     // Heals over time (Cleric's Renew) tick every 2s; each tick also burns nearby undead.
     if(player.hots&&player.hots.length)for(let i=player.hots.length-1;i>=0;i--){const o=player.hots[i];o.t-=dt;o.next-=dt;
-      if(o.next<=0){o.next+=2;const h=Math.round(o.heal*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');if(o.holy)holyPulse(o.heal*o.holy,o.name);}
+      if(o.next<=0){o.next+=2;const h=Math.round(o.heal*rr(0.9,1.1));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');if(o.holy)holyPulse(o.heal*o.holy,o.name,o.holyAll);}
       if(o.t<=0)player.hots.splice(i,1);}
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+maxHP(L)*(player.sit?0.12:0.05)*fire*dt);
     for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
+    if(player.ward>0)player.ward-=dt; // Warding Renew's block lasts as long as the Renew
     // Bard songs pulse every 3s while they play: walking, fighting or sitting.
     if(player.songs&&player.songs.length){player.songNext-=dt;if(player.songNext<=0){player.songNext+=3;player.songs.forEach(id=>songPulse(ABI[id],1))}}
   }
@@ -64,8 +69,10 @@ function update(dt){
   for(let i=traps.length-1;i>=0;i--){const tr=traps[i];tr.t-=dt;
     const m=mobs.find(m=>!m.dead&&Math.hypot(m.x-tr.x,m.y-tr.y)<=12); // 12: mobs stop about 11px from you to swing, so a trap at your feet still catches them
     if(m){traps.splice(i,1);burst(tr.x,tr.y-2,'#cfc8b2',10,true);floatText(m.x,m.y-28,'SNAP!','#ffd27a');
-      hitMob(m,tr.dmg*rr(0.9,1.1)*(1-m.def.armor),'direct',tr.name);
-      if(!m.dead){m.dots=m.dots.filter(d=>d.id!=='bleed');m.dots.push({id:'bleed',name:'Bleed',t:12,next:3,dmg:tr.bleed})}}
+      // Blast Trap (Ranger fork): hits every mob near the trap and knocks them back from it.
+      const hit=tr.blast?mobs.filter(o=>!o.dead&&Math.hypot(o.x-tr.x,o.y-tr.y)<=tr.blast):[m];
+      hit.forEach(o=>{hitMob(o,tr.dmg*rr(0.9,1.1)*(1-o.def.armor),'direct',tr.name);if(!o.dead&&tr.knock&&!o.def.boss)knockBack(o,tr.knock,tr.x,tr.y)});
+      if(!m.dead){m.dots=m.dots.filter(d=>d.id!=='bleed');m.dots.push({id:'bleed',name:'Bleed',t:tr.bleedT||12,next:3,dmg:tr.bleed})}}
     else if(tr.t<=0){traps.splice(i,1);log('Your '+tr.name+' rusts away.','#9aa')}}
   if(decoy){decoy.t-=dt;if(decoy.t<=0){burst(decoy.x,decoy.y-6,'#c8a0ff',8);decoy=null;log('Your Phantasm fades.','#9aa')}}
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
@@ -76,7 +83,9 @@ function update(dt){
     if(m.dead)return;
     for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
       // Shaman's small stacking bonus: each DoT ticks 10% harder for every other DoT on the same mob.
-      if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).length-1):1;
+      // Thornsnare ticks only while the mob is walking (not while it stands and swings, or is held).
+      if(d.next<=0&&d.walk&&(m.root>0||m.stun>0||m.mez>0||m.state!=='chase'||dist(m,victim(m))<=12)){d.next+=3}
+      else if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).length-1):1;
         hitMob(m,d.dmg*sx*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return;}
       if(d.t<=0){m.dots.splice(i,1);log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
     if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
@@ -107,7 +116,7 @@ function update(dt){
       if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
       if(d>11){if(spd>0)moveToward(m,v.x,v.y,spd,dt)}
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
-        if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet)hurtPet(m);else hurtPlayer(m)}}
+        if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
       if(moveToward(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0}
     }

@@ -45,7 +45,7 @@ function buildArea(id){
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
     if(o.kind==='crypt_mouth'){A.lights.push({x:cx,y:(o.y+o.h)*T-10,r:46,w:0})}
-    if(o.kind==='campfire'){A.lights.push({x:cx,y:o.y*T+6,r:72,w:38});A.flames.push({x:cx,y:o.y*T+11,big:1})}
+    if(o.kind==='campfire'){A.lights.push({x:cx,y:o.y*T+6,r:72,w:38});A.flames.push({x:cx,y:o.y*T+11,big:1,camp:1})}
     if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   const st=A.exits.find(e=>e.name===M.start)||A.exits[0];

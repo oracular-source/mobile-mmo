@@ -10,7 +10,7 @@ function loop(ts){
 }
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
-if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,runPace:runPace,simTable:simTable,simSummary:simSummary,seedRng:seedRng,zone:()=>zoneId,arenaMob:arenaMob,update:update,grounds:grounds,getDecoy:()=>decoy};
+if(location.search.indexOf('debug')>=0)window.__game={enterZone:enterZone,player:player,mobs:mobs,inv:inv,tileAt:tileAt,DOOR:DOOR,checkPortals:checkPortals,CLS:CLS,giveItem:giveItem,getPet:()=>pet,devAct:devAct,cast:cast,ABI:ABI,loadout:()=>loadout,runSim:runSim,runPace:runPace,simTable:simTable,simSummary:simSummary,seedRng:seedRng,zone:()=>zoneId,arenaMob:arenaMob,update:update,grounds:grounds,getDecoy:()=>decoy,runForkSim:runForkSim,forkTable:forkTable,getPet2:()=>pet2,forks:()=>forkPick,forkDue:forkDue,nearFire:nearFire,traps:traps};
 // Start screen (v0.38, UI breakdown 11, owner picked A). Tapping a class only shows it; Play does the work.
 // Switching class still saves the choice and reloads (each class keeps its own level, bags and loadout), and a
 // one-time flag in sessionStorage starts the game straight after the reload so it doesn't take a second Play.
@@ -26,7 +26,7 @@ function renderPick(){
 }
 function openIntro(){pickCls=CLS;$('introx').style.display=started?'':'none';renderPick();$('intro').classList.add('show');running=false}
 function startGame(){$('intro').classList.remove('show');running=true;if(started)return; // Change class → same class just resumes where you were
-  started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross')}
+  started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross');setTimeout(offerFork,600)} // a level-10+ character with no fork picked yet gets the choice right away
 (function(){
   $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
   renderPick();

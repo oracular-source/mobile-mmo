@@ -132,7 +132,7 @@ function render(){
   traps.forEach(tr=>{const x=Math.round(tr.x),y=Math.round(tr.y);lx.fillStyle='#8d8692';for(let i=-3;i<=3;i+=2)lx.fillRect(x+i,y-1-((i+3)%4?0:1),1,2);lx.fillStyle='#4a3b33';lx.fillRect(x-4,y+1,9,1)});
   // Trees in view join the depth sort (v0.30): whoever stands north of a trunk is drawn first, so the crown covers them.
   const A0=curArea(),trees=A0?A0.trees.filter(tr=>tr.b[2]>=camX&&tr.b[0]<=camX+VW&&tr.b[3]>=camY&&tr.b[1]<=camY+VH):[];
-  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],decoy?[decoy]:[],[player],trees).sort((a,b)=>a.y-b.y);
+  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],pet2?[pet2]:[],decoy?[decoy]:[],[player],trees).sort((a,b)=>a.y-b.y);
   // A tree you (or your target) are behind fades so you never lose sight of the fight.
   const behind=(o,tr)=>o&&!o.dead&&o.y<tr.y&&o.x+6>tr.b[0]&&o.x-6<tr.b[2]&&o.y>tr.b[1]+4&&o.y-14<tr.b[3];
   ents.forEach(e=>{
@@ -154,10 +154,10 @@ function render(){
       return;
     }
     if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
-    if(e===pet){const im=IMG[pet.img||'pet']||IMG.pet;
-      if(pet.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
+    if(e===pet||e===pet2){const im=IMG[e.img||'pet']||IMG.pet;
+      if(e.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
       shadow(e.x,e.y,Math.max(4,Math.round(im.w/2.4)));drawSprite(im,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);
-      if(pet.charm&&Math.floor(time*3)%2===0){lx.fillStyle='#ff9de2';const hy=Math.round(e.y-im.h-3);lx.fillRect(Math.round(e.x)-1,hy,1,1);lx.fillRect(Math.round(e.x)+1,hy,1,1);lx.fillRect(Math.round(e.x),hy+1,1,1)} // little heart over a charmed mob
+      if(e.charm&&Math.floor(time*3)%2===0){lx.fillStyle='#ff9de2';const hy=Math.round(e.y-im.h-3);lx.fillRect(Math.round(e.x)-1,hy,1,1);lx.fillRect(Math.round(e.x)+1,hy,1,1);lx.fillRect(Math.round(e.x),hy+1,1,1)} // little heart over a charmed mob
       return}
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;

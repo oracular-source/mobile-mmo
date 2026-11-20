@@ -70,3 +70,20 @@ const prog=store.get(PROGKEY,null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Mat
 (function(){const m=/[?&]level=(\d+)/.exec(location.search);if(m){player.lvl=Math.max(1,Math.min(10,+m[1]));player.xp=0;store.set(PROGKEY,{v:2,lvl:player.lvl,xp:0});}})();
 player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
 const save=()=>store.set(PROGKEY,{v:2,lvl:player.lvl,xp:player.xp});
+
+/* ---------- Skill tree forks (v0.38) ---------- */
+// Your pick for each fork level ({10:'a'}), saved per character. Picking happens on the Skills tab: free when the fork
+// is new, and swapping later only works by a campfire (owner, Nov 19; until Town 1 exists).
+const MYFORKS=FORKS[CLS]||[];
+const BASE_AB={};AB.forEach(a=>BASE_AB[a.id]=Object.assign({},a)); // each ability as it is before any fork
+let forkPick=store.get(KEY('forks'),{});
+const saveForks=()=>store.set(KEY('forks'),forkPick);
+// Puts every ability back to its base numbers, then lays the picked side of each fork you've reached on top.
+// Changes the ability objects in place, so ABI, AB and the loadout keep pointing at them.
+function applyForks(){
+  AB.forEach(a=>{const base=BASE_AB[a.id];Object.keys(a).forEach(k=>delete a[k]);Object.assign(a,base)}); // read the id before clearing
+  MYFORKS.forEach(f=>{if(player.lvl<f.lvl)return;const o=f.opts.find(o=>o.id===forkPick[f.lvl]);if(o){Object.assign(ABI[f.ab],o.set);ABI[f.ab].fork=o.name}});
+}
+// The first fork you've reached but not picked yet (shown as "pick your new toy").
+const forkDue=()=>MYFORKS.find(f=>player.lvl>=f.lvl&&!forkPick[f.lvl])||null;
+applyForks();

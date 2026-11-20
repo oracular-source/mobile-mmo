@@ -22,12 +22,12 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - Later options: Phaser + Capacitor (stay on web, ship to app stores) or Godot 4. Server: Nakama. Decide after the prototype.
 
 ## How we work
-- One small feature per session. Finish it, test it, then stop.
+- One feature per session; big builds are fine (owner, Nov 19), e.g. a whole system plus its content in one go. Finish it, test it, then stop.
 - Keep code simple and readable over clever. Add short comments that explain *why*.
 - Before finishing, open the game in a headless browser if you can and check for JavaScript errors.
 - When I report a bug, ask for what I saw (or a screenshot) before guessing.
 - When a feature works, commit with a short, clear message.
-- Work flows through `docs/board.md` (lean): one card at a time, small batches, ideas go to the backlog before any building, defects before features. Update the board's Now/Next, changelog and known issues with every change.
+- Work flows through `docs/board.md` (lean): one card at a time (a card can be a big build), ideas go to the backlog before any building, defects before features. Update the board's Now/Next, changelog and known issues with every change.
 - Chat light (saves compute): end every reply with one line: 🟢 keep going, 🟡 finish this card then start a new chat, or 🔴 start a new chat now. Green = fresh chat. Yellow = a feature is done in this chat or it has had several big builds or file reads. Red = the chat has been summarized/compacted, or a second feature would start here. Before any 🟡 or 🔴, make sure `docs/board.md` Now/Next is current so a new chat can pick up with: "Continue from the board."
 - GitHub is the single source of truth for docs. Refresh the Claude design doc only at milestones.
 - Developer panel for manual testing: open the game with `?dev` (DEV button: levels, heal, god mode, loot, teleports). `?dev=0` turns it off.

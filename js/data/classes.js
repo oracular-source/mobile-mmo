@@ -151,3 +151,53 @@ const CLASSES={
     {id:'crescendo',name:'Crescendo',short:'Cresc',lvl:8,mana:12,cast:0,cd:[60,40,2],col:'#ffd27a',tgt:0,tag:'Big final pulse',kind:'crescendo',power:4}]}
 };
 CLASSES.druid.caster=1;
+
+// Skill tree forks (owner, Nov 18-19; plan in docs/research/progression-and-retention.md). At level 10 and every even level
+// after, one ability gets a fork: pick one of two versions. "set" is copied over the ability's own numbers when that side is
+// picked; the extra fields (thorns, splash, sweep, ...) are read in combat.js. Both sides are a bit stronger than the base
+// ability and about equal to each other: they differ by situation (one mob vs many, long fights vs packs).
+// Level 12 and 14 forks are designed (progression note) and get added here when the level cap passes 10.
+const FORKS={
+  necro:[{lvl:10,ab:'raise',opts:[
+    {id:'a',name:'Bone Pair',desc:'One cast raises two skeletons, each a bit over half as strong. The second one picks up any extra mob that hits you.',set:{pet:{name:'skeleton',img:'pet',hp:[18,8.4],dmg:[1.9,1],ac:6,pair:1}}},
+    {id:'b',name:'Bone Knight',desc:'One tougher skeleton (half again the health, more armor, about the same damage). Every 8s it taunts back any mob that turned on you.',set:{pet:{name:'bone knight',img:'pet',hp:[45,21],dmg:[3.1,1.6],ac:12,taunt:8,say:'A bone knight in rusted plate claws its way out of the ground.'}}}]}],
+  druid:[{lvl:10,ab:'snare',opts:[
+    {id:'a',name:'Thornsnare',desc:'The snared mob takes thorn damage every few seconds while it walks. Keep it moving.',set:{thorns:[3,1.2]}},
+    {id:'b',name:'Tangle Field',desc:'Also snares every mob near your target, for a little less time.',set:{splash:48,splashX:0.8}}]}],
+  warrior:[{lvl:10,ab:'bash',opts:[
+    {id:'a',name:'Shield Slam',desc:'A longer stun that never misses, so it always breaks a cast.',set:{dur:[3.2,0.16],sure:1}},
+    {id:'b',name:'Shield Sweep',desc:'Also stuns every mob in front of you, for a shorter time.',set:{sweep:26,sweepX:0.6}}]}],
+  rogue:[{lvl:10,ab:'evade',opts:[
+    {id:'a',name:'Ambush',desc:'Evade also stuns your target for 2s, and your next Backstab crits.',set:{evStun:2,evCrit:1.5}}, 
+    {id:'b',name:'Feint',desc:'Evade also dazes every mob around you for 2s, so you can handle two.',set:{evDaze:2}}]}],
+  cleric:[{lvl:10,ab:'renew',opts:[
+    {id:'a',name:'Warding Renew',desc:'While Renew lasts, the next big hit on you is blocked.',set:{ward:1}},
+    {id:'b',name:'Radiant Renew',desc:'Each tick also burns every mob near you, not just undead (undead take more).',set:{holyAll:0.6}}]}],
+  enchanter:[{lvl:10,ab:'mez',opts:[
+    {id:'a',name:'Deep Sleep',desc:'One mob sleeps much longer, and the first hit doesn\'t wake it.',set:{dur:[36,0.6],deep:1}},
+    {id:'b',name:'Mass Mez',desc:'Up to 3 mobs near the first one fall asleep, for a shorter time.',set:{mass:3,dur:[12,0.2]}}]}],
+  paladin:[{lvl:10,ab:'consec',opts:[
+    {id:'a',name:'Sanctuary',desc:'A smaller circle with a stronger heal, and you take 20% less damage inside it.',set:{radius:18,heal:[3.2,1.3],sanct:0.8}},
+    {id:'b',name:'Wide Consecrate',desc:'A bigger circle that burns any mob, not just undead. Heals a little less.',set:{radius:38,all:1,heal:[1.6,0.65],dmg:[3,1.1]}}]}],
+  shadowknight:[{lvl:10,ab:'dcleave',opts:[
+    {id:'a',name:'Reaping Cleave',desc:'Heals much more per mob hit, but needs two or more mobs next to you.',set:{tapPer:[6.4,2.4],need2:1}},
+    {id:'b',name:'Rending Blow',desc:'One big hit on your target with a solid heal.',set:{single:1,dmg:[11,4.3],tapPer:[6,2.2]}}]}],
+  wizard:[{lvl:10,ab:'shatter',opts:[
+    {id:'a',name:'Deep Shatter',desc:'A bigger single hit.',set:{dmg:[34,11.7]}},
+    {id:'b',name:'Shatter Burst',desc:'Splashes 40% onto every mob near the target and chills them.',set:{burstR:30,burstX:0.4}}]}],
+  magician:[{lvl:10,ab:'detonate',opts:[
+    {id:'a',name:'Volatile',desc:'A bigger blast.',set:{dmg:[24,9.6]}},
+    {id:'b',name:'Rebirth',desc:'A slightly smaller blast, but your next summon is instant and free.',set:{dmg:[18,7.2],rebirth:1}}]}],
+  ranger:[{lvl:10,ab:'trap',opts:[
+    {id:'a',name:'Barbed Trap',desc:'A bigger hit and a long, deep bleed on the mob that steps in.',set:{dmg:[20,7.5],bleed:[5.4,2.5],bleedT:18}},
+    {id:'b',name:'Blast Trap',desc:'Hits every mob near the trap and knocks them back.',set:{blast:30,knock:24}}]}],
+  monk:[{lvl:10,ab:'mfeign',opts:[
+    {id:'a',name:'Perfect Split',desc:'When you stand up, the mob you kept is stunned for 2s.',set:{standStun:2}},
+    {id:'b',name:'Still Water',desc:'You get health and mana back fast while you lie there: a rest in the middle of a fight.',set:{still:0.08}}]}],
+  shaman:[{lvl:10,ab:'drowsy',opts:[
+    {id:'a',name:'Torpor',desc:'A stronger attack slow on one mob.',set:{aslowX:1.75}},
+    {id:'b',name:'Drowsy Cloud',desc:'A weaker slow on every mob near your target.',set:{splash:40,aslowX:1.3}}]}],
+  bard:[{lvl:10,ab:'crescendo',opts:[
+    {id:'a',name:'Finale',desc:'A bigger final pulse. Your songs end.',set:{power:5.5}},
+    {id:'b',name:'Encore',desc:'A smaller pulse, and your songs keep playing.',set:{power:2.6,keep:1}}]}]
+};

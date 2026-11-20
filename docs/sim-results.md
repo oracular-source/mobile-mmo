@@ -6,6 +6,62 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
+
+## Level 10 forks (v0.39, Nov 19, skill tree chat)
+`__game.runForkSim({seeds:10})` (open with `?debug`): each class's level 10 fork, the base ability and both sides, at level 10 (the cap), 10 fights each, no gear. Fights: one skeleton, a pack of three, Old Gnawbone and the Skeleton King, both set to level 10 (long named fights). Each cell: wins · kill time · damage per second (all mob health, adds included, over the kill time) · damage taken. Rule (progression note): both sides a bit better than the base, about equal, better in different places; if one side wins everywhere, redesign.
+
+Tuned once after the first run: Bone Knight hits harder (2.7 → 3.1 base), Thornsnare thorns halved (it beat the King 9 in 10 vs the base's 1 in 10), Tangle Field reaches farther and lasts longer (48px, 80%), Volatile 130% → 120%, Rebirth's blast 70% → 90%; the Shadow Knight bot now uses Rending Blow on a single mob.
+
+| Class | Side | Single skeleton | Pack of 3 | Old Gnawbone | Skeleton King |
+| --- | --- | --- | --- | --- | --- |
+| Necromancer | Base Raise Bones | 10/10 · 18s · 15.8 dps · 0 taken | 9/10 · 34s · 25.7 dps · 162 taken | 10/10 · 23s · 25.4 dps · 45 taken | 10/10 · 49s · 20.9 dps · 255 taken |
+| Necromancer | Bone Pair | 10/10 · 16s · 18.1 dps · 0 taken | 10/10 · 35s · 24.4 dps · 79 taken | 10/10 · 34s · 22.9 dps · 12 taken | 10/10 · 50s · 20.7 dps · 155 taken |
+| Necromancer | Bone Knight | 10/10 · 18s · 15.9 dps · 0 taken | 10/10 · 36s · 24.0 dps · 98 taken | 10/10 · 41s · 18.1 dps · 20 taken | 10/10 · 50s · 20.8 dps · 190 taken |
+| Druid | Base Tanglefoot | 10/10 · 13s · 22.2 dps · 0 taken | 10/10 · 48s · 18.1 dps · 0 taken | 10/10 · 35s · 22.6 dps · 0 taken | 1/10 · 52s · 19.8 dps · 158 taken |
+| Druid | Thornsnare | 10/10 · 12s · 23.8 dps · 0 taken | 10/10 · 42s · 20.7 dps · 0 taken | 10/10 · 33s · 24.0 dps · 0 taken | 7/10 · 48s · 21.7 dps · 126 taken |
+| Druid | Tangle Field | 10/10 · 13s · 22.2 dps · 0 taken | 10/10 · 43s · 20.1 dps · 0 taken | 10/10 · 37s · 21.6 dps · 0 taken | 1/10 · 52s · 19.7 dps · 158 taken |
+| Warrior | Base Shield Bash | 10/10 · 18s · 15.6 dps · 74 taken | 5/10 · 53s · 16.3 dps · 278 taken | 10/10 · 37s · 21.3 dps · 69 taken | 10/10 · 58s · 17.8 dps · 234 taken |
+| Warrior | Shield Slam | 10/10 · 19s · 15.4 dps · 48 taken | 8/10 · 54s · 15.8 dps · 270 taken | 10/10 · 41s · 19.4 dps · 63 taken | 10/10 · 59s · 17.5 dps · 191 taken |
+| Warrior | Shield Sweep | 10/10 · 18s · 15.6 dps · 74 taken | 9/10 · 50s · 17.1 dps · 284 taken | 10/10 · 35s · 22.6 dps · 65 taken | 10/10 · 56s · 18.5 dps · 223 taken |
+| Rogue | Base Evade | 10/10 · 12s · 23.1 dps · 21 taken | 1/10 · 31s · 27.6 dps · 200 taken | 10/10 · 25s · 22.1 dps · 32 taken | 9/10 · 38s · 27.4 dps · 162 taken |
+| Rogue | Ambush | 10/10 · 12s · 23.4 dps · 21 taken | 2/10 · 30s · 28.9 dps · 192 taken | 10/10 · 25s · 22.1 dps · 32 taken | 9/10 · 34s · 30.8 dps · 152 taken |
+| Rogue | Feint | 10/10 · 12s · 23.4 dps · 21 taken | 3/10 · 32s · 27.0 dps · 192 taken | 10/10 · 25s · 21.9 dps · 27 taken | 9/10 · 37s · 27.8 dps · 160 taken |
+| Cleric | Base Renew | 10/10 · 15s · 20.0 dps · 93 taken | 9/10 · 36s · 24.0 dps · 402 taken | 10/10 · 51s · 15.5 dps · 290 taken | 10/10 · 41s · 25.0 dps · 225 taken |
+| Cleric | Warding Renew | 10/10 · 15s · 18.9 dps · 77 taken | 9/10 · 37s · 23.3 dps · 370 taken | 10/10 · 51s · 15.5 dps · 290 taken | 10/10 · 43s · 24.1 dps · 215 taken |
+| Cleric | Radiant Renew | 10/10 · 15s · 20.0 dps · 93 taken | 9/10 · 36s · 24.0 dps · 402 taken | 10/10 · 37s · 21.1 dps · 224 taken | 10/10 · 41s · 25.0 dps · 225 taken |
+| Enchanter | Base Mesmerize | 10/10 · 16s · 18.0 dps · 0 taken | 10/10 · 51s · 16.7 dps · 0 taken | 10/10 · 85s · 9.3 dps · 0 taken | 10/10 · 102s · 10.1 dps · 58 taken |
+| Enchanter | Deep Sleep | 10/10 · 16s · 18.0 dps · 0 taken | 10/10 · 54s · 16.0 dps · 0 taken | 10/10 · 92s · 8.8 dps · 2 taken | 10/10 · 100s · 10.4 dps · 58 taken |
+| Enchanter | Mass Mez | 10/10 · 16s · 18.0 dps · 0 taken | 10/10 · 79s · 10.9 dps · 0 taken | 10/10 · 85s · 9.3 dps · 1 taken | 10/10 · 67s · 15.3 dps · 59 taken |
+| Paladin | Base Consecrate | 10/10 · 12s · 25.1 dps · 59 taken | 10/10 · 22s · 38.9 dps · 329 taken | 10/10 · 39s · 20.5 dps · 179 taken | 10/10 · 33s · 31.1 dps · 316 taken |
+| Paladin | Sanctuary | 10/10 · 12s · 25.1 dps · 47 taken | 10/10 · 22s · 38.7 dps · 253 taken | 10/10 · 39s · 20.5 dps · 161 taken | 10/10 · 34s · 30.9 dps · 310 taken |
+| Paladin | Wide Consecrate | 10/10 · 12s · 24.5 dps · 59 taken | 10/10 · 28s · 31.6 dps · 394 taken | 10/10 · 25s · 31.3 dps · 107 taken | 10/10 · 36s · 28.9 dps · 339 taken |
+| Shadow Knight | Base Dark Cleave | 10/10 · 18s · 16.8 dps · 35 taken | 0/10 · 316 taken | 10/10 · 34s · 23.7 dps · 81 taken | 10/10 · 54s · 19.1 dps · 340 taken |
+| Shadow Knight | Reaping Cleave | 10/10 · 18s · 16.8 dps · 35 taken | 2/10 · 49s · 17.5 dps · 393 taken | 10/10 · 34s · 23.7 dps · 81 taken | 10/10 · 53s · 19.3 dps · 347 taken |
+| Shadow Knight | Rending Blow | 10/10 · 17s · 17.6 dps · 25 taken | 0/10 · 319 taken | 10/10 · 42s · 18.8 dps · 97 taken | 10/10 · 54s · 18.9 dps · 332 taken |
+| Wizard | Base Shatter | 10/10 · 11s · 25.4 dps · 0 taken | 10/10 · 41s · 21.7 dps · 0 taken | 10/10 · 37s · 22.1 dps · 0 taken | 9/10 · 55s · 18.7 dps · 100 taken |
+| Wizard | Deep Shatter | 10/10 · 11s · 25.4 dps · 0 taken | 10/10 · 39s · 22.5 dps · 0 taken | 10/10 · 34s · 23.6 dps · 0 taken | 8/10 · 55s · 18.8 dps · 101 taken |
+| Wizard | Shatter Burst | 10/10 · 11s · 25.4 dps · 0 taken | 10/10 · 38s · 23.4 dps · 0 taken | 10/10 · 33s · 24.5 dps · 0 taken | 8/10 · 55s · 18.7 dps · 108 taken |
+| Magician | Base Detonate | 10/10 · 10s · 28.6 dps · 0 taken | 0/10 · 134 taken | 10/10 · 28s · 28.5 dps · 13 taken | 0/10 · 134 taken |
+| Magician | Volatile | 10/10 · 10s · 28.6 dps · 0 taken | 2/10 · 31s · 27.9 dps · 130 taken | 10/10 · 25s · 31.2 dps · 8 taken | 0/10 · 134 taken |
+| Magician | Rebirth | 10/10 · 10s · 28.6 dps · 0 taken | 0/10 · 134 taken | 10/10 · 29s · 27.5 dps · 15 taken | 0/10 · 134 taken |
+| Ranger | Base Spike Trap | 10/10 · 13s · 22.2 dps · 0 taken | 10/10 · 53s · 16.1 dps · 0 taken | 10/10 · 67s · 12.0 dps · 0 taken | 9/10 · 58s · 17.7 dps · 159 taken |
+| Ranger | Barbed Trap | 10/10 · 13s · 22.2 dps · 0 taken | 10/10 · 47s · 18.3 dps · 0 taken | 10/10 · 66s · 12.5 dps · 0 taken | 9/10 · 58s · 17.7 dps · 159 taken |
+| Ranger | Blast Trap | 10/10 · 13s · 22.2 dps · 0 taken | 10/10 · 51s · 16.8 dps · 0 taken | 10/10 · 65s · 12.8 dps · 0 taken | 9/10 · 58s · 17.7 dps · 159 taken |
+| Monk | Base Feign Death | 10/10 · 13s · 21.6 dps · 71 taken | 4/10 · 49s · 17.5 dps · 291 taken | 10/10 · 38s · 21.0 dps · 78 taken | 8/10 · 49s · 21.0 dps · 247 taken |
+| Monk | Perfect Split | 10/10 · 13s · 21.6 dps · 71 taken | 3/10 · 54s · 15.9 dps · 300 taken | 10/10 · 39s · 20.2 dps · 66 taken | 9/10 · 47s · 22.0 dps · 222 taken |
+| Monk | Still Water | 10/10 · 13s · 21.6 dps · 71 taken | 8/10 · 51s · 16.9 dps · 306 taken | 10/10 · 38s · 21.0 dps · 78 taken | 8/10 · 48s · 21.6 dps · 252 taken |
+| Shaman | Base Drowsy | 10/10 · 19s · 15.2 dps · 0 taken | 10/10 · 37s · 23.4 dps · 0 taken | 10/10 · 41s · 19.4 dps · 0 taken | 10/10 · 57s · 18.3 dps · 163 taken |
+| Shaman | Torpor | 10/10 · 19s · 15.2 dps · 0 taken | 10/10 · 37s · 23.4 dps · 0 taken | 10/10 · 41s · 19.4 dps · 0 taken | 10/10 · 57s · 18.3 dps · 163 taken |
+| Shaman | Drowsy Cloud | 10/10 · 19s · 15.2 dps · 0 taken | 10/10 · 34s · 25.1 dps · 0 taken | 10/10 · 40s · 19.6 dps · 0 taken | 10/10 · 56s · 18.5 dps · 156 taken |
+| Bard | Base Crescendo | 10/10 · 14s · 21.0 dps · 94 taken | 0/10 · 280 taken | 10/10 · 45s · 17.7 dps · 168 taken | 10/10 · 232s · 4.4 dps · 0 taken |
+| Bard | Finale | 10/10 · 14s · 21.0 dps · 94 taken | 0/10 · 304 taken | 10/10 · 45s · 17.7 dps · 168 taken | 10/10 · 232s · 4.4 dps · 0 taken |
+| Bard | Encore | 10/10 · 14s · 21.0 dps · 94 taken | 0/10 · 275 taken | 10/10 · 45s · 17.6 dps · 175 taken | 10/10 · 233s · 4.4 dps · 0 taken |
+
+**Read:**
+- **Clear trade-offs (keep):** Warrior (Slam takes less damage, Sweep wins packs), Cleric (Warding takes less damage, Radiant kills Gnawbone 14s faster), Paladin (Sanctuary takes less damage, Wide kills Gnawbone 14s faster), Monk (Still Water wins packs 8/10 vs 3/10, Perfect Split wins the King), Wizard and Ranger (close everywhere, small edges), Shaman (Cloud a bit faster on packs; Torpor shows nothing here because the bot kites, so attack speed rarely matters).
+- **One side wins everywhere (redesign candidates, owner call):** **Necro** Bone Pair is faster or safer in every fight; Bone Knight doesn't yet win long named fights as planned. **Druid** Thornsnare still beats Tangle Field everywhere but packs (about equal there). **Magician** Volatile wins packs and Gnawbone; Rebirth plays like the base.
+- **Not really tested by the bot:** Enchanter Mass Mez (the bot then wakes sleeping mobs one by one: slower but just as safe), Bard (the bot only Crescendos when low, so all three rows match), Rogue (all three close; packs still beat the Rogue).
+
 ## Zone 1 pace after the XP knobs (v0.34.1, Nov 19, map chat)
 Same pace sim as below (DEV → Testing grounds → **Zone 1 pace**), after the three-knob XP system: mob XP from level × toughness; 20 more spawns (tunnel +6, graveyard +8, crypt +6) and the graveyard and crypt a level up. Kills per level: first try 6, 9, 12, 16, 21, 27, 34, 42, 52 reached 8 in 44–68 min, which the owner found a bit fast; now **x1.4: 8, 12, 17, 22, 29, 38, 48, 59, 73**. This run goes on to level 10 (there's nothing above level 7 in Zone 1 yet, so 8 to 10 is grinding the crypt; Wolfwood will take over there). 3 runs per class, perfect bots.
 

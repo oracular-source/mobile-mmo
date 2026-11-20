@@ -36,7 +36,8 @@ function updateNPCs(dt){
   if(chatT<=0){chatT=rr(22,38);const near=npcs.filter(n=>dist(n,player)<120);if(near.length){const n=pick(near);say(n,pick(LINES[n.kind]))}}
   for(let i=bubbles.length-1;i>=0;i--){bubbles[i].t+=dt;if(bubbles[i].t>4)bubbles.splice(i,1)}
 }
-const nearFire=()=>Math.hypot(player.x-CAMPFIRE.x,player.y-CAMPFIRE.y)<48;
+// Any campfire: the old Gate Road one, or a campfire in a map-file area (the crossroads). v0.38: areas count too.
+const nearFire=()=>{const A=curArea();if(A)return A.flames.some(f=>f.camp&&Math.hypot(player.x-f.x,player.y-f.y)<48);return zoneId==='over'&&Math.hypot(player.x-CAMPFIRE.x,player.y-CAMPFIRE.y)<48};
 
 // Critters: crows on the road that scatter, frogs at the pond, fireflies.
 const critters=[],flies=[];
@@ -138,6 +139,7 @@ function enterZone(id,from,at){
   run.cryptT0=id==='crypt'?time:null;
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
+  if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null;}
   decoy=null;grounds.length=0;traps.length=0;
   player.onTile=tileAt(player.x,player.y);
 }
