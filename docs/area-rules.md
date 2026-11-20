@@ -17,6 +17,13 @@ The baseline for every new area (owner, Nov 18, 2026). Add to it as we build. Ma
 - **One landmark you can see (or hear, or see lit up) from the area's entrance.**
 - **Borders fit the place (owner, Nov 18).** Pick the transition that makes sense. **Hard cut** where there's a real boundary: a gate, a wall, a fence, a cave mouth (walk through the graveyard gate and now you're in a graveyard: dead trees, dead grass, new light, all at once). **Gradual blend** where open land meets open land, and in bigger areas: the forest thins out, grass dries, the light shifts over a stretch of road so it flows naturally. Default to the blend outdoors; use the hard cut when something physical marks the line.
 
+## Look at references first; every object must read (owner, Nov 19)
+Some art hasn't read as what it was meant to be (the crypt bones looked like little white blobs; the first Wolfwood lean-to looked like an upside-down pyramid). So for every new prop, monster or tile:
+- **Look at references before drawing.** Pull a few reference images (real photos of the thing, plus pixel art of it at a similar size) with image search, and note the 2–3 shapes that make it recognisable (a lean-to = sloped roof + ridge pole + posts + dark opening; a bone = long shaft + knobbed ends, a skull = round dome + dark eye holes).
+- **Draw those shapes big and simple.** At game size a thing reads by its outline, so lead with silhouette and contrast, not small detail.
+- **Squint test at real game zoom** before showing or shipping: crop it from an in-game screenshot at the phone's zoom and ask "would someone name this right without being told?" If not, redraw.
+- **When it's new or unsure, show it first:** a crop of the object in game next to one reference image, so the owner can say yes before it ships.
+
 ## Natural placement, no mistakes
 - Everything looks like it would really be there. Nothing overlaps what it shouldn't: no gravestones on a tower, no props in walls, holes or each other, no mobs standing in scenery.
 - Every object has a footprint (the space it takes up); buildings and paths keep about a tile of space around them.

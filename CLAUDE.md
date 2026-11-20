@@ -52,6 +52,7 @@ Monetization: free to play, with paid extra bank and inventory space. Never sell
 - Sprites are currently stored as text grids in `js/data/sprites.js` (one character per pixel, see `SPR` and `PAL`).
 - Render at low resolution and scale up with nearest-neighbor (no smoothing) so pixels stay crisp.
 - **New areas:** follow `docs/area-rules.md` (one area per pass: brief, style takes, full area mock-up, owner notes, build). Add new rules there as we learn them.
+- **References first, everything must read (owner, Nov 19):** before drawing any new prop, monster or tile, look at reference images (real photos plus pixel art at a similar size), draw the 2–3 shapes that make it recognisable, and squint-test it at real game zoom. If someone couldn't name it without being told, redraw it. When unsure, show the owner the in-game crop next to a reference first. Details in `docs/area-rules.md`.
 - **Natural placement, no mistakes (owner, Nov 18):** every scene, map and mock-up must look like a real place. Nothing overlaps something it shouldn't: no gravestones on a bell tower, no props inside walls, holes or other props, no mobs standing in scenery. Give every object a footprint, keep a tile of clearance around buildings and paths, and check placements for overlaps before showing or shipping. Things sit where they would really be (graves in rows on open ground, rubble at the foot of what it fell from, paths worn where people walk).
 
 ## Folder layout
