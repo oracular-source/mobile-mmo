@@ -356,6 +356,11 @@ $('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');set
    One page: your picture in the middle with the 8 gear slots around it, stats beside it, all 16 bags below.
    Tap a worn slot or a bag item to select it; the strip at the bottom shows details, the comparison with what you
    wear, and the actions. Nothing happens on the first tap, so a stray thumb never strips your weapon. */
+// Tap a buff or debuff icon to see its name for a moment (never pauses; doesn't open the character screen).
+{const tip=document.createElement('div');tip.id='fxtip';$('view').appendChild(tip);let tt=0;
+  const show=e=>{const f=e.target.closest&&e.target.closest('.fx');if(!f)return;e.stopPropagation();const r=f.getBoundingClientRect(),v=$('view').getBoundingClientRect();
+    tip.textContent=f.dataset.n;tip.style.display='block';tip.style.left=Math.max(2,Math.min(v.width-tip.offsetWidth-2,r.left-v.left))+'px';tip.style.top=(r.bottom-v.top+3)+'px';clearTimeout(tt);tt=setTimeout(()=>tip.style.display='none',1500)};
+  ['buffbar','tfx'].forEach(id=>{$(id).addEventListener('pointerdown',show);$(id).addEventListener('click',e=>{if(e.target.closest('.fx'))e.stopPropagation()})})}
 $('pframe').addEventListener('click',()=>{charTab='char';charSel=null;openModal('charUI')});
 let charTab='char',charSel=null; // charSel: {bag:i} or {slot:'head'}
 const DOLL_L=['head','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];

@@ -269,7 +269,21 @@ function render(){
 
 /* ---------- HUD ---------- */
 // Buff bar names and colours come from the abilities that give them (plus a few that aren't on every class).
-const BUFFS={sprint:{short:'Sprint',col:'#7dbbd0'},laststand:{short:'Last Stand',col:'#ffd27a'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,col:a.col}});
+const BUFFS={sprint:{short:'Sprint',name:'Sprint',col:'#7dbbd0',icon:'speed'},laststand:{short:'Last Stand',name:'Last Stand',col:'#ffd27a',icon:'heart'}};AB.forEach(a=>{if(a.buff)BUFFS[a.buff]={short:a.short,name:a.name,col:a.col,icon:a.icon}});
+// Buff and debuff icons with timers (UI breakdown 18, option B): one row of spell icons; a dark shade fills down from the top
+// as the effect runs out, a number shows only under 10s, and the edge blinks red in the last 3s. The longest time each effect
+// has had since it was last put up is its "full" time (a refresh starts it again). The row is rebuilt only when the set of
+// effects changes; shades and numbers update in place.
+const FXM_P={},FXM_T=new WeakMap();
+function fxFull(st,k,v){const m=st[k];if(!m||v>m.p+0.05)st[k]={max:v,p:v};else m.p=v;return st[k].max}
+function fxRow(el,items){
+  const key=items.map(i=>i.k+'/'+i.icon+'/'+i.col+'/'+(i.stack||'')).join('|');
+  if(el.dataset.k!==key){el.dataset.k=key;el.innerHTML=items.map(i=>'<div class="fx" data-n="'+i.name+'">'+iconHTML({icon:i.icon,col:i.col},14)+'<i class="sh"></i>'+(i.stack?'<em>'+i.stack+'</em>':'')+'<b class="n"></b></div>').join('')}
+  items.forEach((i,j)=>{const d=el.children[j];if(!d)return;const timed=i.t>0&&i.max>0;
+    const pc=timed?Math.max(0,Math.min(100,Math.round(100*(1-i.t/i.max)))):0,sh=d.querySelector('.sh');if(sh.dataset.p!==String(pc)){sh.dataset.p=pc;sh.style.height=pc+'%'}
+    const n=timed&&i.t<10?String(Math.ceil(i.t)):'',nb=d.lastChild;if(nb.textContent!==n)nb.textContent=n;
+    d.classList.toggle('low',timed&&i.t<=3)});
+}
 function ui(){
   const L=player.lvl;
   measureSafe();
@@ -293,18 +307,20 @@ function ui(){
   const bb0=$('bpetback');if(bb0)bb0.classList.toggle('held',!!(pet&&pet.hold));
   $('pxp').style.width=(L>=LEVEL_CAP?100:Math.min(100,100*player.xp/need(L)))+'%'; // capped: a save from before v0.34.1 can hold more XP than the new table needs (it dings on the next kill)
   const t=player.target,tf=$('tframe');
-  if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
+  if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);
     const hp=Math.max(0,Math.ceil(t.hp)),pc=Math.max(0,Math.ceil(100*t.hp/t.maxhp));
     $('thp').style.width=(100*t.hp/t.maxhp)+'%';$('thpn').textContent=hp+'/'+t.maxhp;$('thpp').textContent=pc+'%';
-    // Debuffs as full-word tags with seconds left (v0.33). Rough until spell icons exist; then each tag becomes an icon with the same timer.
-    const fx=[],tag=(txt,col,s)=>fx.push('<span style="background:'+col+'">'+txt+(s>0?' '+Math.ceil(s):'')+'</span>');
-    if(t.def.rare)tag('Rare','#ffd75e');if(t.mez>0)tag('Asleep','#e0c3ff',t.mez);if(t.stun>0)tag('Stunned','#ffe08a',t.stun);if(t.fear>0)tag('Afraid','#d9a0ff',t.fear);
-    if(t.root>0)tag('Rooted','#8fd17a',t.root);if(t.snare>0)tag('Snared','#a8d8a0',t.snare);
-    t.dots.forEach(d=>{const ab=ABI[d.id];tag((d.name||'Rot').split(' ').pop(),ab&&ab.col||(d.id==='bleed'?'#ff8a80':d.id==='burn'?'#ff9a4a':'#9be37a'),d.t)});
-    if(t.chill>0)tag('Chilled x'+t.chill,'#bfe6ff');if(t.aslow>0)tag('Slowed','#c8b8a0',t.aslow);if(t.discord>0)tag('Discord','#ffd27a',t.discord<100?t.discord:0);
-    if(t.weak&&t.weak.t>0)tag('Weakened','#c8b07a',t.weak.t);if(t.crack>0)tag('Sundered','#ffb37a',t.crack); // fork debuffs (v0.44)
-    if(t.mark>0)tag('Marked','#ffb37a');if(t.def.undead)tag('Undead','#b8b8b8');if(t.def.armor>=0.5)tag('Armored','#b8b8b8');
-    const fh=fx.join('');if($('tfx').dataset.h!==fh){$('tfx').dataset.h=fh;$('tfx').innerHTML=fh}}
+    // Effects on the target as icons with timers (v0.58, UI breakdown 18 B); traits that never run out sit after the level.
+    const st=FXM_T.get(t)||{};FXM_T.set(t,st);const fx=[],add=(k,icon,col,name,v,stack)=>fx.push({k,icon,col,name,t:v||0,max:v>0?fxFull(st,k,v):0,stack});
+    if(t.mez>0)add('mez','mez','#e0c3ff','Asleep',t.mez);if(t.stun>0)add('stun','star','#ffe08a','Stunned',t.stun);if(t.fear>0)add('fear','ghost','#d9a0ff','Afraid',t.fear);
+    if(t.root>0)add('root','roots','#8fd17a','Rooted',t.root);if(t.snare>0)add('snare','boot','#a8d8a0','Snared',t.snare);
+    t.dots.forEach(d=>{const ab=ABI[d.id];add('dot'+d.id,ab&&ab.icon||(d.id==='bleed'?'dagger':d.id==='burn'?'flame':'drip'),ab&&ab.col||(d.id==='bleed'?'#ff8a80':d.id==='burn'?'#ff9a4a':'#9be37a'),d.name||(ab&&ab.name)||'Rot',d.t)});
+    if(t.chill>0)add('chill','frost','#bfe6ff','Chilled x'+t.chill,0,'x'+t.chill);if(t.aslow>0)add('aslow','hourglass','#c8b8a0','Slowed',t.aslow);if(t.discord>0)add('discord','notes','#ffd27a','Discord',t.discord<100?t.discord:0);
+    if(t.weak&&t.weak.t>0)add('weak','hand','#c8b07a','Weakened',t.weak.t);if(t.crack>0)add('crack','shatter','#ffb37a','Sundered',t.crack); // fork debuffs (v0.44)
+    if(t.mark>0)add('mark','target','#ffb37a','Marked',0);
+    fxRow($('tfx'),fx);
+    const tr=[];if(t.def.rare)tr.push('<i style="color:#ffd75e">Rare</i>');if(t.def.undead)tr.push('<i>Undead</i>');if(t.def.armor>=0.5)tr.push('<i>Armored</i>');
+    const lh='Lv '+t.lv+(tr.length?' '+tr.join(' '):'');if($('tlv').dataset.h!==lh){$('tlv').dataset.h=lh;$('tlv').innerHTML=lh}}
   else tf.style.visibility='hidden';
   // Boss and named casts at you: big bar in the middle of the screen, whoever you're targeting (never in the target frame).
   {const d=$('deathUI'),on=player.dead>0&&!simState.busy?'block':'none';if(d.style.display!==on)d.style.display=on} // the sim's arena deaths never show it
@@ -328,12 +344,12 @@ function ui(){
   });
   // Queued spell: a gold "Next" chip under the cast bar (your thumb covers the button itself).
   const qc=$('qchip');if(qc){const q=player.queued&&player.queued.a;const h=q?(q.icon?iconHTML(q,14):'<i style="background:'+q.col+'"></i>')+'Next: '+q.name:'';if(qc.dataset.h!==h){qc.dataset.h=h;qc.innerHTML=h;qc.style.display=q?'flex':'none'}}
-  // Buff bar: one small tag per buff and song on you (seconds left on short ones).
-  const bb=$('buffbar');if(bb){const tags=[];
-    for(const k in player.buffs){const v=player.buffs[k];if(!(v>0)||k==='hide')continue;const d=BUFFS[k]||{short:k,col:'#cfc8b2'};tags.push('<span style="background:'+d.col+'">'+d.short+(v<100?' '+Math.ceil(v):'')+'</span>')}
-    if(C.holdLine){const n=Math.min(C.holdMax||4,fightingMe().length);if(n)tags.push('<span style="background:#8a9bb5">Hold -'+Math.round(C.holdLine*n*100)+'%</span>')} // Warrior: shows how much Hold the Line is saving you
-    (player.songs||[]).forEach(id=>{const a=ABI[id];if(a)tags.push('<span style="background:'+a.col+'">♪ '+a.short+'</span>')});
-    const h=tags.join('');if(bb.dataset.h!==h){bb.dataset.h=h;bb.innerHTML=h}
+  // Buff bar: one icon per buff and song on you, with timers (v0.58, UI breakdown 18 B).
+  const bb=$('buffbar');if(bb){const fx=[];
+    for(const k in player.buffs){const v=player.buffs[k];if(!(v>0)||k==='hide')continue;const d=BUFFS[k]||{name:k,col:'#cfc8b2'};fx.push({k,icon:d.icon||'aura',col:d.col,name:d.name||d.short,t:v<100?v:0,max:v<100?fxFull(FXM_P,k,v):0})}
+    if(C.holdLine){const n=Math.min(C.holdMax||4,fightingMe().length);if(n)fx.push({k:'hold',icon:'shield',col:'#8a9bb5',name:'Hold the Line -'+Math.round(C.holdLine*n*100)+'%',stack:'-'+Math.round(C.holdLine*n*100)+'%'})} // Warrior: how much Hold the Line is saving you
+    (player.songs||[]).forEach(id=>{const a=ABI[id];if(a)fx.push({k:'song'+id,icon:a.icon||'note',col:a.col,name:a.name})});
+    fxRow(bb,fx);
     // Keep the 1st hit / Auto toggles just under the portrait, which grows when buffs wrap to a new line.
     const tg=$('toggles');if(tg){const top=Math.round($('pframe').getBoundingClientRect().bottom-tg.parentNode.getBoundingClientRect().top+4);if(tg.dataset.top!==String(top)){tg.dataset.top=top;tg.style.top=top+'px'}}}
   // Songs that are playing light up their buttons.

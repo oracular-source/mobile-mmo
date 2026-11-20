@@ -28,7 +28,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 12. Minimap and full map (Wolfwood bug fixed v0.41.2; owner picked A, built v0.42)
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
 17. Never pause: windows and the skill pick (owner picked A, built v0.56)
-18. Buff and debuff icons with timers (options written, owner to pick)
+18. Buff and debuff icons with timers (owner picked B, built v0.58)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -172,4 +172,4 @@ Options, draft `art/drafts/ui-buff-icons.png` (made by `tools/ui_buff_icons.py`)
 - **A Number under:** seconds under every timed icon, red at 3 and under. Most exact; adds a line of height to both frames.
 - **B Dark shade fills down:** the icon darkens from the top as it runs out (like a cooldown), a small number in the corner only under 10s, red edge blinking in the last 3s. Same height as one row of icons.
 - **C Thin bar under:** a 2px bar under each icon drains, no numbers, red in the last 3s. Calmest; you guess the seconds.
-Claude leans **B**: the row stays one line high, you can read "about half left" at a glance, and exact seconds show only when they start to matter (re-rooting, re-snaring). Risk: the shade must look different from a spell cooldown on the grid; it reads differently because these sit on the frames, not the grid, and have no grey-out. Owner to pick.
+Claude leans **B**: the row stays one line high, you can read "about half left" at a glance, and exact seconds show only when they start to matter (re-rooting, re-snaring). Risk: the shade must look different from a spell cooldown on the grid; it reads differently because these sit on the frames, not the grid, and have no grey-out. **Owner picked B** (Nov 20). **Built v0.58:** `fxRow()` in `render.js` draws both rows (rebuilt only when the set of effects changes; shade height, corner number and `.low` red blink update in place, 10 times a second); `fxFull()` keeps each effect's full time (the longest since it was last put up, so a refresh starts over). Buff icons come from the ability that gives the buff (`BUFFS[k].icon`). Traits in `#tlv`. Tap tip `#fxtip` in `ui.js`. Next: owner plays and says if the shade reads as different from spell cooldowns.

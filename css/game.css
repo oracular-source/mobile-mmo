@@ -13,7 +13,6 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 .row span:first-child{overflow:hidden;text-overflow:ellipsis}
 /* Target frame (v0.33, UI breakdown 4): plain grey EverQuest-style frame, health as numbers and percent, debuffs as tags that wrap. */
 #tfx{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}#tfx:empty{display:none}
-#tfx span{font-size:8px;line-height:10px;padding:0 3px;border-radius:2px;color:#0b0a0f;font-weight:700;white-space:nowrap}
 /* Chat box: 4 lines, newest at the bottom (v0.30.1). It only shows lines that matter; routine hits live in the Log panel.
    pointer-events:none so the chat area stays joystick space. Its old 96px height is still used to place Sit (ui.js). */
 #log{position:absolute;bottom:8px;max-height:72px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
@@ -117,7 +116,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .simout{font-size:11px;opacity:.9;margin:6px 0;overflow-x:auto}
 .simtab{border-collapse:collapse;width:100%}
 .simtab th,.simtab td{padding:2px 4px;border-bottom:1px solid #333;text-align:left;white-space:nowrap}
-#buffbar{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}#buffbar:empty{display:none}#buffbar span{font-size:8px;line-height:10px;padding:0 3px;border-radius:2px;color:#0b0a0f;font-weight:700;white-space:nowrap}
+#buffbar{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}#buffbar:empty{display:none}
 .playing{box-shadow:0 0 0 2px #ffd27a,0 0 8px #ffd27a}
 #mm{position:absolute;right:6px;top:calc(100px + env(safe-area-inset-top));width:86px;height:86px;border:1px solid #3a3343;border-radius:6px;background:#07060a;opacity:.92;z-index:3;display:none;touch-action:none;image-rendering:pixelated}
 #maplegend{font-size:12px;margin-top:8px;line-height:1.7}.mpin{display:inline-block;width:9px;height:9px;border:1px solid #000;margin-right:7px;vertical-align:-1px}
@@ -264,3 +263,16 @@ img.ic.sp{border:none;border-radius:0;background:none;image-rendering:pixelated;
    outline, so it reads differently from the steady gold light on the 1st hit / Auto toggles. */
 @keyframes skpulse{0%,100%{border-color:#8a8a8a;box-shadow:none}50%{border-color:#ffd27a;box-shadow:0 0 0 2px rgba(255,210,122,.55)}}
 .hudb.due,#menuUI .tabs button.due{animation:skpulse 1.2s ease-in-out infinite;color:#ffd27a}
+
+/* Buff and debuff icons with timers (v0.58, UI breakdown 18 B): grey square with the grid's light border, dark shade fills down
+   as the effect runs out, number in the corner under 10s, red blinking edge in the last 3s. Traits sit small after the level. */
+#buffbar,#tfx{pointer-events:auto}
+.fx{position:relative;line-height:0;background:#2b2b2b;border:1px solid #8a8a8a;padding:1px}
+.fx img.ic.sp{display:block;margin:0}.fx span.ic{display:block;width:14px;height:14px}
+.fx .sh{position:absolute;left:0;right:0;top:0;height:0;background:rgba(0,0,0,.62);pointer-events:none}
+.fx .n{position:absolute;right:0;bottom:0;font:700 8px/8px sans-serif;color:#fff;text-shadow:0 0 2px #000,0 0 2px #000,0 0 1px #000;pointer-events:none}
+.fx em{position:absolute;left:0;top:0;font:700 7px/7px sans-serif;font-style:normal;color:#fff;text-shadow:0 0 2px #000,0 0 2px #000;pointer-events:none}
+.fx.low{border-color:#ff5a5a;animation:fxblink .5s steps(1) infinite}
+@keyframes fxblink{50%{border-color:#8a8a8a}}
+#tlv i{font-style:normal;font-size:8px;color:#aaa;margin-left:3px}
+#fxtip{position:absolute;z-index:30;display:none;background:rgba(40,40,40,.95);border:1px solid #8a8a8a;color:#eee;font-size:10px;padding:2px 5px;pointer-events:none;white-space:nowrap}
