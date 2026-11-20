@@ -110,7 +110,6 @@ Options (rough):
 - **C A, but names on the map:** short names written beside each pin instead of numbers (crowds at 1x on small areas; reads well zoomed in).
 Claude leans **A** (it's a check; small and finished), with B's zone view as a backlog card for when Zone 1 has its chapel and Town 1.
 **Owner picked A** (Nov 19). **Built v0.42:** the map window has the Menu's header with a ✕ (the green Back to game button is gone), square grey zoom buttons and a square map border; the minimap has a square grey frame. Found places are numbered on the map (a coloured square with the number in it, kept inside the frame when it sits on an edge) and the list below uses the same numbers and colours. Numbers follow the order places are listed, so they stay the same each time you open the map. B's zone view went to the backlog.
-Left after the list: **Log, Menu, 1st hit and Auto** are still the old rounded gold pills, the last bits of the old look on the play screen.
 
 ## 13. Top pills (Log, Menu, 1st hit, Auto)
 Now (v0.42): four rounded gold-trimmed pills, 26px tall, the last old-look buttons on the play screen. **Top left** under your frame: "1st hit on" and "Auto on" (gold text when on). **Top right** under the target frame: Log and Menu. Problems: they don't match the grey square style everywhere else; "1st hit on / off" spells the state in words, so the pill changes width when you toggle it; 26px is under the 44px tap size, fine for between-fight buttons but easy to miss.
@@ -120,3 +119,4 @@ Options (rough):
 - **B Merge the toggles into one row with Log and Menu, top right:** `[1st] [Auto] [Log] [Menu]` under the target frame; the top left under your frame is left clear for buffs. One place for every small button.
 - **C Toggles become icons on your frame:** two small square chips inside the bottom-right corner of your frame (a sword for 1st hit, a loop for Auto), lit gold when on; Log and Menu go square (as A). Least clutter, but icons need art and must be learned.
 Claude leans **A** (small, finished, nothing moves so muscle memory holds).
+**Built v0.44 (owner, Nov 19: "fix up those buttons", A):** all four are grey squares in the grid's style (4px corners), 32px tall. 1st hit and Auto have a small light at the left, lit gold (and gold border and text) when on, dim grey when off; no on/off words, so the width never changes. Log has the gold border while the Log panel is open; Menu reads Done (gold) while arranging. The minimap, Log panel and DEV button moved down 6px.

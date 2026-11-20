@@ -19,7 +19,7 @@ html,body{margin:0;height:100%;background:#050507;color:#e8e2cf;font-family:ui-m
 #log{position:absolute;bottom:8px;max-height:72px;overflow:hidden;display:flex;flex-direction:column;justify-content:flex-end;font-size:10.5px;line-height:1.35;pointer-events:none;text-shadow:0 1px 0 #000,0 0 3px #000;width:44%}
 #topbtns{position:absolute;top:calc(62px + env(safe-area-inset-top));right:6px;display:flex;gap:6px}
 /* Log panel: plain EverQuest-style window under the top bars; the game keeps running while it's open. */
-#logpanel{position:absolute;left:6px;right:6px;top:calc(94px + env(safe-area-inset-top));height:38%;display:none;flex-direction:column;background:rgba(14,13,18,.94);border:1px solid #6b6f78;border-radius:4px;z-index:4}
+#logpanel{position:absolute;left:6px;right:6px;top:calc(100px + env(safe-area-inset-top));height:38%;display:none;flex-direction:column;background:rgba(14,13,18,.94);border:1px solid #6b6f78;border-radius:4px;z-index:4}
 #logtabs{display:flex;gap:4px;padding:4px;border-bottom:1px solid #3a3343}
 #logtabs button{height:30px;padding:0 12px;font-size:11px;border-radius:3px}
 #logtabs #logclose{margin-left:auto;width:36px;padding:0}
@@ -113,7 +113,7 @@ button.active{border-color:#c9a227;color:#ffd27a}
 .simtab th,.simtab td{padding:2px 4px;border-bottom:1px solid #333;text-align:left;white-space:nowrap}
 #buffbar{display:flex;flex-wrap:wrap;gap:2px;margin-top:3px}#buffbar:empty{display:none}#buffbar span{font-size:8px;line-height:10px;padding:0 3px;border-radius:2px;color:#0b0a0f;font-weight:700;white-space:nowrap}
 .playing{box-shadow:0 0 0 2px #ffd27a,0 0 8px #ffd27a}
-#mm{position:absolute;right:6px;top:calc(94px + env(safe-area-inset-top));width:86px;height:86px;border:1px solid #3a3343;border-radius:6px;background:#07060a;opacity:.92;z-index:3;display:none;touch-action:none;image-rendering:pixelated}
+#mm{position:absolute;right:6px;top:calc(100px + env(safe-area-inset-top));width:86px;height:86px;border:1px solid #3a3343;border-radius:6px;background:#07060a;opacity:.92;z-index:3;display:none;touch-action:none;image-rendering:pixelated}
 #maplegend{font-size:12px;margin-top:8px;line-height:1.7}.mpin{display:inline-block;width:9px;height:9px;border:1px solid #000;margin-right:7px;vertical-align:-1px}
 
 /* ---------- v0.27.1 look pass: dark stone panels, gold trim, bevelled buttons (RuneScape-ish: simple, framed, readable) ---------- */
@@ -235,3 +235,11 @@ button.active{border-color:#c9a227;color:#ffd27a;box-shadow:inset 0 0 6px rgba(2
 .mapz button{border-radius:0;background:#2a2a2e;border:1px solid #55555c;color:#ccc;box-shadow:none}
 #maplegend .mrow{display:flex;align-items:center}
 #maplegend .mnum{display:inline-block;min-width:16px;height:16px;line-height:16px;text-align:center;font-size:10px;font-weight:700;color:#000;border:1px solid #000;margin-right:7px}
+/* v0.43 HUD buttons (1st hit, Auto, Log, Menu): plain grey squares like the spell grid and frames.
+   Toggles carry a small light: dim when off, lit gold when on. Taller than the old 26px pills so they're easier to hit. */
+.hudb{height:32px;padding:0 11px;font-size:12px;border-radius:4px;background:rgba(43,43,43,.92);border:1px solid #8a8a8a;color:#e6e6e6;box-shadow:0 1px 2px rgba(0,0,0,.6);display:flex;align-items:center;gap:6px}
+.hudb:active{background:#55524a;border-color:#fff}
+.hudb.on{border-color:#c9a227;color:#ffd27a}
+.hudb.tog i{width:8px;height:8px;border:1px solid #0b0a0f;background:#4a4a4e;flex:none}
+.hudb.tog.on i{background:#ffd27a;box-shadow:0 0 4px rgba(255,210,122,.7)}
+.hudb.tog:not(.on){color:#aaa}

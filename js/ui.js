@@ -110,9 +110,10 @@ function sideBar(side,sitOnly){
 function autoPill(side,bottom,noNext){
   // Top left, under your portrait: the two toggles. Top right, under the target: Menu.
   const pills=document.createElement('div');pills.id='toggles';ctrl.appendChild(pills);
-  const mk=(key,label,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='autopill'+(settings[key]?' active':'');
-    b.textContent=label+' '+(settings[key]?'on':'off');
-    b.style.cssText='height:26px;padding:0 10px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
+  // v0.43: square grey buttons like the spell grid, with a small light that's lit gold when the toggle is on
+  // (easier to read at a glance than "on/off" text), and taller so they're easier to hit.
+  const mk=(key,label,msg,id)=>{const b=document.createElement('button');b.id=id;b.className='hudb tog'+(settings[key]?' on':'');
+    b.innerHTML='<i></i>'+label;b.setAttribute('aria-pressed',settings[key]?'true':'false');
     b.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();settings[key]=!settings[key];saveSettings();buildControls();log(msg+' '+(settings[key]?'on':'off')+'.','#9aa')});
     pills.appendChild(b);};
   mk('tapCast','1st hit','Auto first attack','firstpill');
@@ -120,12 +121,10 @@ function autoPill(side,bottom,noNext){
   // While arranging, Menu reads Done so there's always a way out.
   // Top right: Log, then Menu (v0.30.1). Log sits up here, away from both thumbs, because the chat box is joystick space.
   const tr=document.createElement('div');tr.id='topbtns';ctrl.appendChild(tr);
-  const pill='height:26px;padding:0 12px;font-size:11px;border-radius:13px;background:rgba(20,18,26,.88)';
-  const lg=document.createElement('button');lg.id='blog';lg.textContent='Log';if(logPanelOpen)lg.className='active';lg.style.cssText=pill;
+  const lg=document.createElement('button');lg.id='blog';lg.textContent='Log';lg.className='hudb'+(logPanelOpen?' on':'');
   lg.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();toggleLogPanel()});
   tr.appendChild(lg);
-  const m=document.createElement('button');m.id='bmenu';m.textContent=arranging?'Done':'Menu';if(arranging)m.className='active';
-  m.style.cssText=pill;
+  const m=document.createElement('button');m.id='bmenu';m.textContent=arranging?'Done':'Menu';m.className='hudb'+(arranging?' on':'');
   m.addEventListener('pointerdown',e=>{e.preventDefault();e.stopPropagation();if(arranging)setArranging(false);else openModal('menuUI')});
   tr.appendChild(m);
   if(noNext)return;
@@ -427,7 +426,7 @@ function logPanelAdd(l){
 function toggleLogPanel(open){
   logPanelOpen=open===undefined?!logPanelOpen:open;
   $('logpanel').style.display=logPanelOpen?'flex':'none';
-  const b=$('blog');if(b)b.classList.toggle('active',logPanelOpen);
+  const b=$('blog');if(b)b.classList.toggle('on',logPanelOpen);
   if(logPanelOpen)renderLogPanel();
 }
 $('logtabs').addEventListener('pointerdown',e=>{const b=e.target.closest('button[data-f]');if(!b)return;e.preventDefault();logFilter=b.dataset.f;renderLogPanel()});
