@@ -3,7 +3,7 @@
 /* ---------- Developer tools ---------- */
 function devAct(a){
   const L=player.lvl;
-  if(a==='lvlup'||a==='lvldn'){player.lvl=Math.max(1,Math.min(10,L+(a==='lvlup'?1:-1)));player.xp=0;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);player.cds={};save();buildControls();log('Dev: level '+player.lvl+'.','#ff8a80')}
+  if(a==='lvlup'||a==='lvldn'){player.lvl=Math.max(1,Math.min(TEST_MAX,L+(a==='lvlup'?1:-1)));player.xp=0;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);player.cds={};save();buildControls();log('Dev: level '+player.lvl+'.','#ff8a80')}
   else if(a==='heal'){player.hp=maxHP(L);player.mp=maxMP(L);if(pet)pet.hp=pet.maxhp;log('Dev: full health and mana.','#ff8a80')}
   else if(a==='cds'){player.cds={};player.gcd=0;log('Dev: cooldowns reset.','#ff8a80')}
   else if(a==='skin'){dev.skin=!dev.skin;log('Dev: default skin '+(dev.skin?'on':'off')+'.','#ff8a80')}

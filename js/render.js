@@ -250,7 +250,7 @@ function ui(){
     if($('petnm').textContent!==nm)$('petnm').textContent=nm;if($('pettg').textContent!==tg)$('pettg').textContent=tg;}
   ['bpetatk','bpetback'].forEach(id=>{const b=$(id);if(b)b.style.display=pet&&!player.dead?'flex':'none'});
   const bb0=$('bpetback');if(bb0)bb0.classList.toggle('held',!!(pet&&pet.hold));
-  $('pxp').style.width=(L>=10?100:Math.min(100,100*player.xp/need(L)))+'%'; // capped: a save from before v0.34.1 can hold more XP than the new table needs (it dings on the next kill)
+  $('pxp').style.width=(L>=LEVEL_CAP?100:Math.min(100,100*player.xp/need(L)))+'%'; // capped: a save from before v0.34.1 can hold more XP than the new table needs (it dings on the next kill)
   const t=player.target,tf=$('tframe');
   if(t&&!t.dead){tf.style.visibility='visible';$('tname').textContent=cap(t.def.name);$('tname').style.color=con(t.lv);$('tlv').textContent='Lv '+t.lv;
     const hp=Math.max(0,Math.ceil(t.hp)),pc=Math.max(0,Math.ceil(100*t.hp/t.maxhp));
@@ -261,6 +261,7 @@ function ui(){
     if(t.root>0)tag('Rooted','#8fd17a',t.root);if(t.snare>0)tag('Snared','#a8d8a0',t.snare);
     t.dots.forEach(d=>{const ab=ABI[d.id];tag((d.name||'Rot').split(' ').pop(),ab&&ab.col||(d.id==='bleed'?'#ff8a80':d.id==='burn'?'#ff9a4a':'#9be37a'),d.t)});
     if(t.chill>0)tag('Chilled x'+t.chill,'#bfe6ff');if(t.aslow>0)tag('Slowed','#c8b8a0',t.aslow);if(t.discord>0)tag('Discord','#ffd27a',t.discord<100?t.discord:0);
+    if(t.weak&&t.weak.t>0)tag('Weakened','#c8b07a',t.weak.t);if(t.crack>0)tag('Sundered','#ffb37a',t.crack); // fork debuffs (v0.44)
     if(t.mark>0)tag('Marked','#ffb37a');if(t.def.undead)tag('Undead','#b8b8b8');if(t.def.armor>=0.5)tag('Armored','#b8b8b8');
     const fh=fx.join('');if($('tfx').dataset.h!==fh){$('tfx').dataset.h=fh;$('tfx').innerHTML=fh}}
   else tf.style.visibility='hidden';

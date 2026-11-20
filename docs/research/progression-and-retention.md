@@ -63,6 +63,8 @@ Same rules as level 10: both sides a bit stronger than the base, about equal, di
 - **Bard · Chant of Blades:** *Bladesong* (your swings also hit one mob next to your target) / *Battle Tempo* (swing speed keeps building through a long fight, up to double).
 - **Sim check (when built):** each side in a single fight, a pack and a long named fight at levels 12–15, DPS tracked; if one side wins everywhere, redesign. Watch for: Leaping Plague / Locust Swarm chaining forever through a big pull, Thrall chain-sleeping, Whirlwind threat with Challenge-style tanks in groups later.
 
+**Built (v0.44, Nov 19):** all 14 level 12 forks are in the game; reach them with `?level=12` or DEV until the cap passes 10. Small changes while building: Twin Plague's copies are about 65% each (two stacked is a bit over one full-strength plague), Holy Nova heals a little per mob hit like Dark Cleave, Thrall's mob wanders home after its 6s sleep.
+
 ### Level 14 forks, all 14 classes (approved Nov 19)
 Same rules again. Each class forks an ability that had no fork yet, and classes that already had "one mob vs many" at 10 or 12 get a different kind of choice here (tank vs hit back, offense vs sustain, burst vs over time, you vs your pet).
 - **Necromancer · Lifetap:** *Bone Tap* (also heals your skeleton for half) / *Twin Tap* (also hits a second mob for half).
@@ -79,6 +81,7 @@ Same rules again. Each class forks an ability that had no fork yet, and classes 
 - **Monk · Flying Kick:** *Tiger Leap* (cooldown resets if the leaped-at mob dies) / *Crane Kick* (landing stuns every mob near you 1.5s).
 - **Shaman · Venom Totem:** *Toxic Totem* (stronger poison on every mob near it) / *Mending Totem* (heals you while you stand near it; poisons one mob).
 - **Bard · Dirge:** *Dirge of Ruin* (damage builds the longer a mob stays near you) / *Requiem* (weaker, each mob it kills heals you).
+**Built (v0.44, Nov 19):** all 14 level 14 forks are in the game (`?level=14`). Lacerate's copies are about 75% each; Living Bomb burns 9s then explodes in a small circle; Double Hop keeps a second hop in store (0.6s between hops); Shared Flames falls back to you when no pet is out.
 - **Sim check (when built):** same as level 12, at levels 14–15. Watch for: Tiger Leap chaining through a whole pull, Retaliation plus Iron Stance on tanks in groups later, Wraith healing on packs.
 
 ### Example: Necromancer (draft)

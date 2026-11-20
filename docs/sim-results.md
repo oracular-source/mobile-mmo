@@ -952,3 +952,94 @@ Boss 1 first beaten (5+ wins in 10): level 6 · Two skeletons (8+ in 10): from l
 | 10 | Skeleton | 10/10 | 0 | 14 | 4 | 92 | 0 | – |
 | 10 | Two skeletons | 9/10 | 1 | 40 | 4 | 259 | 36 | 19% |
 | 10 | Boss 1 (lvl 7) | 10/10 | 0 | 187 | 0 | 0 | 8 | – |
+
+## Level 12 and 14 forks, rough check (v0.44, Nov 19)
+
+One seed per fight (the full 10-seed run takes about 10 minutes a class on the build machine), at each fork's level, in the arena: a single skeleton, a pack of 3, Old Gnawbone and the Skeleton King at even level. Cells are DPS on a win, – on a loss. **Same as base** means the class bot never pressed that ability in these fights (its playbook doesn't use it, or the fight never called for it), so the side is untested here, not equal. Fork balance is parked (owner, Nov 19); this is a first look, not a verdict.
+
+| Class | Side | Single | Pack of 3 | Gnawbone | Skeleton King | Note |
+| --- | --- | --- | --- | --- | --- | --- |
+| necro | Base Siphon Plague | 18.9 | – | 29.0 | 26.1 |  |
+| necro | Leaping Plague | 19.2 | 31.5 | 32.9 | 24.1 |  |
+| necro | Twin Plague | 15.7 | – | 25.9 | 23.6 |  |
+| necro | Base Lifetap | 21.5 | – | 30.2 | 28.2 |  |
+| necro | Bone Tap | 21.9 | – | 30.2 | 26.9 |  |
+| necro | Twin Tap | 21.9 | 38.7 | 32.9 | 30.3 |  |
+| druid | Base Creeping Rot | 24.2 | 22.3 | 24.5 | 19.8 |  |
+| druid | Sap Strength | 24.2 | 23.0 | 24.5 | 20.9 |  |
+| druid | Blight Spores | 24.2 | 22.0 | 25.7 | 19.9 |  |
+| druid | Base Mending Touch | 27.6 | 24.5 | 24.5 | 22.6 |  |
+| druid | Wild Regrowth | 27.6 | 24.5 | 24.5 | 22.6 | same as base |
+| druid | Verdant Touch | 27.6 | 24.5 | 24.5 | 22.6 | same as base |
+| warrior | Base Cleave | 19.3 | – | 24.7 | 20.8 |  |
+| warrior | Whirlwind | 19.3 | 17.9 | 27.2 | 21.4 |  |
+| warrior | Sunder | 19.3 | – | 23.6 | 20.2 |  |
+| warrior | Base Defensive Stance | 22.0 | – | 30.4 | 23.0 |  |
+| warrior | Iron Stance | 22.0 | 17.5 | 30.4 | 22.6 |  |
+| warrior | Retaliation | 22.0 | 23.8 | 30.4 | 27.2 |  |
+| rogue | Base Gouge | 32.1 | 25.6 | 19.6 | 34.0 |  |
+| rogue | Blind | 24.9 | – | 21.2 | 29.9 |  |
+| rogue | Kidney Shot | 28.1 | – | 19.6 | 34.0 |  |
+| rogue | Base Rend | 36.6 | – | 26.5 | 36.7 |  |
+| rogue | Garrote | 36.6 | – | 26.5 | 36.7 | same as base |
+| rogue | Lacerate | 36.6 | – | 25.2 | 35.1 |  |
+| cleric | Base Holy Light | 27.2 | 25.3 | 17.5 | 23.7 |  |
+| cleric | Judgment | 27.2 | 25.3 | 17.5 | 24.2 |  |
+| cleric | Holy Nova | 17.6 | 21.2 | 16.3 | 21.4 |  |
+| cleric | Base Divine Aura | 31.0 | 24.2 | 20.2 | 24.1 |  |
+| cleric | Divine Shelter | 31.0 | 24.2 | 20.2 | 24.1 | same as base |
+| cleric | Divine Wrath | 31.0 | 24.2 | 20.2 | 24.1 | same as base |
+| enchanter | Base Charm | 19.5 | 20.9 | 8.8 | 10.6 |  |
+| enchanter | Lasting Charm | 19.5 | 20.9 | 10.5 | 12.3 |  |
+| enchanter | Thrall | 19.5 | 20.9 | 12.4 | 15.4 |  |
+| enchanter | Base Slow Mind | 22.2 | 21.5 | 8.5 | 17.2 |  |
+| enchanter | Deep Slow | 24.4 | 13.1 | 8.5 | 17.6 |  |
+| enchanter | Mind Drain | 22.2 | 21.5 | 8.5 | 17.2 | same as base |
+| paladin | Base Taunt | 31.0 | 35.3 | 22.1 | 49.2 |  |
+| paladin | Challenge | 31.0 | 35.3 | 22.1 | 49.2 | same as base |
+| paladin | Rebuke | 31.0 | 35.3 | 22.1 | 49.2 |  |
+| paladin | Base Divine Strike | 35.3 | 40.9 | 26.5 | 61.2 |  |
+| paladin | Crusader Strike | 35.3 | 53.5 | 20.4 | 44.3 |  |
+| paladin | Divine Storm | 35.3 | 40.9 | 23.1 | 56.8 |  |
+| shadowknight | Base Disease Cloud | 16.9 | – | 25.1 | 20.1 |  |
+| shadowknight | Plague Cloud | 16.9 | – | 27.4 | 25.5 |  |
+| shadowknight | Withering Cloud | 16.4 | 21.9 | 27.4 | 22.9 |  |
+| shadowknight | Base Raise Minion | 19.2 | – | 28.1 | 25.9 |  |
+| shadowknight | Ghoul | 15.4 | – | 15.9 | 24.9 |  |
+| shadowknight | Wraith | 24.1 | – | 31.0 | 24.6 |  |
+| wizard | Base Frost Nova | 28.4 | 20.6 | 21.7 | 20.4 |  |
+| wizard | Deep Freeze | 28.4 | 21.7 | 19.6 | 20.4 |  |
+| wizard | Nova Blast | 28.4 | 29.1 | 23.3 | 20.4 |  |
+| wizard | Base Fireball | 32.3 | 23.5 | 27.1 | 25.1 |  |
+| wizard | Pyroblast | 38.8 | 23.0 | 38.2 | 26.8 |  |
+| wizard | Living Bomb | 37.1 | 32.7 | 33.1 | 27.4 |  |
+| magician | Base Burnout | 33.6 | – | 25.3 | – |  |
+| magician | Overdrive | 39.7 | – | 29.5 | 30.2 |  |
+| magician | Wildfire | 33.6 | – | 25.3 | – | same as base |
+| magician | Base Flame Shield | 38.3 | – | 31.3 | 32.4 |  |
+| magician | Inferno Shield | 38.3 | – | 31.3 | 32.4 | same as base |
+| magician | Shared Flames | 45.2 | – | 33.2 | 38.9 |  |
+| ranger | Base Volley | 27.4 | 20.7 | 11.3 | 21.5 |  |
+| ranger | Rain of Arrows | 27.4 | 20.7 | 11.5 | 21.5 |  |
+| ranger | Pinning Volley | 27.4 | 15.4 | 14.2 | 21.5 |  |
+| ranger | Base Disengage | 31.2 | 19.8 | 15.3 | 28.2 |  |
+| ranger | Recoil Shot | 31.2 | 19.8 | 15.3 | 28.2 | same as base |
+| ranger | Double Hop | 31.2 | 19.8 | 15.3 | 28.2 | same as base |
+| monk | Base Flurry | 23.2 | 21.4 | 23.8 | 27.0 |  |
+| monk | Hundred Fists | 29.4 | – | 23.8 | 26.1 |  |
+| monk | Whirling Flurry | 29.4 | – | 26.2 | – |  |
+| monk | Base Flying Kick | 26.4 | 22.2 | 26.2 | 28.1 |  |
+| monk | Tiger Leap | 26.4 | 24.7 | 25.0 | 28.1 |  |
+| monk | Crane Kick | 33.5 | 21.4 | 29.1 | 28.1 |  |
+| shaman | Base Swarm | 17.9 | 28.6 | 19.5 | 24.2 |  |
+| shaman | Locust Swarm | 17.9 | 28.9 | 27.7 | 24.2 |  |
+| shaman | Stinging Swarm | 17.9 | 31.3 | 21.0 | 24.2 |  |
+| shaman | Base Venom Totem | 20.4 | 33.8 | 22.2 | 27.9 |  |
+| shaman | Toxic Totem | 20.4 | 33.8 | 22.2 | 27.9 | same as base |
+| shaman | Mending Totem | 20.4 | 33.8 | 22.2 | 27.9 | same as base |
+| bard | Base Chant of Blades | 23.7 | – | 25.0 | 5.2 |  |
+| bard | Bladesong | 23.7 | – | 32.8 | 5.4 |  |
+| bard | Battle Tempo | 18.8 | – | 29.1 | 5.1 |  |
+| bard | Base Dirge | 26.9 | – | 27.1 | 5.8 |  |
+| bard | Dirge of Ruin | 26.9 | – | 27.1 | 5.0 |  |
+| bard | Requiem | 26.9 | – | 27.1 | 4.2 |  |

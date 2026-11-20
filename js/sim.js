@@ -202,7 +202,7 @@ const BOTS={
       const t=B.target();if(!t)return;
       const fight=B.fighting(),on=B.onMe();
       // Pull: Holy Light (level 3), then let it come. Before that, walk in and Smite.
-      if(!fight.length){if(player.lvl>=3){if(B.near(t,75)&&B.can('hlight'))B.use('hlight',t)}else if(B.near(t,14)&&B.can('smite'))B.use('smite',t);return}
+      if(!fight.length){if(player.lvl>=3&&ABI.hlight.tgt){if(B.near(t,75)&&B.can('hlight'))B.use('hlight',t)}else if(B.near(t,14)&&B.can('smite'))B.use('smite',t);return}
       if(t.state==='chase'&&dist(player,t)>16&&!(t.stun>0)&&!(t.fear>0))B.stop();else B.near(t,14);
       // 1. Very low: Divine Aura, then Greater Heal inside it.
       if(B.hp()<0.2&&B.can('aura')){B.use('aura');return}
@@ -610,7 +610,7 @@ const FORK_FIGHTS=[
 function runForkSim(opts){
   opts=opts||{};
   if(simState.busy||!BOTS[CLS])return Promise.resolve(null);
-  const forks=MYFORKS.filter(f=>f.lvl<=10); // only forks you can reach under the current level cap
+  const forks=MYFORKS.filter(f=>f.lvl<=TEST_MAX&&(!opts.only||opts.only.indexOf(f.lvl)>=0)); // opts.only: [12,14] checks just those fork levels
   const keep=simBegin();keep.forks=forkPick;
   const seeds=opts.seeds||SIM_SEEDS,jobs=[];
   forks.forEach(f=>[{id:'',name:'Base '+BASE_AB[f.ab].name}].concat(f.opts).forEach(o=>FORK_FIGHTS.forEach(fi=>jobs.push({f:f,o:o,fi:fi}))));
@@ -671,7 +671,7 @@ function paceList(id){
 }
 function paceRun(seed,goal){goal=goal||PACE_GOAL;
   let L=1,xp=0,time=0,deaths=0,fights=0,kills=0;const areas=[],laps=[],lost={},namedAt={};
-  const gain=n=>{if(L>=10)return;xp+=n;while(L<10&&xp>=need(L)){xp-=need(L);L++}if(L>=10)xp=0};
+  const gain=n=>{if(L>=LEVEL_CAP)return;xp+=n;while(L<LEVEL_CAP&&xp>=need(L)){xp-=need(L);L++}if(L>=LEVEL_CAP)xp=0};
   const clear=(id,lap)=>{
     const t0=time,L0=L,d0=deaths,k0=kills;let px=null,py=null;time+=PACE_HOP;
     paceList(id).forEach(sp=>{

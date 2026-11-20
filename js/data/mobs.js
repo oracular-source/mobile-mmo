@@ -36,7 +36,11 @@ const TYPES={
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:
 // 1) KILLS_PER_LEVEL: how many even-level, standard-toughness kills each level takes (index = level). The XP needed for
 //    each level is worked out from it in combat.js. A smooth ~+25% a level; to slow or speed the whole climb, change this row.
-const KILLS_PER_LEVEL=[0,8,12,17,22,29,38,48,59,73]; // v0.34.1 first try was 6,9,12,16,21,27,34,42,52; owner: a bit slower (x1.4)
+const KILLS_PER_LEVEL=[0,8,12,17,22,29,38,48,59,73,91,114,142,178,222]; // 10-14 (v0.44): the same ~+25% a level, ready for when the cap rises
+// Level cap: experience stops here. TEST_MAX is how high ?level= and the DEV panel can go, so forks past the cap (12, 14)
+// can be tried before the world has mobs for them (owner, Nov 19: keep the cap at 10 until the map chat's areas reach 12-15).
+const LEVEL_CAP=10;
+const TEST_MAX=15; // v0.34.1 first try was 6,9,12,16,21,27,34,42,52; owner: a bit slower (x1.4)
 // 2) Toughness: a regular mob pays more or less than a standard mob of its level by how tanky it is (health, with armor)
 //    and how hard it hits, so stat changes carry their XP with them. STD_MOB is the standard; TOUGH_RANGE caps the swing.
 //    Named, rares and bosses skip it: they keep their flat 3x / 6x.

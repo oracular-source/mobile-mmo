@@ -53,6 +53,15 @@ function update(dt){
     if(!fight)player.hp=Math.min(maxHP(L),player.hp+maxHP(L)*(player.sit?0.12:0.05)*fire*dt);
     for(const k in player.buffs)player.buffs[k]=Math.max(0,player.buffs[k]-dt);
     if(player.ward>0)player.ward-=dt; // Warding Renew's block lasts as long as the Renew
+    // Level 12 and 14 fork timers (v0.44).
+    if(player.vshieldT>0){player.vshieldT-=dt;if(player.vshieldT<=0)player.vshield=0} // Verdant Touch's shield fades
+    if(player.kidneyT>0){player.kidneyT-=dt;if(player.kidneyT<=0)player.kidney=0}
+    if(player.spareT>0)player.spareT-=dt; // Double Hop's stored hop comes back
+    if(player.wrathT>0){player.wrathT-=dt;if(player.wrathT<=0&&player.wrath){const w=player.wrath; // Divine Wrath: the aura ends in a blast
+      burst(player.x,player.y-6,'#ffd27a',22,true);floatText(player.x,player.y-30,'DIVINE WRATH','#ffd27a',true);
+      mobs.filter(m=>!m.dead&&dist(m,player)<=w.r).forEach(m=>hitMob(m,w.dmg*(isUndead(m)?1.5:1)*rr(0.9,1.1)*(1-m.def.armor),'direct','Divine Wrath'))}}
+    if(player.drainM){const dm=player.drainM.m;if(dm.dead||!(dm.aslow>0)||mobs.indexOf(dm)<0)player.drainM=null;else player.mp=Math.min(maxMP(L),player.mp+maxMP(L)*player.drainM.x*dt)} // Mind Drain
+    if(!fight)player.tempo=0; // Battle Tempo starts over each fight
     // Bard songs pulse every 3s while they play: walking, fighting or sitting.
     if(player.songs&&player.songs.length){player.songNext-=dt;if(player.songNext<=0){player.songNext+=3;player.songs.forEach(id=>songPulse(ABI[id],1))}}
   }
@@ -62,7 +71,10 @@ function update(dt){
   for(let i=grounds.length-1;i>=0;i--){const g=grounds[i];g.t-=dt;g.next-=dt;
     if(g.next<=0){g.next+=g.every||1;
       if(g.heal&&!player.dead&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r){const h=Math.max(1,Math.round(g.heal));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#ffd27a')}
-      mobs.forEach(m=>{if(m.dead||m.state!=='chase'||Math.hypot(m.x-g.x,m.y-g.y)>g.r)return;
+      // Mending Totem (Shaman fork) poisons only the nearest mob; Pinning Volley (Ranger fork) roots each mob once.
+      const inG=mobs.filter(m=>!m.dead&&m.state==='chase'&&Math.hypot(m.x-g.x,m.y-g.y)<=g.r).sort((a,b)=>Math.hypot(a.x-g.x,a.y-g.y)-Math.hypot(b.x-g.x,b.y-g.y));
+      (g.one?inG.slice(0,1):inG).forEach(m=>{
+        if(g.pin&&g.pinned.indexOf(m)<0){g.pinned.push(m);m.root=Math.max(m.root||0,g.pin*durMult(m));floatText(m.x,m.y-26,'PINNED','#e8e2cf')}
         if(g.all)hitMob(m,g.dmg*rr(0.9,1.1)*(1-m.def.armor),'dot',g.name);else if(isUndead(m))hitMob(m,g.dmg*rr(0.9,1.1),'holy',g.name)});}
     if(g.t<=0){grounds.splice(i,1);log((g.name==='Consecrate'?'The holy ground':'Your '+g.name)+' fades.','#9aa')}}
   // Spike Traps: the first mob to step in sets it off.
@@ -85,14 +97,18 @@ function update(dt){
       // Shaman's small stacking bonus: each DoT ticks 10% harder for every other DoT on the same mob.
       // Thornsnare ticks only while the mob is walking (not while it stands and swings, or is held).
       if(d.next<=0&&d.walk&&(m.root>0||m.stun>0||m.mez>0||m.state!=='chase'||dist(m,victim(m))<=12)){d.next+=3}
-      else if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).length-1):1;
-        hitMob(m,d.dmg*sx*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return;}
-      if(d.t<=0){m.dots.splice(i,1);log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
+      else if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).reduce((n,o)=>n+(o.cnt||1),0)-(d.cnt||1)):1; // Stinging Swarm counts as two
+        const ds=d.id==='mrot'&&m.aslow>0&&m.deepSlow?m.deepSlow:1; // Deep Slow (Enchanter fork): Mind Rot hits harder on a slowed mob
+        hitMob(m,d.dmg*sx*ds*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return;}
+      if(d.t<=0){m.dots.splice(i,1);if(d.boom){bombGo(m,d);if(m.dead)return}log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
     if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
     if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('The snare on '+m.def.name+' wears off.','#9aa')}
     if(m.aslow>0)m.aslow-=dt;
     if(m.discord>0)m.discord-=dt;
     if(m.calm>0)m.calm-=dt;
+    if(m.weak&&m.weak.t>0)m.weak.t-=dt; // Judgment / Rebuke
+    if(m.crack>0)m.crack-=dt; // Sunder
+    if(m.tiger>0)m.tiger-=dt; // Tiger Leap's window
     if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
     if(m.casting&&(m.mez>0||m.stun>0||m.fear>0||m.lost>0||m.state!=='chase'||player.dead))interruptCast(m);
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
@@ -122,7 +138,7 @@ function update(dt){
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false}
     }
   });
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}

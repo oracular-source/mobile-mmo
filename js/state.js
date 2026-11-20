@@ -65,9 +65,9 @@ const saveSettings=()=>store.set('ashfen-settings',settings), saveLoadout=()=>st
 
 const player={buffs:{},bval:{},songs:[],songNext:0,cds:{},x:3.5*T,y:15*T+8,tx:null,ty:null,dir:1,lvl:1,xp:0,hp:52,mp:50,sit:false,cast:null,gcd:0,bark:0,target:null,dead:0,walk:0};
 const PROGKEY=CLS==='druid'?'ashfen-druid':'ashfen-prog-'+CLS;
-const prog=store.get(PROGKEY,null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(10,prog.lvl|0);player.xp=prog.xp|0;}
-// Test shortcut: open the game with ?level=7 in the address to jump to that level (1-10). Prototype only.
-(function(){const m=/[?&]level=(\d+)/.exec(location.search);if(m){player.lvl=Math.max(1,Math.min(10,+m[1]));player.xp=0;store.set(PROGKEY,{v:2,lvl:player.lvl,xp:0});}})();
+const prog=store.get(PROGKEY,null);if(prog&&prog.v===2&&prog.lvl){player.lvl=Math.min(TEST_MAX,prog.lvl|0);player.xp=prog.xp|0;}
+// Test shortcut: open the game with ?level=7 in the address to jump to that level (1-15; XP still stops at the cap). Prototype only.
+(function(){const m=/[?&]level=(\d+)/.exec(location.search);if(m){player.lvl=Math.max(1,Math.min(TEST_MAX,+m[1]));player.xp=0;store.set(PROGKEY,{v:2,lvl:player.lvl,xp:0});}})();
 player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
 const save=()=>store.set(PROGKEY,{v:2,lvl:player.lvl,xp:player.xp});
 

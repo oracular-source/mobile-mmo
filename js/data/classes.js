@@ -156,48 +156,132 @@ CLASSES.druid.caster=1;
 // after, one ability gets a fork: pick one of two versions. "set" is copied over the ability's own numbers when that side is
 // picked; the extra fields (thorns, splash, sweep, ...) are read in combat.js. Both sides are a bit stronger than the base
 // ability and about equal to each other: they differ by situation (one mob vs many, long fights vs packs).
-// Level 12 and 14 forks are designed (progression note) and get added here when the level cap passes 10.
+// Level 12 and 14 forks (v0.44) are in too; they can be tried with ?level=12 / ?level=14 or the DEV panel until the cap passes 10.
 const FORKS={
   necro:[{lvl:10,ab:'raise',opts:[
     {id:'a',name:'Bone Pair',desc:'One cast raises two skeletons, each a bit over half as strong. The second one picks up any extra mob that hits you.',set:{pet:{name:'skeleton',img:'pet',hp:[18,8.4],dmg:[1.9,1],ac:6,pair:1}}},
-    {id:'b',name:'Bone Knight',desc:'One tougher skeleton (half again the health, more armor, about the same damage). Every 8s it taunts back any mob that turned on you.',set:{pet:{name:'bone knight',img:'pet',hp:[45,21],dmg:[3.1,1.6],ac:12,taunt:8,say:'A bone knight in rusted plate claws its way out of the ground.'}}}]}],
+    {id:'b',name:'Bone Knight',desc:'One tougher skeleton (half again the health, more armor, about the same damage). Every 8s it taunts back any mob that turned on you.',set:{pet:{name:'bone knight',img:'pet',hp:[45,21],dmg:[3.1,1.6],ac:12,taunt:8,say:'A bone knight in rusted plate claws its way out of the ground.'}}}]},
+  {lvl:12,ab:'plague',opts:[
+    {id:'a',name:'Leaping Plague',desc:'When the plagued mob dies, the rest of the plague jumps to the nearest mob that\'s fighting you.',set:{dmg:[4.4,2.2],leap:1}},
+    {id:'b',name:'Twin Plague',desc:'Stacks twice on one mob (each copy a bit weaker): cast it again while it\'s still on.',set:{dmg:[2.6,1.3],stack:2}}]},
+  {lvl:14,ab:'tap',opts:[
+    {id:'a',name:'Bone Tap',desc:'Lifetap also heals your skeleton for half of what it heals you.',set:{petTap:0.5}},
+    {id:'b',name:'Twin Tap',desc:'Lifetap also hits a second mob near your target for half.',set:{twin:0.5}}]}],
   druid:[{lvl:10,ab:'snare',opts:[
     {id:'a',name:'Thornsnare',desc:'The snared mob takes thorn damage every few seconds while it walks. Keep it moving.',set:{thorns:[3,1.2]}},
-    {id:'b',name:'Tangle Field',desc:'Also snares every mob near your target, for a little less time.',set:{splash:48,splashX:0.8}}]}],
+    {id:'b',name:'Tangle Field',desc:'Also snares every mob near your target, for a little less time.',set:{splash:48,splashX:0.8}}]},
+  {lvl:12,ab:'rot',opts:[
+    {id:'a',name:'Sap Strength',desc:'The rotting mob hits about 15% softer while the rot lasts.',set:{dmg:[3.15,1.7],weak:0.85}},
+    {id:'b',name:'Blight Spores',desc:'The rot also lands on up to 2 mobs near your target, at 60% strength.',set:{spores:2,sporeX:0.6}}]},
+  {lvl:14,ab:'mend',opts:[
+    {id:'a',name:'Wild Regrowth',desc:'Instant: heals over 8s instead, so you can cast it while kiting.',set:{kind:'hot',cast:0,heal:[4.5,1.8],dur:[8,0]}},
+    {id:'b',name:'Verdant Touch',desc:'Slower cast, bigger heal. Healing past full becomes a shield for 8s.',set:{cast:2,heal:[20,8],overShield:1}}]}],
   warrior:[{lvl:10,ab:'bash',opts:[
     {id:'a',name:'Shield Slam',desc:'A longer stun that never misses, so it always breaks a cast.',set:{dur:[3.2,0.16],sure:1}},
-    {id:'b',name:'Shield Sweep',desc:'Also stuns every mob in front of you, for a shorter time.',set:{sweep:26,sweepX:0.6}}]}],
+    {id:'b',name:'Shield Sweep',desc:'Also stuns every mob in front of you, for a shorter time.',set:{sweep:26,sweepX:0.6}}]},
+  {lvl:12,ab:'cleave',opts:[
+    {id:'a',name:'Whirlwind',desc:'A wider spin that hits every mob around you, with double threat on each.',set:{radius:34,dmg:[6.6,2.75],threatX:2}},
+    {id:'b',name:'Sunder',desc:'A heavy hit on your target that cracks its armor (+20% damage taken, 10s). Mobs beside it take a light hit.',set:{needT:1,mainX:1.8,sideX:0.4,crack:10}}]},
+  {lvl:14,ab:'stance',opts:[
+    {id:'a',name:'Iron Stance',desc:'Lasts longer and blocks much more (65% less damage), but you hit 25% softer.',set:{dur:[14,0.6],stanceX:0.35,stanceHit:0.75}},
+    {id:'b',name:'Retaliation',desc:'Shorter, but every hit you take strikes back at the attacker.',set:{dur:[6,0.3],retal:[4,1.6]}}]}],
   rogue:[{lvl:10,ab:'evade',opts:[
     {id:'a',name:'Ambush',desc:'Evade also stuns your target for 2s, and your next Backstab crits.',set:{evStun:2,evCrit:1.5}}, 
-    {id:'b',name:'Feint',desc:'Evade also dazes every mob around you for 2s, so you can handle two.',set:{evDaze:2}}]}],
+    {id:'b',name:'Feint',desc:'Evade also dazes every mob around you for 2s, so you can handle two.',set:{evDaze:2}}]},
+  {lvl:12,ab:'gouge',opts:[
+    {id:'a',name:'Blind',desc:'Much longer, but any damage breaks it: park a second mob out of the fight.',set:{dur:[10,0.3],blind:1}},
+    {id:'b',name:'Kidney Shot',desc:'A shorter stun on a shorter cooldown, and your next 2 Backstabs work from any side.',set:{dur:[2.5,0.08],cd:[7,4,0.4],kidney:2}}]},
+  {lvl:14,ab:'rend',opts:[
+    {id:'a',name:'Garrote',desc:'From Hide: stops a caster\'s spell, delays its next one, and bleeds double.',set:{dmg:[4.4,2.2],garrote:2}},
+    {id:'b',name:'Lacerate',desc:'Stacks up to 3 times on one mob (each a bit weaker), for long fights.',set:{dmg:[3,1.5],stack:3}}]}],
   cleric:[{lvl:10,ab:'renew',opts:[
     {id:'a',name:'Warding Renew',desc:'While Renew lasts, the next big hit on you is blocked.',set:{ward:1}},
-    {id:'b',name:'Radiant Renew',desc:'Each tick also burns every mob near you, not just undead (undead take more).',set:{holyAll:0.6}}]}],
+    {id:'b',name:'Radiant Renew',desc:'Each tick also burns every mob near you, not just undead (undead take more).',set:{holyAll:0.6}}]},
+  {lvl:12,ab:'hlight',opts:[
+    {id:'a',name:'Judgment',desc:'A bigger hit, and the target deals 15% less damage for 6s.',set:{dmg:[7.5,3],weak:0.85,weakT:6}},
+    {id:'b',name:'Holy Nova',desc:'Light bursts around you: hits every mob near you and heals you a little per mob hit.',set:{kind:'cleave',tgt:0,radius:36,dmg:[5,2],tapPer:[2.5,1]}}]},
+  {lvl:14,ab:'aura',opts:[
+    {id:'a',name:'Divine Shelter',desc:'You also heal over time while you\'re immune.',set:{shelter:[10,4]}},
+    {id:'b',name:'Divine Wrath',desc:'When the aura ends, holy light blasts every mob near you.',set:{wrath:[14,5.5],wrathR:40}}]}],
   enchanter:[{lvl:10,ab:'mez',opts:[
     {id:'a',name:'Deep Sleep',desc:'One mob sleeps much longer, and the first hit doesn\'t wake it.',set:{dur:[36,0.6],deep:1}},
-    {id:'b',name:'Mass Mez',desc:'Up to 3 mobs near the first one fall asleep, for a shorter time.',set:{mass:3,dur:[12,0.2]}}]}],
+    {id:'b',name:'Mass Mez',desc:'Up to 3 mobs near the first one fall asleep, for a shorter time.',set:{mass:3,dur:[12,0.2]}}]},
+  {lvl:12,ab:'charm',opts:[
+    {id:'a',name:'Lasting Charm',desc:'The charm lasts much longer.',set:{dur:[40,2.5]}},
+    {id:'b',name:'Thrall',desc:'Normal length, but when it ends the mob falls asleep for 6s and then walks home instead of turning on you.',set:{thrall:6}}]},
+  {lvl:14,ab:'slow',opts:[
+    {id:'a',name:'Deep Slow',desc:'A stronger slow (mobs attack half as often), and slowed mobs take 25% more from Mind Rot.',set:{slowX:2,deepSlow:1.25}},
+    {id:'b',name:'Mind Drain',desc:'The normal slow, and you get mana back while it lasts.',set:{drain:0.02}}]}],
   paladin:[{lvl:10,ab:'consec',opts:[
     {id:'a',name:'Sanctuary',desc:'A smaller circle with a stronger heal, and you take 20% less damage inside it.',set:{radius:18,heal:[3.2,1.3],sanct:0.8}},
-    {id:'b',name:'Wide Consecrate',desc:'A bigger circle that burns any mob, not just undead. Heals a little less.',set:{radius:38,all:1,heal:[1.6,0.65],dmg:[3,1.1]}}]}],
+    {id:'b',name:'Wide Consecrate',desc:'A bigger circle that burns any mob, not just undead. Heals a little less.',set:{radius:38,all:1,heal:[1.6,0.65],dmg:[3,1.1]}}]},
+  {lvl:12,ab:'taunt',opts:[
+    {id:'a',name:'Challenge',desc:'Taunts every mob fighting near you.',set:{aoe:40}},
+    {id:'b',name:'Rebuke',desc:'One mob, and it deals 20% less damage for 8s.',set:{weak:0.8,weakT:8}}]},
+  {lvl:14,ab:'dstrike',opts:[
+    {id:'a',name:'Crusader Strike',desc:'One heavy hit on your target that heals you for 30% of the damage.',set:{single:1,dmg:[15,6],healPct:0.3}},
+    {id:'b',name:'Divine Storm',desc:'A wider circle all around you, lighter hits.',set:{radius:36,dmg:[5.6,2.25]}}]}],
   shadowknight:[{lvl:10,ab:'dcleave',opts:[
     {id:'a',name:'Reaping Cleave',desc:'Heals much more per mob hit, but needs two or more mobs next to you.',set:{tapPer:[6.4,2.4],need2:1}},
-    {id:'b',name:'Rending Blow',desc:'One big hit on your target with a solid heal.',set:{single:1,dmg:[11,4.3],tapPer:[6,2.2]}}]}],
+    {id:'b',name:'Rending Blow',desc:'One big hit on your target with a solid heal.',set:{single:1,dmg:[11,4.3],tapPer:[6,2.2]}}]},
+  {lvl:12,ab:'disease',opts:[
+    {id:'a',name:'Plague Cloud',desc:'Also spreads to up to 3 mobs near your target, at 70% strength.',set:{spores:3,sporeX:0.7}},
+    {id:'b',name:'Withering Cloud',desc:'One mob: it hits 15% softer, and your Siphon heals half again as much off it.',set:{dmg:[3.3,1.5],weak:0.85,wither:1.5}}]},
+  {lvl:14,ab:'minion',opts:[
+    {id:'a',name:'Ghoul',desc:'A tougher minion that taunts back any mob that turns on you every 8s.',set:{pet:{name:'ghoul',img:'minion',hp:[30,13],dmg:[2.2,1.1],ac:8,taunt:8,say:'A ghoul drags itself up out of the dirt.'}}},
+    {id:'b',name:'Wraith',desc:'A fragile wraith whose hits heal you.',set:{pet:{name:'wraith',img:'minion',hp:[11,5],dmg:[3,1.5],ac:1,tap:0.6,say:'A wraith rises, cold and hungry, at your side.'}}}]}],
   wizard:[{lvl:10,ab:'shatter',opts:[
     {id:'a',name:'Deep Shatter',desc:'A bigger single hit.',set:{dmg:[34,11.7]}},
-    {id:'b',name:'Shatter Burst',desc:'Splashes 40% onto every mob near the target and chills them.',set:{burstR:30,burstX:0.4}}]}],
+    {id:'b',name:'Shatter Burst',desc:'Splashes 40% onto every mob near the target and chills them.',set:{burstR:30,burstX:0.4}}]},
+  {lvl:12,ab:'nova',opts:[
+    {id:'a',name:'Deep Freeze',desc:'Freezes twice as long, less damage: sets up a kite.',set:{root:[6,0.4],dmg:[4,1.6]}},
+    {id:'b',name:'Nova Blast',desc:'More damage and knocks mobs back, with a short freeze.',set:{dmg:[9,3.6],knock:20,root:[1.5,0.1]}}]},
+  {lvl:14,ab:'fireball',opts:[
+    {id:'a',name:'Pyroblast',desc:'A longer cast and a huge hit.',set:{cast:3.5,mana:24,dmg:[36,13]}},
+    {id:'b',name:'Living Bomb',desc:'A fast cast that burns over 9s, then explodes onto every mob near the target.',set:{cast:1,dmg:[8,3],bombDot:[3,1.1],bombBoom:[12,4.5],bombR:36}}]}],
   magician:[{lvl:10,ab:'detonate',opts:[
     {id:'a',name:'Volatile',desc:'A bigger blast.',set:{dmg:[24,9.6]}},
-    {id:'b',name:'Rebirth',desc:'A slightly smaller blast, but your next summon is instant and free.',set:{dmg:[18,7.2],rebirth:1}}]}],
+    {id:'b',name:'Rebirth',desc:'A slightly smaller blast, but your next summon is instant and free.',set:{dmg:[18,7.2],rebirth:1}}]},
+  {lvl:12,ab:'burnout',opts:[
+    {id:'a',name:'Overdrive',desc:'Your pet attacks much faster for a shorter time, and loses a little health each second.',set:{dur:[10,0],petHaste:1.8,petDrain:0.02}},
+    {id:'b',name:'Wildfire',desc:'The normal speed-up, and your pet\'s hits splash 40% onto mobs near its target.',set:{petSplash:0.4}}]},
+  {lvl:14,ab:'fshield',opts:[
+    {id:'a',name:'Inferno Shield',desc:'A stronger shield on you.',set:{val:[3,1.2]}},
+    {id:'b',name:'Shared Flames',desc:'The shield goes on your pet: mobs hitting it burn (on you when no pet is out).',set:{val:[2.6,1.05],onPet:1}}]}],
   ranger:[{lvl:10,ab:'trap',opts:[
     {id:'a',name:'Barbed Trap',desc:'A bigger hit and a long, deep bleed on the mob that steps in.',set:{dmg:[20,7.5],bleed:[5.4,2.5],bleedT:18}},
-    {id:'b',name:'Blast Trap',desc:'Hits every mob near the trap and knocks them back.',set:{blast:30,knock:24}}]}],
+    {id:'b',name:'Blast Trap',desc:'Hits every mob near the trap and knocks them back.',set:{blast:30,knock:24}}]},
+  {lvl:12,ab:'volley',opts:[
+    {id:'a',name:'Rain of Arrows',desc:'Wider and longer, lighter hits.',set:{radius:32,dur:[6,0],dmg:[3.2,1.3]}},
+    {id:'b',name:'Pinning Volley',desc:'Same size; every mob it hits is rooted for 3s once.',set:{dmg:[4.2,1.7],pin:3}}]},
+  {lvl:14,ab:'disengage',opts:[
+    {id:'a',name:'Recoil Shot',desc:'Hop back and fire a free shot that snares.',set:{recoil:5}},
+    {id:'b',name:'Double Hop',desc:'Two hops stored, for long kites.',set:{charges:2}}]}],
   monk:[{lvl:10,ab:'mfeign',opts:[
     {id:'a',name:'Perfect Split',desc:'When you stand up, the mob you kept is stunned for 2s.',set:{standStun:2}},
-    {id:'b',name:'Still Water',desc:'You get health and mana back fast while you lie there: a rest in the middle of a fight.',set:{still:0.08}}]}],
+    {id:'b',name:'Still Water',desc:'You get health and mana back fast while you lie there: a rest in the middle of a fight.',set:{still:0.08}}]},
+  {lvl:12,ab:'flurry',opts:[
+    {id:'a',name:'Hundred Fists',desc:'More punches on one mob.',set:{hits:7,dmg:[2.4,1]}},
+    {id:'b',name:'Whirling Flurry',desc:'Six punches spread across every mob around you.',set:{hits:6,spread:24}}]},
+  {lvl:14,ab:'fkick',opts:[
+    {id:'a',name:'Tiger Leap',desc:'If the mob you leap at dies within 3s, Flying Kick is ready again.',set:{dmg:[6.6,2.6],tiger:3}},
+    {id:'b',name:'Crane Kick',desc:'Landing stuns every mob near you for 1.5s.',set:{crane:1.5,craneR:24}}]}],
   shaman:[{lvl:10,ab:'drowsy',opts:[
     {id:'a',name:'Torpor',desc:'A stronger attack slow on one mob.',set:{aslowX:1.75}},
-    {id:'b',name:'Drowsy Cloud',desc:'A weaker slow on every mob near your target.',set:{splash:40,aslowX:1.3}}]}],
+    {id:'b',name:'Drowsy Cloud',desc:'A weaker slow on every mob near your target.',set:{splash:40,aslowX:1.3}}]},
+  {lvl:12,ab:'swarm',opts:[
+    {id:'a',name:'Locust Swarm',desc:'When its mob dies, the swarm jumps to the nearest mob that\'s fighting you.',set:{leap:1}},
+    {id:'b',name:'Stinging Swarm',desc:'A bit stronger, and it counts as two DoTs for your stacking bonus.',set:{dmg:[4.4,2.2],cnt:2}}]},
+  {lvl:14,ab:'totem',opts:[
+    {id:'a',name:'Toxic Totem',desc:'A stronger poison on every mob near it.',set:{dmg:[5.2,2.1]}},
+    {id:'b',name:'Mending Totem',desc:'Heals you while you stand near it, and poisons one mob.',set:{heal:[3,1.2],one:1}}]}],
   bard:[{lvl:10,ab:'crescendo',opts:[
     {id:'a',name:'Finale',desc:'A bigger final pulse. Your songs end.',set:{power:5.5}},
-    {id:'b',name:'Encore',desc:'A smaller pulse, and your songs keep playing.',set:{power:2.6,keep:1}}]}]
+    {id:'b',name:'Encore',desc:'A smaller pulse, and your songs keep playing.',set:{power:2.6,keep:1}}]},
+  {lvl:12,ab:'chant',opts:[
+    {id:'a',name:'Bladesong',desc:'Your swings also hit one mob next to your target, for half.',set:{blade:0.5}},
+    {id:'b',name:'Battle Tempo',desc:'Swing speed keeps building through a long fight, up to twice as fast.',set:{tempo:1}}]},
+  {lvl:14,ab:'dirge',opts:[
+    {id:'a',name:'Dirge of Ruin',desc:'Damage builds the longer a mob stays near you (up to +75%).',set:{dmg:[3.6,1.8],ruin:1}},
+    {id:'b',name:'Requiem',desc:'Weaker, but each mob it kills heals you.',set:{dmg:[3,1.5],requiem:0.15}}]}]
 };
