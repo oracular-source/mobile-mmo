@@ -29,7 +29,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
 17. Never pause: windows and the skill pick (owner picked A, built v0.56)
 18. Buff and debuff icons with timers (owner picked B, built v0.58)
-19. Windows match the HUD, plus small fixes (options written, owner to pick)
+19. Windows match the HUD, plus small fixes (owner picked B and all six fixes, built v0.60)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -190,3 +190,5 @@ Claude leans **B**: one look everywhere, and the gold headings help on the long 
 4. Stale text: "Sell near Marrow" above the bags shows where no Marrow exists; Help says to sell to Marrow and describes the old default movement. Hide the sell note when no merchant is near; refresh Help.
 5. Character window title "Druid 10" → "Druid · Lv 10" (matches the start screen).
 6. Start screen's green Play button is the last green button; make it the grey button with a gold edge (main action).
+
+**Owner picked B and all six fixes** (Nov 20). **Built v0.60:** one CSS block at the end of `css/game.css` ("Windows match the HUD"); old purple overrides for the Menu's buttons and Arrange removed; Change class lost its inline colours; tab renamed Help; the Menu's Back to game button removed; the sell note shows only near Marrow; titles read "Druid · Lv 10". Rules saved in `docs/area-rules.md` (UI look).

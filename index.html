@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.59">
+<link rel="stylesheet" href="css/game.css?v=0.60">
 </head>
 <body>
 <div id="app">
@@ -54,11 +54,11 @@
     <div id="intro" class="modal show">
       <div class="card">
         <div class="mhead"><h1>Ashfen Hollow</h1><button class="mx" id="introx" aria-label="Close" style="display:none">✕</button></div>
-        <p class="hint" style="margin:0 0 6px">Prototype v0.59 · pick a class</p>
+        <p class="hint" style="margin:0 0 6px">Prototype v0.60 · pick a class</p>
         <div id="clspick"></div>
         <div id="clsinfo"><div class="dfig"><canvas id="clscv" width="20" height="24"></canvas></div><div><b id="clsname"></b> <span id="clstag" class="hint"></span><div id="clsdesc" class="hint"></div></div></div>
         <button id="start" class="go">Play</button>
-        <p class="hint" style="margin:6px 0 0">New here? Menu → How to play.</p>
+        <p class="hint" style="margin:6px 0 0">New here? Menu → Help.</p>
       </div>
     </div>
 
@@ -91,7 +91,7 @@
     <div id="menuUI" class="modal">
       <div class="card">
         <div class="mhead"><h1>Menu</h1><button class="mx" data-close="menuUI" aria-label="Close">✕</button></div>
-        <div class="tabs"><button data-tab="spells">Spells</button><button data-tab="skills">Skills</button><button data-tab="settings">Settings</button><button data-tab="help">How to play</button></div>
+        <div class="tabs"><button data-tab="spells">Spells</button><button data-tab="skills">Skills</button><button data-tab="settings">Settings</button><button data-tab="help">Help</button></div>
         <div id="paneSpells">
           <button class="go" id="barr">Arrange buttons on screen</button>
           <p class="hint">Swap spells here: drag a spell onto a slot, or tap a spell and then tap a slot. Slots swap if the spell is already loaded.</p>
@@ -105,18 +105,17 @@
         <div id="paneSettings"><div id="setbox"></div></div>
         <div id="paneHelp">
           <ul>
-            <li><b>Move:</b> drag anywhere to steer (or tap the ground, if you pick that in Settings → Movement).</li>
+            <li><b>Move:</b> drag anywhere to steer. Settings → Movement also has Tap to walk and Hold to walk.</li>
             <li><b>Fight:</b> tap an enemy to target it. Your 8 spells sit in the grid at the bottom; the top-left one is your main attack. <b style="white-space:nowrap">◀ Back</b> and <b style="white-space:nowrap">Next ▶</b> above the grid switch targets.</li>
             <li><b>1st hit</b> and <b>Auto</b> (under your frame): 1st hit casts your main attack when you tap an enemy; Auto keeps casting it so your thumb is free to move.</li>
             <li>Spells with a cast time need you to stand still. A spell tapped while another is casting is queued (gold ring and a Next chip).</li>
             <li><b>Rest:</b> no potions. Health and mana come back fast out of combat, faster with <b>Sit</b> (left side). Pet classes also get <b>Attack</b> and <b>Back off</b> there.</li>
             <li>Higher-level enemies resist more and shake off roots, snares and stuns sooner. Pulled too many? Run back to the guards.</li>
-            <li><b>Your frame</b> (top left) opens gear, bags and the journal. Loot goes straight to your bags; sell to Marrow the Peddler.</li>
+            <li><b>Your frame</b> (top left) opens gear, bags and the journal. Loot goes straight to your bags.</li>
             <li><b>Log</b> shows the full chat history. <b>Menu</b> has your spells, button layout and settings.</li>
             <li><b>Where to go:</b> the crossroads (levels 1–3), the rat tunnel under the sinkhole, then the Sunken Graveyard to the west and its crypt.</li>
           </ul>
         </div>
-        <button class="go" data-close="menuUI">Back to game</button>
       </div>
     </div>
 
@@ -133,35 +132,35 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.59"></script>
-<script src="js/data/sprites.js?v=0.59"></script>
-<script src="js/rng.js?v=0.59"></script>
-<script src="js/save.js?v=0.59"></script>
-<script src="js/map.js?v=0.59"></script>
-<script src="js/data/classes.js?v=0.59"></script>
-<script src="js/data/icons.js?v=0.59"></script>
-<script src="js/data/mobs.js?v=0.59"></script>
-<script src="js/data/items.js?v=0.59"></script>
-<script src="js/data/tiles.js?v=0.59"></script>
-<script src="js/data/maps/graveyard.js?v=0.59"></script>
-<script src="js/data/maps/crypt.js?v=0.59"></script>
-<script src="js/data/maps/crossroads.js?v=0.59"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.59"></script>
-<script src="js/data/maps/wolfwood.js?v=0.59"></script>
-<script src="js/state.js?v=0.59"></script>
-<script src="js/spawns.js?v=0.59"></script>
-<script src="js/fx.js?v=0.59"></script>
-<script src="js/path.js?v=0.59"></script>
-<script src="js/combat.js?v=0.59"></script>
-<script src="js/input.js?v=0.59"></script>
-<script src="js/ui.js?v=0.59"></script>
-<script src="js/world.js?v=0.59"></script>
-<script src="js/area.js?v=0.59"></script>
-<script src="js/update.js?v=0.59"></script>
-<script src="js/render.js?v=0.59"></script>
-<script src="js/sim.js?v=0.59"></script>
-<script src="js/dev.js?v=0.59"></script>
-<script src="js/minimap.js?v=0.59"></script>
-<script src="js/main.js?v=0.59"></script>
+<script src="js/core.js?v=0.60"></script>
+<script src="js/data/sprites.js?v=0.60"></script>
+<script src="js/rng.js?v=0.60"></script>
+<script src="js/save.js?v=0.60"></script>
+<script src="js/map.js?v=0.60"></script>
+<script src="js/data/classes.js?v=0.60"></script>
+<script src="js/data/icons.js?v=0.60"></script>
+<script src="js/data/mobs.js?v=0.60"></script>
+<script src="js/data/items.js?v=0.60"></script>
+<script src="js/data/tiles.js?v=0.60"></script>
+<script src="js/data/maps/graveyard.js?v=0.60"></script>
+<script src="js/data/maps/crypt.js?v=0.60"></script>
+<script src="js/data/maps/crossroads.js?v=0.60"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.60"></script>
+<script src="js/data/maps/wolfwood.js?v=0.60"></script>
+<script src="js/state.js?v=0.60"></script>
+<script src="js/spawns.js?v=0.60"></script>
+<script src="js/fx.js?v=0.60"></script>
+<script src="js/path.js?v=0.60"></script>
+<script src="js/combat.js?v=0.60"></script>
+<script src="js/input.js?v=0.60"></script>
+<script src="js/ui.js?v=0.60"></script>
+<script src="js/world.js?v=0.60"></script>
+<script src="js/area.js?v=0.60"></script>
+<script src="js/update.js?v=0.60"></script>
+<script src="js/render.js?v=0.60"></script>
+<script src="js/sim.js?v=0.60"></script>
+<script src="js/dev.js?v=0.60"></script>
+<script src="js/minimap.js?v=0.60"></script>
+<script src="js/main.js?v=0.60"></script>
 </body>
 </html>

@@ -279,7 +279,7 @@ function renderSettings(){
     seg('Zoom (or pinch)','zoom',[[160,'Near'],[999,'Far']])+
     seg('Minimap','minimap',[['true','On'],['false','Off']])+
     grp('Game')+
-    '<button class="go" id="chgcls" style="margin:2px 0 6px;background:#1c1922;border-color:#3a3343">Change class</button>'+
+    '<button class="go" id="chgcls" style="margin:2px 0 6px">Change class</button>'+
     // Prototype only: lets the home-screen app (which can't use ?dev) turn developer tools on.
     '<div class="srow"><div class="slbl">Developer tools</div><div class="seg"><button id="devoff" class="'+(dev.on?'':'active')+'">Off</button><button id="devon" class="'+(dev.on?'active':'')+'">On</button></div></div>';
 }
@@ -375,14 +375,14 @@ function slotCell(sl){const id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x
     (it?'<span style="color:'+RAR[it.rar]+'">'+shortName(it.name)+'</span>':'<span class="q">'+nm+'</span>')+'</div>'}
 function renderChar(){
   document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
-  const L=player.lvl;$('ctitle').textContent=C.name+' '+L;let h='';
+  const L=player.lvl;$('ctitle').textContent=C.name+' · Lv '+L;let h='';
   if(charTab==='char'){
     const near=nearMerchant();
     h+='<div class="doll"><div class="dcol">'+DOLL_L.map(slotCell).join('')+'</div><div class="dfig"><canvas id="dollcv" width="15" height="18"></canvas></div><div class="dcol">'+DOLL_R.map(slotCell).join('')+'</div>';
     h+='<div class="dstats"><div>HP <b>'+maxHP(L)+'</b></div>'+(C.mana?'<div>Mana <b>'+maxMP(L)+'</b></div>':'')+
       STAT_KEYS.map(k=>'<div>'+k[1]+' <b>'+stat(k[0])+'</b></div>').join('')+'<div class="cop">'+inv.copper+' copper</div></div></div>';
     const used=inv.bags.filter(Boolean).length;
-    h+='<div class="bhead"><span>Bags '+used+'/'+inv.bags.length+'</span><span class="q">'+(near?'Marrow is buying':'Sell near Marrow')+'</span></div>';
+    h+='<div class="bhead"><span>Bags '+used+'/'+inv.bags.length+'</span>'+(near?'<span class="q">Marrow is buying</span>':'')+'</div>'; // v0.60: no sell note where there's no merchant
     if(near)h+='<button data-act="selljunk" class="sellall">Sell all junk</button>';
     h+='<div class="bag8">';
     inv.bags.forEach((b,i)=>{const it=b&&ITEMS[b.id],sel=charSel&&charSel.bag===i;

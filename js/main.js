@@ -28,7 +28,7 @@ function openIntro(){pickCls=CLS;$('introx').style.display=started?'':'none';ren
 function startGame(){$('intro').classList.remove('show');running=true;if(started)return; // Change class → same class just resumes where you were
   started=true;log('Welcome to Ashfen Hollow, '+C.name+'.','#7dffa6');if(player.lvl>1)log('Progress restored: level '+player.lvl+'.','#9aa');enterZone(ZONE_OF[(location.search.match(/[?&]area=(\w+)/)||[])[1]]||'cross')} // a waiting skill choice shows as a pulsing Menu (pauseWatch), never a window
 (function(){
-  $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name;
+  $('pcls').textContent=C.name+' ▸';$('ctitle').textContent=C.name+' · Lv '+player.lvl;
   renderPick();
   $('clspick').addEventListener('click',e=>{const b=e.target.closest('button[data-cls]');if(!b)return;pickCls=b.dataset.cls;renderPick()});
   $('introx').addEventListener('click',()=>{$('intro').classList.remove('show');running=true});

@@ -71,6 +71,15 @@ Every built area gets a pass with this list, and every new area (the Ruined Chap
 ## Every look decision gets saved here (owner, Nov 20)
 Whenever the owner makes a call on how things should look or feel (in any chat), write it into this file in the section it fits, with the date, in the same push. This file is how every chat keeps the world consistent; the board only tracks the work. **Also save the recipe (owner, Nov 20):** when a visual change ships, add a short "how it's drawn" line here (like the water and ground recipes above), so every new location is built the same way from day one. Each reply that changes a visual says which rule it saved. This is the best-practice file for every new location.
 
+## UI look (owner, Nov 18–20)
+Minimal EverQuest-style until the theme is decided; every screen part uses one look (UI breakdowns in `docs/research/ui.md`).
+- **One panel, one button (v0.60, breakdown 19 B):** frames, HUD buttons and every window are plain grey `rgba(40,40,40,.97)` with a 1px `#8a8a8a` edge and 4px corners; buttons `#2b2b2b` with the same edge; inner cards (spells, forks, gear) `#2b2b2b` with a `#6c6c6c` edge. No gradients, no shine.
+- **Gold means "on / selected"** (`#c9a227` edge, `#ffd27a` text, `#34312a` fill), plus window titles and section headings so long pages scan. The one main action (start screen Play) is grey with a gold edge.
+- **Tabs:** the open tab is a lighter fill (`#4a4a4a`) with white text, never gold, so the pulsing gold "skill choice waiting" is the only gold on a tab row.
+- **Effects (v0.58, breakdown 18 B):** buffs and debuffs are 14px spell icons in a grey square; a dark shade fills down as they run out, a corner number only under 10s, a red edge blinking in the last 3s.
+- **Never pause (v0.56):** windows sit over a light cover with the world running; anything needing the player pulses where they go to act.
+- Don't show text for things that aren't there (e.g. a sell note with no merchant nearby).
+
 ## Layout
 - Main road plus small side paths that reward curiosity.
 - Loops, not dead ends; a shortcut back to the hub where it fits.
