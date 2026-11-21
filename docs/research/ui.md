@@ -29,6 +29,7 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 13. Top pills: Log, Menu, 1st hit, Auto (options written, owner to pick)
 17. Never pause: windows and the skill pick (owner picked A, built v0.56)
 18. Buff and debuff icons with timers (owner picked B, built v0.58)
+19. Windows match the HUD, plus small fixes (options written, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -173,3 +174,19 @@ Options, draft `art/drafts/ui-buff-icons.png` (made by `tools/ui_buff_icons.py`)
 - **B Dark shade fills down:** the icon darkens from the top as it runs out (like a cooldown), a small number in the corner only under 10s, red edge blinking in the last 3s. Same height as one row of icons.
 - **C Thin bar under:** a 2px bar under each icon drains, no numbers, red in the last 3s. Calmest; you guess the seconds.
 Claude leans **B**: the row stays one line high, you can read "about half left" at a glance, and exact seconds show only when they start to matter (re-rooting, re-snaring). Risk: the shade must look different from a spell cooldown on the grid; it reads differently because these sit on the frames, not the grid, and have no grey-out. **Owner picked B** (Nov 20). **Built v0.58:** `fxRow()` in `render.js` draws both rows (rebuilt only when the set of effects changes; shade height, corner number and `.low` red blink update in place, 10 times a second); `fxFull()` keeps each effect's full time (the longest since it was last put up, so a refresh starts over). Buff icons come from the ability that gives the buff (`BUFFS[k].icon`). Traits in `#tlv`. Tap tip `#fxtip` in `ui.js`. Next: owner plays and says if the shade reads as different from spell cooldowns.
+
+## 19. Windows match the HUD (consistency check, Nov 20)
+Breakdowns 1–18 are done, so this pass opened every screen at phone size and looked for anything breaking the RuneScape rule (one panel style, one button style everywhere).
+**Main gap:** the HUD has been plain grey squares since v0.33–v0.45 (`#282828` panels, `#8a8a8a` edges), but every window (Menu, Character, Map, start screen) still has the older look: purple-black gradient, gold-brown edge, rounded buttons with a shine. Two styles on one screen.
+Options, drafts `art/drafts/ui-window-looks-menu.png` and `-char.png` (the real game restyled, by `tools/ui_window_looks.py`):
+- **A Plain grey, white titles:** windows and their buttons use the HUD's grey and edges; gold only means "on / selected".
+- **B Plain grey, gold titles:** same, but window titles and section headings (Spellbook, Loadout, Controls) stay gold so you can scan long windows.
+- **C Dark, grey edges:** keep the dark windows, just square the corners and swap gold-brown edges for grey. Smallest change; still two looks.
+Claude leans **B**: one look everywhere, and the gold headings help on the long Spells and Settings pages.
+**Small fixes found (go with any option):**
+1. A selected tab and the gold "skill choice waiting" pulse look the same in a still frame (both gold edges). Selected = lighter fill, white text, no gold; only the pulse uses gold.
+2. "How to play" wraps to two lines on the tab; rename it **Help**.
+3. The Skills tab has a big "Back to game" button at the bottom; no other window does (✕ closes everywhere). Remove it.
+4. Stale text: "Sell near Marrow" above the bags shows where no Marrow exists; Help says to sell to Marrow and describes the old default movement. Hide the sell note when no merchant is near; refresh Help.
+5. Character window title "Druid 10" → "Druid · Lv 10" (matches the start screen).
+6. Start screen's green Play button is the last green button; make it the grey button with a gold edge (main action).
