@@ -192,3 +192,21 @@ Claude leans **B**: one look everywhere, and the gold headings help on the long 
 6. Start screen's green Play button is the last green button; make it the grey button with a gold edge (main action).
 
 **Owner picked B and all six fixes** (Nov 20). **Built v0.60:** one CSS block at the end of `css/game.css` ("Windows match the HUD"); old purple overrides for the Menu's buttons and Arrange removed; Change class lost its inline colours; tab renamed Help; the Menu's Back to game button removed; the sell note shows only near Marrow; titles read "Druid · Lv 10". Rules saved in `docs/area-rules.md` (UI look).
+
+## 20. Minimap and full map cleanup (owner, Nov 20)
+Owner: doesn't love the minimap icons, wants a better way to show where you are, plus an overall cleanup of the map. Drafts from the real map data: `art/drafts/ui-map-looks-mini.png` (crossroads, Wolfwood, graveyard) and `-full.png` (the real map window restyled), made by `tools/ui_map_looks.py` + `.js`.
+**What's wrong now:** the ground is one flat square per tile, so woods read as a noisy checkerboard and the fog edge is a staircase; the 5-pixel code shapes (square, circle, triangle, diamond) have to be learned; the "you" arrow is small and about the same gold as the campfire; the full map needs numbers plus a list to say what anything is.
+**Same in every option (the cleanup):**
+- **Ground drawn, not tiled:** trees merge into soft forest masses with lumpy edges, water gets round edges, roads are clean lines (wide roads stay solid), buildings plain grey blocks; each area keeps its own colours (v0.48's per-area ground colours).
+- **Soft fog edge** where the explored part ends, instead of square steps.
+- **Picture pins** instead of code shapes: house = town, arch = door down (cave, crypt, sinkhole), flame = campfire, skull = named, chest = hidden chest, arrow = way out pointing out of the area. Black outline, kind colour. Exits off the minimap still point from the rim.
+- **Full map window:** "% explored" moves into the header, zoom − / + sit on the map's corner, so the map gets the room.
+**"You" on the minimap (pick one):**
+- **A Clean square:** square minimap with the name strip; you're a bigger gold arrow with a white edge and a faint light cone showing which way you face.
+- **B Pictures + ring:** square, no name strip (the name moves to the full map); you're a gold dot in a white ring with a small white pointer on its edge (Google Maps / Guild Wars 2 style). Can't be confused with a pin.
+- **C Round compass:** round minimap with a grey ring, name on a tab under it; you're the same ring-and-pointer; pins shrink to coloured dots (pictures only on the full map).
+**Full map (pick one):**
+- **A Names on the map:** each place's name sits next to its pin; no list.
+- **B Tap a pin:** pins only; tapping one shows a strip under the map with the name, what it is, and how far and which way ("Wolfwood · way out · 26 tiles north").
+- **C Short list by kind:** pins only on the map; a compact list underneath grouped as Ways out, Ways down, Named, Rest and finds.
+Claude leans **minimap B + full map A**: the ring can't be mistaken for anything else on the map, picture pins need no learning, and names on the map mean no matching numbers to a list (B's tap strip can come later if labels crowd in bigger areas). The drawn ground is the biggest single win and works with any pick.
