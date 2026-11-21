@@ -78,6 +78,10 @@ Every built area gets a pass with this list, and every new area (the Ruined Chap
 ## Every look decision gets saved here (owner, Nov 20)
 Whenever the owner makes a call on how things should look or feel (in any chat), write it into this file in the section it fits, with the date, in the same push. This file is how every chat keeps the world consistent; the board only tracks the work. **Also save the recipe (owner, Nov 20):** when a visual change ships, add a short "how it's drawn" line here (like the water and ground recipes above), so every new location is built the same way from day one. Each reply that changes a visual says which rule it saved. This is the best-practice file for every new location.
 
+## Characters and monsters: size (owner, Nov 21)
+- **Player characters are 15 × 18 on screen (final).** How it's drawn: each class is authored at 20 × 24 in `RAGS` (`js/data/sprites.js`) and the renderer drops every 4th row and column (`js/render.js`) to show it at 15 × 18. New class looks are drawn the same way.
+- Humanoid monsters and NPCs are sized against that 15 × 18; undead (skeletons, the Skeleton King, zombies) get redrawn bigger than today in the character design pass. The rats, Old Gnawbone and the chapel placeholders are the bar to match.
+
 ## UI look (owner, Nov 18–20)
 Minimal EverQuest-style until the theme is decided; every screen part uses one look (UI breakdowns in `docs/research/ui.md`).
 - **One panel, one button (v0.60, breakdown 19 B):** frames, HUD buttons and every window are plain grey `rgba(40,40,40,.97)` with a 1px `#8a8a8a` edge and 4px corners; buttons `#2b2b2b` with the same edge; inner cards (spells, forks, gear) `#2b2b2b` with a `#6c6c6c` edge. No gradients, no shine.
