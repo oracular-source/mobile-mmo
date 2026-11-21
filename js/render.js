@@ -1,5 +1,6 @@
 // Drawing: sprites to pictures, camera and zoom, lighting, the world, and the HUD bars.
 'use strict';
+const PLAYER_LIGHT=0; // 0 = no light around your character (owner, Nov 21: play by natural light); 1 = the old glow
 function mk(rows,pal,scale){
   scale=scale||1;const h=rows.length,w=rows[0].length;
   const c=document.createElement('canvas');c.width=w*scale;c.height=h*scale;const g=c.getContext('2d');
@@ -314,7 +315,9 @@ function render(){
   // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
   // pools stay put on the ground while the camera glides.
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
-  const lights=[{x:player.x,y:player.y-8,r:95,w:18}].concat(zl)
+  // v0.72 (owner, Nov 21): the player no longer carries a light; you see by the world's own lights and ambient.
+  // PLAYER_LIGHT = 1 brings the old glow back (radius 95) if dark spots turn out unreadable on the phone.
+  const lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(zl)
     .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
   if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
   dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);
