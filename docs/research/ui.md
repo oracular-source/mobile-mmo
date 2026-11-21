@@ -221,3 +221,4 @@ Owner: the "you" marker is much more detailed than everything else. Cause: it's 
 - **B Pixel map:** A, plus a 1-pixel dark edge round forests, water and roads (crisper, busier with scattered trees).
 - **C Closer, richer map:** 3 px a tile (~29 tiles across), trees as separate crowns with a shadow, bigger pins and arrow.
 Claude leaned A (fixes the mismatch, no extra clutter; C's zoom could later be a setting). **Owner picked A. Built v0.61.2.**
+**v0.62.1 (owner):** the pixel arrow looked chunky (the full black outline doubles its size); now a slim white navigation pointer with a thin black edge, turned to the exact heading. Code: `mmYou(g,x,y,u)` in `js/minimap.js`.

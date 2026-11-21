@@ -182,18 +182,15 @@ function drawMinimap(){
   mmg.fillStyle='#ddd';mmg.font=(9*dpr)+'px monospace';mmg.textAlign='center';mmg.textBaseline='middle';
   mmg.fillText(Z.name.length>16?Z.name.slice(0,15)+'…':Z.name,mmEl.width/2,bot+strip/2+dpr*0.5);
 }
-// You (v0.61.2, UI 21 option A): a small white pixel arrow drawn like the pins (same pixel size, black outline),
-// pointing the way you're heading in 8 directions. It used to be smooth circles, which didn't match the pixel pins.
-// Two 7 x 7 pictures (a head and a short tail): pointing east and south-east; the other six are these turned a quarter at a time.
-const MM_YOU_E=['...#...','...##..','...###.','#######','...###.','...##..','...#...'];
-const MM_YOU_SE=['#......','.#.....','..#...#','...#.##','....###','...####','..#####'];
+// You (v0.61.3, owner: "smaller, like a mouse pointer, less chunky"): a slim white pointer with a thin black edge,
+// like a map app's navigation arrow, turned to the exact way you're heading. Drawn as a clean shape, not blocky
+// pixels: at this size 8-way pixel arrows came out lumpy on the diagonals. u = the pins' pixel size (follows S / M / L).
 function mmYou(g,x,y,u){
-  const fa=Math.atan2(player.fy||0,player.fx||(player.fy?0:1));
-  const d=((Math.round(fa/(Math.PI/4))%8)+8)%8,G=d%2?MM_YOU_SE:MM_YOU_E,N=7,on=[];
-  for(let j=0;j<N;j++)for(let i=0;i<N;i++)if(G[j][i]==='#'){let X=i,Y=j;for(let r=0;r<d>>1;r++){const t=X;X=N-1-Y;Y=t}on.push([X,Y])}
-  const x0=Math.round(x-N/2*u),y0=Math.round(y-N/2*u);
-  g.fillStyle='#000';on.forEach(([X,Y])=>g.fillRect(x0+(X-1)*u,y0+(Y-1)*u,3*u,3*u)); // outline first
-  g.fillStyle='#fff';on.forEach(([X,Y])=>g.fillRect(x0+X*u,y0+Y*u,u,u));
+  const fa=Math.atan2(player.fy||0,player.fx||(player.fy?0:1)),L=3.6*u,W=2.6*u;
+  g.save();g.translate(Math.round(x),Math.round(y));g.rotate(fa);
+  g.beginPath();g.moveTo(L,0);g.lineTo(-L*0.75,-W);g.lineTo(-L*0.3,0);g.lineTo(-L*0.75,W);g.closePath();
+  g.lineJoin='miter';g.lineWidth=Math.max(1.5,u*0.9);g.strokeStyle='#000';g.stroke();
+  g.fillStyle='#fff';g.fill();g.restore();
 }
 function mmArrow(x,y,a,r,col){
   mmg.save();mmg.translate(x,y);mmg.rotate(a);mmg.fillStyle='#000';mmg.beginPath();mmg.moveTo(r+1,0);mmg.lineTo(-r-1,-r-1);mmg.lineTo(-r-1,r+1);mmg.fill();
