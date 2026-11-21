@@ -1,6 +1,7 @@
 # Draft sprites for Zone 1's named, round 2 (character chat, Nov 21; owner: bigger, shaggier, 'more spicy').
 # Old Gnawbone is grown from his current grid (same rat, longer and deeper, shaggy back, belly fringe, a bone in his teeth,
 # a rusty trap jaw on his tail). Greyfang is redrawn by hand (ruff, dark saddle, snarl, two hunters' arrows, scars).
+# IN THE GAME since v0.67 (owner OK Nov 21): don't rerun the Gnawbone part, it would grow the new grid again.
 # Run: python3 tools/named_mobs.py -> writes d_gnaw2*.png and d_grey3*.png; grids move into sprites.js once the owner OKs them. Reads the CURRENT Gnawbone from sprites.js, so run it before his new grid goes in.
 import os,sys,json,subprocess; sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 from undead_mobs import outline,img

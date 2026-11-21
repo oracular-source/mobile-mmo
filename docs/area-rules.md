@@ -87,6 +87,7 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Size against the 15 × 18 player:** a regular humanoid monster is a touch taller (16 × 20); a boss or dungeon boss is about 1.6× the player (24 × 28–30), drawn at full detail, never a small sprite scaled up.
 - **How it's drawn:** fill-only text grids with the black outline added by a script (`tools/undead_mobs.py`, `outline()`), light from the top left, faces right, one step frame where the legs (or the hem, for robes) move.
 - **The shapes that make each read:** skeleton = skull with dark sockets and a glint, ribs as white bars split by black, a spine, a pelvis, thin limbs with gaps; zombie = hunched forward, both arms reaching, jaw hanging, skin showing through torn clothes, one bare foot; Skeleton King = crown, glowing sockets, fur collar, torn royal cloak, a big sword he leans on.
+- **Named look bigger and shaggier than their pack (owner, v0.67):** a named is about 1.5–2× its family's size with fur tufts on the back, ragged edges and one story prop on the body (Gnawbone's bone and trap jaw, Greyfang's arrows and scars), so it reads as old and dangerous, not a recolour.
 - **A boss stands apart from the mobs around it:** Brother Malrec keeps his cult's hood but in grand vestments (tall gold-tipped cowl, gold collar, gold-trimmed red robe and stole, gold hem, a crook-staff with a lit censer), so he reads as the one in charge at a glance.
 
 ## UI look (owner, Nov 18–20)

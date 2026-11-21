@@ -28,11 +28,11 @@ Rules for every new monster: black outline, faces right, its own family colours 
 | 4 | Crypt skeleton | Crypt | Skeleton | 16×20 | — | **New look in game (v0.65):** own skeleton body, rusty sword, broken round shield, red eyes, step frame |
 | 5 | Necromancer's skeleton, Shadow Knight's minion | Pets | Skeleton | 16×20 | — | **New look in game (v0.65):** clean bone, green eyes, bone club; dark bone, red eyes, sword |
 | 6 | **Skeleton King** | Crypt | Skeleton (boss) | 24×29 | — | **New look in game (v0.65):** crown, violet fire in the sockets, ermine collar, torn purple cloak, greatsword, drawn at full size |
-| 7 | Old Gnawbone | Rat tunnel (den) | Rat (named) | about 24×12 | — | **Bigger, shaggier draft (Nov 21), owner to review.** **Own sprite in game (v0.29, map chat, owner asked):** 32×17, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth, step frame |
+| 7 | Old Gnawbone | Rat tunnel (den) | Rat (named) | about 24×12 | — | **Round 2 in game (v0.67, owner OK Nov 21):** 48×23, longer and deeper, shaggy back and belly fringe, a bone in his teeth, a rusty trap jaw on his tail. **Own sprite in game (v0.29, map chat, owner asked):** 32×17, hunched and bristly, scarred back, torn ear, a scar through the eye, long yellow teeth, step frame |
 | 8 | Earth and fire elementals | Magician pets | Elemental | 12×12 | One shape in two colours | To do |
 | 9 | Floating sword | Enchanter pet | Object | 5×10 | Tiny sprite | To do (low) |
 | 10 | Blight wolf | Wolfwood | Wolf | 24×14 | — | **In game (v0.40, map chat, owner OK Nov 19):** grey, red eyes, a blight patch, step frame. Packs of 2–3, flees at 20% health |
-| 11 | Greyfang | Wolfwood | Wolf (named) | 30×17 | — | **Bigger, shaggier draft (Nov 21), owner to review.** **In game (v0.40):** the wolf at 1.25× in silver, raised ruff, ice-blue eyes. Walks a loop with two pack wolves, howls them in |
+| 11 | Greyfang | Wolfwood | Wolf (named) | 30×17 | — | **Round 2 in game (v0.67, owner OK Nov 21):** 38×21, redrawn by hand: big ruff, dark saddle, snarl, two hunters' arrows in his side, scars. **In game (v0.40):** the wolf at 1.25× in silver, raised ruff, ice-blue eyes. Walks a loop with two pack wolves, howls them in |
 | 12 | Old Scar | Wolfwood | Wolf (rare) | 24×14 | — | **In game (v0.40):** browner, torn ear, pink scar through a blind eye. Alone, hits hard |
 | 13 | Thornback boar | Wolfwood | Boar | 23×12 | — | **In game (v0.40):** brown, pale thorn ridge, tusk out past the snout curving up (owner, Nov 19). Charges |
 
