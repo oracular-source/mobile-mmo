@@ -1066,6 +1066,28 @@ One seed per fight (the full 10-seed run takes about 10 minutes a class on the b
 | bard | Dirge of Ruin | 26.9 | – | 27.1 | 5.0 |  |
 | bard | Requiem | 26.9 | – | 27.1 | 4.2 |  |
 
+## Drowned Prior locks you in, wall-to-wall water (v0.71, Nov 21)
+`runDungeon({seeds:2})` now fights the Prior's group in an arena that's all knee-deep water (`wade`), as in the game since the lock-in; `runDungeon({seeds:2,noWade:true})` is the old dry arena for comparison. Level 15, same seeds. Prior column: W win / D death, fight length, a second try after a loss.
+
+| Class | Run, wading (min) | Run, dry (min) | Drowned Prior, wading | Drowned Prior, dry |
+| --- | --- | --- | --- | --- |
+| Druid | 12.1 / 10.8 | 12.3 / 10.9 | W 57s / W 58s | W 68s / W 67s |
+| Warrior | 14.1 / 15.9 | 13.9 / 15.7 | lost both | lost both |
+| Rogue | 9.9 / 10.6 | 9.8 / 10.5 | lost both | lost both |
+| Necromancer | 9.3 / 8.5 | 10.9 / 8.3 | lost both | lost, then W 45s on one |
+| Cleric | 12.5 / 12.8 | 12.3 / 12.8 | W 65s / W 62s | W 54s / W 61s |
+| Enchanter | 10.3 / 10.6 | 10.3 / 10.6 | W 57s / W 52s | W 57s / W 54s |
+| Paladin | 11.0 / 9.8 | 10.9 / 9.7 | W 28s / W 34s | W 29s / W 28s |
+| Shadow Knight | 12.1 / 11.9 | 12.4 / 11.9 | lost both | lost both |
+| Wizard | 14.8 / 12.9 | 14.3 / 13.1 | W 116s / W 127s | lost / W 137s |
+| Magician | 15.4 / 14.7 | 13.6 / 14.4 | lost, then W / W 113s | W 105s / W 94s |
+| Ranger | 9.4 / 9.8 | 9.5 / 9.8 | W 66s / W 65s | W 69s / W 68s |
+| Monk | 10.5 / 11.3 | 10.3 / 11.1 | W 76s / W 77s | W 63s / W 68s |
+| Shaman | 8.7 / 8.6 | 8.7 / 8.5 | W 58s / W 55s | W 56s / W 49s |
+| Bard | 14.1 / 13.6 | 13.9 / 13.4 | lost both (lasts longer) | lost both |
+
+**Read:** the water changes little overall: runs stay 8.5–16 min. Kiters with a pet or snares gain a bit (Wizard now wins both, the Druid is faster); the Necro loses its one win and the Magician needs a second try once. The same five still can't beat the Prior and his two dead (Warrior, Rogue, Shadow Knight, Bard, now the Necro): a balance chat job, not changed here.
+
 ## Dungeon 1 rebuild, two floors (v0.66, Nov 21)
 `__game` page, `runDungeon({seeds:2, lvl:15})` for each class: floor 1 (catacomb, hall, the Drowned Prior and his two dead) then floor 2 (the Bellringer and his two cultists, the wisp room, Malrec and his deacons). Each group is one arena fight plus rest and walking; a lost fight is tried once more (+25 s). The Bellringer is no longer optional. Bots don't step off the Prior's ripples or out of the great wisps' rings, and the Prior's grip in the arena only slows (it never mattered much to a bot standing still).
 

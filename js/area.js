@@ -51,6 +51,9 @@ function buildArea(id){
     // v0.66: or, if the last word names a named on this map (drowned_prior), until that named dies (world.js openSeal).
     // In an instance it shuts again on every fresh run.
     else if(k==='seal')A.seals.push({x0:+p[1],y0:+p[2],x1:+p[3],y1:+p[4],by:p[5],open:false});
+    // A locked room (v0.71, owner Nov 21: the Drowned Prior's chamber): step inside room=x0,y0,x1,y1 while the named is up and
+    // a portcullis drops over the door tiles behind you, then the flood rises over the room's whole floor (world.js checkLocks).
+    else if(k==='lockin'){const r=opt('room').split(',').map(Number);(A.locks=A.locks||[]).push({x0:+p[1],y0:+p[2],x1:+p[3],y1:+p[4],by:p[5],room:{x0:r[0],y0:r[1],x1:r[2],y1:r[3]},shut:false,done:false})}
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2]),tx:+p[1],ty:+p[2],open:false,at:0});
     // The area's named rare (v0.32): its own spot, empty until a spawn somewhere in the area rolls it (world.js rollRare). up = still out there.
@@ -68,6 +71,7 @@ function buildArea(id){
   // in Dungeon 1, a little taste of what's to come. Mobs wade too. Drawn the same; you sink to your knees (render.js).
   if(M.wade)for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(rows[y][x]==='~'){A.map[y][x]=0;A.slow[y*w+x]=1}
   A.seals.forEach(sl=>{sl.obj=A.objs.find(o=>o.kind===sl.by)||null;sl.named=A.named.find(n=>n.name===sl.by)||null});sealArea(A);
+  (A.locks||[]).forEach(L=>{L.named=A.named.find(n=>n.name===L.by)||null});
   (A.bars||[]).forEach(b=>{b.open=!!store.get('ashfen-gates',{})[b.id];if(!b.open)A.map[b.ty][b.tx]=5});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});

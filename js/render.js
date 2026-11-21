@@ -210,6 +210,15 @@ function render(){
     if(sl.named){const hh=(sl.y1-sl.y0+1)*T;f(x,y,w,hh,AP.flood[1]);f(x,y,w,1,AP.floodDk);for(let i=0;i<6;i++){const rx=x+((i*23+Math.floor(time*6))%(w-4)),ry=y+3+((i*11)%(hh-6));f(rx,ry,4,1,AP.floodHi)}
       f(x+4,y+hh-6,3,1,'#4a4652');f(x+w-9,y+hh-9,3,1,'#4a4652');return} // the top edge of a step just showing under the water
     f(x-1,y-2,w+2,18,AP.out);f(x,y-1,w,16,AP.cst);f(x,y-1,w,2,AP.cstHi);f(x+w-3,y-1,3,16,AP.cstDk);f(x+9,y+3,1,5,AP.cstMor);f(x+10,y+7,1,4,AP.cstMor);f(x+20,y+4,4,1,AP.cstMor);f(x+4,y+12,w-8,1,AP.cstDk)});
+  // Locked rooms (v0.71): an iron portcullis over the doorway while you're shut in, dropping fast with a little bounce when it
+  // slams, rising slowly when it lifts. Bars you can see through (the hall's light behind), crossbars, spiked feet in the floor.
+  if(CHA&&CHA.locks)CHA.locks.forEach(L=>{let p=L.shut?Math.min(1,(time-L.closeT)/0.16):L.openT?1-Math.min(1,(time-L.openT)/1.2):0;if(p<=0)return;
+    if(L.shut&&time-L.closeT<0.3&&time-L.closeT>0.16)p=1-0.08*Math.sin((time-L.closeT-0.16)/0.14*Math.PI); // the bounce
+    const x=L.x0*T,w=(L.x1-L.x0+1)*T,H=19,top=L.y0*T-4,h=Math.round(H*p),f=(X,Y,ww,hh,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,ww,hh)};
+    f(x-1,top-2,w+2,3,'#0b0a0f');f(x,top-1,w,1,'#4a4652'); // the slot in the arch it drops from
+    for(let bx=x+1;bx<x+w-1;bx+=4){f(bx,top,3,h,'#0b0a0f');f(bx+1,top,1,h,'#5c5c66');if(h>=H-1){f(bx+1,top+h,1,2,'#0b0a0f')}} // bars, then spikes into the floor
+    [5,12].forEach(cy=>{if(cy<h){f(x,top+cy,w,3,'#0b0a0f');f(x,top+cy+1,w,1,'#6e6a72');for(let bx=x+2;bx<x+w-1;bx+=4)f(bx,top+cy+1,1,1,'#8a8690')}}); // crossbars with rivets
+  });
   // Grasp of the Deep (v0.66): rings of ripples spreading on the spot under you while the Prior casts; step off them.
   mobs.forEach(m=>{const c=m.casting;if(!c||!c.spot||m.dead)return;const p=c.t/c.dur,sx=Math.round(c.spot.x),sy=Math.round(c.spot.y);
     for(let k=0;k<3;k++){const q=((time*1.4+k/3)%1),r=GRASP.r*(0.25+0.75*q);lx.globalAlpha=(1-q)*(0.5+0.5*p);lx.fillStyle=k%2?'#9fd8c0':'#d8f0e8';
@@ -296,10 +305,12 @@ function render(){
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();
+  // v0.71: def.glow = a named that carries its own cold light (the Drowned Prior's lantern; without it he melted into his
+  // dark water and read as a plain hooded shape).
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))).concat(mobs.filter(m=>m.def.glow&&!m.dead).map(m=>({x:m.x,y:m.y-12,r:m.def.glow,w:0,c:46}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
   // pools stay put on the ground while the camera glides.
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;

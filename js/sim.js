@@ -526,6 +526,9 @@ const hpLeft=()=>{const a=mobs.filter(m=>m.maxhp);return a.reduce((s,m)=>s+Math.
 function simFight(f,L,seed,mode){
   seedRng(seed);
   pet=null;pet2=null;enterZone('arena');resetPlayer(L);
+  // wade: the whole arena is knee-deep flood (v0.71: the Drowned Prior locks you in and floods his room wall to wall), so
+  // you, your pet and the mobs all walk slowed, as in the game.
+  if(f.wade)slowArea={w:ARENA.w,h:ARENA.h,slow:new Uint8Array(ARENA.w*ARENA.h).fill(1)};
   const bot=BOTS[CLS],st={mode:mode,fight:f.id};
   // Before the pull: raise the pet, hide. Then top up, as if you'd rested.
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
@@ -712,7 +715,7 @@ function runPace(opts){
 // rest after it, plus walking between them at 1.4x the straight line. A lost fight is tried once more (25 s to run back).
 // Floor 1 (catacomb, hall, the Drowned Prior), then floor 2 (the Bellringer, the wisp room, Malrec). Resolves with the
 // minutes, deaths, and how each named fight went. Target (owner, Nov 21): 10-15 minutes.
-function dungeonPace(L,seed){
+function dungeonPace(L,seed,noWade){
   let t=0,deaths=0,fights=0;const named={},log=[];
   ['dungeon1','dungeon1_f2'].forEach(id=>{const A=buildArea(id),by={},order=[];let px=A.start.x,py=A.start.y;
     A.spawns.forEach(sp=>{const k=sp.group||('solo'+A.spawns.indexOf(sp));if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
@@ -720,14 +723,14 @@ function dungeonPace(L,seed){
     while(order.length){order.sort((a,b)=>Math.hypot(by[a][0].x-px,by[a][0].y-py)-Math.hypot(by[b][0].x-px,by[b][0].y-py));const g=by[order.shift()];
       const types=g.map(sp=>sp.type).sort((a,b)=>(TYPES[b].named?1:0)-(TYPES[a].named?1:0)),lv=Math.max.apply(null,g.map(sp=>sp.lv[1]));
       t+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
-      for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lv:lv},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
+      for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lv:lv,wade:!noWade&&types.some(x=>TYPES[x].grasp)},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
         const nm=types.find(x=>TYPES[x].named);if(nm)named[TYPES[nm].name]=(named[TYPES[nm].name]||'')+(r.win?'W':r.death?'D':'T')+Math.round(r.t)+'s ';
         log.push(types.join('+')+' '+(r.win?'win':'lose')+' '+Math.round(r.t)+'s rest '+Math.round(r.rest||0)+'s');
         if(r.win)break;deaths++;t+=PACE_DEATH}}
     const ex=A.exits.find(e=>e.name==='down');if(ex)t+=Math.hypot(ex.tx*T+8-px,ex.ty*T+8-py)*1.4/PSPEED}); // on to the stairs down
   return{min:t/60,deaths:deaths,named:named,log:log}}
 function runDungeon(opts){opts=opts||{};if(simState.busy||!BOTS[CLS])return null;const keep=simBegin(),L=opts.lvl||15,runs=[];
-  for(let i=0;i<(opts.seeds||2);i++)runs.push(dungeonPace(L,1+i));simEnd(keep);return{cls:CLS,name:C.name,lvl:L,runs:runs}}
+  for(let i=0;i<(opts.seeds||2);i++)runs.push(dungeonPace(L,1+i,opts.noWade));simEnd(keep);return{cls:CLS,name:C.name,lvl:L,runs:runs}}
 
 // Pace results for the DEV panel: level after the first lap, time to level 8, deaths, and when each named first fell.
 function paceSummary(res){

@@ -174,6 +174,7 @@ function tankMods(dmg){
 function playerDie(m){
   player.hp=0;player.dead=1;player.cast=null;player.tx=null;player.target=null;player.sit=false;
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
+  resetLocks(); // v0.71: a locked, flooded room (the Drowned Prior's) drains back and opens for the next try
   const loss=Math.min(player.xp,Math.floor(need(player.lvl)*0.1));player.xp-=loss;save();
   // The death panel (v0.37) shows these; you stay down until you tap Respawn.
   $('dkiller').textContent='Slain by '+m.def.name;$('dxp').textContent=loss>0?'−'+loss+' XP':'';

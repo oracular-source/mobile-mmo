@@ -208,7 +208,7 @@ function checkPortals(){
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(inst&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
-  if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);checkLocks(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     // The exit you just came out of wakes up 1 second after you arrive (owner, Nov 20; was "after walking 3 tiles away"):
     // you can run straight back in (to help a friend), but you can't flicker in and out. If you're already back on it when the
     // second is up, it takes you through then (you always arrive 2+ tiles off it, so arriving never counts as standing on it).
@@ -362,7 +362,7 @@ function updateHazards(dt){for(let i=hazards.length-1;i>=0;i--){const h=hazards[
 // The altar: walk up to it and the stone slab behind it grinds aside, opening the stairs down. Shut again on every visit.
 function checkSeals(A){A.seals.forEach(sl=>{if(sl.open||!sl.obj||sl.named)return;const o=sl.obj,tx=Math.floor(player.x/T),ty=Math.floor(player.y/T);
   const near=tx>=o.x-1&&tx<=o.x+o.w&&ty>=o.y-1&&ty<=o.y+o.h+1;
-  if(near&&!sl.near){sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;
+  if(near&&!sl.near){sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;pathReset(); // mobs can path through it now
     const cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+8;burst(cx,cy,'#8a8690',16,true);floatText(cx,cy-14,'The slab grinds aside','#f0c890',true);
     log('You lay a hand on the altar. Behind it, a stone slab grinds aside, and steps lead down into the sound of water.','#f0c890')}
   sl.near=near})}
@@ -400,7 +400,7 @@ function graspThink(m,dt){
   return false}
 // A seal that opens when a named dies (v0.66, Dungeon 1: the Drowned Prior's death drains the flood and uncovers the stairs down).
 function namedSeal(m){const A=curArea();if(!A)return;A.seals.forEach(sl=>{if(sl.open||!sl.named||sl.named.sp!==m.sp)return;
-  sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;
+  sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;pathReset();
   const drained=drainFlood(A),cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+12;burst(cx,cy,'#9fd8c0',18,true);floatText(cx,cy-16,'The way down','#f0c890',true);
   log(drained?cap(m.def.name)+' sinks, and the flood drains away through the cracks with a long gurgle. At the north wall, steps rise out of the silt.':'Behind you, stone grinds: a way down has opened.','#f0c890');
   banner('The flood drains','Steps lead down at the north wall','#9fd8c0')})}
@@ -408,6 +408,39 @@ function namedSeal(m){const A=curArea();if(!A)return;A.seals.forEach(sl=>{if(sl.
 function drainFlood(A){if(!A.slow||A.slow.indexOf(1)<0)return false;
   A.rows=A.rows.map(r=>r.replace(/z/g,'Z'));A.slow.fill(0);if(slowArea===A)slowArea=null;
   A.trees=[];A.world=paintArea(A);if(curArea()===A)world=A.world;return true}
+// Locked rooms (v0.71, owner Nov 21: "the door closes behind you, then water fills the whole room, so they have to walk slow
+// no matter what"). Step into the Drowned Prior's chamber while he's up: a portcullis slams down over the door behind you,
+// then the flood spreads out from the middle pool over every dry floor tile in about 3 s. No dry ground left, so the whole
+// fight is slow wading (him and his dead too), and his Grasp ripples still ask you to step off them. His death drains it all
+// and lifts the portcullis. If you die in there, the water sinks back and the door opens, so the next try starts the same.
+const RISE={dur:3,step:0.4}; // seconds for the water to reach the walls; how often the floor gets repainted while it rises
+const inRoom=(r,x,y)=>x>=r.x0&&x<=r.x1&&y>=r.y0&&y<=r.y1;
+function repaintArea(A){A.trees=[];A.world=paintArea(A);if(curArea()===A){world=A.world;slowArea=A.slow.indexOf(1)>=0?A:null}}
+function setDoor(A,L,v){for(let y=L.y0;y<=L.y1;y++)for(let x=L.x0;x<=L.x1;x++)A.map[y][x]=v;pathReset()} // 5 = shut, 0 = open
+function checkLocks(A){if(!A.locks)return;A.locks.forEach(L=>{if(L.done)return;
+  if(L.named&&L.named.sp.gone){if(L.shut)setDoor(A,L,0);L.shut=false;L.rise=null;L.done=true;L.openT=time; // he's dead: the drain already ran (namedSeal)
+    log('With a rattle of chains, the portcullis behind you rises.','#f0c890');return}
+  if(L.shut){if(L.rise)riseStep(A,L);return}
+  const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T);if(player.dead||!inRoom(L.room,tx,ty))return;
+  if(Math.abs(ty-L.y0)<2&&Math.abs(tx-(L.x0+L.x1)/2)<2.5)return; // a couple of steps in first, so the slam lands behind you, not on you
+  L.shut=true;L.closeT=time;setDoor(A,L,5);
+  // Every dry, open floor tile in the room floods, nearest the middle first (the pool spreads to the walls). Tiles under
+  // things that stand on the floor (braziers) stay dry: their stone footings stick up out of the water.
+  const r=L.room,cx=(r.x0+r.x1)/2,cy=(r.y0+r.y1)/2,list=[];
+  for(let y=r.y0;y<=r.y1;y++)for(let x=r.x0;x<=r.x1;x++)if(A.map[y][x]===0&&!A.slow[y*A.w+x]&&AREA_TILES[A.rows[y][x]].walk)list.push({x:x,y:y,d:Math.hypot((x-cx)/(r.x1-r.x0+1),(y-cy)/(r.y1-r.y0+1))});
+  const dmax=Math.max(0.01,...list.map(q=>q.d));list.forEach(q=>{q.at=RISE.dur*q.d/dmax});list.sort((a,b)=>a.at-b.at);
+  L.rise=list;L.risen=[];L.t0=time;L.painted=time;
+  // A pet left in the doorway or the hall comes in with you rather than ending up shut out.
+  [pet,pet2].forEach(p=>{if(p&&!inRoom(r,Math.floor(p.x/T),Math.floor(p.y/T))){p.x=player.x+(p===pet?-10:10);p.y=player.y+4;p.target=null}});
+  const dx=(L.x0+L.x1+1)*T/2,dy=L.y0*T+8;burst(dx,dy,'#8a8690',14,true);floatText(dx,dy-14,'SLAM','#f0c890',true);
+  log('A portcullis slams down behind you! Water wells up through the cracks in the floor.','#9fd8c0');banner('The door slams shut','The water is rising','#9fd8c0')})}
+function riseStep(A,L){const t=time-L.t0;if(time-L.painted<RISE.step&&L.rise.length&&L.rise[L.rise.length-1].at>t)return;
+  let n=0;while(L.rise.length&&L.rise[0].at<=t){const q=L.rise.shift();q.c=A.rows[q.y][q.x];A.rows[q.y]=A.rows[q.y].slice(0,q.x)+'z'+A.rows[q.y].slice(q.x+1);A.slow[q.y*A.w+q.x]=1;L.risen.push(q);n++}
+  L.painted=time;if(n)repaintArea(A);
+  if(!L.rise.length){L.rise=null;log('The water stops rising: knee-deep from wall to wall.','#9fd8c0')}}
+// You died in a locked room: the water sinks back to the middle pool and the portcullis lifts, ready for the next try.
+function resetLocks(){const A=curArea();if(!A||!A.locks)return;A.locks.forEach(L=>{if(!L.shut||L.done)return;
+  L.shut=false;L.rise=null;setDoor(A,L,0);(L.risen||[]).forEach(q=>{A.rows[q.y]=A.rows[q.y].slice(0,q.x)+q.c+A.rows[q.y].slice(q.x+1);A.slow[q.y*A.w+q.x]=0});L.risen=[];repaintArea(A)})}
 // The great ash wisp: every so often it flares and a ring of fire spreads round where it hangs; 1.6 s to get out of it
 // (or drag the fight away from it). Uses the same ground hazards as Ember Brand.
 const GBURN={first:4,every:8,dur:1.6,r:34,x:1.1};

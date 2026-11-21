@@ -97,7 +97,7 @@ obj candle 26 28
 # the floor's chest, in a little alcove off the west wall, one candle left burning by it
 chest 15 22
 obj candle 15 23
-# 3. FLOODED CHAMBER: the only water in the dungeon (slows a little all the time). MINI BOSS: the Drowned Prior with
+# 3. FLOODED CHAMBER: the only water in the dungeon (slows a little all the time); a pool in the middle until you're locked in. MINI BOSS: the Drowned Prior with
 # two drowned dead. His grip: ripples under you (about 1.5 s), step off or hands rise and slow you hard (light damage).
 # When he dies the flood drains and the steps down at the north wall come up out of the water.
 obj brazier 14 4
@@ -107,6 +107,10 @@ obj brazier 31 14
 named drowned_prior 15 22 9 group=prior
 spawn corpse 15 19 9 group=prior
 spawn skeleton 15 25 9 group=prior
+# LOCKED IN (v0.71, owner Nov 21): a couple of steps into the chamber while the Prior is up, a portcullis slams down over
+# the door behind you and the flood spreads from the middle pool to every wall in about 3 s: no dry ground, slow the whole
+# fight. His death drains it and lifts the portcullis; dying in there sinks the water back and opens the door.
+lockin 22 16 23 16 drowned_prior room=12,3,33,15
 # the steps down stay under water (sealed) until the Prior dies: seal ... <named> opens when that named dies (v0.66)
 seal 21 1 24 2 drowned_prior
 exit down 22 1 to=dungeon1_f2 at=up
