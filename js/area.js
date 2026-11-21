@@ -5,10 +5,10 @@ const AREA_TILES={},AREA_OBJS={};
 TILESET.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_TILES[p[0]]={name:p[1],walk:p[2]==='1',tags:p.slice(4)}});
 OBJECTS.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_OBJS[p[0]]={w:+p[1],h:+p[2],blocks:p[3]==='1',light:+p[7]}});
 // Map file mob names -> mob types in js/data/mobs.js. The Skeleton King uses Boss 1 until he has his own data.
-const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar',cult_zealot:'zealot',cult_ashcaller:'ashcaller',cult_chanter:'chanter',ash_wisp:'wisp',ashen_acolyte:'acolyte',cult_mender:'mender',cult_deacon:'deacon',drowned_prior:'prior',bellringer:'bellringer',malrec:'malrec'};
+const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar',cult_zealot:'zealot',cult_ashcaller:'ashcaller',cult_chanter:'chanter',ash_wisp:'wisp',ashen_acolyte:'acolyte',cult_mender:'mender',cult_deacon:'deacon',drowned_prior:'prior',bellringer:'bellringer',malrec:'malrec',great_wisp:'gwisp',cult_summoner:'summoner'};
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).
-const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel',d1:'dungeon1'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel',dungeon1:'d1'};
+const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel',d1:'dungeon1',d2:'dungeon1_f2'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel',dungeon1:'d1',dungeon1_f2:'d2'};
 // Each map's light: how bright the dark is (amb) and the colour of the night over it. Shared by render.js and the minimap.
 const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee'},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a'},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'},
   // Ruined Chapel (v0.62, Vesper embers): cold blue-grey dusk; the warmth comes from its candles, censers and embers.
@@ -22,7 +22,7 @@ function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>
 function buildArea(id){
   if(AREAS[id])return AREAS[id];
   const M=MAPS[id],rows=M.tiles,w=rows[0].length,h=rows.length;
-  const A={id:id,name:M.name,w:w,h:h,rows:rows,map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||'',instance:!!M.instance,seals:[]};
+  const A={id:id,name:M.name,w:w,h:h,rows:rows.slice(),map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||'',instance:!!M.instance,seals:[]};
   M.things.split('\n').forEach(line=>{const p=line.split('#')[0].trim().split(/\s+/);if(!p[0])return;
     const k=p[0],px=x=>x*T+8,py=y=>y*T+10;
     if(k==='obj')A.objs.push(Object.assign({kind:p[1],x:+p[2],y:+p[3]},AREA_OBJS[p[1]]));
@@ -48,7 +48,8 @@ function buildArea(id){
     // Once opened it stays open for every character (saved under ashfen-gates).
     else if(k==='bar')(A.bars=A.bars||[]).push({tx:+p[1],ty:+p[2],id:p[3],from:p[4]||'W'});
     // A seal (v0.63, Dungeon 1's stairs): tiles x0..x1, y0..y1 shut by a stone slab until you walk up to the object named.
-    // In an instance it shuts again on every visit.
+    // v0.66: or, if the last word names a named on this map (drowned_prior), until that named dies (world.js openSeal).
+    // In an instance it shuts again on every fresh run.
     else if(k==='seal')A.seals.push({x0:+p[1],y0:+p[2],x1:+p[3],y1:+p[4],by:p[5],open:false});
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2]),tx:+p[1],ty:+p[2],open:false,at:0});
@@ -66,7 +67,7 @@ function buildArea(id){
   // Wading water (v0.64, owner: the crossroads creek): wade: 1 on a map lets you walk into its water, slowed like the flood
   // in Dungeon 1, a little taste of what's to come. Mobs wade too. Drawn the same; you sink to your knees (render.js).
   if(M.wade)for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(rows[y][x]==='~'){A.map[y][x]=0;A.slow[y*w+x]=1}
-  A.seals.forEach(sl=>{sl.obj=A.objs.find(o=>o.kind===sl.by)||null});sealArea(A);
+  A.seals.forEach(sl=>{sl.obj=A.objs.find(o=>o.kind===sl.by)||null;sl.named=A.named.find(n=>n.name===sl.by)||null});sealArea(A);
   (A.bars||[]).forEach(b=>{b.open=!!store.get('ashfen-gates',{})[b.id];if(!b.open)A.map[b.ty][b.tx]=5});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
@@ -162,6 +163,8 @@ const AP={out:'#0b0a0f',dg:['#29281f','#2b2a20','#2f2d22','#33301f'],dgTuft:'#3a
   cloth:'#3a2a30',clothDk:'#281c22',sigil:'#aa2822',
   // Dungeon 1 (v0.63): knee-deep flood water over the crypt floor, dark pew wood, red cult cloth, stained glass, ember pits.
   flood:['#18252d','#1b2a33','#172229','#1e2e38'],floodHi:'#33505c',floodDk:'#0f181e',
+  // v0.66: where the Drowned Prior's flood drained away: dark wet stone, silt, puddles left in the hollows, drowned weed.
+  drained:['#262a30','#2a2f36','#23272c','#2e333a'],silt:'#3a3a34',weed:'#2e4436',weedHi:'#46604a',
   pew:'#4a3424',pewHi:'#6a4c34',pewDk:'#2e2016',red:'#7a1c1c',redHi:'#a8302a',redDk:'#4a1012',
   glassR:'#b0302a',glassB:'#3a5aa8',glassG:'#e0b040',glassV:'#5a8a4a',lead:'#14121a',
   pit:'#1a0f0c',coal:'#5a2414',emb:'#ff8a3c',embHi:'#ffd27a',clay:'#7a4a32',clayHi:'#9a6a48',clayDk:'#4a2c1e'};
@@ -338,6 +341,7 @@ function paintArea(A){
         if(ah(tx+k,ty,140)<0.4)R(hx+1+(k%2),hy,1,1,AP.herbFl)}R(bx,by+13,16,1,AP.dirt)}
       // Dungeon 1 (v0.63): flood water (ripples, a floating leaf of rot, the odd bone just under the surface) and stone steps.
       else if(gname==='flood'){if(i<2)R(x,y,4,1,AP.floodHi);else if(i===2)R(x+1,y+1,3,1,AP.floodDk);else if(i===3&&r1<0.12){R(x,y,3,1,AP.boneDk);R(x,y-1,1,1,AP.boneDk);R(x+2,y+1,1,1,AP.boneDk)}else if(i===4&&r1<0.25)R(x,y,1,1,AP.glint)}
+      else if(gname==='drained'){if(i===0&&r1<0.45){R(x-2,y,6,2,AP.flood[1]);R(x-1,y,3,1,AP.floodHi)}else if(i===1)R(x,y,3,1,AP.silt);else if(i===2&&r1<0.5){R(x,y,1,3,AP.weed);R(x+1,y+1,1,2,AP.weed);R(x,y,1,1,AP.weedHi)}else if(i===3&&r1<0.15){R(x,y,3,1,AP.boneDk);R(x+2,y+1,1,1,AP.boneDk)}else if(i===4&&r1<0.3)R(x,y,1,1,AP.glint)}
       else if(gname==='steps'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,4,k%2?'#3e3a46':'#4a4652');R(bx,by+k*4,16,1,'#6a6672');R(bx,by+k*4+3,16,1,'#26232e')}}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }

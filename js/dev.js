@@ -22,9 +22,9 @@ function devAct(a){
   else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='wolf'){enterZone('wolf');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='chapel'){enterZone('chapel');if(pet){pet.x=player.x;pet.y=player.y}}
-  // Dungeon 1 (v0.63): the nave, or straight to the Drowned Prior, the Bellringer or Brother Malrec (stairs opened for you).
-  else if(a==='d1'||a==='prior'||a==='bell'||a==='malrec'){enterZone('d1');const A=curArea(),to={prior:[12,23],bell:[52,36],malrec:[48,8]}[a];
-    if(to){A.seals.forEach(sl=>{sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0});player.x=to[0]*T+8;player.y=to[1]*T+8}if(pet){pet.x=player.x;pet.y=player.y}}
+  // Dungeon 1 (v0.66, two floors): floor 1's catacomb, the Drowned Prior's pool, or floor 2 for the Bellringer or Brother Malrec.
+  else if(a==='d1'||a==='prior'||a==='bell'||a==='malrec'){const f2=a==='bell'||a==='malrec';enterZone(f2?'d2':'d1');if(f2)run.home='dungeon1'; // the way out still leads to the chapel
+    const to={prior:[22,14],malrec:[16,11]}[a];if(to){player.x=to[0]*T+8;player.y=to[1]*T+8}if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='den'){if(zoneId!=='tunnel')enterZone('tunnel');player.x=26*T+8;player.y=29*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='bossroom'){if(zoneId!=='dun')enterZone('dun');player.x=8*T+8;player.y=8*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='rarespawn'){const A=curArea();if(!A||!A.rare){log('Dev: this area has no rare.','#ff8a80')}else{const m=spawnRare(A),p=areaSpot(A,{tx:A.rare.x,ty:A.rare.y+3})||areaSpot(A,{tx:A.rare.x,ty:A.rare.y});if(p){player.x=p.x;player.y=p.y}log('Dev: '+m.def.name+' is up. You are next to its spot.','#ff8a80')}}

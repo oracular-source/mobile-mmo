@@ -24,9 +24,9 @@ function mmPins(id){
   if(id==='dun')return[{x:3,y:30,name:'Way out',k:'exit'},{x:6,y:4,name:'Boss 1',k:'boss'}];
   // Areas from map files: every exit gets a pin (named by the exit, or by where it leads), plus the campfire and each named's spot.
   if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);
-    const EX={stairs_up:'Stairs up',back_tunnel:'Back tunnel (Wolfwood)',crypt_tunnel:'Crypt tunnel',sinkhole:'Sinkhole (rat tunnel)',burrow:'Back hole (rat tunnel)',mouth:'Climb out (crossroads)',back_hole:'Back hole (crossroads)'};
+    const EX={stairs_up:'Stairs up',back_tunnel:'Back tunnel (Wolfwood)',crypt_tunnel:'Crypt tunnel',sinkhole:'Sinkhole (rat tunnel)',burrow:'Back hole (rat tunnel)',mouth:'Climb out (crossroads)',back_hole:'Back hole (crossroads)',down:'Stairs down (floor 2)',up:'Stairs up (floor 1)',out:'Stairs up (chapel)'}; // Dungeon 1's ways (v0.66)
     const TO={crossroads:'Crossroads',graveyard:'Sunken Graveyard',crypt:'Crypt',rat_tunnel:'Rat tunnel',wolfwood:'Wolfwood',wolfwood_edge:'Wolfwood',chapel:'Ruined Chapel',dungeon1:'Chapel door (Dungeon 1)',town1:'Town 1 (not built yet)'};
-    const NAMED={skeleton_king:'Skeleton King',old_gnawbone:'Old Gnawbone',greyfang:"Greyfang's den"};
+    const NAMED={skeleton_king:'Skeleton King',old_gnawbone:'Old Gnawbone',greyfang:"Greyfang's den",drowned_prior:'Drowned Prior',bellringer:'Bellringer',malrec:'Brother Malrec'};
     return A.exits.map(e=>({x:e.tx,y:e.ty,name:e.name==='east_path'?(e.to==='chapel'?'East path (Ruined Chapel)':'East path (crossroads)'):EX[e.name]||TO[e.to]||e.to,k:(e.to==='crypt'||e.to==='rat_tunnel'||e.to==='dungeon1')?'dun':'exit'}))
       .concat(A.objs.filter(o=>o.kind==='shrine').map(o=>({x:o.x,y:o.y,name:'Wayside shrine (rest)',k:'camp'})))
       .concat(A.objs.filter(o=>o.kind==='campfire').map(o=>({x:o.x,y:o.y,name:'Campfire',k:'camp'})))
@@ -73,7 +73,10 @@ function mmZone(id){
     pal:{grass:hex('grass'),tree:hex('tree'),water:hex('water'),path:hex('path'),wall:hex('wall'),rock:hex('rock'),door:hex('door')},
     m:m,mg:m.getContext('2d'),ground:{},comp:null,compDirty:true,seen:new Uint8Array(w*h),count:0,pins:mmPins(id)};
   // Load the saved bits.
-  const hx=mmSaved[id]||'';
+  // A dungeon's maps get rebuilt (v0.66: Dungeon 1 went from one big floor to two), so its explored bits are kept per map
+  // size: an old mask never lands on a new map. Outdoor areas keep their plain key.
+  Z.key=AREA_OF[id]&&MAPS[AREA_OF[id]].instance?id+'@'+w+'x'+h:id;
+  const hx=mmSaved[Z.key]||'';
   for(let i=0;i<hx.length;i++){const v=parseInt(hx[i],16)||0;for(let j=0;j<4;j++)if(v&(8>>j)){const k=i*4+j;if(k<w*h)mmMark(Z,k)}}
   Z.pins.forEach(p=>p.found=!!Z.seen[p.y*w+p.x]);
   MM.z[id]=Z;return Z;
@@ -112,7 +115,7 @@ function mmPicture(Z,s,into){
 }
 function mmSave(){
   const out={};for(const id in mmSaved)out[id]=mmSaved[id];
-  for(const id in MM.z){const Z=MM.z[id];let s='';for(let i=0;i<Z.w*Z.h;i+=4){let v=0;for(let j=0;j<4;j++)if(Z.seen[i+j])v|=8>>j;s+=v.toString(16)}out[id]=s.replace(/0+$/,'')}
+  for(const id in MM.z){const Z=MM.z[id];let s='';for(let i=0;i<Z.w*Z.h;i+=4){let v=0;for(let j=0;j<4;j++)if(Z.seen[i+j])v|=8>>j;s+=v.toString(16)}out[Z.key||id]=s.replace(/0+$/,'')}
   store.set(KEY('explored'),out);MM.dirty=false;
 }
 

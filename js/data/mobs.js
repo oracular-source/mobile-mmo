@@ -59,6 +59,12 @@ const TYPES={
   malrec:{name:'Brother Malrec',img:'malrec',lv:[15,15],hp:240,hpl:60,dmg:4.2,dmgl:1.6,spd:26,aggro:70,armor:0.1,named:1,end:1,wake:1,zone:'Dungeon 1',
     heal:{name:'Rite of Mending',first:5,every:10,dur:2,x:0.25,below:0.5,col:'#ffd27a',boss:1},
     cast:{name:'Ash Bolt',first:6,every:9,dur:2,range:110,boss:1,col:'#ff9a4a'}},
+  // Dungeon 1 rebuild (v0.66). gwisp = a great ash wisp: hovers with its pack (camp) and joins the pull; burn = every so often
+  // it flares and a ring of fire spreads round where it hangs (1.6 s to get out of the ring). It doesn't die with whoever
+  // summoned it (owner, Nov 21). summoner = the cultist who lit it: a caster like the ashcaller.
+  gwisp:{name:'a great ash wisp',img:'gwisp',lv:[14,15],hp:70,hpl:26,dmg:3.2,dmgl:1.4,spd:24,aggro:52,armor:0,float:1,camp:1,burn:1},
+  summoner:{name:'a cult summoner',img:'summoner',lv:[14,15],hp:46,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
+    cast:{name:'Cinder Lash',first:2,every:5,dur:1.2,range:90,x:1.5,col:'#ffb060'}},
   cwisp:{name:'a candle wisp',img:'cwisp',lv:[15,15],hp:30,hpl:6,dmg:0,dmgl:0,spd:11,aggro:0,armor:0,float:1,drift:1,noxp:1},
   boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };

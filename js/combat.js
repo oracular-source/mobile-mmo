@@ -82,6 +82,7 @@ const need=L=>NEED[L]||NEED[NEED.length-1];
 function killMob(m){
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
+  if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
   burst(m.x,m.y-6,'#cfc8b2',10,false);
   log('You have slain '+m.def.name+'!','#ffd27a');
   forkOnDeath(m);

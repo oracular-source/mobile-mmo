@@ -1,7 +1,7 @@
 // Dungeon 1, floor 2: Brother Malrec's monastery, level 15. DRAFT 3 (owner, Nov 21). North is deeper.
 // bell foundry (the Bellringer and two cultists; owner, Nov 21: Bellringer, wisp, Malrec) -> wisp room (old ritual hall round the ember pit: two packs, each a summoner
 // with its big wisp already out; a wisp outlives its summoner) -> Malrec's sanctum (Malrec + two deacons, as built).
-// NOT LOADED BY THE GAME YET (draft for the owner). Format: docs/map-format.md
+// Built in v0.66. Format: docs/map-format.md
 'use strict';
 MAPS.dungeon1_f2 = {
   name: 'Dungeon 1', zone: [27, -60], tint: 'vault', start: 'up', rules: '', instance: 1, wake: 'You wake at the foot of the stairs, under the flooded chamber.',
@@ -57,7 +57,7 @@ MAPS.dungeon1_f2 = {
 # 4. BELL FOUNDRY (named, 15): the cult's brute swinging the broken clapper, a half-cast bell in its mould, two
 # cultists with him (one pull). Toll: 1.5 s wind-up, then a ring that stuns anyone in reach for 2 s: step back.
 # He stands at the far end, so you get a breather off the stairs. His chest won't open while he stands.
-exit up 16 42 to=dungeon1_f1 at=down lit
+exit up 16 42 to=dungeon1 at=down lit
 obj brazier 13 38
 obj brazier 20 38
 obj bell_mold 10 34

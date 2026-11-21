@@ -51,6 +51,7 @@ N    bone_niche   0   #2a2630 wall
 V    steps        1   #4a4652 path floor ground
 K    ember_pit    0   #5a2414 pit
 L    palisade     0   #5a4030 border wall
+Z    drained      1   #2a2f36 floor ground
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).

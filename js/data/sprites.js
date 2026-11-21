@@ -152,7 +152,9 @@ const ROBED={zealot:{w:14,h:19,robe:'#5a2a24',eye:'#ff4a30',item:'sickle'},ashca
   // ember eyes and a tall censer-staff.
   mender:{w:14,h:19,robe:'#5a6a52',eye:'#ff4a30',item:'book'},deacon:{w:15,h:20,robe:'#4a1c1e',eye:'#ff4a30',item:'mace'},
   prior:{w:20,h:23,robe:'#3e4a44',eye:'#d8f0e8',item:'lantern'},bellringer:{w:22,h:25,robe:'#4a3a2c',eye:'#ff6a30',item:'maul'},
-  malrec:{w:18,h:23,robe:'#2a1a1e',eye:'#ffb060',item:'staff'}};
+  malrec:{w:18,h:23,robe:'#2a1a1e',eye:'#ffb060',item:'staff'},
+  // v0.66 (placeholder): the cult summoner in ember-orange, holding up the coal its great wisp was lit from.
+  summoner:{w:14,h:19,robe:'#6a3a1c',eye:'#ffb060',item:'ember'}};
 // Ash wisp: a floating candle flame with a smoky tail (9 x 15), two frames that flicker.
 const WISP_SPR=[["....k....","...kyk...","...kyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","...ss....","....s....","...s....."],
   ["...k.....","...kyk...","..kyyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","....ss...","...s.....","....s...."]];
@@ -181,6 +183,11 @@ const UNDEAD_PAL={
   corpse:{"k": "#0b0a0f", "h": "#1c1418", "S": "#9cae86", "s": "#748a62", "d": "#4f6243", "e": "#ffd23a", "c": "#857a60", "C": "#a39478", "q": "#5a4e3c", "x": "#d8cfb8", "m": "#6a1c1c", "t": "#3e3a48", "T": "#2a2732", "W": "#d8cfb8"},
   king:{"k": "#0b0a0f", "h": "#1c1418", "W": "#e4dccb", "w": "#bdb39c", "b": "#857b69", "e": "#9a6aff", "E": "#e8d8ff", "Y": "#f0d070", "y": "#c9a227", "o": "#7a5a1a", "R": "#d0283a", "F": "#ece6dc", "f": "#1c1418", "q": "#2a1a44", "p": "#3d2a63", "Q": "#5a3f8a", "g": "#9a9ca4", "G": "#c4c6cc", "l": "#6a6c74", "a": "#5a3a24"},
   malrec:{"k": "#0b0a0f", "h": "#0e0a0c", "B": "#2a1d22", "b": "#160e12", "R": "#8a1e24", "r": "#5a1418", "Y": "#f0d070", "y": "#c9a227", "o": "#7a5a1a", "e": "#ffb060", "E": "#fff0c0", "s": "#5a3a24", "c": "#6a6470", "f": "#ff8a3c", "F": "#ffd070", "m": "#6a6670", "w": "#cfc0b0", "v": "#8a7a70", "g": "#9a948c", "G": "#6a645e"}};
+// Great ash wisp (v0.66, Dungeon 1; placeholder): a bigger flame (13 x 21) with licks of fire at its sides, two dark eyes in
+// the white-hot core and a heavier smoke tail. Same colours as the ash wisp, so it reads as its big cousin. Two frames.
+const GWISP_SPR=[["......k......",".....kyk.....","..k..kyk..k..",".kyk.kYk.kyk.",".kyk.kYk.kyk.",".kyykyYykyyk.","..kyyYWYyyk..",".kyyYWWWYyyk.","kyyYWWWWWYyyk","kyYWWEWEWWYyk","kyYWWWWWWWYyk","kyYWWWWWWWYyk","kyyYWWWWWYyyk",".kyyYWWWYyyk.",".kyyyYYYyyyk.","..kyyyyyyyk..","...kkkkkkk...","....ss.ss....",".....sss.....","......s......",".....s......."],
+  ["......k......","......kyk....",".k...kyk...k.","kyk..kYk..kyk","kyk..kYk..kyk",".kyykyYykyyk.","..kyyYWYyyk..",".kyyYWWWYyyk.","kyyYWWWWWYyyk","kyYWWEWEWWYyk","kyYWWWWWWWYyk","kyYWWWWWWWYyk","kyyYWWWWWYyyk",".kyyYWWWYyyk.",".kyyyYYYyyyk.","..kyyyyyyyk..","...kkkkkkk...","...ss..ss....","....sss......",".......s.....","......s......"]];
+const GWISP_PAL=Object.assign({},WISP_PAL,{E:'#3a1a10'});
 const RAGS={
   druid:{"body":"rag","w":["leafstick"],"c":{"H":"#686d56","n":"#535a44","N":"#3e4734","d":"#303a28","h":"#6e4a2a"}},
   warrior:{"body":"tunic","w":["sword","shield"],"c":{"H":"#805853","n":"#6b4542","N":"#563231","d":"#482526","h":"#6e4a2a","R":"#8f2630"}},

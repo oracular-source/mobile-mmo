@@ -112,7 +112,8 @@ function finishRun(){
   const loot=run.loot;
   const A=curArea();
   // Dungeon 1 (v0.63): the way out of Malrec's sanctum takes you back to the chapel door.
-  if(A&&A.instance)prompt(A.name+' complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Back to the chapel grounds',()=>{const ex=A.exits.find(e=>e.name===MAPS[A.id].start)||A.exits[0];enterZone(ZONE_OF[ex.to],A.id,ex.at)});
+  // v0.66: from floor 2 too: back out the way you came into floor 1 (run.home), not up the stairs to floor 1.
+  if(A&&A.instance)prompt(A.name+' complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Back to the chapel grounds',()=>{const H=AREAS[run.home]||A,ex=H.exits.find(e=>e.name===MAPS[H.id].start)||H.exits[0];enterZone(ZONE_OF[ex.to],H.id,ex.at)});
   else prompt('Dungeon 1 complete','Time '+mm+':'+ss+' · '+run.kills+' kills · '+run.xp+' XP. Gear found: '+(loot.length?loot.join(', '):'none this run')+'.','Return to the graveyard',()=>enterZone('gy'));
 }
 // Never pause (v0.56): the prompt is a strip under the cast bar and the world keeps running. It remembers where you
@@ -138,13 +139,17 @@ function areaSpot(A,ex,dir){
 // from: the map key of the area you came from, so you arrive at the matching exit (up the crypt stairs -> crypt mouth).
 function enterZone(id,from,at){
   if(MM.dirty&&!simState.busy)mmSave(); // keep what you explored in the area you're leaving
+  // A fresh dungeon run (v0.66): walking into an instance from outside it rebuilds every floor (flood back, seals shut,
+  // chests full, every mob up). Going between its floors (down the Prior's stairs, back up) keeps the same run.
+  const tgt=AREA_OF[id],fresh=!!(tgt&&MAPS[tgt].instance&&!(from&&MAPS[from]&&MAPS[from].instance));
+  if(fresh)Object.keys(MAPS).forEach(k=>{if(MAPS[k].instance)delete AREAS[k]});
   zoneId=id;const A=curArea();
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
   else if(id==='arena'){map=ARENA.map;MW=ARENA.w;MH=ARENA.h;world=ARENA.world;spawns=[];}
   else if(A){map=A.map;MW=A.w;MH=A.h;world=A.world;spawns=A.spawns;}
   else{map=overMap;MW=40;MH=30;world=overWorld;spawns=overSpawns;}
   WW=MW*T;WH=MH*T;
-  mobs.length=0;spawns.forEach(sp=>{sp.mob=null;sp.timer=0;spawn(sp)});
+  mobs.length=0;spawns.forEach(sp=>{sp.mob=null;if(sp.gone){sp.timer=Infinity;return}sp.timer=0;spawn(sp)}); // gone = killed earlier this dungeon run
   if(A&&A.rare){A.rare.sp.mob=null;if(A.rare.sp.up)spawn(A.rare.sp)} // a rare still out there waits for you (no reroll by walking in and out)
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
   if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
@@ -158,9 +163,9 @@ function enterZone(id,from,at){
   slowArea=A&&A.slow&&A.slow.indexOf(1)>=0?A:null; // flood water slows wading (fx.js moveToward)
   // An instance (v0.63, Dungeon 1): a fresh run every time you walk in. The stairs are sealed again, its chests are full,
   // and the run clock and tally start (shown on the way out).
-  if(A&&A.instance){sealArea(A);A.chests.forEach(ch=>{ch.open=false;ch.near=false});A.seals.forEach(sl=>sl.near=false);
-    run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.atPortal=false;run.wakes=0}
-  player.held=0;player.stunT=0;
+  // v0.66: only a fresh run resets (the floors were just rebuilt above); run.home = the floor you came in by.
+  if(A&&A.instance&&fresh){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.atPortal=false;run.wakes=0;run.home=A.id}
+  player.held=0;player.stunT=0;player.mireT=0;
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null;}
@@ -351,11 +356,11 @@ function brandThink(m,dt){if(m.casting)return;m.brandCd=(m.brandCd===undefined?B
 function updateHazards(dt){for(let i=hazards.length-1;i>=0;i--){const h=hazards[i];h.t+=dt;if(h.t<h.dur)continue;hazards.splice(i,1);
   for(let k=0;k<14;k++)parts.push({x:h.x+rr(-h.r,h.r),y:h.y+rr(-h.r*0.6,h.r*0.6),vx:rr(-6,6),vy:-rr(14,30),t:0,life:0.7,col:k%2?'#ff8a3c':'#ffd27a'});
   if(player.dead||!h.m||h.m.dead)continue;
-  if(Math.hypot((player.x-h.x)/h.r,(player.y-h.y)/(h.r*0.6))<=1)mobSpellHit(h.m,(8+2*h.m.lv)*BRAND.x,'Ember Brand','#ff8a3c');else log('The embers flare where you stood.','#9aa')}}
+  if(Math.hypot((player.x-h.x)/h.r,(player.y-h.y)/(h.r*0.6))<=1)mobSpellHit(h.m,(8+2*h.m.lv)*(h.mult||BRAND.x),h.label||'Ember Brand','#ff8a3c');else log('The embers flare where you stood.','#9aa')}}
 
 /* ---------- Dungeon 1 (v0.63): the altar switch, menders, Grasp of the Deep, Toll, Candle Wake ---------- */
 // The altar: walk up to it and the stone slab behind it grinds aside, opening the stairs down. Shut again on every visit.
-function checkSeals(A){A.seals.forEach(sl=>{if(sl.open||!sl.obj)return;const o=sl.obj,tx=Math.floor(player.x/T),ty=Math.floor(player.y/T);
+function checkSeals(A){A.seals.forEach(sl=>{if(sl.open||!sl.obj||sl.named)return;const o=sl.obj,tx=Math.floor(player.x/T),ty=Math.floor(player.y/T);
   const near=tx>=o.x-1&&tx<=o.x+o.w&&ty>=o.y-1&&ty<=o.y+o.h+1;
   if(near&&!sl.near){sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;
     const cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+8;burst(cx,cy,'#8a8690',16,true);floatText(cx,cy-14,'The slab grinds aside','#f0c890',true);
@@ -376,22 +381,39 @@ function healThink(m,dt){const h=m.def.heal;
   m.casting={name:h.name,t:0,dur:h.dur,heal:1,who:hurt,boss:h.boss};floatText(m.x,m.y-26,h.name+'!',h.col);
   log(cap(m.def.name)+' begins casting '+h.name+' on '+hurt.def.name+'! Stun or fear it to stop the heal.',h.col);return true}
 // Player crowd control from mobs: held = can't move (you can still cast); stunT = can't move or act.
-// Grasp of the Deep (the Drowned Prior): a 2 s boss cast, then pale hands rise from the flood water: anyone standing in water
-// is held for 4 s and hurt. Counter: stand on one of the dry stone plinths when it lands.
-const GRASP={first:6,every:14,dur:2,hold:4,x:1.3},TOLL={first:4,every:10,dur:1.5,r:30,stun:2,x:1.2};
+// Grasp of the Deep (the Drowned Prior; reworked v0.66, owner Nov 21: "slow you down hard", not a hold): ripples spread on
+// a spot under you (a boss bar mid-screen, 1.5 s), then pale hands rise there: still on the spot = slowed hard for a few
+// seconds and a light hit. Forgiving on purpose: it teaches "watch the water" before Malrec asks more. Stun or fear stops it.
+const GRASP={first:5,every:9,dur:1.5,r:15,slow:3.5,x:0.6},MIRE_SLOW=0.35,TOLL={first:4,every:10,dur:1.5,r:30,stun:2,x:1.2};
 const inWater=e=>{const A=slowArea;if(!A)return false;const x=Math.floor(e.x/T),y=Math.floor(e.y/T);return x>=0&&y>=0&&x<A.w&&y<A.h&&!!A.slow[y*A.w+x]};
 function graspThink(m,dt){
-  if(m.casting&&m.casting.grasp){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.graspCd=GRASP.every;
-    const A=slowArea;if(A){for(let k=0;k<40;k++){const x=m.hx+rr(-110,110),y=m.hy+rr(-70,70),tx=Math.floor(x/T),ty=Math.floor(y/T);if(tx>=0&&ty>=0&&tx<A.w&&ty<A.h&&A.slow[ty*A.w+tx])hands.push({x:x,y:y,t:0,life:1.4})}}
-    if(inWater(player)){player.held=GRASP.hold;hands.push({x:player.x,y:player.y,t:0,life:GRASP.hold,on:1});floatText(player.x,player.y-28,'HELD','#9fd8c0',true);
-      log('Pale hands rise from the water and seize you!','#9fd8c0');mobSpellHit(m,(8+2*m.lv)*GRASP.x,'Grasp of the Deep','#9fd8c0')}
-    else log('Pale hands rise from the water and grasp at nothing. You were on dry stone.','#9fb8e0');
+  if(m.casting&&m.casting.grasp){const c=m.casting;c.t+=dt;if(c.t<c.dur)return true;m.casting=null;m.graspCd=GRASP.every;
+    for(let k=0;k<5;k++){const an=k*1.257+rr(-0.3,0.3);hands.push({x:c.spot.x+Math.cos(an)*GRASP.r*0.7,y:c.spot.y+Math.sin(an)*GRASP.r*0.42,t:0,life:1.4})}
+    if(Math.hypot((player.x-c.spot.x)/GRASP.r,(player.y-c.spot.y)/(GRASP.r*0.6))<=1){player.mireT=GRASP.slow;hands.push({x:player.x,y:player.y,t:0,life:GRASP.slow,on:1});
+      floatText(player.x,player.y-28,'SLOWED','#9fd8c0',true);log('Pale hands rise out of the water and drag at your legs!','#9fd8c0');mobSpellHit(m,(8+2*m.lv)*GRASP.x,'Grasp of the Deep','#9fd8c0')}
+    else log('Pale hands rise where you stood and close on nothing.','#9fb8e0');
     return false}
   if(m.casting)return false;
   m.graspCd=(m.graspCd===undefined?GRASP.first:m.graspCd)-dt;
-  if(m.graspCd<=0&&dist(m,player)<160){m.casting={name:'Grasp of the Deep',t:0,dur:GRASP.dur,grasp:1,boss:1};floatText(m.x,m.y-34,'Grasp of the Deep!','#9fd8c0');
-    log(cap(m.def.name)+' begins casting Grasp of the Deep! Get out of the water, onto dry stone.','#9fd8c0');return true}
+  if(m.graspCd<=0&&dist(m,player)<160){m.casting={name:'Grasp of the Deep',t:0,dur:GRASP.dur,grasp:1,boss:1,spot:{x:player.x,y:player.y}};floatText(m.x,m.y-34,'Grasp of the Deep!','#9fd8c0');
+    log('The water ripples under you! Step off the ripples.','#9fd8c0');return true}
   return false}
+// A seal that opens when a named dies (v0.66, Dungeon 1: the Drowned Prior's death drains the flood and uncovers the stairs down).
+function namedSeal(m){const A=curArea();if(!A)return;A.seals.forEach(sl=>{if(sl.open||!sl.named||sl.named.sp!==m.sp)return;
+  sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;
+  const drained=drainFlood(A),cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+12;burst(cx,cy,'#9fd8c0',18,true);floatText(cx,cy-16,'The way down','#f0c890',true);
+  log(drained?cap(m.def.name)+' sinks, and the flood drains away through the cracks with a long gurgle. At the north wall, steps rise out of the silt.':'Behind you, stone grinds: a way down has opened.','#f0c890');
+  banner('The flood drains','Steps lead down at the north wall','#9fd8c0')})}
+// The flood goes: its water becomes wet stone (tile Z), nothing wades any more, and the floor is painted again.
+function drainFlood(A){if(!A.slow||A.slow.indexOf(1)<0)return false;
+  A.rows=A.rows.map(r=>r.replace(/z/g,'Z'));A.slow.fill(0);if(slowArea===A)slowArea=null;
+  A.trees=[];A.world=paintArea(A);if(curArea()===A)world=A.world;return true}
+// The great ash wisp: every so often it flares and a ring of fire spreads round where it hangs; 1.6 s to get out of it
+// (or drag the fight away from it). Uses the same ground hazards as Ember Brand.
+const GBURN={first:4,every:8,dur:1.6,r:34,x:1.1};
+function burnThink(m,dt){if(m.casting)return;m.burnCd=(m.burnCd===undefined?GBURN.first:m.burnCd)-dt;if(m.burnCd>0||dist(m,player)>GBURN.r+30)return;m.burnCd=GBURN.every;
+  hazards.push({x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'});floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
+  log(cap(m.def.name)+' flares up! Get out of the ring of fire.','#ff8a3c')}
 // Toll (the Bellringer): he heaves the bell's clapper up for 1.5 s (a bar over his head), then slams it down: a ring of sound
 // stuns anyone within reach for 2 s. Counter: step back out of the ring (or stun him first).
 function tollThink(m,dt){
@@ -452,7 +474,7 @@ function rareCall(m,dt,spd){
 function checkChests(A){A.chests.forEach(ch=>{
   if(ch.open&&!A.instance&&time-ch.at>=CHEST_REFILL)ch.open=false;
   const near=Math.hypot(player.x-ch.x,player.y-ch.y)<14;
-  const guard=near&&!ch.near&&!ch.open?A.named.map(n=>n.sp.mob).find(m=>m&&!m.dead&&Math.hypot(m.hx-ch.x,m.hy-ch.y)<5*T):null;
+  const guard=near&&!ch.near&&!ch.open?A.named.map(n=>n.sp.mob).find(m=>m&&!m.dead&&Math.hypot(m.hx-ch.x,m.hy-ch.y)<6*T):null;
   if(guard){log('The chest won\'t open while '+guard.def.name+' stands guard over it.','#c8b89a');ch.near=near;return}
   if(near&&!ch.near){if(ch.open&&A.instance)log('You already emptied this chest on this run.','#9aa');else if(ch.open){const mins=Math.max(1,Math.ceil((CHEST_REFILL-(time-ch.at))/60));log('The chest is empty. It looks like someone refills it now and then (about '+mins+' min).','#9aa')}else openChest(A,ch)}
   ch.near=near})}

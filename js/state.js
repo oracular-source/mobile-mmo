@@ -12,7 +12,7 @@ const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],[
 const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)}; // personal loot: only gear your class can use drops for you
 const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
 const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0),MALREC=pool('named').filter(id=>id.indexOf('mal')===0);
-const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',trat:'whisker',brat:'whisker',cskel:'bone',boss1:'bone',ironshell:'shell',palerat:'whisker',bride:'bone',wolf:'pelt',greyfang:'pelt',oldscar:'pelt',boar:'tusk',zealot:'cultrag',ashcaller:'cultrag',chanter:'cultrag',acolyte:'cultrag',wisp:'ember',mender:'dcultjunk',deacon:'dcultjunk',malrec:'dcultjunk',prior:'bone',bellringer:'cultrag'};
+const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',trat:'whisker',brat:'whisker',cskel:'bone',boss1:'bone',ironshell:'shell',palerat:'whisker',bride:'bone',wolf:'pelt',greyfang:'pelt',oldscar:'pelt',boar:'tusk',zealot:'cultrag',ashcaller:'cultrag',chanter:'cultrag',acolyte:'cultrag',wisp:'ember',mender:'dcultjunk',deacon:'dcultjunk',malrec:'dcultjunk',prior:'bone',bellringer:'cultrag',gwisp:'ember',summoner:'cultrag'};
 const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['str','STR'],['wis','WIS'],['int','INT']];
 const inv=(function(){
   const d={bags:new Array(BAG_SIZE).fill(null),equip:{},copper:0};
@@ -32,7 +32,7 @@ const GCD=1.5, PSPEED=34;
 // Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.
 // Chill (Wizard's Frost Bolt) only slows mobs; nothing slows you yet.
 // Shaman's Spirit of the Wolf +30%; the Bard's Song of Travel +60% (they don't add up: the faster one counts).
-const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1)*Math.max(player.buffs.wolf>0&&!inCombat()?1.3:1,songKind('speed')?1.6:1); // Spirit of the Wolf is a travel spell: no speed while anything is fighting (owner, v0.24)
+const pSpeed=()=>PSPEED*(player.mireT>0?MIRE_SLOW:1)*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1)*Math.max(player.buffs.wolf>0&&!inCombat()?1.3:1,songKind('speed')?1.6:1); // Spirit of the Wolf is a travel spell: no speed while anything is fighting (owner, v0.24)
 
 /* ---------- Saved progress, settings and loadout ---------- */
 // Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.

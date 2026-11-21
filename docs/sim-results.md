@@ -1065,3 +1065,25 @@ One seed per fight (the full 10-seed run takes about 10 minutes a class on the b
 | bard | Base Dirge | 26.9 | – | 27.1 | 5.8 |  |
 | bard | Dirge of Ruin | 26.9 | – | 27.1 | 5.0 |  |
 | bard | Requiem | 26.9 | – | 27.1 | 4.2 |  |
+
+## Dungeon 1 rebuild, two floors (v0.66, Nov 21)
+`__game` page, `runDungeon({seeds:2, lvl:15})` for each class: floor 1 (catacomb, hall, the Drowned Prior and his two dead) then floor 2 (the Bellringer and his two cultists, the wisp room, Malrec and his deacons). Each group is one arena fight plus rest and walking; a lost fight is tried once more (+25 s). The Bellringer is no longer optional. Bots don't step off the Prior's ripples or out of the great wisps' rings, and the Prior's grip in the arena only slows (it never mattered much to a bot standing still).
+
+| Class | Run (min) | Deaths | Drowned Prior (+2) | Bellringer (+2) | Malrec (+2 deacons) |
+| --- | --- | --- | --- | --- | --- |
+| Druid | 12.3 / 10.9 | 3 / 2 | W / W | 1 of 2 first try | lost both runs |
+| Warrior | 13.9 / 15.7 | 6 / 8 | lost | lost | lost |
+| Rogue | 9.8 / 10.5 | 6 / 8 | lost | lost | lost |
+| Necromancer | 10.9 / 8.3 | 4 / 1 | 2nd try both | W | W (2nd try once) |
+| Cleric | 12.3 / 12.8 | 8 / 10 | W / W | lost | lost (dies in ~15 s) |
+| Enchanter | 10.3 / 10.6 | 0 / 0 | W | W | W (81–102 s) |
+| Paladin | 10.9 / 9.7 | 5 / 4 | W (~29 s) | lost | lost |
+| Shadow Knight | 12.4 / 11.9 | 5 / 3 | lost | W on 1 of 2 tries | W once |
+| Wizard | 14.3 / 13.1 | 8 / 4 | W once | lost | lost (timeout then dead) |
+| Magician | 13.6 / 14.4 | 4 / 5 | W (~100 s) | lost | W (~140 s) |
+| Ranger | 9.5 / 9.8 | 0 / 0 | W | W | W |
+| Monk | 10.3 / 11.1 | 2 / 1 | W | W once | W |
+| Shaman | 8.7 / 8.5 | 0 / 0 | W | W | W |
+| Bard | 13.8 / 13.4 | 12 / 12 | lost | lost | lost |
+
+**Pace:** every class lands in 8.5–15.7 min (most 10–14), inside the 10–15 target (sim runs are a best case on walking, a worst case on retries). **Balance chat:** the Prior with his two dead is now a real wall for Warrior, Rogue, Shadow Knight, Bard and sometimes the Wizard, though the owner wants him forgiving; the Bellringer stops seven classes; Malrec still beats six (Cleric in ~15 s, as in v0.63). Shaman, Ranger and Enchanter never die.

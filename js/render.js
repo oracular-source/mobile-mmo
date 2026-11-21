@@ -54,11 +54,11 @@ function mkRobed(id){const S=ROBED[id],W=S.w,H=S.h,cx=(W-1)/2,rx=W*0.29,ry=H*0.2
     l:'#a8a8b4',o:'#5a4028',r:'#ff8a3c',R:'#ffe0a0',c:'#8a8690',n:'#a0802a',w:'#e8e0c8',g:'#3a4a44',v:'#3a5a32'});
   const rows=g.map(r=>r.join('')),step=side=>{const n=g.map(r=>r.slice());for(let i=0;i<W;i++){if((side?i>cx:i<cx)&&n[H-1][i]!=='.'){n[H-1][i]='.';if(n[H-2][i]!=='.')n[H-2][i]='k'}}return n.map(r=>r.join(''))};
   const im=mk(rows,pal);im.steps=[mk(step(0),pal),mk(step(1),pal)];return im}
-['zealot','ashcaller','chanter','acolyte','mender','deacon','prior','bellringer','malrec'].forEach(k=>{IMG[k]=mkRobed(k)});
+['zealot','ashcaller','chanter','acolyte','mender','deacon','prior','bellringer','malrec','summoner'].forEach(k=>{IMG[k]=mkRobed(k)});
 // Undead and Brother Malrec redrawn (v0.65, character pass): each with its own body and a step frame (UNDEAD_SPR in sprites.js).
 // Image keys stay the same (dead, skel, pet, minion, boss1, malrec), so mobs, pets and the DEV gallery pick them up as before.
 [['dead','corpse'],['skel','skel'],['pet','pet'],['minion','minion'],['boss1','king'],['malrec','malrec']].forEach(([k,s])=>{IMG[k]=mkWalk(UNDEAD_SPR[s],UNDEAD_SPR[s+'step'],UNDEAD_PAL[s])});
-IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);
+IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);IMG.gwisp=mk(GWISP_SPR[0],GWISP_PAL);IMG.gwisp2=mk(GWISP_SPR[1],GWISP_PAL);
 // Candle wisp (v0.63, Malrec's Candle Wake): the ash wisp's flame in pale candle gold, so it reads as a different thing to chase.
 IMG.cwisp=mk(WISP_SPR[0],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));IMG.cwisp2=mk(WISP_SPR[1],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));
 // Default skin: lay each weapon over the shared body, then colour it from the class's SKINS entry.
@@ -200,7 +200,15 @@ function render(){
     else{f(x-7,y-8,14,10,AP.out);f(x-6,y-7,12,8,AP.wood);f(x-6,y-7,12,2,AP.woodHi);f(x-6,y-4,12,1,AP.bell);f(x-1,y-5,2,3,AP.bellHi)}});
   // Dungeon 1 (v0.63): the slab over the stairs until you touch the altar; Grasp of the Deep's hands; the Toll's ring of sound.
   if(CHA)CHA.seals.forEach(sl=>{if(sl.open)return;const x=sl.x0*T,y=sl.y0*T,w=(sl.x1-sl.x0+1)*T,f=(X,Y,ww,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,ww,h)};
+    // v0.66: a seal a named holds (the Drowned Prior's stairs) is dark flood water over the steps, a slow ripple on it, until he dies.
+    if(sl.named){const hh=(sl.y1-sl.y0+1)*T;f(x,y,w,hh,AP.flood[1]);f(x,y,w,1,AP.floodDk);for(let i=0;i<6;i++){const rx=x+((i*23+Math.floor(time*6))%(w-4)),ry=y+3+((i*11)%(hh-6));f(rx,ry,4,1,AP.floodHi)}
+      f(x+4,y+hh-6,3,1,'#4a4652');f(x+w-9,y+hh-9,3,1,'#4a4652');return} // the top edge of a step just showing under the water
     f(x-1,y-2,w+2,18,AP.out);f(x,y-1,w,16,AP.cst);f(x,y-1,w,2,AP.cstHi);f(x+w-3,y-1,3,16,AP.cstDk);f(x+9,y+3,1,5,AP.cstMor);f(x+10,y+7,1,4,AP.cstMor);f(x+20,y+4,4,1,AP.cstMor);f(x+4,y+12,w-8,1,AP.cstDk)});
+  // Grasp of the Deep (v0.66): rings of ripples spreading on the spot under you while the Prior casts; step off them.
+  mobs.forEach(m=>{const c=m.casting;if(!c||!c.spot||m.dead)return;const p=c.t/c.dur,sx=Math.round(c.spot.x),sy=Math.round(c.spot.y);
+    for(let k=0;k<3;k++){const q=((time*1.4+k/3)%1),r=GRASP.r*(0.25+0.75*q);lx.globalAlpha=(1-q)*(0.5+0.5*p);lx.fillStyle=k%2?'#9fd8c0':'#d8f0e8';
+      for(let a=0;a<40;a++){if(a%5===0)continue;const an=a/40*6.283;lx.fillRect(Math.round(sx+Math.cos(an)*r),Math.round(sy+Math.sin(an)*r*0.6),2,1)}}
+    lx.globalAlpha=0.15+0.35*p;lx.fillStyle=p>0.75&&Math.floor(time*12)%2?'#d8f0e8':'#33505c';lx.beginPath();lx.ellipse(sx,sy,GRASP.r,GRASP.r*0.6,0,0,7);lx.fill();lx.globalAlpha=1});
   hands.forEach(h=>{const p=Math.min(1,h.t/0.35),fade=h.on?1:Math.max(0,1-(h.t-0.9)/0.5),x=Math.round(h.x),y=Math.round(h.y),up=Math.round(6*p),f=(X,Y,w,hh,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,hh)};
     lx.globalAlpha=fade;f(x-3,y-up,2,up+1,'#b8c8c0');f(x+1,y-up,2,up+1,'#9fb4ac');f(x-4,y-up-2,1,2,'#cfdcd4');f(x-2,y-up-3,1,3,'#cfdcd4');f(x,y-up-3,1,3,'#cfdcd4');f(x+2,y-up-2,1,2,'#cfdcd4');f(x-4,y,9,1,'#33505c');lx.globalAlpha=1});
   rings.forEach(r=>{const p=r.t/r.life,rad=r.r*(0.4+0.6*p);lx.globalAlpha=1-p;lx.fillStyle='#ffd27a';for(let a=0;a<48;a++){const an=a/48*6.283;lx.fillRect(Math.round(r.x+Math.cos(an)*rad),Math.round(r.y+Math.sin(an)*rad*0.6),2,1)}lx.globalAlpha=1});

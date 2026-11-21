@@ -707,24 +707,27 @@ function runPace(opts){
   });
 }
 
-// Dungeon 1 pace (v0.63): one run through Brother Malrec's chapel for your class at a level (default 15). Each camp or group
-// on the map is one arena fight (all its mobs at once, at the map's top level for it), plus rest after it, plus walking
-// between them at 1.4x the straight line. A lost fight is tried once more (25 s to run back). optional: the Bellringer's
-// foundry too. Resolves with the minutes, deaths, and how each named fight went. Target (owner, Nov 20): 10-15 minutes.
-function dungeonPace(L,seed,optional){
-  const A=buildArea('dungeon1'),by={},order=[];
-  A.spawns.forEach(sp=>{const k=sp.group||('solo'+A.spawns.indexOf(sp));if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
-  let t=0,deaths=0,px=A.start.x,py=A.start.y,fights=0;const named={},log=[];
-  order.forEach(k=>{const g=by[k];if(!optional&&g.some(sp=>sp.x>=48*T&&sp.y>=28*T&&sp.y<=42*T))return; // the Bellringer's foundry (x 48+, rows 28-42)
-    const types=g.map(sp=>sp.type).sort((a,b)=>(TYPES[b].named?1:0)-(TYPES[a].named?1:0)),lv=Math.max.apply(null,g.map(sp=>sp.lv[1]));
-    t+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
-    for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lv:lv},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
-      const nm=types.find(x=>TYPES[x].named);if(nm)named[TYPES[nm].name]=(named[TYPES[nm].name]||'')+(r.win?'W':r.death?'D':'T')+Math.round(r.t)+'s ';
-      log.push(types.join('+')+' '+(r.win?'win':'lose')+' '+Math.round(r.t)+'s rest '+Math.round(r.rest||0)+'s');
-      if(r.win)return;deaths++;t+=PACE_DEATH}});
+// Dungeon 1 pace (v0.63; two floors since v0.66): one run through Brother Malrec's monastery for your class at a level
+// (default 15). Each camp or group on the map is one arena fight (all its mobs at once, at the map's top level for it), plus
+// rest after it, plus walking between them at 1.4x the straight line. A lost fight is tried once more (25 s to run back).
+// Floor 1 (catacomb, hall, the Drowned Prior), then floor 2 (the Bellringer, the wisp room, Malrec). Resolves with the
+// minutes, deaths, and how each named fight went. Target (owner, Nov 21): 10-15 minutes.
+function dungeonPace(L,seed){
+  let t=0,deaths=0,fights=0;const named={},log=[];
+  ['dungeon1','dungeon1_f2'].forEach(id=>{const A=buildArea(id),by={},order=[];let px=A.start.x,py=A.start.y;
+    A.spawns.forEach(sp=>{const k=sp.group||('solo'+A.spawns.indexOf(sp));if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
+    // nearest group next, as a player would walk it (the map's own order isn't the walking order)
+    while(order.length){order.sort((a,b)=>Math.hypot(by[a][0].x-px,by[a][0].y-py)-Math.hypot(by[b][0].x-px,by[b][0].y-py));const g=by[order.shift()];
+      const types=g.map(sp=>sp.type).sort((a,b)=>(TYPES[b].named?1:0)-(TYPES[a].named?1:0)),lv=Math.max.apply(null,g.map(sp=>sp.lv[1]));
+      t+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
+      for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lv:lv},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
+        const nm=types.find(x=>TYPES[x].named);if(nm)named[TYPES[nm].name]=(named[TYPES[nm].name]||'')+(r.win?'W':r.death?'D':'T')+Math.round(r.t)+'s ';
+        log.push(types.join('+')+' '+(r.win?'win':'lose')+' '+Math.round(r.t)+'s rest '+Math.round(r.rest||0)+'s');
+        if(r.win)break;deaths++;t+=PACE_DEATH}}
+    const ex=A.exits.find(e=>e.name==='down');if(ex)t+=Math.hypot(ex.tx*T+8-px,ex.ty*T+8-py)*1.4/PSPEED}); // on to the stairs down
   return{min:t/60,deaths:deaths,named:named,log:log}}
 function runDungeon(opts){opts=opts||{};if(simState.busy||!BOTS[CLS])return null;const keep=simBegin(),L=opts.lvl||15,runs=[];
-  for(let i=0;i<(opts.seeds||2);i++)runs.push(dungeonPace(L,1+i,opts.optional));simEnd(keep);return{cls:CLS,name:C.name,lvl:L,runs:runs}}
+  for(let i=0;i<(opts.seeds||2);i++)runs.push(dungeonPace(L,1+i));simEnd(keep);return{cls:CLS,name:C.name,lvl:L,runs:runs}}
 
 // Pace results for the DEV panel: level after the first lap, time to level 8, deaths, and when each named first fell.
 function paceSummary(res){

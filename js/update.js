@@ -13,6 +13,7 @@ function update(dt){
     }else if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     // Held by Grasp of the Deep or stunned by the Toll (v0.63): no walking until it wears off.
+    if(player.mireT>0)player.mireT=Math.max(0,player.mireT-dt); // the Drowned Prior's grip (v0.66): slowed, not held
     if(player.held>0||player.stunT>0){player.held=Math.max(0,(player.held||0)-dt);player.stunT=Math.max(0,(player.stunT||0)-dt);mx=0;my=0;player.tx=null}
     const steering=mx!==0||my!==0;if(steering)player.lastMove={x:mx,y:my}; // which way you were heading when you took an exit
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
@@ -143,7 +144,7 @@ function update(dt){
       if(m.def.grasp&&graspThink(m,dt))return;if(m.dead||player.dead)return;
       if(m.def.toll&&tollThink(m,dt))return;if(m.dead||player.dead)return;
       if(m.def.cast&&mobCast(m,dt))return;if(m.dead||player.dead)return; // chapel casters (v0.62): stand still while the bar fills
-      if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.blink)wispBlink(m,dt);
+      if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.burn)burnThink(m,dt);if(m.def.blink)wispBlink(m,dt);
       if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
       if(m.def.charge&&boarCharge(m,v,d,dt,spd))return; // the boar lowering its head or rushing in
       if(d>11){if(spd>0)pathTo(m,v.x,v.y,spd,dt)} // around trees and walls, not into them (js/path.js)
