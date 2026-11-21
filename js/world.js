@@ -86,7 +86,7 @@ function drawCritters(){
 function drawGlows(){
   const flame=(x,y,big)=>{const k=Math.floor(time*8)%3;lx.fillStyle='#e0611f';lx.fillRect(x-1,y-4-(k===1?1:0),3,4);if(big){lx.fillRect(x-2,y-2,5,2)}lx.fillStyle='#ffb347';lx.fillRect(x,y-3,1,2);if(k!==2){lx.fillStyle='#ffe9a8';lx.fillRect(x,y-2,1,1)}};
   lx.save();lx.translate(-camX,-camY);
-  const CA=curArea();if(CA){const A=CA;A.flames.forEach(f=>{if(f.tiny){const k=Math.floor(time*6+f.x)%3;lx.fillStyle='#ffb347';lx.fillRect(f.x,f.y-2-(k===1?1:0),1,2);lx.fillStyle='#ffe9a8';lx.fillRect(f.x,f.y-1,1,1)}else if(f.lamp){lx.fillStyle=Math.floor(time*5)%4?'#ffd27a':'#ffb347';lx.fillRect(f.x+4,f.y-4,2,3)}else flame(f.x,f.y,f.big)});
+  const CA=curArea();if(CA){const A=CA;A.flames.forEach(f=>{if(f.hid)return;if(f.tiny){const k=Math.floor(time*6+f.x)%3;lx.fillStyle='#ffb347';lx.fillRect(f.x,f.y-2-(k===1?1:0),1,2);lx.fillStyle='#ffe9a8';lx.fillRect(f.x,f.y-1,1,1)}else if(f.lamp){lx.fillStyle=Math.floor(time*5)%4?'#ffd27a':'#ffb347';lx.fillRect(f.x+4,f.y-4,2,3)}else flame(f.x,f.y,f.big)});
     // Cold motes drifting up out of the crypt mouth.
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
     // Dust turning in the daylight shafts (rat tunnel) and rising out of the sinkhole (crossroads).
@@ -128,8 +128,12 @@ $('pno').addEventListener('click',closePrompt);
 function areaSpot(A,ex,dir){
   let offs=[[0,2],[0,-2],[2,0],[-2,0],[0,3],[0,-3],[3,0],[-3,0],[2,2],[-2,2],[2,-2],[-2,-2]];
   if(dir&&(dir.x||dir.y)){const d=Math.hypot(dir.x,dir.y);offs=offs.map((o,i)=>[o,i]).sort((a,b)=>{const s=o=>(o[0]*dir.x+o[1]*dir.y)/(d*Math.hypot(o[0],o[1]));return (s(b[0])-s(a[0]))||(a[1]-b[1])}).map(o=>o[0])}
-  for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;
-    if(x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0)return{x:x*T+8,y:y*T+8}}
+  // Open ground only (v0.64, owner: coming up out of the rat tunnel dropped you in a pocket behind the lamppost that was
+  // hard to get out of): a spot needs most of the ground around it open, so you never arrive boxed in by a tree, a post
+  // or a wall. If nothing round the exit is that open, the first free spot still does.
+  const ok=(x,y)=>x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0,roomy=(x,y)=>{let n=0;for(let j=-2;j<=2;j++)for(let i=-2;i<=2;i++)if(ok(x+i,y+j))n++;return n>=15};
+  for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;if(ok(x,y)&&roomy(x,y))return{x:x*T+8,y:y*T+8}}
+  for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;if(ok(x,y))return{x:x*T+8,y:y*T+8}}
   return A.start||null}
 // from: the map key of the area you came from, so you arrive at the matching exit (up the crypt stairs -> crypt mouth).
 function enterZone(id,from,at){

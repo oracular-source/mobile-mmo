@@ -50,6 +50,7 @@ z    flood        1   #24323c low slow floor ground flood
 N    bone_niche   0   #2a2630 wall
 V    steps        1   #4a4652 path floor ground
 K    ember_pit    0   #5a2414 pit
+L    palisade     0   #5a4030 border wall
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -94,7 +95,7 @@ flowers      1 1 0      ground 0     -    1
 shovel       1 1 0      ground 0     -    0
 wagon        3 2 1      ground 0     -    0
 fishing_rod  1 1 0      ground 0     -    0
-town_gate    4 1 0      ground 0     -    0
+town_gate    6 1 1      ground 0     -    3
 well         2 2 1      ground 1     -    0
 book_pyre    1 1 1      ground 0     -    2
 torn_banner  1 1 0      ground 0     -    0

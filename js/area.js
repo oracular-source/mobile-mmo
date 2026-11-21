@@ -63,6 +63,9 @@ function buildArea(id){
   A.objs.forEach(o=>{if(!o.blocks)return;for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)A.map[y][x]=5;});
   // Slow ground (v0.63): flood water slows everyone who wades it, you and the mobs (moveToward, fx.js). Floaters skim over.
   A.slow=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(AREA_TILES[rows[y][x]].tags.indexOf('flood')>=0)A.slow[y*w+x]=1;
+  // Wading water (v0.64, owner: the crossroads creek): wade: 1 on a map lets you walk into its water, slowed like the flood
+  // in Dungeon 1, a little taste of what's to come. Mobs wade too. Drawn the same; you sink to your knees (render.js).
+  if(M.wade)for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(rows[y][x]==='~'){A.map[y][x]=0;A.slow[y*w+x]=1}
   A.seals.forEach(sl=>{sl.obj=A.objs.find(o=>o.kind===sl.by)||null});sealArea(A);
   (A.bars||[]).forEach(b=>{b.open=!!store.get('ashfen-gates',{})[b.id];if(!b.open)A.map[b.ty][b.tx]=5});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
@@ -70,6 +73,7 @@ function buildArea(id){
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
   A.objs.forEach(o=>{const cx=o.x*T+o.w*T/2;
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
+    if(o.kind==='town_gate'){const m=o.x*T+o.w*T/2;[m-22,m+23].forEach(x=>{A.lights.push({x:x,y:o.y*T+16-26,r:48,w:30});A.flames.push({x:x-6,y:o.y*T+16-22,big:0,lamp:1})})}
     if(o.kind==='lantern'){A.lights.push({x:cx,y:o.y*T-4,r:44,w:26});A.flames.push({x:cx,y:o.y*T-1,big:0,lamp:1})}
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
@@ -94,8 +98,35 @@ function buildArea(id){
   const edge=st.tx>=w-1||st.tx<=0||st.ty>=h-1||st.ty<=0;
   A.start=edge?{x:st.tx*T+8+(st.tx>=w-1?-48:st.tx<=0?48:0),y:st.ty*T+8+(st.ty>=h-1?-48:st.ty<=0?48:0)}:areaSpot(A,st); // a few steps inside, clear of the exit
   if(!A.start)A.start={x:st.tx*T+8,y:st.ty*T+8};
-  A.trees=[];A.world=paintArea(A);
+  if(M.startAt)A.start={x:M.startAt[0]*T+8,y:M.startAt[1]*T+8}; // v0.64: where you start and wake when the way in is a closed gate
+  A.trees=[];A.world=paintArea(A);edgeWoods(A);
+  // A flame behind a tree crown (v0.64, owner: a lantern flickering through a tree at the crossroads): flames draw after the
+  // lighting, over everything, so one under a crown in front showed through the leaves. Those stay unlit-looking now.
+  A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
   AREAS[id]=A;return A;
+}
+// The woods carry on past the map's top and bottom edges (v0.64, owner: "the trees show a definitive line of where the
+// map actually stops"). The camera shows a strip past those edges (v0.55) where the ground was mirrored but the trees
+// stopped dead in a straight line. Now trees grow out there too, a few rows deep: the edge's own trees carry on (so
+// roads and clearings that run off the map stay open), and further out the gaps close up into deeper forest, with the
+// odd dead snag. Outdoors only; you can never walk there. Shadows go into the mirrored ground strips.
+function edgeWoods(A){
+  if(A.instance||A.tint==='earth'||A.tint==='crypt'||A.tint==='vault')return;
+  const W=A.w,H=A.h,wd=A.world,treeN={tree:1,fir:1,dead_tree:1};
+  const nm=(x,y)=>{x=Math.max(0,Math.min(W-1,x));y=Math.max(0,Math.min(H-1,y));return AREA_TILES[A.rows[y][x]].name};
+  const open=n=>{const t=Object.values(AREA_TILES).find(t=>t.name===n);return t&&t.walk&&t.tags.indexOf('path')<0&&n!=='bridge'};
+  // The kind of wood an edge has: whatever tree is most common in its first few rows.
+  const kindNear=(tx,top)=>{const c={};for(let j=0;j<4;j++)for(let i=-4;i<=4;i++){const n=nm(tx+i,top?j:H-1-j);if(treeN[n])c[n]=(c[n]||0)+1}
+    return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||(A.tint==='wood'||A.tint==='chapel'?'fir':'tree')};
+  const sh=(cv,x,y,r)=>{if(!cv)return;const g=cv.getContext('2d');g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(x,y,r,Math.max(2,Math.round(r/3)),0,0,7);g.fill()};
+  [true,false].forEach(top=>{for(let k=1;k<=8;k++)for(let tx=0;tx<W;tx++){
+    const sy=top?k-1:H-k,src=nm(tx,sy);let n=null;
+    if(treeN[src])n=ah(tx,k,160+(top?0:1))<0.9?src:null; // the edge's own trees carry on (one in ten left out, so it isn't a mirror)
+    else if(k>=2&&open(src)&&[-1,0,1].every(i=>open(nm(tx+i,sy))&&open(nm(tx+i,top?0:H-1)))&&ah(tx,k,162+(top?0:1))<0.12+0.1*k)n=kindNear(tx,top); // gaps close up further out
+    if(!n)continue;if(n==='tree'&&ah(tx,k,164)<0.05)n='dead_tree'; // now and then a dead snag
+    const ty=top?-k:H-1+k,bx=tx*T,by=ty*T,im=pickTree(A,n,tx,ty);
+    if(top)sh(wd.edgeTop,bx+8+im.shx,-(by+14),im.sh);else sh(wd.edgeBot,bx+8+im.shx,wd.edgeBot.height-(by+14-H*T),im.sh);
+    A.trees.push(treeAt(im,bx,by,by+13))}});
 }
 // Shut every seal again (a fresh instance visit) and block its tiles.
 function sealArea(A){A.seals.forEach(sl=>{sl.open=false;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=5})}
@@ -360,6 +391,7 @@ function paintArea(A){
       else if(n==='bones')drawBones(R,bx,by,ah(tx,ty,11));
       else if(n==='stone_wall'){const isW=(x,y)=>{const m=name(x,y);return m==='stone_wall'||m==='gate'};drawStoneWall(R,g,bx,by,isW(tx,ty-1),isW(tx,ty+1),isW(tx+1,ty),isW(tx-1,ty),tx,ty)}
       else if(n==='pillar')drawColumn(R,g,bx,by,ah(tx,ty,17));
+      else if(n==='palisade'){const isP=(x,y)=>name(x,y)==='palisade';drawPalisade(R,bx,by,isP(tx-1,ty),isP(tx+1,ty),tx,ty)}
       else if(n==='earth_wall'||n==='rat_hole'){const solid=(x,y)=>{const m=name(x,y);return !m||m==='earth_wall'||m==='rat_hole'};drawEarth(R,bx,by,!solid(tx,ty+1),!solid(tx,ty-1),n==='rat_hole',ah(tx,ty,13))}
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
@@ -741,6 +773,14 @@ function drawSunkPanel(R,x,y){
    A low wall seen from the 3/4 view: its top (light capstones) and, where nothing walls it in to the south, its front face in
    running-bond courses. East-west runs fill the tile; north-south runs are narrower so the turns meet at a square corner (a
    post). Ivy hangs off the top here and there, moss on the caps, a dark line and shadow at the foot. Recipe in area-rules.md. */
+// Palisade (v0.64, the Town 1 wall at the crossroads): sharpened logs side by side, each a little different in height and
+// lean, lashed with a rail, earth banked at the foot. Joins with its neighbours so a run reads as one wall.
+function drawPalisade(R,bx,by,l,rt,tx,ty){
+  for(let i=0;i<4;i++){const x=bx+i*4,h=22+Math.floor(ah(tx*4+i,ty,150)*6),top=by+14-h;
+    R(x,top+2,4,h,AP.out);R(x+1,top+3,2,h-3,AP.wood);R(x+1,top+3,1,h-3,AP.woodHi);R(x+1,top+1,2,2,AP.out);R(x+1,top+2,2,1,AP.woodDk); // log with a point
+    if(ah(tx*4+i,ty,151)<0.3)R(x+1,top+8+Math.floor(ah(tx,ty,152)*6),2,1,AP.woodDk)} // a knot
+  R(bx-(l?0:1),by+1,16+(l?0:1)+(rt?0:1),3,AP.out);R(bx,by+2,16,1,AP.rut); // the rail
+  R(bx,by+12,16,3,AP.dirt);R(bx,by+12,16,1,AP.dirtHi);if(ah(tx,ty,153)<0.5)R(bx+3+Math.floor(ah(tx,ty,154)*8),by+11,3,1,AP.moss)}
 function drawStoneWall(R,g,bx,by,n,s,e,w,tx,ty){
   const hz=e||w||!(n||s),L=w?bx:bx+3,Rx=e?bx+16:bx+13,brick=(x0,y0,ww,hh)=>{R(x0,y0,ww,hh,AP.cst);for(let yy=0;yy<hh;yy+=4){R(x0,y0+yy+3,ww,1,AP.cstMor);const off=((ty*4+yy)/4)%2?4:0;for(let xx=x0+((x0+off)%8?8-((x0+off)%8):0);xx<x0+ww;xx+=8)R(xx,y0+yy,1,3,AP.cstMor)}};
   const top=(x0,y0,ww,hh)=>{R(x0-1,y0-1,ww+2,hh+1,AP.out);R(x0,y0,ww,hh,AP.cstHi);R(x0,y0,ww,1,'#9a9aa4');for(let xx=x0+5+Math.floor(ah(tx,ty,61)*3);xx<x0+ww-1;xx+=6+Math.floor(ah(xx,ty,62)*3))R(xx,y0+1,1,hh-1,AP.cstMor);
@@ -1217,19 +1257,33 @@ function drawObj(g,R,o){
     R(X+30,Y-5,1,15,'rgba(220,220,210,0.45)');R(X+29,Y+10,3,1,'#c0302a'); // the line and a red float
     R(X+3,Y+8,7,7,AP.out);R(X+4,Y+9,5,5,AP.wood);R(X+4,Y+9,5,1,AP.woodHi);R(X+4,Y+11,5,1,AP.ironHi);R(X+5,Y+9,3,1,AP.water);return}
   if(k==='town_gate'){
-    // The way south to Town 1 (v0.59): the town's timber gate a little way up from the map's bottom edge, so you see it
-    // as you walk down the road. Reads as a gate: two tall square posts, a roofed beam across the top, plank doors
-    // swung open against the posts (you walk through), sharpened palisade stakes either side, a lantern on each post
-    // and a hanging shield sign. Town 1 itself isn't built, so the road past it says so.
-    shadow(X+2,Y+H-3,W-4,4);
-    for(let x=X+1;x<X+W-1;x+=4){if(x>X+9&&x<X+W-12)continue;const h=18+Math.floor(ah(x,o.y,5)*4);R(x,Y+H-h,4,h,AP.out);R(x+1,Y+H-h+2,2,h-2,AP.wood);R(x+1,Y+H-h+2,1,h-2,AP.woodHi);R(x+1,Y+H-h,2,2,AP.woodDk)} // stakes
-    const door=(x0,dir)=>{for(let i=0;i<8;i++){const x=x0+i*dir,top=Y+H-25+Math.round(i*0.5),h=25-Math.round(i*0.5);R(x,top,1,h,AP.out);if(i>0&&i<7){R(x,top+1,1,h-2,i%3===0?AP.woodDk:AP.wood);R(x,top+5,1,1,AP.iron);R(x,top+h-7,1,1,AP.iron)}}};
-    door(X+19,1);door(X+W-20,-1); // the open doors, seen edge-on as they swing in
-    [X+12,X+W-19].forEach(px=>{R(px,Y+H-40,7,40,AP.out);R(px+1,Y+H-39,5,39,AP.wood);R(px+1,Y+H-39,2,39,AP.woodHi);R(px+5,Y+H-39,1,39,AP.woodDk);R(px+1,Y+H-4,5,2,AP.moss)});
-    R(X+8,Y+H-44,W-16,6,AP.out);R(X+9,Y+H-43,W-18,4,AP.roof);R(X+9,Y+H-43,W-18,1,AP.roofHi);for(let x=X+10;x<X+W-10;x+=5)R(x,Y+H-42,1,3,AP.woodDk); // roofed beam
-    R(X+14,Y+H-44,6,1,AP.moss);R(X+40,Y+H-44,5,1,AP.moss);
-    R(X+28,Y+H-38,1,4,AP.out);R(X+35,Y+H-38,1,4,AP.out);R(X+26,Y+H-34,12,10,AP.out);R(X+27,Y+H-33,10,8,'#3a4a6a');R(X+31,Y+H-32,2,6,'#c9a227');R(X+29,Y+H-30,6,2,'#c9a227'); // shield sign
-    [X+9,X+W-9].forEach(lx=>{R(lx-2,Y+H-34,5,7,AP.out);R(lx-1,Y+H-33,3,5,'#ffb860')});return}
+    // The way south to Town 1, redrawn in v0.64 (owner: "it's not reading gate at all"). References: timber motte gatehouses
+    // and palisade forts. What makes it read: two square timber towers with steep shingle roofs taller than everything
+    // round them, a covered walkway joining them over the road, and big plank doors, shut (Town 1 isn't built yet), with
+    // iron bands and a crest. A palisade wall (tile L) runs off into the woods either side. 96 x ~80 pixels.
+    const B=Y+H,mid=X+W/2;shadow(X+2,B-3,W-4,5);
+    const tower=tx=>{ // a square timber tower, 22 wide, body 50 tall, roof 18
+      R(tx,B-52,22,52,AP.out);for(let x=1;x<21;x++)R(tx+x,B-51,1,47,x%4===0?AP.woodDk:x<4?AP.woodHi:AP.wood);
+      R(tx+1,B-36,20,3,AP.out);R(tx+1,B-35,20,1,AP.woodHi);R(tx+1,B-18,20,3,AP.out);R(tx+1,B-17,20,1,AP.woodHi); // cross beams
+      R(tx+1,B-5,20,5,AP.stoneDk);R(tx+1,B-5,20,1,AP.stone);[3,9,15].forEach(x=>R(tx+x,B-3,1,3,AP.stoneDk2)); // stone footing
+      R(tx+8,B-31,6,10,AP.out);R(tx+9,B-30,4,8,'#ffb860');R(tx+9,B-30,4,2,'#ffe0a0');R(tx+10,B-30,1,8,AP.out); // a lit window
+      R(tx+1,B-6,3,1,AP.moss);R(tx+17,B-7,3,2,AP.moss);
+      for(let y=0;y<18;y++){const hw=Math.round(13*y/17);R(tx+11-hw-1,B-70+y,hw*2+3,1,AP.out);if(y>0)R(tx+11-hw,B-70+y,hw*2+1,1,y%3===0?AP.slateDk:AP.roof);if(y>1)R(tx+11-hw,B-70+y,Math.max(1,hw-2),1,AP.roofHi)} // steep roof
+      R(tx+10,B-74,2,5,AP.out);R(tx+10,B-73,1,3,AP.ironHi); // finial
+      R(tx-2,B-53,26,2,AP.out);R(tx-1,B-53,24,1,AP.woodDk)}; // eaves
+    tower(X+2);tower(X+W-24);
+    // the covered walkway over the road between the towers
+    R(X+24,B-48,48,12,AP.out);R(X+24,B-47,48,9,AP.wood);for(let x=X+26;x<X+72;x+=5)R(x,B-47,1,9,AP.woodDk);R(X+24,B-47,48,1,AP.woodHi);
+    R(X+22,B-54,52,6,AP.out);R(X+23,B-53,50,4,AP.roof);R(X+23,B-53,50,1,AP.roofHi);for(let x=X+25;x<X+72;x+=4)R(x,B-52,1,3,AP.slateDk);
+    // the doors: two plank leaves under a round-topped frame, shut, iron bands and studs, a ring on each, a crest above
+    const dx=mid-17,dy=B-34;R(dx-3,dy-3,40,37,AP.out);R(dx-2,dy-2,38,3,AP.woodDk);
+    for(let y=0;y<34;y++){const arch=y<4?[9,5,3,1][y]:0;for(let x=arch;x<34-arch;x++)R(dx+x,dy+y,1,1,(x===16||x===17)?AP.out:(x%4===0?AP.plankDk:x%4===1?AP.plankHi:AP.plank))}
+    [7,17,27].forEach(y=>{R(dx,dy+y,34,2,AP.iron);R(dx,dy+y,34,1,AP.ironHi);for(let x=2;x<34;x+=6)R(dx+x,dy+y,1,1,AP.ironTip)});
+    R(dx+12,dy+20,3,3,AP.bell);R(dx+19,dy+20,3,3,AP.bell);R(dx+13,dy+21,1,1,AP.out);R(dx+20,dy+21,1,1,AP.out);
+    R(mid-6,B-47,12,11,AP.out);R(mid-5,B-46,10,9,'#3a4a6a');R(mid-1,B-45,2,7,'#c9a227');R(mid-4,B-43,8,2,'#c9a227'); // crest
+    // lanterns on iron brackets either side of the doors (their light is in buildArea)
+    [mid-24,mid+21].forEach(lx=>{R(lx,B-30,4,1,AP.out);R(lx+(lx<mid?0:3),B-30,1,3,AP.out);R(lx-1,B-28,5,7,AP.out);R(lx,B-27,3,5,'#ffb860');R(lx,B-27,3,1,'#ffe0a0')});
+    return}
   if(k==='cart'){
     // The gravedigger's handcart with a shovel in it.
     shadow(X+2,Y+13,W-2,3);R(X+1,Y+3,W-6,9,AP.out);R(X+2,Y+4,W-8,7,AP.wood);R(X+2,Y+4,W-8,1,AP.woodHi);[8,16].forEach(x=>R(X+x,Y+4,1,7,AP.woodDk));

@@ -265,7 +265,14 @@ function render(){
   ents.forEach(e=>{
     if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
       lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
-    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.save();lx.translate(ox,oy);drawEnt(e);lx.restore()});
+    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.save();lx.translate(ox,oy);drawEnt(e);
+    // Wading (v0.64): in slow water (Dungeon 1's flood, the crossroads creek) the water covers your feet and shins, with a
+    // ripple ring that moves, so you can see why you're slow. Floating things (wisps, the sword) skim over.
+    if(slowArea&&!e.dead&&!(e.def&&e.def.float)&&e.img!=='blade'&&e!==decoy&&!(e===player&&player.dead>0)){const SA=slowArea,tx=Math.floor(e.x/T),ty=Math.floor(e.y/T);
+      if(tx>=0&&ty>=0&&tx<SA.w&&ty<SA.h&&SA.slow[ty*SA.w+tx]){const x=Math.round(e.x),y=Math.round(e.y),fl=SA.rows[ty][tx]==='z',w=e===player?16:Math.min(26,Math.max(12,Math.round(((IMG[e.img]||{}).w||14)*0.9))),ph=Math.floor(time*5+x)%4;
+        lx.fillStyle=fl?AP.flood[1]:AP.water;lx.fillRect(x-w/2,y-3,w,5);lx.fillStyle=fl?AP.floodHi:AP.waterHi;lx.fillRect(x-w/2-1+ph%2,y-3,w+2,1);
+        lx.fillStyle=AP.glint;lx.globalAlpha=0.5;lx.fillRect(x-w/2-2-ph,y-1,2,1);lx.fillRect(x+w/2+ph,y-1,2,1);lx.globalAlpha=1}}
+    lx.restore()});
   if(A0)drawAreaCritters(A0,1); // perched crows, owl, bats, chimney smoke (v0.49)
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});

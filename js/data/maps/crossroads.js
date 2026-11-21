@@ -2,7 +2,7 @@
 // the rat tunnel's sinkhole (east), Town 1 (south), and a steep path north-east up to the Ruined Chapel's east gate. Format: docs/map-format.md. Check: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.crossroads = {
-  name: 'Crossroads', zone: [50, 69], tint: 'dusk', start: 'south', rules: '',
+  name: 'Crossroads', zone: [50, 69], tint: 'dusk', start: 'south', rules: '', wade: 1, startAt: [25, 37], // the creek: walk in, but slowly (v0.64)
   enter: 'You stand at the crossroads outside Town 1. Roads run off in every direction.',
   tiles: [
     'TT,TTTTTTTTTFFFFb,FFFFF,,==,,,,FFFFFF,FFTFFTTTTT',
@@ -44,22 +44,20 @@ MAPS.crossroads = {
     ',TTT,,:,,,T,,,,,,,b,,,,,,==,,,,,,,,,,TTTTTTTTTTT',
     'TTTT,,:,,,TT,,,,,,,TT,,,,==,T,,,,,,,,TTTTTTTTTTT',
     'TTTT,:,,,TTTT,,,,,TT,,,,,==,TTT,,,,,TTT,TTTTTTTT',
-    'TTT,,,,,,TT,TTT,,TT,T,,,,==,TTTTT,TTTTTTTTTTTT,T',
-    'T,TTT,,TTTTTTTTTTTTT,,,,,==,TTTTTTT,TT,TTTTTTT,T',
-    'TTTTTTTTTTTTTTTTT,T,,T,,,==,TTT,TTTTTTTTTTTTTTTT',
-    'TTTT,TTTTTTTTTTTTTT,,,,,,==,TTTTTT,TTTTTTTTTTTT,',
-    'TTTTTTTTTTTTTTTTTTTT,,,,,==,T,TTT,TTTTTT,TTTT,T,',
+    'TTT,,,,,,TT,TTT,,TT,T,,,,==,,,TTT,TTTTTTTTTTTT,T',
+    'T,TTT,,TTTTTTTTTTTTT,,,,,==,,,,,TTT,TT,TTTTTTT,T',
+    'TTTTTTTTTTTTTTTTLLLLLLL,,==,,LLLLLLTTTTTTTTTTTTT',
+    'TTTT,TTTTTTTTTTTTTTTT,,,,==,,TTTTT,TTTTTTTTTTTT,',
+    'TTTTTTTTTTTTTTTTTTTT,,,,,==,,,TTT,TTTTTT,TTTT,T,',
   ],
   things: `
 obj campfire 20 25
 obj signpost 27 29
 obj sinkhole 39 22
-obj lantern 37 21
-obj torch 20 40
-obj torch 27 40
+obj lantern 37 24   # v0.64: moved to the path side (it boxed you in north of the sinkhole)
 obj torch 2 28
 # ways in and out
-exit south 25 43 to=town1 lit
+exit south 25 40 to=town1 lit   # v0.64: at the closed gate (Town 1 isn't built yet)
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
@@ -98,7 +96,7 @@ spawn beetle 3 43 17
 spawn beetle 2 6 10
 spawn beetle 3 36 6
 # small stories and wear (heart pass, v0.59)
-obj town_gate 23 41
+obj town_gate 23 41   # v0.64: a gatehouse in a palisade wall, doors shut
 obj wagon 11 32
 obj bedroll 18 24
 obj fallen_log 19 27
@@ -107,9 +105,9 @@ fog 3 10 17 8
 # critters: moths at every light, crows on the signpost and the wagon, frogs on the creek banks, an owl over the
 # crossing, fireflies over the marsh, rabbits in the meadows that bolt for the trees
 critter moth 20.5 25.4 3
-critter moth 37.6 21.0 2
-critter moth 20.5 40.3 2
-critter moth 27.5 40.3 2
+critter moth 37.6 24.0 2
+critter moth 23.6 40.2 2
+critter moth 28.4 40.2 2
 critter moth 2.5 28.3 2
 critter crow 27.6 28.0 1 high
 critter crow 12.6 31.9 1 high
