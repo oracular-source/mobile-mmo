@@ -41,10 +41,15 @@ f    fern         1   #2e4a2a living ground
 O    boulder      0   #4a4a48 wall
 a    ash          1   #4a4644 ground
 q    gravel       1   #5e5a52 path ground
-s    flagstone    1   #5c5862 path ground
+s    flagstone    1   #5c5862 path ground floor
 W    stone_wall   0   #57535c border wall
 P    pillar       0   #6e6a74 wall
 e    herbs        1   #3e5432 living ground
+Y    pew          0   #5a4230 furniture
+z    flood        1   #24323c low slow floor ground flood
+N    bone_niche   0   #2a2630 wall
+V    steps        1   #4a4652 path floor ground
+K    ember_pit    0   #5a2414 pit
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -90,4 +95,13 @@ shovel       1 1 0      ground 0     -    0
 wagon        3 2 1      ground 0     -    0
 fishing_rod  1 1 0      ground 0     -    0
 town_gate    4 1 0      ground 0     -    0
+well         2 2 1      ground 1     -    0
+book_pyre    1 1 1      ground 0     -    2
+torn_banner  1 1 0      ground 0     -    0
+pack         1 1 0      ground 0     -    0
+altar        4 1 1      floor  1     -    2
+window       1 1 0      wall   0     -    3
+table        3 1 1      floor  0     -    0
+cage         2 2 1      floor  0     -    0
+bell_mold    2 2 1      floor  1     -    0
 `;

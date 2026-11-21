@@ -219,7 +219,8 @@ def font(sz, bold=False):
 SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt_rat': (220, 170, 130, 255), 'skeleton': (240, 234, 216, 255),
              'tunnel_rat': (220, 170, 130, 255), 'big_rat': (200, 140, 100, 255), 'beetle': (130, 170, 220, 255),
              'blight_wolf': (170, 176, 184, 255), 'thornback_boar': (176, 120, 80, 255),
-             'cult_zealot': (200, 90, 70, 255), 'cult_ashcaller': (170, 168, 176, 255), 'cult_chanter': (170, 110, 210, 255), 'ash_wisp': (255, 230, 160, 255)}
+             'cult_zealot': (200, 90, 70, 255), 'cult_ashcaller': (170, 168, 176, 255), 'cult_chanter': (170, 110, 210, 255), 'ash_wisp': (255, 230, 160, 255),
+             'cult_mender': (120, 200, 140, 255), 'cult_deacon': (230, 200, 120, 255), 'skeleton': (220, 216, 200, 255), 'corpse': (140, 160, 120, 255)}
 TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), 'chapel': (50, 60, 100, 55), '': (0, 0, 0, 0)}
 OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030', 'mausoleum': '#6b6578', 'dead_oak': '#4a3e32',
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
@@ -228,7 +229,9 @@ OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030'
            'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'lean_to': '#6a5034', 'firepit': '#3a3430',
            'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038',
            'chapel': '#6a6672', 'fallen_bell': '#a08a50', 'ash_circle': '#2a2624', 'shrine': '#7a7480', 'censer': '#ffb060',
-           'banner': '#3a1418', 'bedroll': '#6a5a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030'}
+           'banner': '#3a1418', 'bedroll': '#6a5a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030',
+           'well': '#6a6672', 'book_pyre': '#ff8a3c', 'torn_banner': '#c8c0b0', 'pack': '#7a5a3a', 'altar': '#8a8494',
+           'window': '#ffcf6a', 'table': '#5a4230', 'cage': '#4a4652', 'bell_mold': '#6a5a40'}
 
 def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
     g = m['tiles']; x1 = x1 or m['W']; y1 = y1 or m['H']
@@ -277,6 +280,11 @@ def ground_pass(d, m, tiles, s, x, y, px, py):
         if h == 0: d.line([px + s * 0.2, py + s * 0.3, px + s * 0.6, py + s * 0.7], fill=hexc('#3a3640'))
     if t['name'] == 'herbs':
         for a in (0.25, 0.5, 0.75): d.ellipse([px + s * a - s * 0.12, py + s * 0.35, px + s * a + s * 0.12, py + s * 0.65], fill=hexc('#5e7a40'))
+    if t['name'] == 'flood':
+        if (x * 3 + y) % 4 == 0: d.line([px + s * 0.2, py + s * 0.55, px + s * 0.6, py + s * 0.55], fill=hexc('#3e5a66'))
+        if (x + y * 5) % 7 == 0: d.ellipse([px + s * 0.55, py + s * 0.2, px + s * 0.8, py + s * 0.35], outline=hexc('#4c6e7a'))
+    if t['name'] == 'steps':
+        for i in range(4): d.rectangle([px, py + i * s // 4, px + s - 1, py + i * s // 4 + max(1, s // 10)], fill=shade(col, 0.6 + i * 0.12))
     if t['name'] == 'stairs':
         for i in range(3): d.rectangle([px + 1, py + 2 + i * s // 3, px + s - 2, py + 2 + i * s // 3 + max(1, s // 8)], fill=hexc('#4a4560'))
 
@@ -352,6 +360,20 @@ def scenery_pass(d, m, tiles, s, x, y, px, py):
         d.ellipse([px + s * 0.15, py + s * 0.7, px + s * 0.85, py + s * 1.0], fill=(0, 0, 0, 90))
         d.rectangle([px + s * 0.25, py - s * 0.4, px + s * 0.75, py + s * 0.9], fill=col, outline=hexc('#2a2830'))
         d.rectangle([px + s * 0.15, py - s * 0.5, px + s * 0.85, py - s * 0.3], fill=shade(col, 1.2))
+    if t['name'] == 'pew':
+        d.rectangle([px, py + s * 0.25, px + s - 1, py + s * 0.45], fill=shade(col, 1.25))      # the back rail
+        d.rectangle([px, py + s * 0.45, px + s - 1, py + s * 0.85], fill=col, outline=hexc('#241810'))
+    if t['name'] == 'bone_niche':
+        d.rectangle([px, py, px + s - 1, py + s - 1], fill=hexc('#15131a'))
+        if y + 1 < m['H'] and tiles[g[y + 1][x]]['walk']:
+            d.rectangle([px + s * 0.15, py + s * 0.35, px + s * 0.85, py + s - 1], fill=hexc('#08070b'))
+            d.ellipse([px + s * 0.3, py + s * 0.5, px + s * 0.7, py + s * 0.85], fill=hexc('#c9c0ae'))   # a skull on its shelf
+            d.rectangle([px + s * 0.38, py + s * 0.62, px + s * 0.45, py + s * 0.68], fill=hexc('#08070b'))
+            d.rectangle([px + s * 0.55, py + s * 0.62, px + s * 0.62, py + s * 0.68], fill=hexc('#08070b'))
+    if t['name'] == 'ember_pit':
+        d.rectangle([px, py, px + s - 1, py + s - 1], fill=hexc('#1a0c08'))
+        for a, b in ((0.25, 0.3), (0.6, 0.55), (0.35, 0.75)):
+            if (x * 3 + y * 7 + int(a * 10)) % 3: d.ellipse([px + s * a, py + s * b, px + s * a + s * 0.22, py + s * b + s * 0.18], fill=hexc('#ff6a2a'))
     if t['name'] == 'rock':
         if (x + y) % 4 == 0: d.rectangle([px + 2, py + 2, px + s // 3, py + s // 3], fill=hexc('#221f2a'))
 
@@ -431,6 +453,42 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
             d.rectangle([px + 1, py - s * 0.6, px + w - 2, py + h - 1], fill=col, outline=hexc('#0b0a0f'))
             d.polygon([(px, py - s * 0.5), (px + w / 2, py - s * 1.2), (px + w, py - s * 0.5)], fill=hexc('#3a3a48'), outline=hexc('#0b0a0f'))
             d.rectangle([px + w * 0.4, py - s * 0.3, px + w * 0.6, py + h * 0.6], fill=hexc('#ffd27a')); continue
+        if k == 'well':
+            d.ellipse([px + 2, py + s * 0.3, px + w - 3, py + h - 2], fill=col, outline=hexc('#0b0a0f'))
+            d.ellipse([px + s * 0.45, py + s * 0.65, px + w - s * 0.45, py + h - s * 0.4], fill=hexc('#0e1a22'))
+            for a in (0.2, 0.8): d.line([px + w * a, py + h * 0.6, px + w * a, py - s * 0.3], fill=hexc('#5a4230'), width=2)
+            d.line([px + w * 0.2, py - s * 0.3, px + w * 0.8, py - s * 0.3], fill=hexc('#5a4230'), width=2); continue
+        if k == 'book_pyre':
+            d.polygon([(px + 1, py + s - 2), (px + s / 2, py + s * 0.25), (px + s - 2, py + s - 2)], fill=hexc('#4a3a2c'), outline=hexc('#0b0a0f'))
+            for a, b in ((0.3, 0.7), (0.6, 0.6)): d.rectangle([px + s * a, py + s * b, px + s * a + s * 0.2, py + s * b + s * 0.12], fill=hexc('#c8b890'))
+            d.ellipse([px + s * 0.35, py + s * 0.1, px + s * 0.65, py + s * 0.45], fill=col); continue
+        if k == 'torn_banner':
+            d.polygon([(px + 1, py + s * 0.5), (px + s - 1, py + s * 0.35), (px + s * 0.8, py + s * 0.85), (px + s * 0.2, py + s * 0.9)], fill=col, outline=hexc('#3a3630'))
+            d.line([px + s * 0.4, py + s * 0.45, px + s * 0.5, py + s * 0.8], fill=hexc('#c9a227')); continue
+        if k == 'pack':
+            d.rounded_rectangle([px + s * 0.2, py + s * 0.35, px + s * 0.75, py + s * 0.9], radius=s * 0.15, fill=col, outline=hexc('#1c1712'))
+            d.line([px + s * 0.85, py + s * 0.1, px + s * 0.55, py + s * 0.95], fill=hexc('#8a6a48'), width=2); continue  # a walking staff
+        if k == 'altar':
+            d.rectangle([px, py + s * 0.2, px + w - 1, py + h - 1], fill=hexc('#0b0a0f'))
+            d.rectangle([px + 1, py + s * 0.2 + 1, px + w - 2, py + h - 2], fill=col)
+            d.rectangle([px + 1, py + s * 0.2 + 1, px + w - 2, py + s * 0.45], fill=hexc('#7a2020'))   # a red cult cloth over the old one
+            d.ellipse([px + w * 0.4, py + s * 0.25, px + w * 0.6, py + s * 0.5], outline=hexc('#ffd27a')); continue
+        if k == 'window':
+            d.rectangle([px + s * 0.2, py + s * 0.05, px + s * 0.8, py + s * 0.85], fill=hexc('#0b0a0f'))
+            for i, c2 in enumerate(('#ffcf6a', '#c05040', '#6a8ad0', '#ffcf6a')):
+                d.rectangle([px + s * 0.27, py + s * (0.12 + i * 0.17), px + s * 0.73, py + s * (0.26 + i * 0.17)], fill=hexc(c2))
+            continue
+        if k == 'table':
+            d.rectangle([px + 1, py + s * 0.25, px + w - 2, py + s * 0.7], fill=col, outline=hexc('#1c1712'))
+            for a in (0.2, 0.55): d.ellipse([px + w * a, py + s * 0.3, px + w * a + s * 0.3, py + s * 0.55], fill=hexc('#c8b890')); continue
+        if k == 'cage':
+            d.rectangle([px + 2, py + 2, px + w - 3, py + h - 3], outline=col, width=2)
+            for i in range(1, 5): d.line([px + w * i / 5, py + 2, px + w * i / 5, py + h - 3], fill=col)
+            d.ellipse([px + w * 0.35, py + h * 0.55, px + w * 0.65, py + h * 0.8], fill=hexc('#c9c0ae')); continue  # what's left of the monk
+        if k == 'bell_mold':
+            d.ellipse([px + 2, py + s * 0.3, px + w - 3, py + h - 2], fill=hexc('#3a3026'), outline=hexc('#0b0a0f'))
+            d.polygon([(px + w * 0.32, py + h * 0.2), (px + w * 0.68, py + h * 0.2), (px + w * 0.85, py + h * 0.8), (px + w * 0.15, py + h * 0.8)], fill=col, outline=hexc('#2a2014'))
+            d.line([px + w * 0.2, py + h * 0.85, px + w * 0.8, py + h * 0.85], fill=hexc('#ff8a3c'), width=2); continue  # still warm at the rim
         if k == 'dead_oak':
             cx, cy = px + w / 2, py + h / 2
             for a, b in ((0.05, 0.1), (0.95, 0.0), (0.15, 0.55), (0.9, 0.5), (0.5, 0.0)):

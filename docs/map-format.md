@@ -36,6 +36,8 @@ critter crow 22.5 4.9 1 high   # kind x y [how many] [high]: small living things
 - `named ... route=x,y;x,y;...` (optional): a wandering named's loop. The checker makes sure every point is open ground you can reach and draws the loop as a dashed line; `pack=N` is how many wolves walk with it.
 - `critter` (v0.49): looks only, never in the way. Kinds: `crow` (flies off when you come close, back once you've gone; `high` = perched up on a fence, roof or statue, drawn over everyone), `frog` (on open ground by water, plops in when you come close), `moth` (circles the light it's placed at; the number is how many), `owl` (sits on a branch, blinks, turns its head to watch you), `firefly` (v0.59: drifts and blinks over a marsh or meadow; the number is how many), `rabbit` (v0.59: nibbles in the grass, bolts for the trees when you come close), `bat` (flutters round the spot). Ripples on open water and smoke from a shack's chimney need no line. The checker wants frogs on open ground with water near, and moths near a light.
 - `rules: 'dead-inside'` turns on the dead-area check for this map.
+- `instance: 1` (Nov 20, Dungeon 1): an instanced area (just you, or your group later); the game side comes with the Dungeon 1 build.
+- New in Nov 20 for the chapel and Dungeon 1: tiles `Y` pew, `z` flood water (walkable; it will slow you and mobs), `N` bone niche (a wall with a skull shelf), `V` steps (walk down between rooms of one map), `K` ember pit; objects well, book_pyre, torn_banner, pack, altar, window (stained glass, on a wall), table, cage, bell_mold.
 - Coordinates count from 0 at the top-left; x goes right, y goes down. The overview picture has a ruler every 4 tiles, so notes like "move the shack to 2,20" work.
 
 ## What the checker enforces

@@ -225,7 +225,7 @@ Start small: one hub city, three outdoor zones and two dungeons, covering levels
 | --- | --- | --- | --- |
 | Hub city | All | Safe zone | Bank, vendors, trainers, group finder |
 | Zone 1 | 1–10 | Outdoor, shared | Crossroads, graveyard and crypt, rat tunnel, Wolfwood, Ruined Chapel (see Zone 1 below) |
-| Dungeon 1 (Malrec's chapel) | 8–11 | Instanced, 1–5 players | Inside Zone 1; 10–15 minute run (4 rooms) |
+| Dungeon 1 (Malrec's chapel) | 14–15 | Instanced, 1–5 players | Inside Zone 1; 10–15 minute run (4 rooms) |
 | Zone 2 | 10–20 | Outdoor, shared | First named mobs and rare spawns |
 | Zone 3 | 20–30 | Outdoor, shared | Dangerous roamers, group-only named camp |
 | Dungeon A | 12–18 | Instanced, 1–5 players | 15–20 minute run, scales to party size |
@@ -312,13 +312,16 @@ The Mire is out of Zone 1 for now (small and finished); it may return in Zone 2.
 
 The zone's only instanced dungeon (Nov 17 change: the crypt is now an open, shared area in the graveyard). Entered from under the ruined chapel's altar, for about levels 14–15 (draft 2 ladder, Nov 18; was 8–10), scaled for one player until multiplayer exists.
 
-- **Shape (owner, Nov 17):** a crypt under the altar, then the cult halls, ending at Brother Malrec. Kept short on purpose (later dungeons go bigger): **4 rooms, about 16 mobs plus Malrec, a 10–15 minute run.**
-- **Rooms:**
-  1. **Chapel nave** (above ground): one camp of three fen cultists by a lit altar. Touching the altar opens the stairs down.
-  2. **Flooded catacomb:** the crypt's dead (skeletons and shambling corpses, levels 8–9) in knee-deep water that **slows everyone, you and the mobs**, so kiting still works but takes more care. A side passage hides a chest.
-  3. **Cult halls:** two camps of three cultists (levels 9–10), each with a **healer**. Kill or root the healer first: the warm-up for Malrec.
-  4. **Malrec's sanctum:** Brother Malrec (a stretch fight at the top of the zone; draft 2 ladder: most classes beat him at **15**) with two acolytes at his side. Candles light up one by one as the fight goes on; censer smoke trails behind him.
-- **Malrec's fight:** he heals his acolytes, so deal with them first (kill, root, mez or fear). His big move follows the telegraph rule (seen coming, with a counter); details when it's built.
+- **Shape (owner, Nov 20, replaces the 4-room plan):** bigger and substantial, with a mini boss, but still a **10–15 minute run**: six rooms, a secret loop and an optional named lair, about 23 mobs on the main way, two named fights plus Malrec. Map draft 2: `js/data/maps/dungeon1.js`; brief in `docs/research/map-design.md`.
+- **Rooms:** one map walked straight through, north is deeper.
+  1. **Chapel nave** (above ground): pews, stained glass, the altar under a red cult cloth; one camp of three (14). Touching the altar opens the stairs down behind it.
+  2. **Flooded catacomb:** bone niches and coffins in knee-deep water that **slows everyone, you and the mobs**. Five drowned dead (14). A secret loop round the west wall to a chest in a burial niche.
+  3. **Drowned crypts:** narrow burial passages that loop, flooded in patches; four dead (14–15).
+  4. **The Drowned Prior (mini boss, 15):** in his flooded crypt chapel. **Grasp of the Deep** (2 s cast): hands rise from the water and hold anyone standing in it; get onto a dry stone plinth.
+  5. **The cult's half:** refectory and ritual hall (an ember pit), each with a camp of three that has a **mender** (heals the others: stop it first); a dormitory with a monk in a cage; two ash wisps (15).
+  6. **Malrec's sanctum:** Brother Malrec (15; most classes should beat him at 15) on a dais with **two deacons** (15).
+  - **Optional: the Bellringer (15)** in the old bell foundry off the catacomb, with two cultists and his own chest. **Toll** (1.5 s wind-up): stuns anyone within reach; step back.
+- **Malrec's fight:** he heals his deacons, so deal with them first (kill, root, mez or fear). His big move follows the telegraph rule (seen coming, with a counter); three options for the owner in the brief (Candle Wake, Ember Rain, Rite of Ash).
 - **Malrec's chest:** like Boss 1's: one named item for your class and one uncommon every time, plus a small rare chance. Then the exit with a run summary.
 - **Solo check:** he must stay soloable at the cap (pillar 2). When he's built, the sim checks that most classes beat him at 15 (draft 2 ladder); if not, tune him, not the level.
 - **Today's game:** the instanced crypt with Boss 1 is still in the prototype until the Zone 1 rework is built. Its notes: 13 mobs in five rooms, crypt rats and skeletons (levels 4–6), Boss 1 (level 7) with a shadow bolt about every 7 seconds and two skeletons at half health. The bolt is a **telegraphed 2s cast** (v0.18.3): a purple cast bar shows in the target frame and over its head, and Boss 1 stands still while casting. A stun or fear interrupts it (Evade and Feign Death too); being out of range (110), Deflect or Divine Aura makes it miss. Every boss's big move should follow this rule: seen coming, with a counter, a chest and an exit with a run summary.
