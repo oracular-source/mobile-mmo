@@ -71,6 +71,8 @@ function mkSkin(id){
 // Rags (gear tier 0): head + body + starter weapon on a 20x24 grid, coloured from RAGS. Also makes two
 // walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
 function mkRags(id){
+  // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
+  const q=RAG15[id];if(q){const pal=Object.assign({},RAG15_COMMON,q.c),im=mk(q.r,pal);im.steps=[mk(q.a,pal),mk(q.b,pal)];return im}
   const c=RAGS[id];if(!c)return null;
   const W=20,g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>{const a=r.split('');while(a.length<W)a.push('.');return a});
   c.w.forEach(w=>RAG_WEAPONS[w].forEach(([y0,rows])=>rows.forEach((r,j)=>{const y=y0+j;if(!g[y])return;for(let i=0;i<r.length&&i<W;i++)if(r[i]!=='.')g[y][i]=r[i]})));

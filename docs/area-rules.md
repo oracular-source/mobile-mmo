@@ -90,6 +90,14 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Named look bigger and shaggier than their pack (owner, v0.67):** a named is about 1.5–2× its family's size with fur tufts on the back, ragged edges and one story prop on the body (Gnawbone's bone and trap jaw, Greyfang's arrows and scars), so it reads as old and dangerous, not a recolour.
 - **A boss stands apart from the mobs around it:** Brother Malrec keeps his cult's hood but in grand vestments (tall gold-tipped cowl, gold collar, gold-trimmed red robe and stole, gold hem, a crook-staff with a lit censer), so he reads as the one in charge at a glance.
 
+## Player bodies: recipe from the player pass (owner OK as placeholders, v0.68, Nov 21)
+- **Draw at the real size, 15 × 18,** pixel by pixel: a 13 × 16 fill plus the black outline from `outline()` (`tools/player_rags.py`). Never draw bigger and shrink; dropped rows and columns cut eyes and break outlines.
+- **Layout:** head 6–7 rows (about 40% of the height) centred on columns 3–8, body columns 2–9, starter weapon in the right hand at column 10–11 (staffs run the full height), shield or off-hand on the left at columns 0–1. Faces front, light from the top left (H light edge on the left, N/d shade on the right), rope belt across the waist, grey leg wraps and dark foot wraps.
+- **The head carries the class:** every class gets its own head shape so it reads as a solid black silhouette (crown of leaves, headband with tails, iron cap, pot helm, pointed hood, tall hood, coif, mask, brimmed hat, cone cap, horns, topknot, feathered cap). Faces show with two eye pixels and a gap; hidden-face classes show only glowing or dark eyes.
+- **One body detail per class** beyond the shared rags: torn floor-length robe (Necro), bare arms and wraps (Monk), half-cape (Shadow Knight), quiver (Ranger), tabard (Paladin), stole (Magician), bone necklace and fur mantle (Shaman), puffed sleeves and lute (Bard).
+- **Walk:** two step frames, one foot lifted a pixel each; robes can hide it until the animation pass.
+- **Colours** are a few swappable slots per class (cloth ramp H/n/N/d, hood A/a/Q, accent R), which is what makes recolours cheap later.
+
 ## UI look (owner, Nov 18–20)
 Minimal EverQuest-style until the theme is decided; every screen part uses one look (UI breakdowns in `docs/research/ui.md`).
 - **One panel, one button (v0.60, breakdown 19 B):** frames, HUD buttons and every window are plain grey `rgba(40,40,40,.97)` with a 1px `#8a8a8a` edge and 4px corners; buttons `#2b2b2b` with the same edge; inner cards (spells, forks, gear) `#2b2b2b` with a `#6c6c6c` edge. No gradients, no shine.
