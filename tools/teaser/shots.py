@@ -45,41 +45,53 @@ SHOTS = [
                + cap('14 classes', 0, 69, y=0.16, size=20) + ov('Warrior', 0.70, 22, 0, 69, col='#ff9a7a'),
          tick="mobs.forEach(m=>{if(!m.dead)m.hp=Math.max(m.hp,m.maxhp*0.35)});"),
 
-    # 4. The crypt: a group takes on the Skeleton King.
-    dict(name='s4_king', cls='paladin', area='crypt', level=12, frames=190, zoom=150, warm=6,
+    # 4. The crypt: a group takes on the Skeleton King (his shadow bolt telegraph, his skeletons at half health).
+    dict(name='s4_king', cls='paladin', area='crypt', level=12, frames=240, zoom=150, warm=6,
          setup="H.quiet();H.god();__heroName='Dunmore';H.at(500,200);"
                "H.only(m=>m.type==='boss1');window.K=mobs.find(m=>m.type==='boss1'&&!m.dead);"
                "H.fight({abis:['dstrike','hbash','smiteu','pstrike'],range:20,R:200});"
-               "addFake('warrior','Kael',470,214,{dmg:9,slot:3.6});addFake('wizard','Morwen',530,226,{dmg:12,slot:0.4});"
-               "addFake('rogue','Vex',486,232,{dmg:9,slot:2.4});addFake('cleric','Brother Tam',514,244,{dmg:5,slot:1.4,healT:player});"
-               + "__fakes.forEach(f=>{f.target=K;f.aggro=300});engage(K);K.def=Object.assign({},K.def,{name:'the Skeleton King'});curArea().lights.push({x:500,y:150,r:120,w:14});" + cap('The crypt · the Skeleton King', 8, 185),
-         tick="H.track(K,i,10,170);"),
+               "addFake('warrior','Kael',470,214,{dmg:9,slot:3.6});addFake('wizard','Morwen',540,236,{dmg:12,slot:0.4,bigEvery:3});"
+               "addFake('magician','Fizzwick',460,240,{dmg:11,slot:2.6,bigEvery:3.5});addFake('cleric','Brother Tam',514,250,{dmg:6,slot:1.4,healT:player});"
+               "__fakes.forEach(f=>{f.target=K;f.aggro=300});engage(K);K.def=Object.assign({},K.def,{name:'the Skeleton King'});curArea().lights.push({x:500,y:150,r:120,w:14});"
+               + cap('The Skeleton King', 8, 235) + ov('Shadow Bolt · raises his guard', 0.21, 13, 30, 235, col='#d8b8ff', w='400'),
+         tick="H.track(K,i,10,225);if(i===8)K.bolt=0.2;"),
 
-    # 5. Wolfwood: Greyfang and his pack.
-    dict(name='s5_greyfang', cls='shadowknight', area='wolfwood', level=12, frames=180, zoom=150, warm=6,
+    # 5. Wolfwood: Greyfang howls in his pack.
+    dict(name='s5_greyfang', cls='shadowknight', area='wolfwood', level=12, frames=190, zoom=150, warm=6,
          setup="H.quiet();H.god();__heroName='Sable';window.G=mobs.find(m=>m.type==='greyfang');"
                "H.only(m=>m===G||Math.hypot(m.x-G.x,m.y-G.y)<40);G.sp.route=null;H.at(G.x+10,G.y+70);"
                "H.fight({abis:['dcleave','harm','siphon','sstrike'],range:20,R:200});player.target=G;"
-               "addFake('ranger','Juniper',G.x-30,G.y+92,{dmg:9,slot:0.2});addFake('druid','Thistle',G.x+42,G.y+96,{dmg:8,slot:2.8});"
-               "addFake('monk','Pell',G.x-14,G.y+104,{dmg:9,slot:4});addFake('enchanter','Isolde',G.x+20,G.y+112,{dmg:7,slot:1.2});"
-               + cap("Wolfwood · Greyfang's pack", 8, 175),
-         tick="H.track(G,i,10,165);mobs.forEach(m=>{if(!m.dead&&m!==G)m.hp=Math.max(m.hp,m.maxhp*(i<120?0.5:0))});"),
+               "addFake('ranger','Juniper',G.x-30,G.y+92,{dmg:9,slot:0.2,bigEvery:3});addFake('druid','Thistle',G.x+42,G.y+96,{dmg:8,slot:2.8,bigEvery:3});"
+               "addFake('shaman','Brann',G.x-14,G.y+104,{dmg:9,slot:4,bigEvery:3});addFake('enchanter','Isolde',G.x+20,G.y+112,{dmg:7,slot:1.2,bigEvery:3});"
+               + cap("Greyfang · he howls in his pack", 8, 185),
+         tick="H.track(G,i,10,175);mobs.forEach(m=>{if(!m.dead&&m!==G)m.hp=Math.max(m.hp,m.maxhp*(i<130?0.5:0))});"),
 
-    # 6. The Ruined Chapel grounds, then Dungeon 1 and Brother Malrec.
-    dict(name='s6a_chapel', cls='monk', area='chapel', level=15, frames=100, zoom=150, warm=6,
-         setup="H.quiet();H.god();__heroName='Pell';H.at(260,450);H.only(m=>Math.hypot(m.x-250,m.y-398)<55);"
-               "H.fight({abis:['dragon','flurry','fkick','palm'],range:20,R:120});mobs.forEach(m=>{if(!m.dead)engage(m)});"
-               "addFake('paladin','Dunmore',240,446,{dmg:8});addFake('magician','Fizzwick',285,448,{dmg:9});addFake('shaman','Brann',262,458,{dmg:7});"
-               + cap('The Ruined Chapel', 6, 95),
-         tick="mobs.forEach(m=>{if(!m.dead)m.hp=Math.max(m.hp,m.maxhp*(i<70?0.4:0))});"),
-    dict(name='s6b_malrec', cls='warrior', area='dungeon1_f2', level=15, frames=200, zoom=150, warm=6,
+    # 6. Dungeon 1: the Drowned Prior (Grasp of the Deep), the Bellringer (the Toll), Brother Malrec (Candle Wake).
+    dict(name='s6a_prior', cls='warrior', area='dungeon1', level=15, frames=180, zoom=150, warm=6,
+         setup="H.quiet();H.god();__heroName='Kael';window.P=mobs.find(m=>m.type==='prior');"
+               "H.only(m=>m===P);H.at(P.x,P.y+50);player.target=P;engage(P);P.graspCd=0.6;"
+               "H.fight({abis:['cleave','bash','strike'],range:20,R:200});"
+               "addFake('necro','Grimsby',P.x-40,P.y+60,{dmg:9,slot:2.6,bigEvery:3});addFake('wizard','Morwen',P.x+40,P.y+62,{dmg:12,slot:0.5,bigEvery:3});"
+               "addFake('cleric','Brother Tam',P.x,P.y+80,{dmg:6,slot:1.6,healT:player});__fakes.forEach(f=>{f.target=P;f.aggro=300});"
+               + cap('The Drowned Prior', 8, 175) + ov('Grasp of the Deep', 0.21, 13, 20, 175, col='#9fd8c0', w='400'),
+         tick="H.track(P,i,10,170);if(i===95)P.graspCd=0.1;"),
+    dict(name='s6b_bell', cls='monk', area='dungeon1_f2', level=15, frames=140, zoom=150, warm=6,
+         setup="H.quiet();H.god();__heroName='Pell';window.BR=mobs.find(m=>m.type==='bellringer');"
+               "H.only(m=>m===BR);H.at(BR.x,BR.y+40);player.target=BR;engage(BR);BR.tollCd=0.8;"
+               "H.fight({abis:['dragon','flurry','fkick','palm'],range:20,R:200});"
+               "addFake('paladin','Dunmore',BR.x-24,BR.y+30,{dmg:8,slot:3});addFake('magician','Fizzwick',BR.x+44,BR.y+50,{dmg:11,slot:0.3,bigEvery:2.5});"
+               "addFake('shaman','Brann',BR.x-40,BR.y+56,{dmg:9,slot:2.2,bigEvery:2.5});__fakes.forEach(f=>{f.target=BR;f.aggro=300});"
+               + cap('The Bellringer', 8, 135) + ov('The Toll', 0.21, 13, 20, 135, col='#ffd27a', w='400'),
+         tick="H.track(BR,i,10,130);if(i===80)BR.tollCd=0.1;"),
+    dict(name='s6c_malrec', cls='warrior', area='dungeon1_f2', level=15, frames=230, zoom=150, warm=6,
          setup="H.quiet();H.god();__heroName='Kael';window.M=mobs.find(m=>m.type==='malrec');"
                "H.only(m=>m.type==='malrec'||m.type==='deacon');H.at(264,150);player.target=M;"
                "H.fight({abis:['cleave','bash','strike'],range:20,R:200});"
-               "addFake('cleric','Brother Tam',250,190,{dmg:5,slot:1.5,healT:player});addFake('wizard','Morwen',290,186,{dmg:12,slot:0.6});"
-               "addFake('necro','Grimsby',236,176,{dmg:9,slot:2.6});addFake('rogue','Vex',280,166,{dmg:10,slot:5.5});"
-               + cap('Dungeon 1 · Brother Malrec', 8, 195),
-         tick="H.track(M,i,10,180);mobs.forEach(m=>{if(!m.dead&&m.type==='deacon')m.hp=Math.max(m.hp,m.maxhp*(i<140?0.3:0))});"),
+               "addFake('cleric','Brother Tam',250,190,{dmg:6,slot:1.5,healT:player});addFake('wizard','Morwen',290,186,{dmg:12,slot:0.6,bigEvery:3});"
+               "addFake('necro','Grimsby',236,176,{dmg:9,slot:2.6,bigEvery:3});addFake('shaman','Brann',280,166,{dmg:9,slot:5.5,bigEvery:3});"
+               + cap('Brother Malrec', 8, 225) + ov('Candle Wake: stop the wisps', 0.21, 13, 30, 225, col='#ffd27a', w='400'),
+         tick="H.track(M,i,10,210);mobs.forEach(m=>{if(!m.dead&&m.type==='deacon')m.hp=Math.max(m.hp,m.maxhp*(i<160?0.3:0))});"
+              "mobs.forEach(m=>{if(!m.dead&&m.type==='cwisp')m.hp=Math.max(m.hp,m.maxhp*(i<185?0.5:0))});"),
 
     # 7. More players: the campfire as a hub, the camera pulling back.
     dict(name='s7_together', cls='druid', area='crossroads', level=8, frames=190, zoom=999, warm=20,

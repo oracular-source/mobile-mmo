@@ -34,6 +34,7 @@ HUD_CSS = "#devbtn{display:none !important} .modal{display:none !important}"
 # Recording-only patches to render.js: a camera override, the hero can be hidden, fakes join the depth sort, names on top.
 PATCHES = [
     ("camY=sn(camY);}", "camY=sn(camY);}if(window.__cam){camX=window.__cam.x;camY=window.__cam.y}"),
+    ("drawGlows();", "drawGlows();if(window.__spellFx)window.__spellFx();"),
     ("[player],trees)", "[player],trees,window.__fakes||[])"),
     ("const drawEnt=e=>{", "const drawEnt=e=>{if(e.fake){window.__drawFake(e);return}if(e===player&&window.__hideHero)return;"),
     ("if(player.dead>0){cx.fillStyle='rgba(60", "if(window.__names)window.__names();if(window.__overlayDraw)window.__overlayDraw();if(player.dead>0){cx.fillStyle='rgba(60"),
