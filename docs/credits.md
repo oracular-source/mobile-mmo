@@ -12,3 +12,4 @@ Every asset in the game is listed here with its source and license.
 | Fonts | System monospace fonts on the player's device | Not bundled |
 | `js/data/icons.js` (spell icon shapes) | Made for this game (Claude, Nov 20) | Original |
 | Dungeon 1 art drawn in `js/area.js` and `js/render.js` (pews, flood water, bone niches, stone steps, ember pits, the altar and its slab, stained-glass windows, refectory tables, the cage, the bell mould, Grasp of the Deep's hands, the Toll's ring) and its placeholder monsters (`ROBED` in `js/data/sprites.js`: mender, deacon, the Drowned Prior, the Bellringer, Brother Malrec; the candle wisp) (v0.63) | Original, made for this project | Owned by the project |
+| Undead and Brother Malrec sprites (`UNDEAD_SPR` in `js/data/sprites.js`, drawn by `tools/undead_mobs.py`), draft sheets `art/drafts/undead-draft1.png` and `art/drafts/named-draft1.png` (`tools/named_mobs.py`) (v0.65) | Made for this game (Claude, Nov 21) | Original |

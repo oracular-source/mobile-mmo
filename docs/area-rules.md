@@ -82,6 +82,13 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Player characters are 15 × 18 on screen (final).** How it's drawn: each class is authored at 20 × 24 in `RAGS` (`js/data/sprites.js`) and the renderer drops every 4th row and column (`js/render.js`) to show it at 15 × 18. New class looks are drawn the same way.
 - Humanoid monsters and NPCs are sized against that 15 × 18; undead (skeletons, the Skeleton King, zombies) get redrawn bigger than today in the character design pass. The rats, Old Gnawbone and the chapel placeholders are the bar to match.
 
+## Monster bodies: recipe from the undead pass (owner OK, Nov 21)
+- **Each family gets its own body**, never a recolour of another family. Variants of one family (crypt skeleton, Necro pet, Shadow Knight minion) share the body and change bone colour, eye colour and what they hold.
+- **Size against the 15 × 18 player:** a regular humanoid monster is a touch taller (16 × 20); a boss or dungeon boss is about 1.6× the player (24 × 28–30), drawn at full detail, never a small sprite scaled up.
+- **How it's drawn:** fill-only text grids with the black outline added by a script (`tools/undead_mobs.py`, `outline()`), light from the top left, faces right, one step frame where the legs (or the hem, for robes) move.
+- **The shapes that make each read:** skeleton = skull with dark sockets and a glint, ribs as white bars split by black, a spine, a pelvis, thin limbs with gaps; zombie = hunched forward, both arms reaching, jaw hanging, skin showing through torn clothes, one bare foot; Skeleton King = crown, glowing sockets, fur collar, torn royal cloak, a big sword he leans on.
+- **A boss stands apart from the mobs around it:** Brother Malrec keeps his cult's hood but in grand vestments (tall gold-tipped cowl, gold collar, gold-trimmed red robe and stole, gold hem, a crook-staff with a lit censer), so he reads as the one in charge at a glance.
+
 ## UI look (owner, Nov 18–20)
 Minimal EverQuest-style until the theme is decided; every screen part uses one look (UI breakdowns in `docs/research/ui.md`).
 - **One panel, one button (v0.60, breakdown 19 B):** frames, HUD buttons and every window are plain grey `rgba(40,40,40,.97)` with a 1px `#8a8a8a` edge and 4px corners; buttons `#2b2b2b` with the same edge; inner cards (spells, forks, gear) `#2b2b2b` with a `#6c6c6c` edge. No gradients, no shine.

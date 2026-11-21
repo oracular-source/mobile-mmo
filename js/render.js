@@ -55,6 +55,9 @@ function mkRobed(id){const S=ROBED[id],W=S.w,H=S.h,cx=(W-1)/2,rx=W*0.29,ry=H*0.2
   const rows=g.map(r=>r.join('')),step=side=>{const n=g.map(r=>r.slice());for(let i=0;i<W;i++){if((side?i>cx:i<cx)&&n[H-1][i]!=='.'){n[H-1][i]='.';if(n[H-2][i]!=='.')n[H-2][i]='k'}}return n.map(r=>r.join(''))};
   const im=mk(rows,pal);im.steps=[mk(step(0),pal),mk(step(1),pal)];return im}
 ['zealot','ashcaller','chanter','acolyte','mender','deacon','prior','bellringer','malrec'].forEach(k=>{IMG[k]=mkRobed(k)});
+// Undead and Brother Malrec redrawn (v0.65, character pass): each with its own body and a step frame (UNDEAD_SPR in sprites.js).
+// Image keys stay the same (dead, skel, pet, minion, boss1, malrec), so mobs, pets and the DEV gallery pick them up as before.
+[['dead','corpse'],['skel','skel'],['pet','pet'],['minion','minion'],['boss1','king'],['malrec','malrec']].forEach(([k,s])=>{IMG[k]=mkWalk(UNDEAD_SPR[s],UNDEAD_SPR[s+'step'],UNDEAD_PAL[s])});
 IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);
 // Candle wisp (v0.63, Malrec's Candle Wake): the ash wisp's flame in pale candle gold, so it reads as a different thing to chase.
 IMG.cwisp=mk(WISP_SPR[0],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));IMG.cwisp2=mk(WISP_SPR[1],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));
@@ -237,7 +240,9 @@ function render(){
     if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
     if(e===pet||e===pet2){const im=IMG[e.img||'pet']||IMG.pet;
       if(e.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
-      shadow(e.x,e.y,Math.max(4,Math.round(im.w/2.4)));drawSprite(im,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);
+      shadow(e.x,e.y,Math.max(4,Math.round(im.w/2.4)));
+      if(im.steps){const mv=e._lw!==e.walk;e._lw=e.walk;drawSprite(walkFrame(im,e.walk,mv).im,e.x,e.y+1,e.dir,0,false)} // new pets step their legs, standing still when idle
+      else drawSprite(im,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);
       if(e.charm&&Math.floor(time*3)%2===0){lx.fillStyle='#ff9de2';const hy=Math.round(e.y-im.h-3);lx.fillRect(Math.round(e.x)-1,hy,1,1);lx.fillRect(Math.round(e.x)+1,hy,1,1);lx.fillRect(Math.round(e.x),hy+1,1,1)} // little heart over a charmed mob
       return}
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
