@@ -1,4 +1,4 @@
-# Redesign pass, draft 2 (character chat, Nov 21; owner: "give another crack" at everything not redone yet, expect small changes).
+# Redesign pass, draft 3 (character chat, Nov 21; owner: "give another crack" at everything not redone yet, expect small changes).
 # Cult (zealot, ashcaller, chanter, mender, deacon, summoner, the Ashen Acolyte), blight wolf, Old Scar, thornback boar,
 # big tunnel rat and the Pale Rat, mire beetle and Ironshell, the Weeping Bride, the Magician's elementals and the
 # Enchanter's floating sword. Fill-only text grids (same format as js/data/sprites.js); outline() adds the black edge.
@@ -128,7 +128,7 @@ CULT_SET=[('zealot',ZEAL,cultpal('#5a2a24')),('ashcaller',ASH,cultpal('#5c5a5e')
 # ================= Wolfwood =================
 # Blight wolf: the old wolf a size up with real fur: lighter back, a little ruff at the neck, a thin flank (ribs), bushy
 # tail, the blight as a sick green patch eating its shoulder with a faint glow, red eye, bared teeth.
-WP=dict(k='#0b0a0f',A='#a9acb0',a='#7d8086',d='#55585f',D='#3e4046',b='#6f7a5c',B='#9ab06a',e='#ff3b30',w='#e8e2d4',r='#7a1a22')
+WP=dict(k='#0b0a0f',N='#24242a',A='#a9acb0',a='#7d8086',d='#55585f',D='#3e4046',b='#6f7a5c',B='#9ab06a',e='#ff3b30',w='#e8e2d4',r='#7a1a22')
 WOLF=pad([
 "...........................a..a...",
 "..........................aAa.aAa.",
@@ -147,6 +147,8 @@ WOLF=pad([
 "....aDd..aD...........aDd.aD.......",
 "....aDDd.aDd..........aDDd.aDd.....",
 ])
+_HEAD=["...A.A........","..AaAa........","..AaaAa.......","AAAaaaeaa.....","AAaaaaaaaaaa..","aAAaaaaaaaaaaN","aaAaaaawwrwr..","aaAaaddrrr....","aaAaad........","ddaadd........","ddaad........."]
+WOLF=pad([WOLF[j][:23]+_HEAD[j] for j in range(11)]+WOLF[11:])
 def legstep(rows,legs_from):
     """Four-legged walk frame: each whole leg moves one pixel, every other leg forward and back, so the pairs splay.
     (Shifting single pixels split 2-pixel legs in half: the 'silly' boar legs in draft 1.)"""
@@ -174,7 +176,7 @@ for j,r in enumerate(SCAR):
     for i,c in enumerate(r):
         if c in 'bB':SCAR[j][i]='a'
 for i,j in [(10,4),(11,5),(12,5),(13,6),(14,6),(15,7),(16,7),(17,8)]:SCAR[j][i]='S'
-SCAR[4][31]='G';SCAR[3][30]='S';SCAR[5][30]='S';SCAR[0][30]='.';SCAR[1][31]='.'
+SCAR[3][29]='G';SCAR[2][28]='S';SCAR[4][30]='S';SCAR[0][28]='.'
 SCAR=[''.join(r) for r in SCAR]
 BP=dict(k='#0b0a0f',A='#8a6448',a='#6a4a34',d='#43301f',D='#2e2016',T='#e0d4b4',t='#a8987a',p='#a0706a',e='#ff3b30',w='#efe6cc',h='#3a2a1e')
 BOAR=pad([
@@ -203,11 +205,12 @@ BRAT=pad([
 "........aAAAAAAAAAAAAaPp...",
 "......aAaaaaaammaaaaAAaaa..",
 ".....aaaaaSaaammaaaaaaaaea.",
-"PPPPdaaaaaaSaaaaaaaaaaaaaap",
-"....ddaaaaaaaaaaaaaaaaaayy.",
-".....ddddadddddddaddddd.y..",
-".......d...d.......d...d...",
-".......p...p.......p...p...",
+"....aaaaaaaSaaaaaaaaaaaaaap",
+"PPPPdaaaaaaaaaaaaaaaaaaayy.",
+"....ddaaaaaaaaaaaaaaaaaa.y.",
+".....dddddddddddddddd......",
+"......d..d......d..d.......",
+"......p..p......p..p.......",
 ])
 PALE=dict(RP,A='#ece6e0',a='#c8c0b8',d='#968c86',D='#706864',m='#d8cec8',S='#e0a0a0',e='#ff2020')
 
@@ -350,7 +353,7 @@ def frames(name,rows,legs):
 if __name__=='__main__':
     font=lambda s:ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans.ttf',s)
     S=6;sheet=Image.new('RGBA',(1560,1500),'#2b2d28');d=ImageDraw.Draw(sheet)
-    d.text((20,12),'Redesign pass, draft 2 (character chat, Nov 21). Each pair: in the game now (left) and new (right, stand + step).',fill='#fff',font=font(20))
+    d.text((20,12),'Redesign pass, draft 3 (character chat, Nov 21). Each pair: in the game now (left) and new (right, stand + step).',fill='#fff',font=font(20))
     items=[(n,r,p,None) for n,r,p in CULT_SET]+BEASTS
     x=20;y=60;rowh=0
     for n,rows,pal,legs in items:
@@ -381,4 +384,4 @@ if __name__=='__main__':
         else:im=img(rows,pal,4)
         sheet.alpha_composite(im,(x,base-im.height));x+=im.width+8
     sheet=sheet.crop((0,0,1560,ly+260))
-    out=os.path.join(os.path.dirname(__file__),'..','art','drafts','redesign-draft2.png');sheet.save(out);print('wrote',out)
+    out=os.path.join(os.path.dirname(__file__),'..','art','drafts','redesign-draft3.png');sheet.save(out);print('wrote',out)
