@@ -337,7 +337,7 @@ SWORD=pad([
 ])
 
 BEASTS=[('wolf',WOLF,WP,10),('oldscar',SCAR,OSP,10),('boar',BOAR,BP,10),('brat',BRAT,RP,8),('palerat',BRAT,PALE,8),
-        ('beetle',BEET,EP,7),('ironshell',IRON,IP,12),('bride',BRIDE,WB,None),('earth',EARTH,EAP,10),('fire',FIRE,FP,None)]
+        ('beetle',BEET,EP,7),('ironshell',IRON,IP,12),('bride',BRIDE,WB,None),('earth',EARTH,EAP,10),('fire',FIRE,FP,None),('blade',SWORD,SP,None)]
 
 # walk frame: each pair splays (one leg reaching forward, one back); paws keep pointing forward
 WOLF_LEGS=["....aaDd..aD.........aDd...aD......","....aDd....aD.......aDd.....aD.....","...aDd......aD.....aDd......aD.....","...aDd......aD.....aDd.......aD....","...aDDd.....aDd....aDDd......aDd..."]

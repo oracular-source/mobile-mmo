@@ -60,6 +60,8 @@ function mkRobed(id){const S=ROBED[id],W=S.w,H=S.h,cx=(W-1)/2,rx=W*0.29,ry=H*0.2
 [['dead','corpse'],['skel','skel'],['pet','pet'],['minion','minion'],['boss1','king'],['malrec','malrec']].forEach(([k,s])=>{IMG[k]=mkWalk(UNDEAD_SPR[s],UNDEAD_SPR[s+'step'],UNDEAD_PAL[s])});
 // The Drowned Prior and the Bellringer get their own models too (character pass, Nov 21), replacing the shared robed shape.
 ['prior','bellringer'].forEach(k=>{IMG[k]=mkWalk(MONASTERY_SPR[k],MONASTERY_SPR[k+'step'],MONASTERY_PAL[k])});
+// Redesign pass (Nov 21): every monster not yet redone gets its hand-drawn look; walkers get their step frame.
+Object.keys(REDO_PAL).forEach(k=>{const s=REDO_SPR[k+'step'];IMG[k]=s?mkWalk(REDO_SPR[k],s,REDO_PAL[k]):mk(REDO_SPR[k],REDO_PAL[k])});
 IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);IMG.gwisp=mk(GWISP_SPR[0],GWISP_PAL);IMG.gwisp2=mk(GWISP_SPR[1],GWISP_PAL);
 // Candle wisp (v0.63, Malrec's Candle Wake): the ash wisp's flame in pale candle gold, so it reads as a different thing to chase.
 IMG.cwisp=mk(WISP_SPR[0],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));IMG.cwisp2=mk(WISP_SPR[1],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));
