@@ -574,9 +574,11 @@ function drawDirtPile(R,bx,by,r){
 // The old plank bridge on the north road: boards across the creek, a rail on each side.
 function drawBridge(R,bx,by,topEnd,botEnd){
   R(bx,by,16,16,AP.plankDk);
-  for(let y=0;y<16;y+=3){R(bx,by+y,16,2,AP.plank);R(bx,by+y,16,1,AP.plankHi);R(bx+5+((y/3)%2)*6,by+y,1,2,AP.plankDk)}
+  // (heart pass, v0.59) old planks: one in a few has gone, showing the dark water under it, and the odd one is a shade off
+  for(let y=0;y<16;y+=3){const r=ah(bx,by+y,61);if(r<0.12){R(bx+1,by+y,14,2,'#0d1a22');R(bx+3,by+y+1,4,1,AP.waterHi);continue}
+    R(bx,by+y,16,2,r>0.8?'#5e4632':AP.plank);R(bx,by+y,16,1,AP.plankHi);R(bx+5+((y/3)%2)*6,by+y,1,2,AP.plankDk)}
   R(bx,by,1,16,AP.out);R(bx+15,by,1,16,AP.out);
-  if(topEnd){R(bx,by-3,2,5,AP.woodDk);R(bx+14,by-3,2,5,AP.woodDk)}if(botEnd){R(bx,by+13,2,4,AP.woodDk);R(bx+14,by+13,2,4,AP.woodDk)}
+  if(topEnd){R(bx,by-3,2,5,AP.woodDk);R(bx+14,by-3,2,5,AP.woodDk);R(bx,by-3,2,1,AP.moss)}if(botEnd){R(bx,by+13,2,4,AP.woodDk);R(bx+14,by+13,2,4,AP.woodDk);R(bx+14,by+16,2,1,AP.moss)}
 }
 function drawRubble(R,bx,by,r){
   [[3,9,4,3],[8,11,5,3],[6,6,3,2],[11,7,3,3],[2,13,3,2]].forEach(([x,y,w,h],i)=>{if(i===4&&r<0.5)return;R(bx+x-1,by+y-1,w+2,h+2,AP.out);R(bx+x,by+y,w,h,i%2?AP.stoneDk:AP.stone);R(bx+x,by+y,w,1,AP.stoneHi)});
@@ -807,10 +809,16 @@ function drawObj(g,R,o){
     shadow(X+1,Y+12,14,3);[[2,9],[5,12],[10,12],[13,9],[4,6],[11,6]].forEach(([x,y])=>{R(X+x-1,Y+y-1,4,3,AP.out);R(X+x,Y+y,2,1,AP.stoneHi)});
     R(X+4,Y+8,9,3,AP.out);R(X+5,Y+9,7,1,AP.woodHi);R(X+6,Y+7,5,3,AP.out);R(X+7,Y+8,3,1,AP.wood);R(X+6,Y+10,5,1,'#ff7a2a');return}
   if(k==='signpost'){
-    // Wooden signpost: arms pointing down each road.
-    shadow(X+4,Y+14,8,2);R(X+7,Y-12,3,27,AP.out);R(X+8,Y-11,1,25,AP.wood);
-    R(X,Y-10,14,5,AP.out);R(X+1,Y-9,12,3,AP.woodHi);R(X+12,Y-9,2,3,AP.wood);R(X+3,Y-8,6,1,AP.woodDk);
-    R(X+3,Y-3,13,5,AP.out);R(X+4,Y-2,11,3,AP.wood);R(X+3,Y-2,1,3,AP.woodHi);R(X+6,Y-1,6,1,AP.woodDk);return}
+    // Wooden signpost at the crossroads (heart pass, v0.59): an old post with a cap, one arm for each road. The west arm
+    // points to the graveyard, the east one to the sinkhole, the north one up toward Wolfwood; the lower arm has lost a
+    // nail and hangs crooked. Weathered: a split in the post, moss at the foot and on the cap, lichen on a board.
+    shadow(X+3,Y+14,10,2);R(X+7,Y-16,3,31,AP.out);R(X+8,Y-15,1,29,AP.wood);R(X+8,Y-3,1,4,AP.woodDk);
+    R(X+6,Y-18,5,3,AP.out);R(X+7,Y-17,3,1,AP.woodHi);R(X+7,Y-18,2,1,AP.moss);
+    R(X+6,Y-14,8,4,AP.out);R(X+7,Y-13,6,2,AP.woodHi);R(X+13,Y-13,1,2,AP.wood);R(X+14,Y-12,1,1,AP.out); // north arm (short, up the road)
+    R(X-2,Y-9,11,5,AP.out);R(X-1,Y-8,9,3,AP.woodHi);R(X-3,Y-7,1,1,AP.out);R(X+1,Y-7,5,1,AP.woodDk);R(X+2,Y-8,2,1,'#8a8a6a'); // west arm, lichen
+    R(X+9,Y-6,9,5,AP.out);R(X+10,Y-5,7,3,AP.wood);R(X+18,Y-4,1,1,AP.out);R(X+11,Y-4,4,1,AP.woodDk); // east arm
+    for(let i=0;i<9;i++){R(X+2+i,Y+1+Math.round(i*0.6),1,4,AP.out);R(X+3+i,Y+2+Math.round(i*0.6),1,2,i%4===0?AP.woodDk:AP.wood)}R(X+8,Y+1,2,2,AP.ironHi); // the crooked arm on its last nail
+    R(X+6,Y+13,5,2,AP.moss);R(X+7,Y+12,2,1,'#5f7a4a');return}
   if(k==='sinkhole'){
     // The sinkhole: the ground has fallen in. Torn turf at the lip, roots hanging into the dark, dust in the air (world.js).
     const cx=X+W/2,cy=Y+H/2;
@@ -895,6 +903,52 @@ function drawObj(g,R,o){
   if(k==='torch'){R(X+6,Y-6,4,22,AP.out);R(X+7,Y-5,2,20,AP.woodDk);R(X+7,Y-5,1,20,AP.wood);R(X+5,Y-6,6,3,AP.out);R(X+6,Y-5,4,1,AP.ironHi);shadow(X+5,Y+14,7,2);return}
   if(k==='lantern'){R(X+7,Y-8,2,24,AP.out);R(X+7,Y-8,1,23,AP.woodHi);R(X+8,Y-8,5,2,AP.out);R(X+11,Y-6,4,6,AP.out);R(X+12,Y-5,2,4,'#ffb860');return}
   if(k==='candle'){[[4,10,3],[9,12,4],[12,9,2]].forEach(([x,y,h])=>{R(X+x-1,Y+y-1,3,h+2,AP.out);R(X+x,Y+y,1,h,'#e8e0c8')});R(X+3,Y+14,11,1,'#cfc8b2');return}
+  if(k==='wagon'){
+    // Small story (crossroads heart pass, v0.59): a trader's covered wagon that lost a wheel and was pushed off the road.
+    // What makes it read as a wagon: a spoked wheel, a planked box and the canvas hoops. Here the front wheel has come
+    // off and lies flat in the grass, so the front corner sits on the ground (the box tilts), the canvas is torn,
+    // a crate has slid out and split, a sack lies in the grass, and the shaft rests on the ground.
+    const ring=(cx,cy,r,col,hub)=>{for(let a=0;a<40;a++){const an=a/40*6.283;R(Math.round(cx+Math.cos(an)*r),Math.round(cy+Math.sin(an)*r),1,1,col)}
+      for(let a=0;a<6;a++){const an=a/6*6.283+0.3;treeLine(R,cx,cy,Math.round(cx+Math.cos(an)*(r-1)),Math.round(cy+Math.sin(an)*(r-1)),1,AP.woodDk)}R(cx-1,cy-1,3,3,AP.out);R(cx,cy,1,1,hub)};
+    shadow(X+4,Y+H-6,W-6,4);
+    // the shaft resting on the ground off the front (left), with its cross-bar
+    treeLine(R,X+1,Y+H-6,X+12,Y+H-11,2,AP.out);treeLine(R,X+1,Y+H-7,X+12,Y+H-12,1,AP.woodHi);R(X,Y+H-9,2,5,AP.out);R(X,Y+H-8,1,3,AP.wood);
+    // the box, tipped down at the front: each plank column sits lower toward the left
+    for(let i=0;i<30;i++){const x=X+10+i,drop=Math.round((30-i)*0.18),top=Y+8+drop,bot=Y+H-8+Math.round(drop*0.4);
+      R(x,top,1,bot-top,AP.out);if(i>0&&i<29){R(x,top+1,1,bot-top-2,i%6===0?AP.woodDk:AP.wood);R(x,top+1,1,1,AP.woodHi);R(x,top+5,1,1,AP.woodDk)}}
+    // canvas cover on three hoops: pale cloth, sagging between hoops, a dark tear on the front
+    for(let i=0;i<28;i++){const x=X+11+i,drop=Math.round((28-i)*0.18),sag=Math.round(2*Math.sin((i%9)/9*Math.PI)),top=Y-6+drop+sag;
+      R(x,top,1,15-sag,AP.out);if(i>0&&i<27){R(x,top+1,1,13-sag,i%9===0?'#8a8270':'#b8ae94');R(x,top+1,1,2,'#d2c8ae')}}
+    [11,20,29,38].forEach(x0=>{const drop=Math.round((39-x0)*0.18);R(X+x0,Y-6+drop,1,15,'#5a4636')});
+    R(X+14,Y+1,5,4,'#1a1410');R(X+15,Y+5,2,2,'#1a1410');R(X+13,Y+2,1,2,'#d2c8ae'); // the tear
+    // the back wheel, still on: rim, spokes, hub
+    ring(X+33,Y+H-9,6,AP.out,AP.ironHi);ring(X+33,Y+H-9,5,AP.wood,AP.ironHi);
+    // the broken front wheel lying flat in front: seen from above it's a squashed ring, two spokes snapped
+    for(let a=0;a<36;a++){const an=a/36*6.283;R(Math.round(X+8+Math.cos(an)*7),Math.round(Y+H-3+Math.sin(an)*2.5),1,1,a%9===4?AP.out:AP.wood)}
+    R(X+7,Y+H-4,3,2,AP.out);R(X+8,Y+H-4,1,1,AP.ironHi);treeLine(R,X+3,Y+H-3,X+13,Y+H-3,1,AP.woodDk);
+    // a crate slid out the back and split open, and a tied sack in the grass
+    R(X+38,Y+H-12,9,9,AP.out);R(X+39,Y+H-11,7,7,AP.woodHi);R(X+39,Y+H-8,7,1,AP.woodDk);R(X+42,Y+H-11,1,7,AP.woodDk);R(X+44,Y+H-12,3,3,AP.out);R(X+45,Y+H-11,1,1,'#c9a227');
+    R(X+20,Y+H-4,8,5,AP.out);R(X+21,Y+H-3,6,3,'#9a8a6a');R(X+21,Y+H-3,6,1,'#b8a888');R(X+23,Y+H-5,2,2,AP.out);return}
+  if(k==='fishing_rod'){
+    // Small story (v0.59): someone left a rod propped on the bridge rail with the line still in the water, and a bucket.
+    R(X+12,Y+2,1,12,AP.woodDk); // rod butt against the rail post
+    treeLine(R,X+12,Y+3,X+30,Y-6,1,AP.woodHi);R(X+30,Y-6,1,1,AP.out);
+    R(X+30,Y-5,1,15,'rgba(220,220,210,0.45)');R(X+29,Y+10,3,1,'#c0302a'); // the line and a red float
+    R(X+3,Y+8,7,7,AP.out);R(X+4,Y+9,5,5,AP.wood);R(X+4,Y+9,5,1,AP.woodHi);R(X+4,Y+11,5,1,AP.ironHi);R(X+5,Y+9,3,1,AP.water);return}
+  if(k==='town_gate'){
+    // The way south to Town 1 (v0.59): the town's timber gate a little way up from the map's bottom edge, so you see it
+    // as you walk down the road. Reads as a gate: two tall square posts, a roofed beam across the top, plank doors
+    // swung open against the posts (you walk through), sharpened palisade stakes either side, a lantern on each post
+    // and a hanging shield sign. Town 1 itself isn't built, so the road past it says so.
+    shadow(X+2,Y+H-3,W-4,4);
+    for(let x=X+1;x<X+W-1;x+=4){if(x>X+9&&x<X+W-12)continue;const h=18+Math.floor(ah(x,o.y,5)*4);R(x,Y+H-h,4,h,AP.out);R(x+1,Y+H-h+2,2,h-2,AP.wood);R(x+1,Y+H-h+2,1,h-2,AP.woodHi);R(x+1,Y+H-h,2,2,AP.woodDk)} // stakes
+    const door=(x0,dir)=>{for(let i=0;i<8;i++){const x=x0+i*dir,top=Y+H-25+Math.round(i*0.5),h=25-Math.round(i*0.5);R(x,top,1,h,AP.out);if(i>0&&i<7){R(x,top+1,1,h-2,i%3===0?AP.woodDk:AP.wood);R(x,top+5,1,1,AP.iron);R(x,top+h-7,1,1,AP.iron)}}};
+    door(X+19,1);door(X+W-20,-1); // the open doors, seen edge-on as they swing in
+    [X+12,X+W-19].forEach(px=>{R(px,Y+H-40,7,40,AP.out);R(px+1,Y+H-39,5,39,AP.wood);R(px+1,Y+H-39,2,39,AP.woodHi);R(px+5,Y+H-39,1,39,AP.woodDk);R(px+1,Y+H-4,5,2,AP.moss)});
+    R(X+8,Y+H-44,W-16,6,AP.out);R(X+9,Y+H-43,W-18,4,AP.roof);R(X+9,Y+H-43,W-18,1,AP.roofHi);for(let x=X+10;x<X+W-10;x+=5)R(x,Y+H-42,1,3,AP.woodDk); // roofed beam
+    R(X+14,Y+H-44,6,1,AP.moss);R(X+40,Y+H-44,5,1,AP.moss);
+    R(X+28,Y+H-38,1,4,AP.out);R(X+35,Y+H-38,1,4,AP.out);R(X+26,Y+H-34,12,10,AP.out);R(X+27,Y+H-33,10,8,'#3a4a6a');R(X+31,Y+H-32,2,6,'#c9a227');R(X+29,Y+H-30,6,2,'#c9a227'); // shield sign
+    [X+9,X+W-9].forEach(lx=>{R(lx-2,Y+H-34,5,7,AP.out);R(lx-1,Y+H-33,3,5,'#ffb860')});return}
   if(k==='cart'){
     // The gravedigger's handcart with a shovel in it.
     shadow(X+2,Y+13,W-2,3);R(X+1,Y+3,W-6,9,AP.out);R(X+2,Y+4,W-8,7,AP.wood);R(X+2,Y+4,W-8,1,AP.woodHi);[8,16].forEach(x=>R(X+x,Y+4,1,7,AP.woodDk));

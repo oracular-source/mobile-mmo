@@ -5,16 +5,16 @@ MAPS.crossroads = {
   name: 'Crossroads', zone: [50, 69], tint: 'dusk', start: 'south', rules: '',
   enter: 'You stand at the crossroads outside Town 1. Roads run off in every direction.',
   tiles: [
-    'TT,TTTTTTTTTTTTTb,TTTTT,,,==,,,TTTTTT,TTTTTTTTTT',
-    ',TTT,T,TTTTTTT,TTTTTTTT,,,==,,,T,TTTTTTTT,TTTTTT',
-    'TTTTTT,TTTTT,TTTT,T,TTT,,,==,,,TTTTTTTTT,TTTTTTT',
-    'TTTT,TTTTTT,T,TTTTT,TTT,T,==,,,TTTTTTTTTTT,TT,,,',
-    'TTTTTTTTTTT,TTTTTT,TTTT,,,==,,bTTTTTT,TTT,,T,T,,',
-    ',TTTTTTTTTTTTTTTTTTTTTT,,,==,,,TT,,T,T,,,,,,,,~~',
-    'TTTT,TTTTTTTTT,,TTT,TTT,,,==,,,,,,T,,,T,,,~~~~~~',
-    'TTTTTTTTTT,TTTTTTT,TTTT,,,==,,,,,,,,,,,~~~~~~~,,',
-    'TTTTTTTTTTTbTTTTTTTTTT,,,,==,,b,,,,~~~~~~~,,,,,,',
-    'TTTTTT,,b,,,,,T,,TT,,,,,,===,,~~~~~~~~~,,,,,,,,,',
+    'TT,TTTTTTTTTFFFFb,FFFFF,,==,,,,FFFFFF,FFTFFTTTTT',
+    ',TTT,T,TTTTTFT,FFFFTFFF,,==,,,,F,FFFFFFFF,FFTTTT',
+    'TTTTTT,TTTTT,TTFF,F,TTF,,==,,,,TFFTFFFTT,FTFTTTT',
+    'TTTT,TTTTTT,T,TTTTT,TTF,T==,,,,TTTFFTFTFFF,TT,,,',
+    'TTTTTTTTTTT,FFTTFT,TTTT,,==,,,bFTTTTF,FFF,,T,T,,',
+    ',TTTTTTTTTTTTTFTTTTTTTT,,==,,,,FT,,T,T,,,,,,,,~~',
+    'TTTT,TTTTTTTTT,,TTT,TTT,,==,,,,,,,T,,,T,,,~~~~~~',
+    'TTTTTTTTTT,TTTTTTT,TTTT,,==,,,,,,,,,,,,~~~~~~~,,',
+    'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~,,,,,,',
+    'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,,,,,,,,',
     'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT,T',
     ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,TT,T',
     'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTTTTTT',
@@ -28,27 +28,27 @@ MAPS.crossroads = {
     'TTTTTTTTT,,,TTTTTTTTTT,,,==,,,TTTT,T,,,,:,,,bTTT',
     'T,TTT,T,,,,,TTTTTTTTTT,,,==,,,TT,,,bT,,:,,,,,,TT',
     'TTTTTT,,,,,,,TT,TTTTT,,,,==,,,,,,,,,,,,:,,,,r,TT',
-    'TTTTT,,,,,,,,,TTTT,,,,,,===,T,,,,,,,=,:,,,,,,,,T',
-    'TTTTTT,,,,,,,TTTTT,,,,,,==,,,,,,,====,,,,,,,r,TT',
-    'TTTT,TT,,,,TTTTTTT,,,,,,==,,,,=======,,,,,,,,,TT',
-    'TTTTTTTTT,,TT,,,,,,,,,,,==,=======,,,,r,,,,,,TTT',
-    ',,,,,T,,,,,,,,,,,,,,,,,,=======,,,,,,,,,T,,,TTTT',
+    'TTTTT,,,,,,,,,TTTT,,,,,,,==,T,,,,,,,:,:,,,,,,,,T',
+    'TTTTTT,,,,,,,TTTTT,,,,,,,==,,,,,,::::,,,,,,,r,TT',
+    'TTTT,TT,,,,TTTTTTT,,,,,,,==,,,:::::::,,,,,,,,,TT',
+    'TTTTTTTTT,,TT,,,,,,,,,,,,===::::::,,,,r,,,,,,TTT',
+    ',,,,,T,,,,,,,,,,,,,,,,,,,===:::,,,,,,,,,T,,,TTTT',
     ',,,,,,,,,T,,,,,,,,,,========,,,,b,,,,T,TTT,TTTTT',
-    ',,,,,,,,,,,,,,============,,,,,,,,,TTTTTTTTTTTTT',
-    '=====================,,,==,,,,,T,TTT,,TTTTTT,TTT',
-    '=========,,,===,,,,,,,,,==,,,TTTTTTTTTT,TTTTTTTT',
-    ',,,,,,,,,:,,,,,,,,,,T,,,==,,,T,T,TTT,TTTTTTTTTTT',
-    ',,T,,,,,:,,,,,,,,,TTT,,,==,,,TTTT,,TTT,TTTTTTTTT',
-    ',,,,T,,,:,,,,,,,,,TT,,,,==,,,,T,,,,,TT,TTTTTTTTT',
-    'TTTTTT,:,,,,,,,,,b,T,,,===,,,T,,,,,,,TTTTTTTTTTT',
-    ',TTT,,:,,,T,,,,,,,b,,,,==,,,,,,,,,,,,TTTTTTTTTTT',
-    'TTTT,,:,,,TT,,,,,,,TT,,==,,,T,,,,,,,,TTTTTTTTTTT',
-    'TTTT,:,,,TTTT,,,,,TT,,,==,,,TTT,,,,,TTT,TTTTTTTT',
-    'TTT,,,,,,TT,TTT,,TT,T,,==,,,TTTTT,TTTTTTTTTTTT,T',
-    'T,TTT,,TTTTTTTTTTTTT,,,==,,,TTTTTTT,TT,TTTTTTT,T',
-    'TTTTTTTTTTTTTTTTT,T,,T,==,,,TTT,TTTTTTTTTTTTTTTT',
-    'TTTT,TTTTTTTTTTTTTT,,,,==,,,TTTTTT,TTTTTTTTTTTT,',
-    'TTTTTTTTTTTTTTTTTTTT,,,==,T,T,TTT,TTTTTT,TTTT,T,',
+    ',,,,,,,,,,,,,,=============,,,,,,,,TTTTTTTTTTTTT',
+    '=====================,,,,==,,,,T,TTT,,TTTTTT,TTT',
+    '===============,,,,,,,,,,==,,TTTTTTTTTT,TTTTTTTT',
+    ',,,,,,,,,:,,,,,,,,,,T,,,,==,,T,T,TTT,TTTTTTTTTTT',
+    ',,T,,,,,:,,,,,,,,,TTT,,,,==,,TTTT,,TTT,TTTTTTTTT',
+    ',,,,T,,,:,,,,,,,,,TT,,,,,==,,,T,,,,,TT,TTTTTTTTT',
+    'TTTTTT,:,,,,,,,,,b,T,,,,,==,,T,,,,,,,TTTTTTTTTTT',
+    ',TTT,,:,,,T,,,,,,,b,,,,,,==,,,,,,,,,,TTTTTTTTTTT',
+    'TTTT,,:,,,TT,,,,,,,TT,,,,==,T,,,,,,,,TTTTTTTTTTT',
+    'TTTT,:,,,TTTT,,,,,TT,,,,,==,TTT,,,,,TTT,TTTTTTTT',
+    'TTT,,,,,,TT,TTT,,TT,T,,,,==,TTTTT,TTTTTTTTTTTT,T',
+    'T,TTT,,TTTTTTTTTTTTT,,,,,==,TTTTTTT,TT,TTTTTTT,T',
+    'TTTTTTTTTTTTTTTTT,T,,T,,,==,TTT,TTTTTTTTTTTTTTTT',
+    'TTTT,TTTTTTTTTTTTTT,,,,,,==,TTTTTT,TTTTTTTTTTTT,',
+    'TTTTTTTTTTTTTTTTTTTT,,,,,==,T,TTT,TTTTTT,TTTT,T,',
   ],
   things: `
 obj campfire 20 25
@@ -56,10 +56,10 @@ obj signpost 27 29
 obj sinkhole 39 22
 obj lantern 37 21
 obj torch 20 40
-obj torch 26 41
+obj torch 27 40
 obj torch 2 28
 # ways in and out
-exit south 23 43 to=town1 lit
+exit south 25 43 to=town1 lit
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
@@ -85,11 +85,52 @@ spawn beetle 2-3 22 8
 # round the sinkhole
 spawn rat 2-3 41 26
 spawn rat 2-3 43 19
+# Owner (Nov 20): more mobs in the little pockets in the trees, a bit of danger for new players without overrunning them.
+spawn rat 2 9 22
+spawn rat 1-2 11 24
+spawn rat 1-2 15 34
+spawn rat 2 3 33
+spawn rat 1-2 33 35
+spawn rat 1-2 31 37
+spawn rat 2-3 42 15
+spawn beetle 3 43 17
+spawn beetle 2 6 10
+spawn beetle 3 36 6
+# small stories and wear (heart pass, v0.59)
+obj town_gate 23 41
+obj wagon 11 32
+obj bedroll 18 24
+obj fallen_log 19 27
+obj fishing_rod 26 10
+fog 3 10 17 8
+# critters: moths at every light, crows on the signpost and the wagon, frogs on the creek banks, an owl over the
+# crossing, fireflies over the marsh, rabbits in the meadows that bolt for the trees
+critter moth 20.5 25.4 3
+critter moth 37.6 21.0 2
+critter moth 20.5 40.3 2
+critter moth 27.5 40.3 2
+critter moth 2.5 28.3 2
+critter crow 27.6 28.0 1 high
+critter crow 12.6 31.9 1 high
+critter crow 15.5 29.6
+critter crow 31.4 27.8
+critter frog 30.5 11.6
+critter frog 39.5 9.6
+critter frog 18.5 14.4
+critter frog 9.5 16.6
+critter frog 4.5 17.6
+critter owl 28.5 22.6
+critter firefly 8 13 6
+critter firefly 15 12.5 5
+critter firefly 33 8 4
+critter rabbit 9.5 22.5
+critter rabbit 33.5 34.5
+critter rabbit 14 36.5
+critter rabbit 41.5 16.5
 # secret: a chest at the end of a deer trail in the south-west woods
 chest 5 38
 label 24 24 Crossroads
 label 40 19 Sinkhole
-label 41 13 Back hole
 label 25 9 Old bridge
 label 11 11 Marsh
 `

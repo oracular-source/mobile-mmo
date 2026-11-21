@@ -90,7 +90,7 @@ def check(m, tiles, objs):
     # critters (v0.49): known kinds, on the map; frogs on open ground by water, moths near a light
     for c in critters:
         cx, cy = int(c['x']), int(c['y'])
-        if c['kind'] not in ('crow', 'frog', 'moth', 'owl', 'bat'): E.append(f"unknown critter {c['kind']}"); continue
+        if c['kind'] not in ('crow', 'frog', 'moth', 'owl', 'bat', 'firefly', 'rabbit'): E.append(f"unknown critter {c['kind']}"); continue
         if not (0 <= cx < Wd and 0 <= cy < H): E.append(f"critter {c['kind']} at {c['x']},{c['y']} is off the map"); continue
         if c['kind'] == 'frog':
             if not tiles[g[cy][cx]]['walk']: E.append(f"frog at {c['x']},{c['y']} sits in scenery or water")
@@ -228,7 +228,7 @@ OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030'
            'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'lean_to': '#6a5034', 'firepit': '#3a3430',
            'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038',
            'chapel': '#6a6672', 'fallen_bell': '#a08a50', 'ash_circle': '#2a2624', 'shrine': '#7a7480', 'censer': '#ffb060',
-           'banner': '#3a1418', 'bedroll': '#6a5a48'}
+           'banner': '#3a1418', 'bedroll': '#6a5a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030'}
 
 def draw_tiles(d, m, tiles, s, ox=0, oy=0, x0=0, y0=0, x1=None, y1=None):
     g = m['tiles']; x1 = x1 or m['W']; y1 = y1 or m['H']

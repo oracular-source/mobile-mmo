@@ -196,7 +196,7 @@ function checkPortals(){
     if(ex!==player.atExit){player.atExit=ex;if(ex&&ex!==player.exitGuard){
       // Built areas link straight through. You can leave with mobs on you (owner, Nov 19): reaching the edge is fair, and they reset behind you.
       if(ZONE_OF[ex.to]){if(inCombat())log('You slip away. What was chasing you loses your trail.','#9aa');enterZone(ZONE_OF[ex.to],A.id,ex.at)}
-      else if(ex.to==='town1')log('The road south leads to Town 1. It is not built yet.','#9aa');
+      else if(ex.to==='town1')log('The gates of Town 1 are shut for now. It is not built yet.','#9aa');
       else if(ex.to==='chapel')log('The road north leads on to an old chapel. It is not built yet.','#9aa');
       else log('This way is not built yet.','#9aa');}}
     return}
@@ -316,14 +316,15 @@ function openChest(A,ch){
 // A map's things can hold "critter <kind> x y [n]" (tile units, decimals fine, docs/map-format.md):
 // crow (perches, flies off when you come close, comes back once you've gone), frog (sits by the water, plops in when you
 // come close), moth (n of them circling a light), owl (sits on a branch, blinks, turns its head to watch you), bat
-// (flutters round a belfry). Ripples on open water and smoke from a shack's chimney come with any area that has them.
+// (flutters round a belfry), firefly (drifts and blinks over a marsh, v0.59), rabbit (nibbles in a meadow, bolts
+// for the trees when you come close, v0.59). Ripples on open water and smoke from a shack's chimney come with any area that has them.
 // Looks only: these use Math.random, never rng(), so they can't shift any game roll or sim result.
 const vr=(a,b)=>a+Math.random()*(b-a);
 function areaCritters(A){
   if(A.crit)return A.crit;
   A.crit=[];A.rip=[];A.smoke=[];A.ripT=0;A.smokeT=0;
   (A.critDefs||[]).forEach(d=>{for(let i=0;i<d.n;i++){const c={kind:d.kind,hx:d.x,hy:d.y,x:d.x,y:d.y,ph:Math.random()*6.28,dir:Math.random()<0.5?1:-1,t:0,st:'sit',pk:vr(1,4),hop:vr(1,5),blink:vr(2,6),look:0};
-    if(d.kind==='moth'){c.r=vr(5,9)+i*2;c.sp=vr(0.8,1.6)}if(d.kind==='bat'){c.r=vr(13,19)+i*4;c.sp=vr(0.9,1.4)} // bats swing out past the tower's sides so they show against the sky and walls
+    if(d.kind==='moth'){c.r=vr(5,9)+i*2;c.sp=vr(0.8,1.6)}if(d.kind==='bat'){c.r=vr(13,19)+i*4;c.sp=vr(0.9,1.4)}if(d.kind==='firefly'){c.r=vr(10,26);c.sp=vr(0.15,0.35);c.hx+=vr(-12,12);c.hy+=vr(-8,8)} // bats swing out past the tower's sides so they show against the sky and walls
     // a crow standing where you could walk is on the ground; anywhere else it's perched up on something
     if(d.kind==='crow')c.ground=!d.high;
     A.crit.push(c)}});
@@ -355,6 +356,14 @@ function updateAreaCritters(A,dt){
       else if(c.st==='leap'){const k=Math.min(1,c.t/0.35);c.x=c.fx+(c.tx-c.fx)*k;c.y=c.fy+(c.ty-c.fy)*k;c.jump=Math.sin(k*Math.PI)*6;
         if(k>=1){c.st='gone';c.t=0;c.jump=0;A.rip.push({x:c.tx,y:c.ty,t:0,big:1})}}
       else if(c.t>8&&home>110){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='rabbit'){
+      // (v0.59) sits and nibbles, now and then hops a step; gets close and it bolts away from you and is gone in the trees.
+      if(c.st==='sit'){c.hop-=dt;if(c.hop<=0){c.hop=vr(1.5,5);if(Math.random()<0.4){const nx=c.hx+vr(-8,8),ny=c.hy+vr(-5,5);if(!blocked(nx,ny)){c.dir=nx>c.x?1:-1;c.x=nx;c.y=ny;c.jump=0.18}}else c.nib=0.6}
+        if(c.jump>0)c.jump-=dt;if(c.nib>0)c.nib-=dt;
+        if(d<40&&player.dead<=0){const a=Math.atan2(c.y-player.y,c.x-player.x)+vr(-0.5,0.5);c.vx=Math.cos(a)*78;c.vy=Math.sin(a)*78;c.dir=c.vx>0?1:-1;c.st='run';c.t=0}}
+      else if(c.st==='run'){const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;c.jump=Math.abs(Math.sin(c.t*14))*3;
+        if(blocked(nx,ny)||c.t>1.1){c.st='gone';c.t=0;c.jump=0}else{c.x=nx;c.y=ny}} // into the undergrowth
+      else if(c.t>10&&home>130){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
     else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
   });
   if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:0})}}}
@@ -370,7 +379,8 @@ function drawAreaCritters(A,layer){
     A.rip.forEach(r=>{const k=r.t/1.6,rad=1+k*(r.big?8:5);lx.globalAlpha=1-k;for(let a=0;a<14;a++){const an=a/14*6.283;f(r.x+Math.cos(an)*rad,r.y+Math.sin(an)*rad*0.45,1,1,k<0.4?AP.glint:AP.waterHi)}lx.globalAlpha=1});
     A.crit.forEach(c=>{if(c.st==='gone')return;
       if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.st==='leap'?c.jump:c.jump>0?2:0),c.dir);
-      if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)});
+      if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir);
+      if(c.kind==='rabbit')critGrid(c.jump>0.5?RABBIT_HOP:c.nib>0&&Math.floor(time*8)%2?RABBIT_NIB:RABBIT,c.x,c.y-c.jump,c.dir)});
     return}
   A.crit.forEach(c=>{
     if(c.kind==='crow'&&(c.st==='fly'||(!c.ground&&c.st==='sit'))){const flap=c.st==='fly'&&Math.floor(time*10)%2;critGrid(c.st==='fly'?(flap?CROW_FLY2:CROW_FLY):c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)}
@@ -384,7 +394,9 @@ function drawAreaCritters(A,layer){
 const FROG=['.k...k.','kek.kek','kgGGGgk','kgGGGgk','kk.k.kk'],FROG_JUMP=['.k...k.','kek.kek','kgGGGgk','k.k.k.k'];
 const CROW=['..kkk..','.kbbbky','kbhhbk.','kbbbbk.','.k.k...'],CROW_PECK=['.......','..kkk..','kbbbbk.','kbhhbky','.k.k...'];
 const CROW_FLY=['k.....k','hk.k.kh','.kbbbky','..kbk..'],CROW_FLY2=['.......','.kkkkk.','hhbbbhy','..kbk..'];
-const CRIT_PAL={k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692'};
+// Rabbit (v0.59), 8 x 6 facing right: long ears, a brown body with a lighter back, the white tail at the rear.
+const RABBIT=['.....kk.','....kRk.','.kkkkRRk','kwRRRRkk','krrrrrrk','.kk..kk.'],RABBIT_NIB=['........','....kk..','.kkkkRk.','kwRRRRkk','krrrrrrk','.kk..kk.'],RABBIT_HOP=['......kk','.....kRk','kkkkkkRR','wRRRRRkk','krrrrrk.','k.....k.'];
+const CRIT_PAL={k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692',r:'#6a5848',R:'#9a8670',w:'#e8e2d4'};
 function critGrid(G,x,y,dir){const w=G[0].length,x0=Math.round(x)-(w>>1),y0=Math.round(y)-G.length;
   G.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[dir<0?w-1-i:i];if(ch==='.')continue;lx.fillStyle=CRIT_PAL[ch];lx.fillRect(x0+i,y0+j,1,1)}})}
 function drawOwl(c){
@@ -400,5 +412,7 @@ function drawCritterGlows(A){
   A.crit.forEach(c=>{
     if(c.kind==='moth'){const x=Math.round(c.hx+Math.cos(time*c.sp*2+c.ph)*c.r),y=Math.round(c.hy-6+Math.sin(time*c.sp*3.1+c.ph)*c.r*0.6);
       lx.fillStyle='#efe3c4';lx.fillRect(x,y,1,1);if(Math.floor(time*14+c.ph*3)%2){lx.fillStyle='#b8ad90';lx.fillRect(x-1,y,1,1);lx.fillRect(x+1,y,1,1)}}
+    if(c.kind==='firefly'){const x=Math.round(c.hx+Math.cos(time*c.sp+c.ph)*c.r+Math.sin(time*c.sp*2.7+c.ph)*6),y=Math.round(c.hy+Math.sin(time*c.sp*1.3+c.ph)*c.r*0.5);
+      const on=0.5+0.5*Math.sin(time*(1.3+c.sp*3)+c.ph*5);if(on>0.35){lx.globalAlpha=(on-0.35)*0.5;lx.fillStyle='#c8e070';lx.fillRect(x-1,y,3,1);lx.fillRect(x,y-1,1,3);lx.globalAlpha=Math.min(1,(on-0.35)*2.2);lx.fillStyle='#f0ff9a';lx.fillRect(x,y,1,1);lx.globalAlpha=1}}
     if(c.kind==='owl'&&c.blink>=0){lx.fillStyle='#ffcf5a';const x0=Math.round(c.x)-3+c.look,y0=Math.round(c.y)-9;lx.fillRect(x0+2,y0+3,1,1);lx.fillRect(x0+4,y0+3,1,1)}});
 }

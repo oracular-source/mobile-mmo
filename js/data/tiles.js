@@ -87,4 +87,7 @@ banner       1 1 0      wall   0     -    0
 bedroll      1 1 0      ground 0     -    0
 flowers      1 1 0      ground 0     -    1
 shovel       1 1 0      ground 0     -    0
+wagon        3 2 1      ground 0     -    0
+fishing_rod  1 1 0      ground 0     -    0
+town_gate    4 1 0      ground 0     -    0
 `;
