@@ -6,6 +6,12 @@ Every monster in the game today and every one planned for Zone 1, with its new-l
 
 Rules for every new monster: black outline, faces right, its own family colours (never the player-side colours; undead stay in bone, grey-green and purple), a red or glowing eye as the accent, legs that move when it walks (a step frame), and size from its tier.
 
+## Owner notes (Nov 21, character chat)
+- **Keep as the bar:** the rats, Old Gnawbone, and the chapel and Dungeon 1 placeholders (cultists, wisps, Acolyte, Malrec and the rest): owner likes how they look.
+- **Redo:** the crypt skeleton (and the pet skeletons), the Skeleton King and the shambling corpse (zombie). Owner doesn't like them; they need to be **bigger** than today. Owner wants another look at them.
+- **Scope of this pass:** base character models only, as placeholders. Animations come later. Then the base look for every class.
+- Player characters are **15 × 18** (final), so humanoid monster sizes are judged against that.
+
 ## In the game now
 | # | Monster | Where | Family | Size target | Today | Status |
 | --- | --- | --- | --- | --- | --- | --- |
