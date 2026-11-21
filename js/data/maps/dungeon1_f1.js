@@ -26,23 +26,23 @@ MAPS.dungeon1_f1 = {
     'XXXXXXXXXXXX____zzzz_zzzzzzzzz____XXXXXXXXXXXX',
     'XXXXXXXXXXXXX____________________XXXXXXXXXXXXX',
     'XXXXXXXXXXXXXX__________________XXXXXXXXXXXXXX',
-    'XXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWWWWWWWWWWssWWWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWPsssssssssssPWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XWWWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XWsssssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XWsssssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XWWWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWsssssssssssssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWPsssssssssssPWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXWWWWWWWWWWWWssWXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
-    'XXXXXXXXXXXXXXN__NXXNXXNXXNXXNXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWWWWWWssWWWWWWWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWPsssssssssssPWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXWWWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXWsssssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXWsssssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXWWWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWsssssssssssssWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWPsssssssssssPWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXWWWWWWssWWWWWWWXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXX',
+    'XXXXXXXXXXXXXXNXXNXXNX__XXNXXNXXXXXXXXXXXXXXXX',
     'XXXXXXXXXXXXXX______XX__XX______XXXXXXXXXXXXXX',
     'XXXXXXXXXXXXX____________________XXXXXXXXXXXXX',
     'XXXXXXXXXXXX__C________________C__XXXXXXXXXXXX',
@@ -74,28 +74,29 @@ spawn corpse 14 23 36
 spawn skeleton 14 28 37
 spawn corpse 14 29 39
 spawn skeleton 14 27 39
-# 2. THE HALL: the monks' old refectory (dressed stone, flagstones, long tables). Healer first: the mender camp is
-# back in the north-east corner. In the south-west a pack of two with a BIG WISP that hovers with it and joins the
-# pull; its move is an area burn round it: stay out of the ring or drag the fight away. 9+ tiles apart, no shouting.
-obj table 5 20
-obj table 9 23
-obj table 12 26
-obj banner 8 17
-obj banner 11 17
-obj torn_banner 5 24
-obj censer 16 23
-spawn cult_zealot 14 13 20
-spawn cult_ashcaller 14 15 19
-spawn cult_mender 14 14 21
-spawn cult_zealot 14-15 6 27
-spawn cult_ashcaller 14-15 8 27
-spawn great_wisp 15 6 25
-# small story: a monk the cult kept alive, caged by the south door
-obj cage 13 27
-obj candle 12 28
+# 2. THE HALL: the monks' old refectory (dressed stone, flagstones, long tables), straight north of the catacomb
+# (owner, Nov 21: a straight shot like floor 2). Healer first: the mender camp is back in the north-east corner. On
+# the west side a pack of two with a BIG WISP that hovers with it and joins the pull; its move is an area burn round
+# it: stay out of the ring or drag the fight away. 9+ tiles apart, no shouting; both set back from the south door.
+obj table 18 20
+obj table 22 23
+obj table 23 26
+obj banner 21 17
+obj banner 24 17
+obj torn_banner 20 27
+obj censer 29 23
+spawn cult_zealot 14 26 20
+spawn cult_ashcaller 14 28 19
+spawn cult_mender 14 27 21
+spawn great_wisp 15 18 22
+spawn cult_zealot 14-15 18 24
+spawn cult_ashcaller 14-15 19 25
+# small story: a monk the cult kept alive, caged in the south-east corner
+obj cage 27 26
+obj candle 26 28
 # the floor's chest, in a little alcove off the west wall, one candle left burning by it
-chest 2 22
-obj candle 2 23
+chest 15 22
+obj candle 15 23
 # 3. FLOODED CHAMBER: the only water in the dungeon (slows a little all the time). MINI BOSS: the Drowned Prior with
 # two drowned dead. His grip: ripples under you (about 1.5 s), step off or hands rise and slow you hard (light damage).
 # When he dies the flood drains and the steps down at the north wall come up out of the water.
@@ -111,13 +112,13 @@ seal 21 1 24 2 drowned_prior
 exit down 22 1 to=dungeon1_f2 at=up
 # something alive
 critter bat 22.5 38 2
-critter moth 2.3 23 1
-critter moth 12.3 28 1
+critter moth 15.3 23 1
+critter moth 26.3 28 1
 critter bat 22 7 2
 critter moth 20.3 42 1
 fog 14 5 18 9
 label 22 44 1. Catacomb (enter)
-label 10 30 2. The hall (refectory)
+label 23 30 2. The hall (refectory)
 label 22 16 3. Flooded chamber: Drowned Prior
 label 22 0 Stairs down (after the Prior)
 `
