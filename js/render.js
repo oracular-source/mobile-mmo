@@ -25,6 +25,29 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.
 // Wolfwood (v0.40): blight wolf, Greyfang, Old Scar and the thornback boar, each with a step frame.
 ['wolf','greyfang','oldscar','boar'].forEach(k=>{IMG[k]=mkWalk(WOLF_SPR[k],WOLF_SPR[k+'step'],Object.assign({},PAL,WOLF_PAL[k]))});
 
+// Ruined Chapel (v0.62): hooded cultists and the Ashen Acolyte from one robed shape (ROBED in sprites.js), and the ash wisp.
+// The hood is a rounded cowl with the face lost in shadow and two eyes glowing in it; the robe flares to the hem; a rope belt;
+// light from the left. Two step frames lift one side of the hem.
+function mkRobed(id){const S=ROBED[id],W=S.w,H=S.h,cx=(W-1)/2,rx=W*0.29,ry=H*0.235,hy=H*0.23,b0=Math.round(H*0.37);
+  const g=[];for(let j=0;j<H;j++){g[j]=[];for(let i=0;i<W;i++)g[j][i]='.'}
+  const inHood=(i,j)=>((i-cx)/rx)**2+((j-hy)/ry)**2<1,half=j=>2.4+(j-b0)/2.6,inBody=(i,j)=>j>=b0&&j<H&&Math.abs(i-cx)<=half(j);
+  for(let j=0;j<H;j++)for(let i=0;i<W;i++){if(!inHood(i,j)&&!inBody(i,j))continue;const hx=i-cx;
+    const edge=!(inHood(i-1,j)||inBody(i-1,j))||!(inHood(i+1,j)||inBody(i+1,j))||!(inHood(i,j-1)||inBody(i,j-1))||j===H-1||!(inHood(i,j+1)||inBody(i,j+1));
+    let c=edge?'k':hx<-1?'A':hx>1.2?'d':'a';
+    if(!edge&&inHood(i,j)&&((i-cx)/(rx*0.58))**2+((j-hy-0.9)/(ry*0.6))**2<1)c='f'; // the face lost in the hood's shadow
+    g[j][i]=c}
+  const ey=Math.round(hy+0.6);g[ey][Math.round(cx-1)]='e';g[ey][Math.round(cx+1)]='e';
+  const belt=b0+Math.round((H-b0)*0.42);for(let i=0;i<W;i++)if(g[belt][i]!=='.'&&g[belt][i]!=='k')g[belt][i]='b';
+  const put=(i,j,c)=>{if(j>=0&&j<H&&i>=0&&i<W)g[j][i]=c};
+  if(S.item==='sickle'){[[W-2,b0+6],[W-1,b0+5],[W-1,b0+4],[W-1,b0+3],[W-2,b0+2],[W-3,b0+2]].forEach(([i,j])=>put(i,j,'l'));put(W-2,b0+7,'o');put(W-3,b0+8,'o')}
+  if(S.item==='ember'){put(0,b0+1,'k');put(1,b0+1,'r');put(1,b0,'R');put(0,b0,'k');put(1,b0-1,'k')}
+  if(S.item==='censer'){for(let j=b0+2;j<b0+6;j++)put(W-1,j,'c');put(W-2,b0+6,'k');put(W-1,b0+6,'n');put(W-1,b0+7,'k');put(W-2,b0+7,'n');put(W-1,b0+5,'r')}
+  const pal=Object.assign({},PAL,{k:'#0b0a0f',a:S.robe,A:shiftCol(S.robe,[30,28,26]),d:shiftCol(S.robe,[-24,-22,-20]),f:'#100c0e',e:S.eye,b:shiftCol(S.robe,[-40,-38,-34]),
+    l:'#a8a8b4',o:'#5a4028',r:'#ff8a3c',R:'#ffe0a0',c:'#8a8690',n:'#a0802a'});
+  const rows=g.map(r=>r.join('')),step=side=>{const n=g.map(r=>r.slice());for(let i=0;i<W;i++){if((side?i>cx:i<cx)&&n[H-1][i]!=='.'){n[H-1][i]='.';if(n[H-2][i]!=='.')n[H-2][i]='k'}}return n.map(r=>r.join(''))};
+  const im=mk(rows,pal);im.steps=[mk(step(0),pal),mk(step(1),pal)];return im}
+['zealot','ashcaller','chanter','acolyte'].forEach(k=>{IMG[k]=mkRobed(k)});
+IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);
 // Default skin: lay each weapon over the shared body, then colour it from the class's SKINS entry.
 function mkSkin(id){
   const sk=SKINS[id];if(!sk)return null;
@@ -151,6 +174,14 @@ function render(){
   if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
   if(zoneId==='dun'&&run.portal){const p=run.portal;lx.fillStyle='#7dffa6';for(let a=0;a<24;a++){if((a+Math.floor(time*8))%3===0)continue;const an=a/24*Math.PI*2;lx.fillRect(Math.round(p.x+Math.cos(an)*7),Math.round(p.y+Math.sin(an)*4),1,1)}lx.fillRect(Math.round(p.x)-1,Math.round(p.y)-1,2,2)}
+  // Barred gates (v0.62, the chapel's east gate): two plank leaves in the wall with an iron-bound bar across, or swung open.
+  {const BA=curArea();if(BA&&BA.bars)BA.bars.forEach(b=>{const x=b.tx*T,y=b.ty*T,f=(X,Y,w,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,h)};
+    f(x-1,y-6,3,22,'#0b0a0f');f(x+14,y-6,3,22,'#0b0a0f');f(x,y-5,1,20,'#84848e');f(x+15,y-5,1,20,'#5a5a64');
+    if(!b.open){f(x+1,y-3,14,18,'#0b0a0f');f(x+2,y-2,12,16,'#4a3222');[4,7,10].forEach(i=>f(x+2+i,y-2,1,16,'#2a1a12'));f(x+1,y+4,14,3,'#0b0a0f');f(x+1,y+5,14,1,'#7a5a42');f(x+3,y+4,2,3,'#2b2738');f(x+11,y+4,2,3,'#2b2738')}
+    else{f(x+1,y-3,3,18,'#0b0a0f');f(x+2,y-2,1,16,'#4a3222');f(x+12,y-3,3,18,'#0b0a0f');f(x+13,y-2,1,16,'#4a3222');f(x-4,y+13,8,2,'#0b0a0f');f(x-3,y+13,6,1,'#7a5a42')}})}
+  // Ember Brand (v0.62): a ring of embers on the ground under where you stood, filling in as it comes to a head; step out.
+  hazards.forEach(h=>{const p=h.t/h.dur;for(let a=0;a<56;a++){if((a+Math.floor(time*10))%6===0)continue;const an=a/56*6.283;lx.fillStyle=a%2?'#ff8a3c':'#ffe9a8';lx.fillRect(Math.round(h.x+Math.cos(an)*h.r),Math.round(h.y+Math.sin(an)*h.r*0.6)-1,2,2)}
+    lx.globalAlpha=0.18+0.32*p;lx.fillStyle=p>0.8&&Math.floor(time*12)%2?'#ffb060':'#c4471f';lx.beginPath();lx.ellipse(Math.round(h.x),Math.round(h.y),h.r*p,h.r*0.6*p,0,0,7);lx.fill();lx.globalAlpha=1});
   const CHA=curArea();if(CHA)CHA.chests.forEach(ch=>{const x=Math.round(ch.x),y=Math.round(ch.y),f=(X,Y,w,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,h)};
     if(ch.open){f(x-7,y-12,14,14,AP.out);f(x-6,y-11,12,3,AP.woodHi);f(x-6,y-8,12,1,AP.woodDk);f(x-6,y-7,12,8,AP.wood);f(x-5,y-7,10,3,'#120d0a');f(x-6,y-3,12,1,AP.bell)} // lid up, empty inside
     else{f(x-7,y-8,14,10,AP.out);f(x-6,y-7,12,8,AP.wood);f(x-6,y-7,12,2,AP.woodHi);f(x-6,y-4,12,1,AP.bell);f(x-1,y-5,2,3,AP.bellHi)}});
@@ -194,6 +225,9 @@ function render(){
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
+    // Ash wisps (v0.62) hover: a small shadow, a slow bob, the flame flickering between two frames, a thread of smoke.
+    if(m.def.float){const bob=Math.round(Math.sin(time*3+m.hx)*1.5);shadow(m.x,m.y,3);drawSprite(Math.floor(time*8+m.hx)%2?IMG.wisp2:img,m.x,m.y-5+bob,m.dir,0,false);
+      if(Math.random()<0.2)parts.push({x:m.x+(Math.random()-0.5)*2,y:m.y-6+bob,vx:(Math.random()-0.5)*4,vy:-9,t:0,life:0.9,col:'#6a6670'});return}
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
     if(m.def.rare){const pr=0.5+0.5*Math.sin(time*3),rw=Math.round(img.w/2)+2;lx.globalAlpha=0.09+0.08*pr;lx.fillStyle='#d8c8ff';lx.beginPath();lx.ellipse(Math.round(m.x),Math.round(m.y),rw,Math.max(2,Math.round(rw/3)),0,0,7);lx.fill();lx.globalAlpha=1;
       if(Math.random()<0.12)parts.push({x:m.x+(Math.random()-0.5)*img.w,y:m.y-Math.random()*img.h,vx:0,vy:-8,t:0,life:0.7,col:'#e6dcff'})} // the faint glow that says "rare" (visual only, no game rolls)
@@ -204,6 +238,8 @@ function render(){
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark
     if(m.chill>0&&Math.floor(time*3+m.x)%2===0){lx.fillStyle='#bfe6ff';for(let i=0;i<m.chill;i++)lx.fillRect(Math.round(m.x)-4+i*3,Math.round(m.y)-1,1,1)}
+    if(m.chantT>0&&Math.floor(time*5+m.x)%3===0){lx.fillStyle='#e0c3ff';const cy=Math.round(m.y-img.h-2);lx.fillRect(Math.round(m.x)-4,cy+Math.floor(time*4)%3,1,1);lx.fillRect(Math.round(m.x)+4,cy+(Math.floor(time*4)+1)%3,1,1)} // a chanter's song on it (v0.62)
+    if(m.type==='acolyte'&&Math.random()<0.3)parts.push({x:m.x+(Math.random()-0.5)*8,y:m.y-4,vx:(Math.random()-0.5)*5,vy:-7,t:0,life:1.1,col:Math.random()<0.15?'#ff8a3c':'#7a7680'}); // trailing smoke and the odd ember
     if(m.dots.length&&rng()<0.25)parts.push({x:m.x+rr(-4,4),y:m.y-rr(4,12),vx:0,vy:-10,t:0,life:0.5,col:'#6aa84f'});
   };
   // Each sprite and its little overlays (roots, marks, buff sparkles) are drawn at whole game pixels, then the lot is
@@ -219,7 +255,7 @@ function render(){
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
   // pools stay put on the ground while the camera glides.
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
@@ -324,7 +360,7 @@ function ui(){
   else tf.style.visibility='hidden';
   // Boss and named casts at you: big bar in the middle of the screen, whoever you're targeting (never in the target frame).
   {const d=$('deathUI'),on=player.dead>0&&!simState.busy?'block':'none';if(d.style.display!==on)d.style.display=on} // the sim's arena deaths never show it
-  const bc=$('bcast'),cm=mobs.find(m=>!m.dead&&m.casting&&(m.def.boss||m.def.named));
+  const bc=$('bcast'),cm=mobs.find(m=>!m.dead&&m.casting&&(m.def.boss||m.def.named||m.def.rare));
   if(cm){bc.style.display='block';$('bcastname').textContent=cap(cm.def.name)+': '+cm.casting.name;$('bcastfill').style.width=Math.min(100,100*cm.casting.t/cm.casting.dur)+'%'}else bc.style.display='none';
   // Log, Menu, the minimap and DEV sit under the top frames and move down when the frames grow (debuff tags, buffs wrapping).
   {const hb=$('hud').getBoundingClientRect(),vt=$('view').getBoundingClientRect().top,base=$('hud').offsetTop+52,dy=Math.max(0,Math.round(hb.bottom-vt-base));

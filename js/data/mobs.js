@@ -31,6 +31,20 @@ const TYPES={
   greyfang:{name:'Greyfang',img:'greyfang',lv:[11,11],hp:138,hpl:34,dmg:4.9,dmgl:1.95,spd:34,aggro:60,armor:0.1,named:1,howl:1,zone:'Wolfwood'},
   // Old Scar (rare, 11): an old one-eyed wolf, alone, hits hard.
   oldscar:{name:'Old Scar',img:'oldscar',lv:[11,11],hp:112,hpl:32,dmg:5.6,dmgl:2.1,spd:36,aggro:56,armor:0.05,rare:1,zone:'Wolfwood'},
+  // Ruined Chapel grounds (v0.62, levels 10-14). camp = fen cultists standing within 3 tiles of one another fight as one camp, and
+  // the first one pulled shouts for the nearest other camp if it's close (CAMP_CALL in world.js). cast = a spell with a cast bar over
+  // its head (stun, fear or step out of range to stop it): name, first/every seconds, cast time, range, x = damage vs one melee hit.
+  // chant = every few seconds the chanter's song makes its camp hit harder (kill it first). drain = each hit also burns that much mana.
+  // blink = every few seconds it vanishes in a puff and reappears beside you. float = drawn hovering, with its own light.
+  zealot:{name:'a fen zealot',img:'zealot',lv:[10,14],hp:55,hpl:22,dmg:3.6,dmgl:1.65,spd:28,aggro:50,armor:0.1,camp:1},
+  ashcaller:{name:'a fen ashcaller',img:'ashcaller',lv:[10,14],hp:42,hpl:17,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
+    cast:{name:'Ash Bolt',first:1.5,every:4.5,dur:1,range:90,x:1.6,col:'#ff9a4a'}},
+  chanter:{name:'a fen chanter',img:'chanter',lv:[10,14],hp:46,hpl:18,dmg:2.8,dmgl:1.3,spd:27,aggro:50,armor:0,camp:1,chant:1},
+  wisp:{name:'an ash wisp',img:'wisp',lv:[10,14],hp:36,hpl:15,dmg:2.8,dmgl:1.3,spd:30,aggro:46,armor:0,drain:1,blink:1,float:1},
+  // The Ashen Acolyte (rare, 14, herb garden): a telegraphed shadow bolt like the King's, and Ember Brand: a ring of embers
+  // flares under you (1.5 s to step out, then a big burn). No flee-to-heal (owner, Nov 20: unfair to classes without a snare).
+  acolyte:{name:'the Ashen Acolyte',img:'acolyte',lv:[14,14],hp:120,hpl:32,dmg:4.6,dmgl:1.9,spd:28,aggro:56,armor:0.05,rare:1,brand:1,zone:'Ruined Chapel',
+    cast:{name:'Shadow Bolt',first:3,every:6,dur:2,range:110,boss:1,col:'#b48cff'}},
   boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:

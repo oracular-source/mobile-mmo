@@ -44,6 +44,7 @@ function engage(m,byPet){
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
   const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;floatText(m.x,m.y-26,'HOWL!','#ffb37a',true);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
   if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&!(o.calm>0)&&dist(o,m)<reach){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
+  if(m.def.camp)campCall(m); // a chapel camp shouts for the nearest other camp (v0.62)
 }
 // src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
 function hitMob(m,dmg,kind,label,src){
@@ -122,6 +123,7 @@ function hurtPlayer(m){
   const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);
   if(player.buffs.bark>0)dmg*=0.75;
   if(player.buffs.stance>0)dmg*=player.stanceX||0.5; // Iron Stance (Warrior fork) blocks more
+  if(m.chantT>0)dmg*=CHANT.x; // a chanter's song (v0.62)
   dmg*=weakX(m); // Sap Strength, Judgment, Rebuke, Withering Cloud (forks): the mob hits softer
   dmg=tankMods(dmg);
   if(grounds.some(g=>g.sanct&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r))dmg*=grounds.find(g=>g.sanct).sanct; // Sanctuary (Paladin fork)
@@ -138,6 +140,8 @@ function hurtPlayer(m){
   if(player.buffs.fshield>0&&player.bval&&player.bval.fshield&&!m.dead&&!(player.fsPet&&pet))hitMob(m,player.bval.fshield*rr(0.9,1.1)*(1-m.def.armor),'shield','Flame Shield');
   // Retaliation (Warrior fork): every hit taken during the stance strikes back.
   if(player.buffs.stance>0&&player.retal&&!m.dead)hitMob(m,player.retal*rr(0.9,1.1)*(1-m.def.armor),'direct','Retaliation');
+  // An ash wisp's touch (v0.62) burns mana as well as health.
+  if(m.def.drain&&player.mp>0&&dmg>0){const lost=Math.min(player.mp,Math.round(dmg*m.def.drain));player.mp-=lost;floatText(player.x+8,player.y-12,'-'+lost+' mana','#7dbbff',0,'small')}
   log(cap(m.def.name)+' hits YOU for '+dmg+'.','#ff8a80',dmg>=maxHP(player.lvl)*0.2?'main':'fight'); // big hits (a fifth of your health) stay in the chat box
   unhide('You are no longer hidden.');
   if(player.cast&&rng()<0.15){player.cast=null;log('Your spell is interrupted.','#ffb37a')}

@@ -3,7 +3,7 @@
 // garden and fish pond, the monks' plot (graves dug up), an ash circle. The chapel door is Dungeon 1 (Brother Malrec).
 // Style A Vesper embers (area-rules.md). Draft 2 (Nov 20): built to the Area pass checklist; the chapel sits further
 // south so its lit steeple shows from the road in. Format: docs/map-format.md. Check: python3 tools/mapcheck.py js/data/maps/*.js
-// Not loaded by the game yet (not in index.html).
+// In the game since v0.62.
 'use strict';
 MAPS.chapel = {
   name: 'Ruined Chapel', zone: [24, -24], tint: 'chapel', start: 'south', rules: '',
@@ -38,8 +38,8 @@ MAPS.chapel = {
     'FFFnnn:naFWqq++o+++aaqaaqaqsqqqaaaqaqaaaaqaaWOOF',
     'FFFnvn:anFWaqaaqaaaqqqaaaaaaaaaaaaqaaaaqaaaaWOOO',
     'FFFnn::vnFWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWFFF',
-    'vFFFnn:naaaFnvvvnnFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF',
-    'nFFvvn:anaaFvnnnnnnFFFFFFavFFFFFFFFFFFFFFFFFFFFF',
+    'vFFFnn:naaaFnvvvnnFfvnnfvnnfvnnfvFnfvnFFFFFFFFFF',
+    'nFFvvn:anaaFvnnnnnnnfvnFfavnfvnnfvnnfFnFFFFFFFFF',
     'nFnfnv:fnnFannnvvnvnvnnnnnnvvnnnnnfaavFFaaFFFFFF',
     'nnnFn::ffnvnvnnvffvnnvnvnnnfnnvnnvnnnfnFnnFFFFFF',
     'FnFFnn:fnn:fnnn:nvnn:vnfn:nnnf:nnnf::vnnnFFFFFFF',
@@ -90,7 +90,9 @@ obj stump 12 36
 # ways in and out
 exit south 28 39 to=wolfwood at=north
 exit dungeon 27 22 to=dungeon1 at=out lit
-exit east_path 47 25 to=crossroads
+exit east_path 47 25 to=crossroads at=east_path
+# the east gate is barred: it opens from the inside (west) and stays open
+bar 44 18 chapel_east_gate W
 # on the road in: lone wisps and the first camp (10)
 spawn ash_wisp 10 35 36
 spawn ash_wisp 10 20 36

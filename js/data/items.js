@@ -9,6 +9,8 @@ const ITEMS={
   rag:{name:'Grave Rag',rar:'junk',value:2,stack:true},
   pelt:{name:'Mangy Wolf Pelt',rar:'junk',value:6,stack:true},
   tusk:{name:'Boar Tusk',rar:'junk',value:7,stack:true},
+  cultrag:{name:'Ash-stained Cowl',rar:'junk',value:8,stack:true},
+  ember:{name:'Cold Ember',rar:'junk',value:9,stack:true},
   // Summon keys (v0.31): used up at a named's spot to call it if it isn't up. Not junk, so "Sell all junk" leaves them alone.
   severed_paw:{name:'Severed Paw',rar:'key',value:1,stack:true,desc:"Summon key · lay it on the bone pile at the bottom of the rat tunnel to call Old Gnawbone"},
   crown_shard:{name:'Crown Shard',rar:'key',value:1,stack:true,desc:"Summon key · set it on the empty throne in the crypt to call the Skeleton King"},
@@ -107,5 +109,5 @@ const KEY_DROPS={tunnel:{trat:'severed_paw',brat:'severed_paw'},crypt:{cskel:'cr
 const KEY_CHANCE=0.1;
 // Hidden chests (v0.32): each opening rolls one piece of gear your class can use. Chance of uncommon and rare by area (the rest is common), plus copper.
 // Deeper areas pay better. An opened chest fills again after CHEST_REFILL seconds.
-const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20}};
+const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20},chapel:{unc:0.65,rare:0.15,cu:26}};
 const CHEST_REFILL=600;

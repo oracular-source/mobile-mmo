@@ -25,9 +25,10 @@ function mmPins(id){
   // Areas from map files: every exit gets a pin (named by the exit, or by where it leads), plus the campfire and each named's spot.
   if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);
     const EX={stairs_up:'Stairs up',back_tunnel:'Back tunnel (Wolfwood)',crypt_tunnel:'Crypt tunnel',sinkhole:'Sinkhole (rat tunnel)',burrow:'Back hole (rat tunnel)',mouth:'Climb out (crossroads)',back_hole:'Back hole (crossroads)'};
-    const TO={crossroads:'Crossroads',graveyard:'Sunken Graveyard',crypt:'Crypt',rat_tunnel:'Rat tunnel',wolfwood:'Wolfwood',wolfwood_edge:'Wolfwood',chapel:'Chapel (not built yet)',town1:'Town 1 (not built yet)'};
+    const TO={crossroads:'Crossroads',graveyard:'Sunken Graveyard',crypt:'Crypt',rat_tunnel:'Rat tunnel',wolfwood:'Wolfwood',wolfwood_edge:'Wolfwood',chapel:'Ruined Chapel',dungeon1:'Chapel door (Dungeon 1)',town1:'Town 1 (not built yet)'};
     const NAMED={skeleton_king:'Skeleton King',old_gnawbone:'Old Gnawbone',greyfang:"Greyfang's den"};
-    return A.exits.map(e=>({x:e.tx,y:e.ty,name:EX[e.name]||TO[e.to]||e.to,k:(e.to==='crypt'||e.to==='rat_tunnel')?'dun':'exit'}))
+    return A.exits.map(e=>({x:e.tx,y:e.ty,name:e.name==='east_path'?(e.to==='chapel'?'East path (Ruined Chapel)':'East path (crossroads)'):EX[e.name]||TO[e.to]||e.to,k:(e.to==='crypt'||e.to==='rat_tunnel'||e.to==='dungeon1')?'dun':'exit'}))
+      .concat(A.objs.filter(o=>o.kind==='shrine').map(o=>({x:o.x,y:o.y,name:'Wayside shrine (rest)',k:'camp'})))
       .concat(A.objs.filter(o=>o.kind==='campfire').map(o=>({x:o.x,y:o.y,name:'Campfire',k:'camp'})))
       .concat(A.named.map(n=>({x:n.x,y:n.y-2,name:NAMED[n.name]||n.name,k:'boss'})))
       .concat(A.chests.map(c=>({x:c.tx,y:c.ty,name:'Hidden chest',k:'camp'})))}

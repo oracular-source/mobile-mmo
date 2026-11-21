@@ -5,12 +5,14 @@ const AREA_TILES={},AREA_OBJS={};
 TILESET.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_TILES[p[0]]={name:p[1],walk:p[2]==='1',tags:p.slice(4)}});
 OBJECTS.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_OBJS[p[0]]={w:+p[1],h:+p[2],blocks:p[3]==='1',light:+p[7]}});
 // Map file mob names -> mob types in js/data/mobs.js. The Skeleton King uses Boss 1 until he has his own data.
-const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar'};
+const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar',cult_zealot:'zealot',cult_ashcaller:'ashcaller',cult_chanter:'chanter',ash_wisp:'wisp',ashen_acolyte:'acolyte'};
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).
-const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf'};
+const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel'};
 // Each map's light: how bright the dark is (amb) and the colour of the night over it. Shared by render.js and the minimap.
-const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee'},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a'},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'}};
+const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee'},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a'},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'},
+  // Ruined Chapel (v0.62, Vesper embers): cold blue-grey dusk; the warmth comes from its candles, censers and embers.
+  chapel:{amb:0.4,col:'8,10,20',text:'#f0c890'}};
 function curArea(){const k=AREA_OF[zoneId];return k?buildArea(k):null}
 // Small integer hash so every tile gets the same "random" details each time (no effect on the game's seeded rolls).
 function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>>13))*1274126177|0;return((n^(n>>>16))>>>0)/4294967296}
@@ -31,9 +33,15 @@ function buildArea(id){
         const pk=+opt('pack')||0;if(pk){sp.group='pack_'+p[1];for(let i=0;i<pk;i++){const f={type:'wolf',x:sp.x+(i?14:-14),y:sp.y+8,timer:0,mob:null,group:sp.group,lv:[sp.lv[0]-1,sp.lv[0]-1],follow:sp,fo:{x:i?14:-14,y:8}};A.spawns.push(f)}}}
         // Packs (wolves): spawns of a pack type standing within 3 tiles of one another fight together.
         else if(TYPES[sp.type]&&TYPES[sp.type].pack){const mate=A.spawns.find(o=>o!==sp&&o.type===sp.type&&!o.follow&&Math.hypot(o.x-sp.x,o.y-sp.y)<=3*T);
-          sp.group=mate?(mate.group=mate.group||'pk'+A.spawns.indexOf(mate)):null}}
+          sp.group=mate?(mate.group=mate.group||'pk'+A.spawns.indexOf(mate)):null}
+        // Camps (v0.62, chapel cultists): any camp mobs standing within 3 tiles of one another are one camp.
+        else if(TYPES[sp.type]&&TYPES[sp.type].camp){const mate=A.spawns.find(o=>o!==sp&&TYPES[o.type]&&TYPES[o.type].camp&&Math.hypot(o.x-sp.x,o.y-sp.y)<=3*T);
+          sp.group=mate?(mate.group=mate.group||'cp'+A.spawns.indexOf(mate)):null}}
     else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3),at:(p.find(s=>s.indexOf('at=')===0)||'at=').slice(3)}); // at = the exit you arrive by on the other side
     else if(k==='critter')(A.critDefs=A.critDefs||[]).push({kind:p[1],x:+p[2]*T,y:+p[3]*T,n:+p[4]||1,high:p.indexOf('high')>0}); // small living things (v0.49, world.js)
+    // A barred gate (v0.62, the chapel's east gate): closed until you lift the bar from the inside (the side named, W = west).
+    // Once opened it stays open for every character (saved under ashfen-gates).
+    else if(k==='bar')(A.bars=A.bars||[]).push({tx:+p[1],ty:+p[2],id:p[3],from:p[4]||'W'});
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2]),tx:+p[1],ty:+p[2],open:false,at:0});
     // The area's named rare (v0.32): its own spot, empty until a spawn somewhere in the area rolls it (world.js rollRare). up = still out there.
@@ -43,6 +51,7 @@ function buildArea(id){
   // Walk map for the game's blocked(): 0 open, 2 water, 3 scenery, 5 buildings.
   for(let y=0;y<h;y++){A.map[y]=[];for(let x=0;x<w;x++){const t=AREA_TILES[rows[y][x]];A.map[y][x]=t.walk?0:(t.tags.indexOf('water')>=0?2:3)}}
   A.objs.forEach(o=>{if(!o.blocks)return;for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)A.map[y][x]=5;});
+  (A.bars||[]).forEach(b=>{b.open=!!store.get('ashfen-gates',{})[b.id];if(!b.open)A.map[b.ty][b.tx]=5});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
@@ -54,6 +63,12 @@ function buildArea(id){
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
     if(o.kind==='crypt_mouth'){A.lights.push({x:cx,y:(o.y+o.h)*T-10,r:46,w:0})}
     if(o.kind==='campfire'){A.lights.push({x:cx,y:o.y*T+6,r:72,w:38});A.flames.push({x:cx,y:o.y*T+11,big:1,camp:1})}
+    // Ruined Chapel (v0.62): the steeple's gold window, censer embers, the shrine's candle, the ash circle's coals, the smouldering books.
+    if(o.kind==='chapel'){const wx=o.x*T+o.w*T/2;A.lights.push({x:wx,y:(o.y+o.h)*T-80,r:46,w:40},{x:wx,y:(o.y+o.h)*T-6,r:30,w:22})}
+    if(o.kind==='censer'){A.lights.push({x:o.x*T+13,y:o.y*T-4,r:26,w:22});A.flames.push({x:o.x*T+13,y:o.y*T-7,big:0,tiny:1})}
+    if(o.kind==='shrine'){A.lights.push({x:o.x*T+15,y:o.y*T-6,r:44,w:30});A.flames.push({x:o.x*T+15,y:o.y*T-10,big:0,tiny:1});(A.rests=A.rests||[]).push({x:o.x*T+16,y:o.y*T+8})}
+    if(o.kind==='ash_circle'){A.lights.push({x:cx,y:o.y*T+26,r:30,w:30})}
+    if(o.kind==='book_pyre'){A.lights.push({x:cx,y:o.y*T+8,r:28,w:26});A.flames.push({x:cx,y:o.y*T+8,big:0})}
     if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   const st=A.exits.find(e=>e.name===M.start)||A.exits[0];
@@ -83,13 +98,22 @@ const AP={out:'#0b0a0f',dg:['#29281f','#2b2a20','#2f2d22','#33301f'],dgTuft:'#3a
   fern:'#3d5a32',fernHi:'#56704a',fernDk:'#2a3f24',
   firDk:'#101c17',fir:'#182b22',firHi:'#24402f',firTop:'#35563f',
   bould:'#5a5a55',bouldHi:'#7c7b73',bouldDk:'#36362f',
-  bark:'#7d786e',barkHi:'#aaa498',barkDk:'#4f4b44'};
+  bark:'#7d786e',barkHi:'#aaa498',barkDk:'#4f4b44',
+  // Ruined Chapel (v0.62, Vesper embers, from tools/chapel_takes.py take A): trampled ash, gravel, broken flagstones, herb rows,
+  // running-bond grey stone with ivy, slate roofs, warm candle gold.
+  ashG:['#2c2d2e','#302f2e','#343330','#2a2b2b'],ashHi:'#55534f',ashDk:'#212122',ember:'#ff8a3c',
+  grav:['#4a4740','#4f4b44','#45423c','#535048'],gravHi:'#6a645a',gravDk:'#36332e',
+  flag:['#4a4a52','#52525a','#46464e','#4e4e57'],flagLine:'#2a2a31',flagHi:'#64646e',
+  herbG:['#283421','#2b3823','#2e3b25','#263020'],herb:'#3e5a32',herbHi:'#5e7a40',herbFl:'#9a86b0',
+  cst:'#5a5a64',cstHi:'#84848e',cstDk:'#3a3a42',cstMor:'#2c2c33',ivy:'#34502e',ivyHi:'#4a6a3a',
+  slate:'#3e3236',slateHi:'#54464a',slateDk:'#2a2226',gold:'#ffd070',goldHi:'#fff0c8',
+  cloth:'#3a2a30',clothDk:'#281c22',sigil:'#aa2822'};
 
 function groundCol(n,r){
   if(n==='dead_grass')return AP.dg[Math.floor(r*4)];if(n==='grass')return AP.gg[Math.floor(r*4)];
   if(n==='dirt_path'||n==='gate'||n==='broken_fence')return r<0.5?AP.path:(r<0.8?'#54473a':AP.pathHi);
   if(n==='road')return r<0.6?AP.road:'#665443';if(n==='mud')return r<0.7?AP.mud:'#2c2820';if(n==='marsh')return r<0.6?AP.marsh:'#2a3a30';
-  if(n==='water')return r<0.7?AP.water:'#16293a';if(n==='cave_dirt'||n==='dirt_slope')return AP.cave[Math.floor(r*4)];if(n==='bridge')return AP.road;if(n==='moss')return AP.mossG[Math.floor(r*4)];if(Array.isArray(AP[n]))return AP[n][Math.floor(r*4)];if(n==='fern')return AP.needles[Math.floor(r*4)];if(n==='floor'||n==='stairs')return r<0.5?AP.flr:(r<0.8?AP.flr2:AP.flrHi);return AP.dg[0]}
+  if(n==='water')return r<0.7?AP.water:'#16293a';if(n==='cave_dirt'||n==='dirt_slope')return AP.cave[Math.floor(r*4)];if(n==='bridge')return AP.road;if(n==='moss')return AP.mossG[Math.floor(r*4)];if(Array.isArray(AP[n]))return AP[n][Math.floor(r*4)];if(n==='fern')return AP.needles[Math.floor(r*4)];if(n==='ash')return AP.ashG[Math.floor(r*4)];if(n==='gravel')return AP.grav[Math.floor(r*4)];if(n==='flagstone')return AP.flag[Math.floor(r*4)];if(n==='herbs')return AP.herbG[Math.floor(r*4)];if(n==='floor'||n==='stairs')return r<0.5?AP.flr:(r<0.8?AP.flr2:AP.flrHi);return AP.dg[0]}
 /* ---------- Water with natural edges (v0.52, owner Nov 20: square water read like a path) ----------
    Walking still uses the square tiles; only the look changes. Each tile is 1 (water) or 0 (land) at its centre; blending
    those across the tile and adding two layers of slow wobble gives one smooth shape whose banks curve across tile lines.
@@ -163,7 +187,7 @@ function groundDetail(R,n,x,y,r){
   else if(n==='dirt_path'||n==='gate'||n==='broken_fence')R(x,y,1,1,AP.pebble);else if(n==='road')R(x,y,1,1,AP.roadHi);
   else if(n==='mud')R(x,y,3,1,AP.mudDk);else if(n==='marsh'){R(x,y-2,1,3,AP.reed);R(x,y-2,1,1,AP.reedHi)}
   else if(n==='needles')R(x,y,2,1,AP.needleHi);else if(n==='moss')R(x,y,3,2,AP.mossHi);else if(n==='blight')R(x,y,1,1,AP.ash);
-  else if(n==='cave_dirt')R(x,y,1,1,AP.caveHi)}
+  else if(n==='cave_dirt')R(x,y,1,1,AP.caveHi);else if(n==='ash')R(x,y,1,1,AP.ashHi);else if(n==='gravel')R(x,y,2,1,AP.gravHi)}
 function paintGround(A,g,groundOf){
   const W=A.w*T,H=A.h*T,types=[],tid={},id=n=>tid[n]!==undefined?tid[n]:(tid[n]=types.push(n)-1);
   const tt=[];for(let y=0;y<A.h;y++){tt[y]=[];for(let x=0;x<A.w;x++)tt[y][x]=id(groundOf(x,y))}
@@ -212,6 +236,7 @@ function paintArea(A){
     if(n==='rock'||n==='bones'||n==='coffin')return 'floor';
     if(A.tint==='dusk')return 'grass';
     if(A.tint==='wood')return n==='dead_tree'?'blight':'needles'; // firs and boulders on needles, dead trees in the blight
+    if(A.tint==='chapel')return n==='fir'||n==='boulder'||n==='tree'?'needles':n==='stone_wall'||n==='pillar'?'gravel':'ash'; // inside the wall it's trampled ash
     return 'dead_grass'};
   const groundOf=(x,y)=>{x=Math.max(0,Math.min(A.w-1,x));y=Math.max(0,Math.min(A.h-1,y));const t=AREA_TILES[tile(x,y)];return t.name==='bridge'?'water':t.walk||t.name==='water'?t.name:under(x,y)};
 
@@ -244,6 +269,15 @@ function paintArea(A){
       else if(gname==='moss'){if(i<2)R(x,y,3,2,AP.mossHi);else if(i===2)R(x,y,2,1,AP.mossDk);else if(i===3&&r1<0.3)R(x,y,1,1,'#7a8a4a')}
       else if(gname==='blight'){if(i<2)R(x,y,1,1,AP.ash);else if(i===2&&r1<0.5){R(x,y,3,1,AP.crack);R(x+2,y+1,2,1,AP.crack)}else if(i===3&&r1<0.2)R(x,y,2,1,AP.boneDk)}
       else if(gname==='fern'){if(i<3){const fx=x,fy=y;R(fx,fy,1,4,AP.fernDk);R(fx-2,fy+1,2,1,AP.fern);R(fx+1,fy+1,2,1,AP.fern);R(fx-1,fy+2,1,1,AP.fern);R(fx+1,fy+2,1,1,AP.fern);R(fx,fy-1,1,1,AP.fernHi)}}
+      // Ruined Chapel ground (v0.62, Vesper embers): trampled ash with grey specks and charred bits (now and then a dying ember),
+      // gravel paths with pebbles, broken flagstone slabs before the door (seams, cracks, the odd missing corner), herb rows.
+      else if(gname==='ash'){if(i<2)R(x,y,1,1,AP.ashHi);else if(i===2)R(x,y,2,1,AP.ashDk);else if(i===3&&r1<0.25){R(x,y,3,1,'#1a1a1b');R(x+1,y-1,1,1,'#1a1a1b')}else if(i===4&&r1<0.07)R(x,y,1,1,'#a8502a')}
+      else if(gname==='gravel'){if(i<3){R(x,y,2,1,AP.gravHi);R(x,y+1,2,1,AP.gravDk)}else if(i===3)R(x,y,1,1,AP.gravDk)}
+      else if(gname==='flagstone'&&i===0){const sx=(ty%2)?8:0;R(bx,by,16,1,AP.flagLine);R(bx+sx,by,1,16,AP.flagLine);R(bx+1,by+1,6,1,AP.flagHi);
+        if(r1<0.35){R(bx+4,by+5,1,1,AP.flagLine);R(bx+5,by+6,2,1,AP.flagLine);R(bx+7,by+7,1,2,AP.flagLine)} // a crack
+        if(r2<0.18){R(bx+11,by+10,5,6,AP.ashG[1]);R(bx+11,by+10,5,1,AP.flagLine);R(bx+11,by+10,1,6,AP.flagLine);R(bx+13,by+13,1,1,AP.ashHi)}} // a corner gone, ash showing
+      else if(gname==='herbs'&&i===0){for(let k=0;k<3;k++){const hx=bx+2+k*5,hy=by+7+((k+tx)%2);R(hx-1,hy+2,5,2,AP.out);R(hx,hy,3,3,AP.herb);R(hx-1,hy+1,1,2,AP.herb);R(hx+3,hy+1,1,2,AP.herb);R(hx,hy,1,1,AP.herbHi);R(hx+1,hy-1,1,1,AP.herbHi);
+        if(ah(tx+k,ty,140)<0.4)R(hx+1+(k%2),hy,1,1,AP.herbFl)}R(bx,by+13,16,1,AP.dirt)}
       else if(gname==='stairs'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#1c1a24':'#24212c');R(bx,by+k*4,16,1,'#3a3545')}}
     }
     }
@@ -294,6 +328,8 @@ function paintArea(A){
       else if(n==='rubble')drawRubble(R,bx,by,ah(tx,ty,8));
       else if(n==='rock')drawRock(R,bx,by,name(tx,ty+1)!=='rock'&&ty+1<A.h,name(tx,ty-1)!=='rock'&&ty>0,ah(tx,ty,9));
       else if(n==='bones')drawBones(R,bx,by,ah(tx,ty,11));
+      else if(n==='stone_wall'){const isW=(x,y)=>{const m=name(x,y);return m==='stone_wall'||m==='gate'};drawStoneWall(R,g,bx,by,isW(tx,ty-1),isW(tx,ty+1),isW(tx+1,ty),isW(tx-1,ty),tx,ty)}
+      else if(n==='pillar')drawColumn(R,g,bx,by,ah(tx,ty,17));
       else if(n==='earth_wall'||n==='rat_hole'){const solid=(x,y)=>{const m=name(x,y);return !m||m==='earth_wall'||m==='rat_hole'};drawEarth(R,bx,by,!solid(tx,ty+1),!solid(tx,ty-1),n==='rat_hole',ah(tx,ty,13))}
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
@@ -319,6 +355,8 @@ function paintArea(A){
         A.trees.push(treeAt(treeImg('oak',0),X+T/2,Y+(o.h-1)*T,base-2));return}
       if(o.kind==='giant_tree'){const X=o.x*T,Y=o.y*T,base=Y+o.h*T-1;g.fillStyle='rgba(0,0,0,0.4)';g.beginPath();g.ellipse(X+o.w*T/2,base-2,40,9,0,0,7);g.fill();
         A.trees.push(treeAt(treeImg('giant',0),X,Y+(o.h-1)*T,base-2));return}
+      if(o.kind==='chapel'){const im=chapelImg(o),X=o.x*T,Y=o.y*T;im.box=[0,0,im.c.width-1,im.c.height-1];
+        A.trees.push({tree:im,x:X-im.ox,y:Y+o.h*T-1,px:X-im.ox,py:Y-im.oy,b:[X-im.ox,Y-im.oy+20,X-im.ox+im.c.width,Y+o.h*T],a:1});return} // sorted with characters, like a tree
       drawObj(g,R,o)});
   }
   // Chests are drawn each frame in render.js (drawChests), since they open and fill again.
@@ -666,12 +704,157 @@ function drawSunkPanel(R,x,y){
   [0,4,8,12].forEach((bx,i)=>{const top=4+Math.floor(bx/3),len=i===2?3:7;S(bx,top,2,len,AP.out);S(bx,top,1,len-1,AP.ironHi);if(i!==2)S(bx,top+len,2,1,AP.ironTip)});
   for(let i=0;i<10;i++)S(i,10+Math.floor(i/3),1,1,AP.out); // the second rail just breaking the surface
   S(-2,8,3,1,AP.waterHi);S(5,10,3,1,AP.waterHi);S(9,13,5,1,AP.waterHi);S(2,14,3,1,AP.waterHi);S(14,9,2,1,AP.glint);S(-1,2,2,1,AP.glint)}
+/* ---------- Ruined Chapel (v0.62): low stone walls and cloister columns ----------
+   A low wall seen from the 3/4 view: its top (light capstones) and, where nothing walls it in to the south, its front face in
+   running-bond courses. East-west runs fill the tile; north-south runs are narrower so the turns meet at a square corner (a
+   post). Ivy hangs off the top here and there, moss on the caps, a dark line and shadow at the foot. Recipe in area-rules.md. */
+function drawStoneWall(R,g,bx,by,n,s,e,w,tx,ty){
+  const hz=e||w||!(n||s),L=w?bx:bx+3,Rx=e?bx+16:bx+13,brick=(x0,y0,ww,hh)=>{R(x0,y0,ww,hh,AP.cst);for(let yy=0;yy<hh;yy+=4){R(x0,y0+yy+3,ww,1,AP.cstMor);const off=((ty*4+yy)/4)%2?4:0;for(let xx=x0+((x0+off)%8?8-((x0+off)%8):0);xx<x0+ww;xx+=8)R(xx,y0+yy,1,3,AP.cstMor)}};
+  const top=(x0,y0,ww,hh)=>{R(x0-1,y0-1,ww+2,hh+1,AP.out);R(x0,y0,ww,hh,AP.cstHi);R(x0,y0,ww,1,'#9a9aa4');for(let xx=x0+5+Math.floor(ah(tx,ty,61)*3);xx<x0+ww-1;xx+=6+Math.floor(ah(xx,ty,62)*3))R(xx,y0+1,1,hh-1,AP.cstMor);
+    if(ah(tx,ty,63)<0.35)R(x0+2+Math.floor(ah(tx,ty,64)*(ww-6)),y0+1,3,2,AP.moss)};
+  if(hz){g.fillStyle='rgba(0,0,0,0.3)';g.fillRect(L,by+15,Rx-L,3);brick(L,by+6,Rx-L,9);R(L,by+14,Rx-L,1,AP.cstDk);R(L,by+15,Rx-L,1,AP.out)}
+  if(n||s){const y0=n?by-1:by-1,y1=s?by+16:by+6;if(!s){g.fillStyle='rgba(0,0,0,0.3)';g.fillRect(bx+3,by+15,10,3);brick(bx+3,by+6,10,9);R(bx+3,by+14,10,1,AP.cstDk);R(bx+3,by+15,10,1,AP.out)}
+    R(bx+2,y0,12,y1-y0,AP.out);R(bx+3,y0,10,y1-y0,AP.cst);R(bx+3,y0,2,y1-y0,AP.cstHi);R(bx+12,y0,1,y1-y0,AP.cstDk);for(let yy=y0+4+Math.floor(ah(tx,ty,65)*3);yy<y1-1;yy+=6)R(bx+3,yy,10,1,AP.cstMor);
+    if(ah(tx,ty,66)<0.3)R(bx+5,by+4,3,3,AP.moss)}
+  if(hz)top(L,by-1,Rx-L,7);
+  // Ivy hanging off the top over the face, in clumps.
+  if(hz&&ah(tx,ty,67)<0.4){const ix=L+2+Math.floor(ah(tx,ty,68)*(Rx-L-6));for(let k=0;k<4;k++){const h=3+Math.floor(ah(tx+k,ty,69)*6);R(ix+k,by+4,1,h,k%2?AP.ivy:AP.ivyHi);R(ix+k,by+4+h,1,1,AP.out)}R(ix-1,by+3,6,2,AP.ivy)}
+}
+// A cloister column: base, shaft lit from the left, capital. About one in four has broken off partway, its top jagged.
+function drawColumn(R,g,bx,by,r){
+  g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+9,by+14,6,2,0,0,7);g.fill();
+  const broke=r<0.25,top=broke?by-2-Math.floor(r*16):by-16;
+  R(bx+3,by+10,10,5,AP.out);R(bx+4,by+11,8,3,AP.cst);R(bx+4,by+11,8,1,AP.cstHi);
+  R(bx+4,top,8,by+11-top,AP.out);R(bx+5,top,6,by+11-top,AP.cst);R(bx+5,top,2,by+11-top,AP.cstHi);R(bx+10,top,1,by+11-top,AP.cstDk);
+  if(broke){R(bx+5,top,2,1,AP.out);R(bx+8,top+1,3,1,AP.out);R(bx+7,top-1,1,1,AP.cstHi);R(bx+12,by+13,2,1,AP.cstDk);R(bx+13,by+12,1,1,AP.cst)} // chips at its foot
+  else{R(bx+2,top-3,12,4,AP.out);R(bx+3,top-2,10,2,AP.cstHi);R(bx+3,top,10,1,AP.cstDk)}
+  if(r>0.6){R(bx+5,by+2,1,6,AP.ivy);R(bx+6,by+4,1,4,AP.ivyHi);R(bx+5,by+1,2,1,AP.ivyHi)}
+}
 function drawPillar(R,x,y){R(x,y,8,14,AP.out);R(x+1,y+2,6,11,AP.brick);R(x+1,y+2,2,11,AP.brickHi);R(x,y,8,3,AP.stoneDk2);R(x+1,y,6,1,AP.stone);R(x+1,y+6,6,1,AP.mortar);R(x+1,y+10,6,1,AP.mortar)}
 
+/* ---------- Ruined Chapel props (v0.62, Vesper embers; shapes from tools/chapel_takes.py take A, references first) ----------
+   What makes each one read: the bell's flared mouth and crown loop; the shrine's little roof over a lit niche on a post; the
+   censer's bowl on a chain with smoke; the banner's swallowtail and red ring; the well's round stone ring and crossbar. */
+function drawChapelProp(g,R,o,X,Y,W,H,shadow){
+  const k=o.kind,ell=(cx,cy,rx,ry,col)=>{g.fillStyle=col;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill()};
+  if(k==='fallen_bell'){
+    // The chapel's bell, down in the cloister: lying on its side, mouth facing east, cracked; the earth dug out under its lip
+    // (the hidden chest sits there), its crown loop still on.
+    const cx=X+5,cy=Y+18;ell(X+16,Y+28,15,4,'rgba(0,0,0,0.4)');
+    for(let i=0;i<21;i++){const fl=i<3?[3,5,6][i]:6+Math.floor((i-3)*(i-3)/40);for(let j=-fl-1;j<=fl+1;j++){const edge=Math.abs(j)>=fl||i===0;
+      R(cx+i,cy+j,1,1,edge?AP.out:j<-fl/3?'#a08a50':j<fl/3?'#7a6634':'#56461f')}}
+    for(let j=-12;j<=12;j++)R(cx+20,cy+j,2,1,AP.out); // the lip, seen edge-on
+    R(cx+21,cy-11,1,22,'#56461f');R(cx+21,cy-11,1,8,'#7a6634');
+    [[6,-3],[7,-2],[8,-2],[9,-1],[10,0],[11,0],[12,1],[13,2]].forEach(([i,j])=>R(cx+i,cy+j,1,1,AP.out)); // the crack
+    R(cx+3,cy-6,2,1,'#c9b070');R(cx+8,cy-8,3,1,'#c9b070');R(cx+12,cy+4,1,1,'#4f7a5a');R(cx+5,cy+3,2,1,'#4f7a5a'); // shine, patina
+    R(cx-4,cy-2,4,4,AP.out);R(cx-3,cy-1,2,2,'#56461f'); // crown loop
+    R(cx+18,cy+12,9,3,AP.dirt);R(cx+19,cy+12,6,1,AP.dirtHi);R(cx+24,cy+11,3,1,AP.dirt); // dug earth at the lip
+    R(X+22,Y+2,4,2,AP.moss);return true}
+  if(k==='ash_circle'){
+    // The cult's ritual ring: a ring of pale ash and salt on the ground, scorched inside, a heap of embers in the middle.
+    // Ground only: you walk over it. The embers glow (light 1).
+    const cx=X+W/2,cy=Y+H/2+2;
+    for(let a=0;a<120;a++){const an=a/120*6.283,rr=1+((a*7)%5===0?1:0);const x=Math.round(cx+Math.cos(an)*21),y=Math.round(cy+Math.sin(an)*14);R(x,y,rr,1,a%3?'#b2ac9f':'#8a857c');if(a%9===0)R(x,y+1,1,1,'#6a675f')}
+    for(let i=0;i<46;i++){const an=ah(o.x,i,150)*6.283,d=ah(i,o.y,151)*15;R(Math.round(cx+Math.cos(an)*d*1.3),Math.round(cy+Math.sin(an)*d*0.85),2,1,'#1c1b1c')}
+    ell(cx,cy,7,4,'#1a1312');ell(cx,cy,5,3,'#5a2414');[[-3,0,'#ff8a3c'],[1,-1,'#ffb060'],[2,1,'#c4471f'],[-1,1,'#ff6a2a'],[0,0,'#ffd27a']].forEach(([x,y,c])=>R(cx+x,cy+y,2,1,c));
+    return true}
+  if(k==='shrine'){
+    // Pilgrims' wayside shrine (rest spot): a stone post holding a little stone box with a lit candle in its niche, under a
+    // small pitched slate roof. Offerings at its foot.
+    const x=X+12,y=Y+15;shadow(X+6,Y+13,22,3);
+    R(x-1,y-16,8,17,AP.out);R(x,y-15,6,15,AP.cst);R(x,y-15,2,15,AP.cstHi);R(x+5,y-15,1,15,AP.cstDk); // post
+    R(x-6,y-28,18,13,AP.out);R(x-5,y-27,16,11,AP.cst);R(x-5,y-27,3,11,AP.cstHi);R(x-1,y-25,8,7,'#18141a');R(x,y-24,6,1,AP.out); // box and niche
+    R(x+2,y-22,2,4,'#e8e0c8');R(x+2,y-24,2,2,AP.gold);R(x+2,y-25,1,1,AP.goldHi); // the candle
+    for(let j=0;j<6;j++){R(x-8+j,y-29-j,20-2*j,1,AP.out);if(j<5)R(x-7+j,y-29-j,(18-2*j)>>1,1,AP.slateHi),R(x-7+j+((18-2*j)>>1),y-29-j,(18-2*j)-((18-2*j)>>1),1,AP.slate)}
+    R(x-8,y-29,20,1,AP.out);R(x+1,y-35,4,1,AP.out); // eaves and ridge
+    R(x-4,y-1,3,2,'#c8b890');R(x+7,y,2,1,'#8a2a20');R(x+9,y-1,1,2,'#e8e0c8'); // offerings: a folded cloth, a ribbon, a stub of candle
+    return true}
+  if(k==='censer'){
+    // A standing censer: an iron hook on a pole with a brass bowl on its chain; embers inside, smoke rising (drawn live).
+    shadow(X+4,Y+13,9,2);R(X+7,Y-14,3,28,AP.out);R(X+8,Y-13,1,26,AP.woodHi);R(X+7,Y-14,8,2,AP.out);R(X+8,Y-13,6,1,AP.ironHi);
+    R(X+13,Y-12,1,5,'#8d8692');R(X+10,Y-7,7,6,AP.out);R(X+11,Y-6,5,4,'#8a6f1a');R(X+11,Y-6,2,1,'#c9a227');R(X+12,Y-7,3,1,'#ff8a3c');R(X+13,Y-8,1,1,'#ffd27a');
+    R(X+5,Y+12,7,2,AP.out);return true}
+  if(k==='banner'){
+    // A cult banner nailed over the wall: a pole across the top, dark cloth with a swallowtail cut and a red ring.
+    const x=X+4,y=Y+1;R(x-2,y-1,12,2,AP.out);R(x-1,y-1,10,1,AP.woodHi);
+    for(let j=0;j<15;j++)for(let i=0;i<8;i++){if(j>11&&(i===3||i===4)&&j-11>Math.abs(i-3.5)-0.5)continue;
+      const d=(i-3.5)*(i-3.5)+(j-5.5)*(j-5.5),edge=i===0||i===7||j===14||(j>11&&(i===2||i===5));
+      R(x+i,y+1+j,1,1,edge?AP.out:d<6&&d>1.6?AP.sigil:i<4?AP.cloth:AP.clothDk)}
+    return true}
+  if(k==='torn_banner'){
+    // The monks' white banner, torn down and left crumpled at the foot of the wall: pale cloth, a gold sun stitched on it.
+    shadow(X+2,Y+12,13,2);R(X+1,Y+7,14,7,AP.out);R(X+2,Y+8,12,5,'#c8c0b0');R(X+2,Y+11,12,2,'#a39c8e');R(X+5,Y+6,6,2,AP.out);R(X+6,Y+7,4,1,'#d8d0c0');
+    R(X+7,Y+9,3,2,'#c9a227');R(X+6,Y+10,1,1,'#c9a227');R(X+10,Y+10,1,1,'#c9a227');R(X+8,Y+8,1,1,'#c9a227');R(X+12,Y+12,3,1,'#5a4030');return true}
+  if(k==='bedroll'){
+    // A cultist's bedroll: a rolled blanket with a sack for a pillow.
+    shadow(X+1,Y+12,14,2);R(X+1,Y+6,14,7,AP.out);R(X+2,Y+7,12,5,'#5a4a3c');R(X+2,Y+7,12,1,'#6e5c4a');R(X+5,Y+7,1,5,'#3e3228');R(X+10,Y+7,1,5,'#3e3228');
+    R(X+11,Y+4,5,5,AP.out);R(X+12,Y+5,3,3,'#7a6a52');return true}
+  if(k==='well'){
+    // The courtyard well: a round ring of stones (seen from above at an angle), dark water deep inside, two posts and a
+    // crossbar with the rope and a bucket.
+    const cx=X+16,cy=Y+20;ell(cx+1,cy+8,15,4,'rgba(0,0,0,0.35)');ell(cx,cy,14,9,AP.out);ell(cx,cy,13,8,AP.cst);
+    for(let a=0;a<20;a++){const an=a/20*6.283;R(Math.round(cx+Math.cos(an)*11),Math.round(cy+Math.sin(an)*6.5),1,1,AP.cstMor)}
+    ell(cx,cy-1,8,4.5,AP.out);ell(cx,cy-1,7,3.5,'#0e1a22');R(cx-3,cy-2,3,1,'#22404e');
+    R(cx-12,cy+3,24,4,AP.cstDk);R(cx-12,cy+3,24,1,AP.cstHi);for(let x=cx-11;x<cx+12;x+=5)R(x,cy+4,1,3,AP.cstMor); // the ring's front face
+    [cx-13,cx+11].forEach(px=>{R(px,cy-22,3,26,AP.out);R(px+1,cy-21,1,24,AP.woodHi)});R(cx-13,cy-23,27,3,AP.out);R(cx-12,cy-22,25,1,AP.wood);
+    R(cx,cy-20,1,14,'#8a7f70');R(cx-2,cy-7,5,4,AP.out);R(cx-1,cy-6,3,2,AP.wood);R(X+3,Y+2,4,2,AP.moss);return true}
+  if(k==='book_pyre'){
+    // The monks' books, burned before the chapel door: a low heap of charred books, a few pale pages, a small flame (it
+    // smoulders; the flame and smoke are drawn live).
+    shadow(X+1,Y+12,15,3);R(X+1,Y+7,14,7,AP.out);R(X+2,Y+8,12,5,'#2a2420');[[2,8,5,'#3e2c22'],[7,9,6,'#4a3424'],[4,11,7,'#33261e']].forEach(([x,y,w,c])=>{R(X+x,Y+y,w,2,c);R(X+x,Y+y,w,1,'#1a1412')});
+    R(X+4,Y+5,7,3,AP.out);R(X+5,Y+6,5,1,'#3e2c22');R(X+3,Y+12,3,1,'#c8b890');R(X+11,Y+10,3,1,'#d8ccaa');R(X+12,Y+13,2,1,'#c8b890');R(X+6,Y+9,2,1,'#ff6a2a');R(X+10,Y+12,1,1,'#c4471f');return true}
+  if(k==='pack'){
+    // A pilgrim's pack dropped by the shrine, a walking staff leaning on it.
+    shadow(X+2,Y+12,11,2);R(X+3,Y+5,9,9,AP.out);R(X+4,Y+6,7,7,'#7a5a3a');R(X+4,Y+6,2,7,'#8f6c48');R(X+5,Y+4,5,2,AP.out);R(X+6,Y+5,3,1,'#5a4030');
+    R(X+4,Y+9,7,1,'#5a4030');for(let j=0;j<16;j++)R(X+13-Math.floor(j/5),Y-3+j,2,1,j%5===0?AP.out:'#8a6a48');return true}
+  return false}
+// The chapel (v0.62): the landmark of the grounds and the door to Dungeon 1. A long nave running north under a slate roof
+// with holes in it, its front gable facing south, and the steeple rising from the front: whole, with one gold-lit window (the
+// breadcrumb you see from the road in) and the empty belfry where the fallen bell hung. An arched door sized for people.
+// Drawn on its own picture and sorted like a tree, so anyone north of its front wall is behind it and it fades for you.
+function chapelImg(o){
+  const W=o.w*T,H=o.h*T,PAD=8,UP=72,c=document.createElement('canvas');c.width=W+PAD*2;c.height=H+UP+4;const g=c.getContext('2d');
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x+PAD,y+UP,w,h)};
+  const brick=(x0,y0,w,h,lit)=>{R(x0,y0,w,h,AP.cst);for(let yy=0;yy<h;yy+=4){R(x0,y0+yy+3,w,1,AP.cstMor);const off=((yy/4)%2)?4:0;for(let xx=off;xx<w;xx+=8)R(x0+xx,y0+yy,1,3,AP.cstMor)}if(lit)R(x0,y0,3,h,AP.cstHi)};
+  const fy=H-1,mid=Math.round(W/2),fx0=3,fx1=W-3;
+  // shadow on the ground behind the front
+  g.fillStyle='rgba(0,0,0,0.35)';g.fillRect(PAD+fx0+4,UP+fy-2,fx1-fx0,5);
+  // roof: two slopes running back north from the gable, slate rows, a dark ridge; two holes with the rafters showing
+  const ry0=8,ry1=fy-34;R(fx0+1,ry0-1,fx1-fx0-2,ry1-ry0+2,AP.out);
+  for(let y=ry0;y<ry1;y++){for(let x=fx0+2;x<fx1-2;x++){let col=x<mid?AP.slateHi:AP.slate;if((y+(x%6))%6===0)col=AP.slateDk;if(x===mid||x===mid-1)col=AP.out;R(x,y,1,1,col)}}
+  [[mid+18,30,9,6],[mid-30,52,7,5]].forEach(([hx,hy,rw,rh])=>{for(let y=-rh;y<=rh;y++)for(let x=-rw;x<=rw;x++){const q=(x*x)/(rw*rw)+(y*y)/(rh*rh);if(q<1)R(hx+x,hy+y,1,1,q>0.7?AP.out:'#141117')}
+    for(let x=-rw+2;x<rw-1;x+=4)R(hx+x,hy-rh+1,1,rh*2-1,AP.woodDk)});
+  R(fx0+8,ry0+20,3,2,AP.moss);R(fx1-16,ry0+60,4,2,AP.moss);
+  // front wall with the gable over it
+  R(fx0-1,fy-35,fx1-fx0+3,37,AP.out);brick(fx0,fy-34,fx1-fx0+1,34,true);R(fx0,fy-1,fx1-fx0+1,1,AP.cstDk);
+  for(let j=0;j<22;j++){const half=Math.round((fx1-fx0)/2-j*((fx1-fx0)/2)/22);R(mid-half-1,fy-35-j,half*2+3,1,AP.out);R(mid-half,fy-35-j,half*2+1,1,(j%4===3)?AP.cstMor:AP.cst);R(mid-half,fy-35-j,3,1,AP.cstHi)}
+  // two narrow dark windows in the front wall, either side of the tower
+  [fx0+12,fx1-17].forEach(wx=>{R(wx-1,fy-28,7,16,AP.out);R(wx,fy-27,5,14,'#18141c');R(wx+2,fy-29,1,1,AP.out);R(wx,fy-14,5,1,AP.cstHi)});
+  // ivy up the east corner, rubble at the foot
+  for(let y=fy-30;y<fy;y++)R(fx1-1-(y%3===0?1:0),y,1,1,y%2?AP.ivy:AP.ivyHi);R(fx1-3,fy-31,4,2,AP.ivy);
+  for(let x=fx0+3;x<fx1-2;x+=9){R(x,fy+1,2,1,AP.cstDk);R(x+1,fy,1,1,AP.cst)}
+  // the steeple: a square tower over the door, running-bond stone lit from the left, a cornice band, a pointed slate spire
+  const tx0=mid-15,tx1=mid+15,tt=fy-100;
+  R(tx0-1,tt-1,tx1-tx0+3,fy-tt+2,AP.out);brick(tx0,tt,tx1-tx0+1,fy-tt,true);R(tx1-2,tt,3,fy-tt,AP.cstDk);
+  R(tx0-3,tt-2,tx1-tx0+7,5,AP.out);R(tx0-2,tt-1,tx1-tx0+5,3,AP.cstHi);R(tx0-2,tt+1,tx1-tx0+5,1,AP.cstDk); // cornice
+  R(tx0-1,fy-58,tx1-tx0+3,3,AP.out);R(tx0,fy-57,tx1-tx0+1,1,AP.cstHi); // string course between door and window
+  for(let j=0;j<50;j++){const half=Math.max(0,15-Math.floor(j*15/48));R(mid-half-1,tt-3-j,half*2+3,1,AP.out);if(half>0){R(mid-half,tt-3-j,half,1,AP.slateHi);R(mid,tt-3-j,half+1,1,AP.slate);if(j%5===4)R(mid-half,tt-3-j,half*2+1,1,AP.slateDk)}}
+  R(mid,tt-58,1,6,AP.out);R(mid-2,tt-56,5,1,AP.out); // a small iron cross at the tip
+  // the one lit window (gold), arched, high in the tower
+  const wy=fy-86;R(mid-6,wy-1,13,17,AP.out);R(mid-5,wy+3,11,12,AP.gold);for(let y=0;y<4;y++){const h=[2,4,5,5][y];R(mid-h,wy+y,h*2+1,1,AP.gold)}R(mid,wy,1,15,'#c89a40');R(mid-5,wy+8,11,1,'#c89a40');R(mid-3,wy+2,2,3,AP.goldHi);
+  // the empty belfry where the bell hung: a dark arch with the beam still across it
+  const by=fy-72;R(mid-7,by-1,15,13,AP.out);R(mid-6,by+2,13,9,'#141117');for(let y=0;y<3;y++){const h=[3,5,6][y];R(mid-h,by+y,h*2+1,1,'#141117')}R(mid-6,by+3,13,2,AP.woodDk);R(mid-1,by+5,2,2,AP.out);
+  // the arched door (the way into Dungeon 1): 17 wide, 26 tall, dark old wood in planks with iron bands, a pale stone surround
+  const dy=fy-26;R(mid-10,dy-4,21,31,AP.out);R(mid-9,dy-3,19,29,AP.cstHi);R(mid-8,dy,17,26,AP.out);
+  for(let y=0;y<26;y++){const h=y<5?[4,6,7,8,8][y]:8;for(let x=-h;x<=h;x++)R(mid+x,dy+y,1,1,(x===0)?AP.out:(x+8)%4===0?'#2a1a12':x<0?'#3e2a1c':'#4a3222')}
+  R(mid-8,dy+9,17,1,'#2b2738');R(mid-8,dy+19,17,1,'#2b2738');R(mid+3,dy+14,2,2,'#c9a227'); // iron bands, the ring
+  R(mid-11,fy-1,23,2,AP.cstDk); // the step
+  return {c:c,ox:PAD,oy:UP,box:null}}
 function drawObj(g,R,o){
   const X=o.x*T,Y=o.y*T,W=o.w*T,H=o.h*T,k=o.kind;
   const shadow=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,0.35)';g.fillRect(x,y,w,h)};
   const bricks=(x,y,w,h,base,hi)=>{R(x,y,w,h,base);for(let yy=0;yy<h;yy+=4){R(x,y+yy,w,1,AP.mortar);const off=(yy/4)%2?4:0;for(let xx=off;xx<w;xx+=8)R(x+xx,y+yy,1,4,AP.mortar);if(hi)for(let xx=off+1;xx<w;xx+=8)R(x+xx,y+yy+1,3,1,hi)}};
+  if(drawChapelProp(g,R,o,X,Y,W,H,shadow))return;
   if(k==='bell_tower'){
     // Broken stone bell tower: it rises well above its footprint; the right side of the top has crumbled away (rubble lies at its foot).
     const top=Y-34;shadow(X+3,Y+H-4,W,5);

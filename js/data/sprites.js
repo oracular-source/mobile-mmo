@@ -140,6 +140,16 @@ const RAG_WEAPONS={
   lute:[[10,["k",".o",".kok","koook","kokok","koook",".kkk"]]],
   wraps:[[14,["..w.............w"]]]
 };
+// Ruined Chapel (v0.62, placeholders until the character design pass; shapes from tools/chapel_takes.py take A):
+// hooded fen cultists drawn from one robed shape (render.js mkRobed): w x h, robe colour, eye colour and what they hold.
+// zealot rust-red with a sickle, ashcaller grey with an ember held up, chanter purple with a censer; the Ashen Acolyte pale
+// grey, a size bigger, ember eyes and a censer trailing smoke.
+const ROBED={zealot:{w:14,h:19,robe:'#5a2a24',eye:'#ff4a30',item:'sickle'},ashcaller:{w:14,h:19,robe:'#5c5a5e',eye:'#ff4a30',item:'ember'},
+  chanter:{w:14,h:19,robe:'#3e3a56',eye:'#ff4a30',item:'censer'},acolyte:{w:16,h:21,robe:'#8a8682',eye:'#ffb060',item:'censer'}};
+// Ash wisp: a floating candle flame with a smoky tail (9 x 15), two frames that flicker.
+const WISP_SPR=[["....k....","...kyk...","...kyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","...ss....","....s....","...s....."],
+  ["...k.....","...kyk...","..kyyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","....ss...","...s.....","....s...."]];
+const WISP_PAL={k:'#3a1a10',y:'#ff8a3c',Y:'#ffd070',W:'#fff6d8',s:'#6a6670'};
 const RAGS={
   druid:{"body":"rag","w":["leafstick"],"c":{"H":"#686d56","n":"#535a44","N":"#3e4734","d":"#303a28","h":"#6e4a2a"}},
   warrior:{"body":"tunic","w":["sword","shield"],"c":{"H":"#805853","n":"#6b4542","N":"#563231","d":"#482526","h":"#6e4a2a","R":"#8f2630"}},

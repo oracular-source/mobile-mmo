@@ -111,6 +111,7 @@ function update(dt){
     if(m.crack>0)m.crack-=dt; // Sunder
     if(m.tiger>0)m.tiger-=dt; // Tiger Leap's window
     if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
+    if(m.chantT>0)m.chantT-=dt; // a chanter's song (v0.62)
     if(m.casting&&(m.mez>0||m.stun>0||m.fear>0||m.lost>0||m.state!=='chase'||player.dead))interruptCast(m);
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
@@ -133,15 +134,18 @@ function update(dt){
       if(m.def.adds)namedAdds(m);
       if(m.def.callAt&&rareCall(m,dt,spd))return; // the Pale Rat running for help
       if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
+      if(m.def.cast&&mobCast(m,dt))return;if(m.dead||player.dead)return; // chapel casters (v0.62): stand still while the bar fills
+      if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.blink)wispBlink(m,dt);
       if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
       if(m.def.charge&&boarCharge(m,v,d,dt,spd))return; // the boar lowering its head or rushing in
       if(d>11){if(spd>0)pathTo(m,v.x,v.y,spd,dt)} // around trees and walls, not into them (js/path.js)
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined}
     }
   });
+  updateHazards(dt);
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)parts.splice(i,1)}
   for(let i=beams.length-1;i>=0;i--){beams[i].t+=dt;if(beams[i].t>0.15)beams.splice(i,1)}

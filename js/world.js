@@ -37,7 +37,8 @@ function updateNPCs(dt){
   for(let i=bubbles.length-1;i>=0;i--){bubbles[i].t+=dt;if(bubbles[i].t>4)bubbles.splice(i,1)}
 }
 // Any campfire: the old Gate Road one, or a campfire in a map-file area (the crossroads). v0.38: areas count too.
-const nearFire=()=>{const A=curArea();if(A)return A.flames.some(f=>f.camp&&Math.hypot(player.x-f.x,player.y-f.y)<48);return zoneId==='over'&&Math.hypot(player.x-CAMPFIRE.x,player.y-CAMPFIRE.y)<48};
+// The chapel road's wayside shrine (v0.62) is a rest spot too.
+const nearFire=()=>{const A=curArea();if(A)return A.flames.some(f=>f.camp&&Math.hypot(player.x-f.x,player.y-f.y)<48)||(A.rests||[]).some(r=>Math.hypot(player.x-r.x,player.y-r.y)<44);return zoneId==='over'&&Math.hypot(player.x-CAMPFIRE.x,player.y-CAMPFIRE.y)<48};
 
 // Critters: crows on the road that scatter, frogs at the pond, fireflies.
 const critters=[],flies=[];
@@ -150,7 +151,7 @@ function enterZone(id,from,at){
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null;}
-  decoy=null;grounds.length=0;traps.length=0;
+  decoy=null;grounds.length=0;traps.length=0;hazards.length=0;
   player.onTile=tileAt(player.x,player.y);
 }
 /* ---------- Summoning a named (v0.31) ---------- */
@@ -188,7 +189,7 @@ function checkPortals(){
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(zoneId==='dun'&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
-  if(A){checkSummon(A);checkChests(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  if(A){checkSummon(A);checkChests(A);checkBars(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
     // The exit you just came out of wakes up 1 second after you arrive (owner, Nov 20; was "after walking 3 tiles away"):
     // you can run straight back in (to help a friend), but you can't flicker in and out. If you're already back on it when the
     // second is up, it takes you through then (you always arrive 2+ tiles off it, so arriving never counts as standing on it).
@@ -198,6 +199,7 @@ function checkPortals(){
       if(ZONE_OF[ex.to]){if(inCombat())log('You slip away. What was chasing you loses your trail.','#9aa');enterZone(ZONE_OF[ex.to],A.id,ex.at)}
       else if(ex.to==='town1')log('The gates of Town 1 are shut for now. It is not built yet.','#9aa');
       else if(ex.to==='chapel')log('The road north leads on to an old chapel. It is not built yet.','#9aa');
+      else if(ex.to==='dungeon1')log('The chapel door is barred from within. Chanting carries through the wood. (Brother Malrec\'s halls come in the next release.)','#f0c890');
       else log('This way is not built yet.','#9aa');}}
     return}
   const t=tileAt(player.x,player.y);
@@ -213,7 +215,7 @@ function checkPortals(){
 // An attack slow on it slows the casting too (cast bar fills slower, longer wait between bolts).
 const BOLT={first:3,every:5,cast:2,range:110}; // first cast after 3s, then 5s between casts: one bolt about every 7s
 // A stun, fear, sleep, Evade or Feign Death (or the fight ending) breaks off a boss's cast.
-function interruptCast(m){if(!m.casting)return;m.casting=null;m.bolt=BOLT.every;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
+function interruptCast(m){if(!m.casting)return;m.casting=null;m.bolt=m.def.cast?m.def.cast.every:BOLT.every;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
 function bossThink(m,dt){
   // The Enchanter's Slow Mind slows its spellcasting too: longer casts, longer gaps. The Shaman's Drowsy only slows attacks (v0.24).
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
@@ -276,11 +278,72 @@ function boarCharge(m,v,d,dt,spd){
   if(m.chargeCd<=0&&d>=CHARGE.min&&d<=CHARGE.max&&spd>0){m.wind=CHARGE.wind;m.chargeCd=CHARGE.cd;floatText(m.x,m.y-18,'lowers its head','#ffd27a');return true}
   return false}
 
+/* ---------- Ruined Chapel (v0.62): cult camps that call for help, the chanter's song, casters, wisps, Ember Brand ---------- */
+// The chapel's east gate: barred from the inside. Walk up to it inside the wall and you lift the bar (it stays open for good,
+// for every character); from the ledge outside it won't budge.
+function checkBars(A){(A.bars||[]).forEach(b=>{const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),near=Math.abs(tx-b.tx)<=1&&Math.abs(ty-b.ty)<=1;
+  if(near&&!b.near&&!b.open){const inside=b.from==='W'?tx<b.tx:b.from==='E'?tx>b.tx:b.from==='N'?ty<b.ty:ty>b.ty;
+    if(inside){b.open=true;A.map[b.ty][b.tx]=0;const g=store.get('ashfen-gates',{});g[b.id]=1;store.set('ashfen-gates',g);burst(b.tx*T+8,b.ty*T+4,'#c8b89a',10,true);
+      log('You lift the heavy bar and the east gate creaks open. A steep path leads down toward the crossroads.','#f0c890');floatText(b.tx*T+8,b.ty*T-10,'Gate open','#f0c890',true)}
+    else log('The gate is barred from the other side.','#9aa')}
+  b.near=near})}
+// Camps (cultists): the first of a camp to be pulled shouts, and the nearest other camp within CAMP_CALL comes running.
+// One shout per camp, and the camp that answers doesn't shout again, so one pull brings at most two camps.
+const CAMP_CALL=128;
+function campCall(m){
+  if(!m.sp.group)return;const mine=mobs.filter(o=>!o.dead&&o.sp.group===m.sp.group);if(mine.some(o=>o.shouted))return;mine.forEach(o=>o.shouted=true);
+  let best=null,bd=CAMP_CALL;mobs.forEach(o=>{if(o.dead||!o.def.camp||o.sp.group===m.sp.group||o.state!=='idle'||!o.sp.group)return;const d=Math.hypot(o.x-m.x,o.y-m.y);if(d<bd&&!wallBetween(m,o)){bd=d;best=o}});
+  if(!best)return;
+  floatText(m.x,m.y-26,'TO ME!','#ffb37a',true);log(cap(m.def.name)+' shouts for help!','#ffb37a');
+  mobs.forEach(o=>{if(!o.dead&&o.sp.group===best.sp.group){o.shouted=true;engage(o);log(cap(o.def.name)+' answers the call!','#ffb37a')}})}
+// A shout doesn't carry through a wall (the chapel's stone wall, a fence): true if one stands on the line between two mobs.
+function wallBetween(a,b){const A=curArea();if(!A)return false;const n=Math.ceil(Math.hypot(b.x-a.x,b.y-a.y)/4);
+  for(let i=1;i<n;i++){const x=Math.floor((a.x+(b.x-a.x)*i/n)/T),y=Math.floor((a.y+(b.y-a.y)*i/n)/T),c=A.rows[y]&&A.rows[y][x],t=c&&AREA_TILES[c];if(t&&(t.tags.indexOf('wall')>=0||t.tags.indexOf('border')>=0))return true}
+  return false}
+// The chanter: every CHANT.every seconds while it fights it sings, and its camp (itself too) hits CHANT.x harder for CHANT.dur s.
+const CHANT={every:7,dur:6,x:1.25,first:2};
+function chantThink(m,dt){m.chantCd=(m.chantCd===undefined?CHANT.first:m.chantCd)-dt;if(m.chantCd>0)return;m.chantCd=CHANT.every;
+  const mates=mobs.filter(o=>!o.dead&&(o===m||(m.sp.group&&o.sp.group===m.sp.group))&&dist(o,m)<90);
+  mates.forEach(o=>{o.chantT=CHANT.dur});floatText(m.x,m.y-24,'chants','#e0c3ff');burst(m.x,m.y-10,'#c8a0ff',6);
+  log(cap(m.def.name)+' chants, and '+(mates.length>1?'its camp fights harder':'it fights harder')+'!','#e0c3ff')}
+// Casters (ashcallers, the Ashen Acolyte): a spell with a cast bar over its head. Stands still while casting. A stun, fear,
+// sleep, Evade or Feign Death breaks it off (interruptCast); out of range when it lands = it misses.
+function mobCast(m,dt){const c=m.def.cast;
+  if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
+  if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.bolt=c.every;
+    if(dist(m,player)>c.range){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' falls short. You were out of range.','#9fb8e0');return false}
+    beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:c.col});burst(player.x,player.y-8,c.col,8);
+    if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the '+c.name.toLowerCase()+'.','#9fb8e0');return false}
+    mobSpellHit(m,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
+  m.bolt=(m.bolt===undefined?c.first:m.bolt)-dt;
+  if(m.bolt<=0&&dist(m,player)<c.range&&victim(m)===player){m.casting={name:c.name,t:0,dur:c.dur};floatText(m.x,m.y-26,c.name+'!',c.col);
+    if(c.boss)log(cap(m.def.name)+' begins casting '+c.name+'! Stun or fear it, or get out of range.',c.col);return true}
+  return false}
+// A spell or burn on you from a mob: same softening as the King's bolt (Warrior passives, shields), plus the level gap.
+function mobSpellHit(m,base,label,col){
+  let dmg=base*rr(0.85,1.15);const ld=m.lv-player.lvl;dmg*=ld>0?1+0.15*ld:Math.max(0.7,1+0.05*ld);if(m.chantT>0)dmg*=CHANT.x;
+  dmg=Math.max(1,Math.round(tankMods(dmg)));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;
+  if(dmg>0)floatText(player.x,player.y-20,String(dmg),col);log(cap(m.def.name)+"'s "+label.toLowerCase()+' hits YOU for '+dmg+'.','#ff8a80',dmg>=maxHP(player.lvl)*0.2?'main':'fight');
+  unhide('You are no longer hidden.');if(player.hp<=0&&!lastStand())playerDie(m)}
+// Ash wisps: every so often one gutters out in a puff and flares up again a few steps from you, somewhere else.
+function wispBlink(m,dt){m.blinkCd=(m.blinkCd===undefined?rr(3,5):m.blinkCd)-dt;if(m.blinkCd>0||m.root>0)return false;m.blinkCd=rr(5,7);
+  const v=victim(m),a0=rng()*6.283;for(let k=0;k<8;k++){const an=a0+k*0.785,x=v.x+Math.cos(an)*26,y=v.y+Math.sin(an)*20;
+    if(!blocked(x,y)&&!blocked(x,y-6)){burst(m.x,m.y-8,'#8a8590',8);m.x=x;m.y=y;burst(x,y-8,'#ffd27a',8);floatText(x,y-22,'blinks','#ffd27a');return true}}
+  return false}
+// Ember Brand (the Ashen Acolyte): a ring of embers flares under you; 1.5 s to step out of it, then a big burn inside.
+const BRAND={first:5,every:9,dur:1.5,r:20,x:1.5},hazards=[];
+function brandThink(m,dt){if(m.casting)return;m.brandCd=(m.brandCd===undefined?BRAND.first:m.brandCd)-dt;if(m.brandCd>0||dist(m,player)>120)return;m.brandCd=BRAND.every;
+  hazards.push({x:player.x,y:player.y,r:BRAND.r,t:0,dur:BRAND.dur,m:m});floatText(m.x,m.y-26,'Ember Brand!','#ff8a3c');log(cap(m.def.name)+' brands the ground under you with embers! Move!','#ff8a3c')}
+function updateHazards(dt){for(let i=hazards.length-1;i>=0;i--){const h=hazards[i];h.t+=dt;if(h.t<h.dur)continue;hazards.splice(i,1);
+  for(let k=0;k<14;k++)parts.push({x:h.x+rr(-h.r,h.r),y:h.y+rr(-h.r*0.6,h.r*0.6),vx:rr(-6,6),vy:-rr(14,30),t:0,life:0.7,col:k%2?'#ff8a3c':'#ffd27a'});
+  if(player.dead||!h.m||h.m.dead)continue;
+  if(Math.hypot((player.x-h.x)/h.r,(player.y-h.y)/(h.r*0.6))<=1)mobSpellHit(h.m,(8+2*h.m.lv)*BRAND.x,'Ember Brand','#ff8a3c');else log('The embers flare where you stood.','#9aa')}}
+
 /* ---------- Named rares (v0.32) ---------- */
 // About 1 in 100 spawns in an area brings out that area's rare, at its own spot off the main path (owner, Nov 17).
 // Rolled when a mob respawns, not when you walk in, so leaving and coming back can't fish for it. Only one out at a time.
 const RARE_CHANCE=0.01;
-const RARE_TEXT={ironshell:'Something big and heavy shifts in the marsh reeds.',palerat:'A thin, high squeak echoes from somewhere off the warren.',bride:'A woman\'s sobbing drifts across the graves.',oldscar:'A low, ragged growl carries from the east, off the deer trail.'};
+const RARE_TEXT={acolyte:'Smoke curls up from the herb garden, and someone is praying in a voice like ash.',ironshell:'Something big and heavy shifts in the marsh reeds.',palerat:'A thin, high squeak echoes from somewhere off the warren.',bride:'A woman\'s sobbing drifts across the graves.',oldscar:'A low, ragged growl carries from the east, off the deer trail.'};
 function rollRare(A){if(!A||!A.rare||A.rare.sp.up||rng()>=RARE_CHANCE)return;spawnRare(A)}
 function spawnRare(A){const sp=A.rare.sp;if(sp.mob&&!sp.mob.dead)return sp.mob;sp.up=true;const m=spawn(sp);
   log(RARE_TEXT[sp.type]||'Something rare stirs nearby.',(AREA_TINT[A.tint]||{}).text||'#c8a0ff');return m}
@@ -330,7 +393,8 @@ function areaCritters(A){
     A.crit.push(c)}});
   // Open water for ripples: water tiles with water all round them, so rings never cross the shore.
   A.waterSpots=[];for(let y=1;y<A.h-1;y++)for(let x=1;x<A.w-1;x++){const w=(a,b)=>A.rows[b][a]==='~';if(w(x,y)&&w(x-1,y)&&w(x+1,y)&&w(x,y-1)&&w(x,y+1))A.waterSpots.push({x:x*T+8,y:y*T+8})}
-  A.chimneys=A.objs.filter(o=>o.kind==='shack').map(o=>({x:o.x*T+o.w*T-4,y:o.y*T-11}));
+  A.chimneys=A.objs.filter(o=>o.kind==='shack').map(o=>({x:o.x*T+o.w*T-4,y:o.y*T-11}))
+    .concat(A.objs.filter(o=>o.kind==='censer').map(o=>({x:o.x*T+13,y:o.y*T-9})),A.objs.filter(o=>o.kind==='book_pyre').map(o=>({x:o.x*T+8,y:o.y*T+4}))); // chapel censers and the smouldering books (v0.62)
   return A.crit;
 }
 // The closest point a few pixels inside open water, within about three tiles (for a fleeing frog), or null.

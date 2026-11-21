@@ -84,6 +84,7 @@ def check(m, tiles, objs):
         elif k == 'chest': markers.append(dict(k=k, type='chest', x=int(t[1]), y=int(t[2])))
         elif k == 'exit': markers.append(dict(k=k, type=t[1], x=int(t[2]), y=int(t[3]), extra=t[4:]))
         elif k == 'fog': fogs.append(tuple(int(v) for v in t[1:5]))
+        elif k == 'bar': markers.append(dict(k=k, type='bar', x=int(t[1]), y=int(t[2])))   # a barred gate (opens from one side in the game)
         elif k == 'label': pass
         elif k == 'critter': critters.append(dict(kind=t[1], x=float(t[2]), y=float(t[3])))
         else: E.append(f'unknown line: {" ".join(t)}')

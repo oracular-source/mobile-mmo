@@ -75,7 +75,7 @@ obj lantern 58 44
 exit south 56 47 to=crossroads at=north
 exit graveyard 12 47 to=graveyard at=north
 exit crypt_tunnel 9 16 to=crypt at=back_tunnel lit
-exit north 40 0 to=chapel
+exit north 40 0 to=chapel at=south
 # Greyfang wanders a loop round the middle of the wood with two pack wolves; howls them back, never flees
 named greyfang 11 28 7 pack=2 route=28,7;38,9;46,14;45,22;40,27;30,29;20,26;15,19;20,11
 # the way in from the crossroads: easiest wolves

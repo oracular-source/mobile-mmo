@@ -38,5 +38,7 @@ Drawn when their area is built, so the list stays in step with the map chat.
 | The Weeping Bride (rare) | Graveyard | Zombie | Torn veil, pale glow |
 | The Pale Rat (rare) | Rat tunnel | Rat | White with red eyes, bigger |
 
+**In the game since v0.62 as placeholders** (character design pass redraws them): fen zealot, ashcaller and chanter (one robed shape in three colours, `mkRobed` in `js/render.js`, data `ROBED` in `js/data/sprites.js`), the Ashen Acolyte (the same shape a size bigger, pale), the ash wisp (`WISP_SPR`).
+
 ## Not monsters, but on the same art list later
 Guards and Marrow the Peddler (people: redo with the character look), crow and frog critters (fine for now).

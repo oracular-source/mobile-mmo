@@ -1,5 +1,5 @@
 // Crossroads (outside Town 1's gate), levels 1-3: the hub of Zone 1. Roads to the graveyard (west), Wolfwood (north),
-// the rat tunnel's sinkhole (east) and Town 1 (south). Format: docs/map-format.md. Check: python3 tools/mapcheck.py js/data/maps/*.js
+// the rat tunnel's sinkhole (east), Town 1 (south), and a steep path north-east up to the Ruined Chapel's east gate. Format: docs/map-format.md. Check: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.crossroads = {
   name: 'Crossroads', zone: [50, 69], tint: 'dusk', start: 'south', rules: '',
@@ -15,15 +15,15 @@ MAPS.crossroads = {
     'TTTTTTTTTT,TTTTTTT,TTTT,,==,,,,,,,,,,,,~~~~~~~,,',
     'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~,,,,,,',
     'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,,,,,,,,',
-    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT,T',
-    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,TT,T',
-    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTTTTTT',
-    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTTTTTTT',
-    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,,TTTT',
-    'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,,TTTT',
-    '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,,,,TTT',
-    '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,,,,,TT',
-    'wwb,,,,,,TT,,TTTTTTTTT,,,==,,,TT,TTTTTTT,,,,,TTT',
+    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT::',
+    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,T:,T',
+    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTT:,TT',
+    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,:TTT',
+    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,:TTTT',
+    'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,:TTTT',
+    '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,:,,TTT',
+    '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,:,,,TT',
+    'wwb,,,,,,TT,,TTTTTTTTT,,,==,,,TT,TTTTTTT,:,,,TTT',
     ',,,,,TTTTTTT,TTTTT,TTT,,,==,,,T,TTT,T,,,,:,,TTTT',
     'TTTTTTTTT,,,TTTTTTTTTT,,,==,,,TTTT,T,,,,:,,,bTTT',
     'T,TTT,T,,,,,TTTTTTTTTT,,,==,,,TT,,,bT,,:,,,,,,TT',
@@ -63,6 +63,7 @@ exit south 25 43 to=town1 lit
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
+exit east_path 47 10 to=chapel at=east_path   # v0.62: the steep path up to the chapel's east gate (it opens from the chapel side)
 # by the town road: the easiest rats
 spawn rat 1 21 37
 spawn rat 1 26 35
