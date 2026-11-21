@@ -213,3 +213,11 @@ Claude leans **minimap B + full map A**: the ring can't be mistaken for anything
 
 **Owner picked B, but cleaner and smaller** (Nov 20): "a mix between B and what we have now": keep today's small, simple look, not the chunkier draft. **Built v0.61:** minimap stays 2 px a tile with the name strip; ground drawn in flat colours (trees and water as rounded masses with no highlights or lumps, roads as clean lines, wide roads solid, soft fog edge); 5 × 5 picture pins (pointer, house, arch, flame, skull, chest) in their own colours; you = gold dot in a white ring with a white pointer. Full map = option B: no numbers or list, tap a pin for a strip (name, what it is, tiles and direction), "% explored" in the title, + / − on the map's corner. Code: `mmGround` (drawn ground per size, cached), `mmPicture` (cut by the explored mask `Z.m` with a blurred edge), the minimap rebuilds its picture only when new tiles are revealed (`compDirty`), `mapSel` + a tap handler on `#mapcv`.
 **v0.61.1 (owner):** pin size choice, Small / Medium / Large (`settings.pins`, `mmPinMul`): a button under + / − on the full map shows a house pin at that size plus the letter, and Settings → Display → Map pins.
+
+
+## 21. You on the minimap (owner, Nov 20)
+Owner: the "you" marker is much more detailed than everything else. Cause: it's drawn as smooth circles (gold dot, white ring, pointer) while the pins are 5 × 5 pixel pictures and the ground is flat. Drafts from the real crossroads and Wolfwood maps (made in chat, not saved to the repo):
+- **A Pixel arrow:** map unchanged; you = a white 7 × 7 pixel arrow, pins' black outline and pixel size, 8 directions.
+- **B Pixel map:** A, plus a 1-pixel dark edge round forests, water and roads (crisper, busier with scattered trees).
+- **C Closer, richer map:** 3 px a tile (~29 tiles across), trees as separate crowns with a shadow, bigger pins and arrow.
+Claude leaned A (fixes the mismatch, no extra clutter; C's zoom could later be a setting). **Owner picked A. Built v0.61.2.**

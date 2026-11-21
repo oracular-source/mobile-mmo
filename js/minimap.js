@@ -175,23 +175,24 @@ function drawMinimap(){
     const a=Math.atan2(y-cyp,x-cxp),r=Math.min((cxp-pad)/Math.abs(Math.cos(a)||1e-6),(cyp-pad)/Math.abs(Math.sin(a)||1e-6));
     mmArrow(cxp+Math.cos(a)*r,cyp+Math.sin(a)*r,a,3*dpr,MM_ICOL[ic]);
   });
-  mmYou(mmg,cxp,cyp,2.6*dpr,dpr);
+  mmYou(mmg,cxp,cyp,pu);
   // Name strip.
   mmg.fillStyle='rgba(43,43,43,.95)';mmg.fillRect(0,bot,mmEl.width,strip);mmg.fillStyle='#8a8a8a';mmg.fillRect(0,bot,mmEl.width,dpr);
   mmg.fillStyle='#ddd';mmg.font=(9*dpr)+'px monospace';mmg.textAlign='center';mmg.textBaseline='middle';
   mmg.fillText(Z.name.length>16?Z.name.slice(0,15)+'…':Z.name,mmEl.width/2,bot+strip/2+dpr*0.5);
 }
-// You (v0.61, UI 20 option B): a gold dot in a white ring with a small white pointer on its edge showing which way
-// you're heading. Nothing else on the map is round and white, so it can't be mistaken for a pin.
-function mmYou(g,x,y,q,dpr){
+// You (v0.61.2, UI 21 option A): a small white pixel arrow drawn like the pins (same pixel size, black outline),
+// pointing the way you're heading in 8 directions. It used to be smooth circles, which didn't match the pixel pins.
+// Two 7 x 7 pictures (a head and a short tail): pointing east and south-east; the other six are these turned a quarter at a time.
+const MM_YOU_E=['...#...','...##..','...###.','#######','...###.','...##..','...#...'];
+const MM_YOU_SE=['#......','.#.....','..#...#','...#.##','....###','...####','..#####'];
+function mmYou(g,x,y,u){
   const fa=Math.atan2(player.fy||0,player.fx||(player.fy?0:1));
-  g.save();g.translate(x,y);
-  g.rotate(fa);g.fillStyle='#000';g.beginPath();g.moveTo(q*2.2+dpr,0);g.lineTo(q*0.6,-q-dpr);g.lineTo(q*0.6,q+dpr);g.fill();
-  g.fillStyle='#fff';g.beginPath();g.moveTo(q*2.2,0);g.lineTo(q*0.8,-q*0.85);g.lineTo(q*0.8,q*0.85);g.fill();g.rotate(-fa);
-  g.fillStyle='#000';g.beginPath();g.arc(0,0,q+1.5*dpr,0,7);g.fill();
-  g.fillStyle='#fff';g.beginPath();g.arc(0,0,q+0.6*dpr,0,7);g.fill();
-  g.fillStyle='#ffd27a';g.beginPath();g.arc(0,0,q-0.3*dpr,0,7);g.fill();
-  g.restore();
+  const d=((Math.round(fa/(Math.PI/4))%8)+8)%8,G=d%2?MM_YOU_SE:MM_YOU_E,N=7,on=[];
+  for(let j=0;j<N;j++)for(let i=0;i<N;i++)if(G[j][i]==='#'){let X=i,Y=j;for(let r=0;r<d>>1;r++){const t=X;X=N-1-Y;Y=t}on.push([X,Y])}
+  const x0=Math.round(x-N/2*u),y0=Math.round(y-N/2*u);
+  g.fillStyle='#000';on.forEach(([X,Y])=>g.fillRect(x0+(X-1)*u,y0+(Y-1)*u,3*u,3*u)); // outline first
+  g.fillStyle='#fff';on.forEach(([X,Y])=>g.fillRect(x0+X*u,y0+Y*u,u,u));
 }
 function mmArrow(x,y,a,r,col){
   mmg.save();mmg.translate(x,y);mmg.rotate(a);mmg.fillStyle='#000';mmg.beginPath();mmg.moveTo(r+1,0);mmg.lineTo(-r-1,-r-1);mmg.lineTo(-r-1,r+1);mmg.fill();
@@ -218,7 +219,7 @@ function renderMapScreen(){
     p.sx=px/dpr;p.sy=py/dpr;
     if(p===mapSel){g.strokeStyle='#ffd27a';g.lineWidth=1.5*dpr;g.beginPath();g.arc(px,py,5*u,0,7);g.stroke()}
     mmIcon(g,px,py,ic,u,ic==='exit'?mmExitRot(Z,p):0)});
-  mmYou(g,x,y,3.4*dpr,dpr); // the same marker as the minimap, on top
+  mmYou(g,x,y,u); // the same marker as the minimap, at the pins' size, on top
   const leg=$('maplegend');
   if(!mapSel){leg.innerHTML='<div class="mtip">'+(found.length?'Tap a pin to see what it is. '+found.length+' place'+(found.length>1?'s':'')+' found.':'No places found yet. Walk around to fill in the map.')+'</div>';return}
   const p=mapSel,ic=mmIconOf(p),dx=p.x+.5-player.x/T,dy=p.y+.5-player.y/T,dist=Math.round(Math.hypot(dx,dy));
