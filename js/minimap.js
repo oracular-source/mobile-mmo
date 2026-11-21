@@ -138,6 +138,8 @@ const MM_ICON={
   skull: ['.###.','#####','#o#o#','.###.','.#.#.'],   // named
   chest: ['#####','#ooo#','#####','##o##','#####']};  // hidden chest
 const MM_ICOL={exit:'#7dffa6',town:'#e8e2d0',door:'#c8a0ff',fire:'#ffb347',skull:'#ff6b6b',chest:'#ffd27a'};
+// Pin size (v0.61.1, owner): Small (default), Medium or Large, picked on the map's corner or in Settings → Display.
+const MM_PINS={S:1,M:1.5,L:2},mmPinMul=()=>MM_PINS[settings.pins]||1;
 const MM_WHAT={exit:'Way out',town:'Way out',door:'Way down',fire:'Rest spot',skull:'Named',chest:'Hidden chest'};
 function mmIconOf(p){if(p.name==='Hidden chest')return'chest';if(/^Town/.test(p.name))return'town';
   return{exit:'exit',dun:'door',camp:'fire',boss:'skull'}[p.k]||'fire'}
@@ -165,10 +167,10 @@ function drawMinimap(){
   mmg.imageSmoothingEnabled=false;mmg.fillStyle=MM_FOG;mmg.fillRect(0,0,mmEl.width,mmEl.height);
   mmg.drawImage(Z.comp,Math.round(cxp-ptx*s),Math.round(cyp-pty*s));
   // Pins for places you've found. Ways out off the edge get a small arrow on the rim, so you know which way to head.
-  const pad=5*dpr,bot=mmEl.height-strip;
+  const pad=5*dpr,bot=mmEl.height-strip,pu=Math.max(1,Math.round(dpr*mmPinMul()));
   Z.pins.forEach(p=>{if(!p.found)return;
     const x=cxp+(p.x+0.5-ptx)*s,y=cyp+(p.y+0.5-pty)*s,ic=mmIconOf(p);
-    if(x>pad&&y>pad&&x<mmEl.width-pad&&y<bot-pad){mmIcon(mmg,x,y,ic,u,ic==='exit'?mmExitRot(Z,p):0);return}
+    if(x>pad&&y>pad&&x<mmEl.width-pad&&y<bot-pad){mmIcon(mmg,x,y,ic,pu,ic==='exit'?mmExitRot(Z,p):0);return}
     if(p.k!=='exit'&&p.k!=='dun')return;
     const a=Math.atan2(y-cyp,x-cxp),r=Math.min((cxp-pad)/Math.abs(Math.cos(a)||1e-6),(cyp-pad)/Math.abs(Math.sin(a)||1e-6));
     mmArrow(cxp+Math.cos(a)*r,cyp+Math.sin(a)*r,a,3*dpr,MM_ICOL[ic]);
@@ -208,7 +210,7 @@ function renderMapScreen(){
   const cssW=Math.min(box.clientWidth||300,360),fit=Math.max(2,Math.floor(cssW/Z.w)),s=fit*MAPZ,cw=Z.w*s,ch=Z.h*s;
   cv2.style.width=cw+'px';cv2.style.height=ch+'px';
   const S=Math.round(s*dpr);mmPicture(Z,S,cv2);cv2.style.width=cw+'px';cv2.style.height=ch+'px';
-  const g=cv2.getContext('2d'),u=Math.max(1,Math.round(dpr*Math.min(2,1+MAPZ*0.5)));
+  const g=cv2.getContext('2d'),u=Math.max(1,Math.round(dpr*Math.min(2,1+MAPZ*0.5)*mmPinMul()));mmPinBtn();
   const x=player.x/T*S,y=player.y/T*S;
   if(MAPZ>1&&!renderMapScreen.keep){box.scrollLeft=x/dpr-box.clientWidth/2;box.scrollTop=y/dpr-box.clientHeight/2} // keep you in view when zoomed
   const cl=(v,a,b)=>Math.max(a,Math.min(b,v)),m=5*u;
@@ -225,6 +227,10 @@ function renderMapScreen(){
     '<div><div class="mselname">'+p.name+'</div><div class="mselsub">'+MM_WHAT[ic]+' · '+(dist<2?'right here':dist+' tiles '+dir)+'</div></div></div>';
   mmIcon($('mselic').getContext('2d'),4.5*dpr,4.5*dpr,ic,dpr,ic==='exit'?mmExitRot(Z,p):0);
 }
+// The pin size button on the map's corner shows a house pin at the size you have, plus S / M / L; a tap goes to the next size.
+function mmPinBtn(){const c=$('mappinsic'),dpr=Math.min(2,window.devicePixelRatio||1),n=Math.round(14*dpr);c.width=c.height=n;c.style.width=c.style.height='14px';
+  const g=c.getContext('2d');g.clearRect(0,0,n,n);mmIcon(g,n/2,n/2,'town',Math.max(1,Math.round(dpr*({S:.5,M:1,L:1.5}[settings.pins]||.5))),0);$('mappinsl').textContent=settings.pins||'S'}
+$('mappins').addEventListener('click',()=>{settings.pins={S:'M',M:'L',L:'S'}[settings.pins]||'M';saveSettings();renderMapScreen.keep=true;renderMapScreen();renderMapScreen.keep=false});
 // Tap a pin (a tap, not a drag or a pinch): select the nearest found pin within reach, or clear the selection.
 (()=>{const cv2=$('mapcv');let down=null;
   cv2.addEventListener('pointerdown',e=>{down={x:e.clientX,y:e.clientY,id:e.pointerId}});

@@ -278,6 +278,7 @@ function renderSettings(){
     grp('Display')+
     seg('Zoom (or pinch)','zoom',[[160,'Near'],[999,'Far']])+
     seg('Minimap','minimap',[['true','On'],['false','Off']])+
+    seg('Map pins','pins',[['S','Small'],['M','Medium'],['L','Large']])+
     grp('Game')+
     '<button class="go" id="chgcls" style="margin:2px 0 6px">Change class</button>'+
     // Prototype only: lets the home-screen app (which can't use ?dev) turn developer tools on.

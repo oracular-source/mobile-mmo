@@ -36,7 +36,7 @@ const pSpeed=()=>PSPEED*(player.buffs.hide>0?0.7:1)*(player.buffs.sprint>0?1.5:1
 
 /* ---------- Saved progress, settings and loadout ---------- */
 // Storage itself (store.get / store.set, save version, upgrades) lives in js/save.js.
-const settings=Object.assign({scheme:'grid',left:false,gridSize:'M',padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'joy',showJoy:false,zoom:999,minimap:true},store.get('ashfen-settings',{}));
+const settings=Object.assign({scheme:'grid',left:false,gridSize:'M',padSize:'M',flick:'normal',tapCast:true,autoCast:true,move:'joy',showJoy:false,zoom:999,minimap:true,pins:'S'},store.get('ashfen-settings',{}));
 // v0.28: everyone moves to the EverQuest-style grid once (owner pick); Settings can switch back.
 if(!settings.grid28){settings.grid28=true;settings.scheme='grid';store.set('ashfen-settings',settings)}
 // v0.29.1: Classic buttons are gone; anyone still on them moves to the grid.

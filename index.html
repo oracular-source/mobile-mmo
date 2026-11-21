@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.61">
+<link rel="stylesheet" href="css/game.css?v=0.61.1">
 </head>
 <body>
 <div id="app">
@@ -54,7 +54,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <div class="mhead"><h1>Ashfen Hollow</h1><button class="mx" id="introx" aria-label="Close" style="display:none">✕</button></div>
-        <p class="hint" style="margin:0 0 6px">Prototype v0.61 · pick a class</p>
+        <p class="hint" style="margin:0 0 6px">Prototype v0.61.1 · pick a class</p>
         <div id="clspick"></div>
         <div id="clsinfo"><div class="dfig"><canvas id="clscv" width="20" height="24"></canvas></div><div><b id="clsname"></b> <span id="clstag" class="hint"></span><div id="clsdesc" class="hint"></div></div></div>
         <button id="start" class="go">Play</button>
@@ -124,7 +124,7 @@
         <div class="mhead"><h1 id="mapname">Map</h1><button class="mx" data-close="mapUI" aria-label="Close">✕</button></div>
         <div class="mapwrap">
           <div id="mapbox"><canvas id="mapcv"></canvas></div>
-          <div class="mapz"><button id="mapzin" aria-label="Zoom in">+</button><button id="mapzout" aria-label="Zoom out">−</button><span id="mapzl">1x</span></div>
+          <div class="mapz"><button id="mapzin" aria-label="Zoom in">+</button><button id="mapzout" aria-label="Zoom out">−</button><button id="mappins" aria-label="Pin size"><canvas id="mappinsic"></canvas><b id="mappinsl">S</b></button><span id="mapzl">1x</span></div>
         </div>
         <div id="maplegend"></div>
       </div>
@@ -134,35 +134,35 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.61"></script>
-<script src="js/data/sprites.js?v=0.61"></script>
-<script src="js/rng.js?v=0.61"></script>
-<script src="js/save.js?v=0.61"></script>
-<script src="js/map.js?v=0.61"></script>
-<script src="js/data/classes.js?v=0.61"></script>
-<script src="js/data/icons.js?v=0.61"></script>
-<script src="js/data/mobs.js?v=0.61"></script>
-<script src="js/data/items.js?v=0.61"></script>
-<script src="js/data/tiles.js?v=0.61"></script>
-<script src="js/data/maps/graveyard.js?v=0.61"></script>
-<script src="js/data/maps/crypt.js?v=0.61"></script>
-<script src="js/data/maps/crossroads.js?v=0.61"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.61"></script>
-<script src="js/data/maps/wolfwood.js?v=0.61"></script>
-<script src="js/state.js?v=0.61"></script>
-<script src="js/spawns.js?v=0.61"></script>
-<script src="js/fx.js?v=0.61"></script>
-<script src="js/path.js?v=0.61"></script>
-<script src="js/combat.js?v=0.61"></script>
-<script src="js/input.js?v=0.61"></script>
-<script src="js/ui.js?v=0.61"></script>
-<script src="js/world.js?v=0.61"></script>
-<script src="js/area.js?v=0.61"></script>
-<script src="js/update.js?v=0.61"></script>
-<script src="js/render.js?v=0.61"></script>
-<script src="js/sim.js?v=0.61"></script>
-<script src="js/dev.js?v=0.61"></script>
-<script src="js/minimap.js?v=0.61"></script>
-<script src="js/main.js?v=0.61"></script>
+<script src="js/core.js?v=0.61.1"></script>
+<script src="js/data/sprites.js?v=0.61.1"></script>
+<script src="js/rng.js?v=0.61.1"></script>
+<script src="js/save.js?v=0.61.1"></script>
+<script src="js/map.js?v=0.61.1"></script>
+<script src="js/data/classes.js?v=0.61.1"></script>
+<script src="js/data/icons.js?v=0.61.1"></script>
+<script src="js/data/mobs.js?v=0.61.1"></script>
+<script src="js/data/items.js?v=0.61.1"></script>
+<script src="js/data/tiles.js?v=0.61.1"></script>
+<script src="js/data/maps/graveyard.js?v=0.61.1"></script>
+<script src="js/data/maps/crypt.js?v=0.61.1"></script>
+<script src="js/data/maps/crossroads.js?v=0.61.1"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.61.1"></script>
+<script src="js/data/maps/wolfwood.js?v=0.61.1"></script>
+<script src="js/state.js?v=0.61.1"></script>
+<script src="js/spawns.js?v=0.61.1"></script>
+<script src="js/fx.js?v=0.61.1"></script>
+<script src="js/path.js?v=0.61.1"></script>
+<script src="js/combat.js?v=0.61.1"></script>
+<script src="js/input.js?v=0.61.1"></script>
+<script src="js/ui.js?v=0.61.1"></script>
+<script src="js/world.js?v=0.61.1"></script>
+<script src="js/area.js?v=0.61.1"></script>
+<script src="js/update.js?v=0.61.1"></script>
+<script src="js/render.js?v=0.61.1"></script>
+<script src="js/sim.js?v=0.61.1"></script>
+<script src="js/dev.js?v=0.61.1"></script>
+<script src="js/minimap.js?v=0.61.1"></script>
+<script src="js/main.js?v=0.61.1"></script>
 </body>
 </html>
