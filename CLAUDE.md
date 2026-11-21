@@ -9,7 +9,7 @@ A tab-target fantasy MMO for phones, inspired by EverQuest (camps, pulls, classe
 - Ask before big or hard-to-undo changes (deleting files, restructuring folders, adding new tools or frameworks).
 
 ## Current phase
-Phase 2: solo prototype. The game starts at the crossroads (v0.29), with the rat tunnel under its sinkhole and the Sunken Graveyard and its shared crypt to the west (the old Gate Road and Dungeon 1 are DEV-only); all 14 classes playable: Druid, Warrior, Necromancer, Rogue, batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) and batch 2 (Magician, Ranger, Monk, Shaman, Bard) on the default skin; single-player, no server.
+Phase 2: solo prototype. Zone 1 is built end to end (crossroads, rat tunnel, Sunken Graveyard and crypt, Wolfwood, Ruined Chapel and Dungeon 1, v0.63). The game starts at the crossroads (v0.29), with the rat tunnel under its sinkhole and the Sunken Graveyard and its shared crypt to the west (the old Gate Road and Dungeon 1 are DEV-only); all 14 classes playable: Druid, Warrior, Necromancer, Rogue, batch 1 (Cleric, Enchanter, Paladin, Shadow Knight, Wizard) and batch 2 (Magician, Ranger, Monk, Shaman, Bard) on the default skin; single-player, no server.
 Launch classes (later phases): Warrior, Cleric, Druid, Enchanter, Rogue, Necromancer. The full 14-class roster is in the design doc.
 Don't add multiplayer, accounts or server code until I say we're in phase 3.
 

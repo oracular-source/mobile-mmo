@@ -7,6 +7,28 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
 
+## Dungeon 1 run (v0.63, Nov 20, map chat)
+`runDungeon({seeds:2})` (open with `?debug`; `optional:true` adds the Bellringer's foundry): one run through Brother Malrec's chapel at level 15 (the cap is 16). Each camp or group is one arena fight (all its mobs at once), then rest to 80%, plus walking at 1.4× the straight line; a lost fight costs 25 s and one retry. Best case: bots play perfectly, the arena has no flood water (so the Prior's Grasp always misses and nobody wades) and fights don't chain. **Target (owner): 10–15 minutes.** Malrec column = his fight with both deacons (W win, D death, T timeout; seconds), two seeds, up to two tries each.
+
+| Class | Run (min) | Deaths | Drowned Prior | Brother Malrec + 2 deacons |
+| --- | --- | --- | --- | --- |
+| Druid | 12.9, 10.6 | 3, 2 | W 33s, W 30s | D 79s D 152s · D 82s D 79s |
+| Warrior | 11.5, 11.6 | 2, 2 | W 51s, W 42s | D 60s D 54s · D 62s D 60s |
+| Necromancer | 9.2, 8.4 | 0, 0 | W 46s, W 46s | W 101s · W 56s |
+| Rogue | 7.8, 7.8 | 2, 2 | W 25s, W 24s | D 28s D 32s · D 27s D 27s |
+| Cleric | 12.8, 12.8 | 8, 4 | W 48s, W 44s | D 56s D 15s · D 15s D 15s |
+| Enchanter | 10.2, 9.6 | 0, 0 | W 44s, W 43s | W 103s · W 68s |
+| Paladin | 12.0, 11.4 | 6, 6 | W 27s, W 27s | D 44s D 44s · D 44s D 34s |
+| Shadow Knight | 10.5, 9.9 | 1, 0 | W 40s, W 41s | D 26s W 86s · W 95s |
+| Wizard | 12.5, 12.8 | 5, 3 | W 33s, W 33s | T 72s W 101s · T 90s W 121s |
+| Magician | 12.2, 12.1 | 4, 4 | W 37s, W 35s | W 145s · W 142s |
+| Ranger | 12.0, 10.3 | 2, 1 | W 36s, W 36s | W 94s · W 102s |
+| Monk | 8.4, 8.5 | 0, 0 | W 34s, W 34s | W 81s · W 90s |
+| Shaman | 9.6, 9.6 | 0, 0 | W 50s, W 50s | W 62s · W 66s |
+| Bard | 12.0, 11.8 | 5, 6 | W 39s, W 41s | D 28s D 31s · D 26s D 29s |
+
+**Reading it:** the run lands at 8–13 minutes, inside the target once real play's slop (wading, missed interrupts, the Prior's Grasp) is added. **8 of 14 beat Malrec at 15** (Necro, Enchanter, Shadow Knight, Wizard, Magician, Ranger, Monk, Shaman); Druid, Warrior, Rogue, Cleric, Paladin and Bard lose to Malrec plus two deacons at once, the same three-at-once weakness as the chapel camps. The **Cleric dies in about 15 s** to Malrec in most tries, which looks like a bot or kit problem worth a look. With the foundry (one seed): the Bellringer falls to Necro, Warrior, Enchanter, Cleric, Ranger, Rogue and Shaman (25–68 s), not the Bard; the run grows by about 1–3 minutes. Tuning this is the balance chat's job (Decisions: tune toward Malrec). Tuned once during the build: Malrec's heal 35% every 8 s → 25% every 10 s, deacons a little softer, his Ash Bolt every 7 s → 9 s, the Prior and the Bellringer given more health (they died in 25–45 s).
+
 ## Level 10 forks (v0.39, Nov 19, skill tree chat)
 `__game.runForkSim({seeds:10})` (open with `?debug`): each class's level 10 fork, the base ability and both sides, at level 10 (the cap), 10 fights each, no gear. Fights: one skeleton, a pack of three, Old Gnawbone and the Skeleton King, both set to level 10 (long named fights). Each cell: wins · kill time · damage per second (all mob health, adds included, over the kill time) · damage taken. Rule (progression note): both sides a bit better than the base, about equal, better in different places; if one side wins everywhere, redesign.
 

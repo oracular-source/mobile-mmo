@@ -11,8 +11,8 @@ const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
 const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)}; // personal loot: only gear your class can use drops for you
 const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
-const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0);
-const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',trat:'whisker',brat:'whisker',cskel:'bone',boss1:'bone',ironshell:'shell',palerat:'whisker',bride:'bone',wolf:'pelt',greyfang:'pelt',oldscar:'pelt',boar:'tusk',zealot:'cultrag',ashcaller:'cultrag',chanter:'cultrag',acolyte:'cultrag',wisp:'ember'};
+const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0),MALREC=pool('named').filter(id=>id.indexOf('mal')===0);
+const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',trat:'whisker',brat:'whisker',cskel:'bone',boss1:'bone',ironshell:'shell',palerat:'whisker',bride:'bone',wolf:'pelt',greyfang:'pelt',oldscar:'pelt',boar:'tusk',zealot:'cultrag',ashcaller:'cultrag',chanter:'cultrag',acolyte:'cultrag',wisp:'ember',mender:'dcultjunk',deacon:'dcultjunk',malrec:'dcultjunk',prior:'bone',bellringer:'cultrag'};
 const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['str','STR'],['wis','WIS'],['int','INT']];
 const inv=(function(){
   const d={bags:new Array(BAG_SIZE).fill(null),equip:{},copper:0};

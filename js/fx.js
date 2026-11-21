@@ -43,8 +43,12 @@ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 /* ---------- Helpers ---------- */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function con(lv){const d=lv-player.lvl;return d<=-2?'#5fbf5f':d===-1?'#5fa8ff':d===0?'#f2f2f2':d===1?'#ffd23f':'#ff4d4d'}
+let slowArea=null; // the current area if it has slow ground (set by enterZone), else null
+const WADE=0.6;    // speed in flood water
 function moveToward(e,tx,ty,spd,dt){
   const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);if(d<0.5)return true;
+  // Flood water (v0.63, Dungeon 1) slows anyone wading it, you, pets and mobs alike; floating things skim over it.
+  const SA=slowArea;if(SA&&!(e.def&&e.def.float)){const sx=Math.floor(e.x/T),sy=Math.floor(e.y/T);if(sx>=0&&sy>=0&&sx<SA.w&&sy<SA.h&&SA.slow[sy*SA.w+sx])spd*=WADE}
   const step=Math.min(d,spd*dt),vx=dx/d*step,vy=dy/d*step;
   if(!blocked(e.x+vx,e.y))e.x+=vx;else if(!blocked(e.x+vx,e.y+(vy>=0?3:-3)))e.y+=(vy>=0?1:-1)*Math.abs(vx);
   if(!blocked(e.x,e.y+vy))e.y+=vy;else if(!blocked(e.x+(vx>=0?3:-3),e.y+vy))e.x+=(vx>=0?1:-1)*Math.abs(vy);

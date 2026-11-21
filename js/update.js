@@ -12,6 +12,8 @@ function update(dt){
       if(Math.hypot(dx,dy)>5){mx=dx;my=dy}
     }else if(joy.active){const d=Math.hypot(joy.dx,joy.dy);if(d>0){mx=joy.dx/d;my=joy.dy/d}}
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
+    // Held by Grasp of the Deep or stunned by the Toll (v0.63): no walking until it wears off.
+    if(player.held>0||player.stunT>0){player.held=Math.max(0,(player.held||0)-dt);player.stunT=Math.max(0,(player.stunT||0)-dt);mx=0;my=0;player.tx=null}
     const steering=mx!==0||my!==0;if(steering)player.lastMove={x:mx,y:my}; // which way you were heading when you took an exit
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
       // Still Water (Monk fork): health and mana come back fast while you lie there.
@@ -116,6 +118,7 @@ function update(dt){
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1)*(1-0.12*(m.chill||0)); // each chill stack: -12% speed
+    if(m.state==='drift'){wispDrift(m,dt,spd);return} // a candle wisp drifting to Brother Malrec (v0.63)
     if(m.state==='idle'){
       if(m.sp.route)walkRoute(m,dt); // Greyfang walks his loop
       else if(m.sp.follow&&m.sp.follow.mob&&!m.sp.follow.mob.dead){const L=m.sp.follow.mob;m.wx=L.x+m.sp.fo.x;m.wy=L.y+m.sp.fo.y;pathTo(m,m.wx,m.wy,m.def.spd*0.5,dt);m.hx=m.x;m.hy=m.y} // pack wolves keep at his side
@@ -134,6 +137,11 @@ function update(dt){
       if(m.def.adds)namedAdds(m);
       if(m.def.callAt&&rareCall(m,dt,spd))return; // the Pale Rat running for help
       if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
+      // Dungeon 1 (v0.63): healers, the Prior's Grasp of the Deep, the Bellringer's Toll, Malrec's Candle Wake.
+      if(m.def.wake)candleWake(m);
+      if(m.def.heal&&healThink(m,dt))return;if(m.dead||player.dead)return;
+      if(m.def.grasp&&graspThink(m,dt))return;if(m.dead||player.dead)return;
+      if(m.def.toll&&tollThink(m,dt))return;if(m.dead||player.dead)return;
       if(m.def.cast&&mobCast(m,dt))return;if(m.dead||player.dead)return; // chapel casters (v0.62): stand still while the bar fills
       if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.blink)wispBlink(m,dt);
       if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
@@ -142,10 +150,12 @@ function update(dt){
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.wakes=0}
     }
   });
   updateHazards(dt);
+  for(let i=hands.length-1;i>=0;i--){hands[i].t+=dt;if(hands[i].t>hands[i].life)hands.splice(i,1)}
+  for(let i=rings.length-1;i>=0;i--){rings[i].t+=dt;if(rings[i].t>rings[i].life)rings.splice(i,1)}
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)parts.splice(i,1)}
   for(let i=beams.length-1;i>=0;i--){beams[i].t+=dt;if(beams[i].t>0.15)beams.splice(i,1)}

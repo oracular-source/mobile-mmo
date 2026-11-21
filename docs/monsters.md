@@ -33,12 +33,13 @@ Drawn when their area is built, so the list stays in step with the map chat.
 | --- | --- | --- | --- |
 | Fen cultist | Ruined Chapel | Humanoid | Camps of three, a healer in each |
 | The Ashen Acolyte (rare) | Ruined Chapel | Humanoid | Grey robes trailing smoke |
-| Brother Malrec (boss) | Dungeon 1 | Humanoid (boss) | Censer trailing smoke, candles light around him |
 | Ironshell (rare) | Crossroads | Beetle | Twice the size, cracked mossy shell |
 | The Weeping Bride (rare) | Graveyard | Zombie | Torn veil, pale glow |
 | The Pale Rat (rare) | Rat tunnel | Rat | White with red eyes, bigger |
 
 **In the game since v0.62 as placeholders** (character design pass redraws them): fen zealot, ashcaller and chanter (one robed shape in three colours, `mkRobed` in `js/render.js`, data `ROBED` in `js/data/sprites.js`), the Ashen Acolyte (the same shape a size bigger, pale), the ash wisp (`WISP_SPR`).
+
+**In the game since v0.63 as placeholders** (Dungeon 1; same robed shape, `ROBED`): fen mender (pale sage, a book), cult deacon (oxblood, a size up, a mace), **the Drowned Prior** (mini boss, 20×23, grey-green rotted habit with weed, pale eyes, a dead lantern), **the Bellringer** (optional named, 22×25, soot-brown, the bell's clapper as a maul), **Brother Malrec** (boss, 18×23, black and red, ember eyes, a tall censer-staff), and the candle wisp (the ash wisp's flame in pale candle gold). **Owner (Nov 20): likes the rats as they are**; keep them as the bar for the character design pass rather than redoing them.
 
 ## Not monsters, but on the same art list later
 Guards and Marrow the Peddler (people: redo with the character look), crow and frog critters (fine for now).

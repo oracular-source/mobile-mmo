@@ -41,13 +41,23 @@ function mkRobed(id){const S=ROBED[id],W=S.w,H=S.h,cx=(W-1)/2,rx=W*0.29,ry=H*0.2
   const put=(i,j,c)=>{if(j>=0&&j<H&&i>=0&&i<W)g[j][i]=c};
   if(S.item==='sickle'){[[W-2,b0+6],[W-1,b0+5],[W-1,b0+4],[W-1,b0+3],[W-2,b0+2],[W-3,b0+2]].forEach(([i,j])=>put(i,j,'l'));put(W-2,b0+7,'o');put(W-3,b0+8,'o')}
   if(S.item==='ember'){put(0,b0+1,'k');put(1,b0+1,'r');put(1,b0,'R');put(0,b0,'k');put(1,b0-1,'k')}
+  // Dungeon 1 (v0.63): the mender's open book, the deacon's mace, the Prior's dead lantern on its chain and the weed hanging off
+  // him, the Bellringer's great clapper-maul, Malrec's tall censer-staff.
+  if(S.item==='book'){put(0,b0+3,'k');put(1,b0+3,'w');put(2,b0+3,'w');put(1,b0+4,'k');put(2,b0+4,'k')}
+  if(S.item==='mace'){for(let j=b0+3;j<b0+8;j++)put(W-1,j,'o');put(W-2,b0+1,'k');put(W-1,b0+1,'l');put(W-2,b0+2,'l');put(W-1,b0+2,'l')}
+  if(S.item==='lantern'){for(let j=b0+1;j<b0+5;j++)put(W-1,j,'c');put(W-2,b0+5,'k');put(W-1,b0+5,'g');put(W-2,b0+6,'g');put(W-1,b0+6,'g');put(W-2,b0+7,'k');put(W-1,b0+7,'k');
+    for(let i=2;i<W-2;i+=3){const j=b0+2+((i*7)%(H-b0-3));if(g[j][i]!=='.'&&g[j][i]!=='k')put(i,j,'v');if(g[j+1]&&g[j+1][i]!=='.'&&g[j+1][i]!=='k')put(i,j+1,'v')}}
+  if(S.item==='maul'){for(let j=b0-3;j<b0+8;j++)put(W-2,j,'o');for(let j=b0-6;j<b0-2;j++){put(W-3,j,'k');put(W-2,j,'n');put(W-1,j,'k')}put(W-2,b0-7,'k')}
+  if(S.item==='staff'){for(let j=1;j<H-1;j++)put(W-1,j,'o');put(W-1,0,'k');put(W-2,1,'n');put(W-2,2,'r');put(W-2,3,'n')}
   if(S.item==='censer'){for(let j=b0+2;j<b0+6;j++)put(W-1,j,'c');put(W-2,b0+6,'k');put(W-1,b0+6,'n');put(W-1,b0+7,'k');put(W-2,b0+7,'n');put(W-1,b0+5,'r')}
   const pal=Object.assign({},PAL,{k:'#0b0a0f',a:S.robe,A:shiftCol(S.robe,[30,28,26]),d:shiftCol(S.robe,[-24,-22,-20]),f:'#100c0e',e:S.eye,b:shiftCol(S.robe,[-40,-38,-34]),
-    l:'#a8a8b4',o:'#5a4028',r:'#ff8a3c',R:'#ffe0a0',c:'#8a8690',n:'#a0802a'});
+    l:'#a8a8b4',o:'#5a4028',r:'#ff8a3c',R:'#ffe0a0',c:'#8a8690',n:'#a0802a',w:'#e8e0c8',g:'#3a4a44',v:'#3a5a32'});
   const rows=g.map(r=>r.join('')),step=side=>{const n=g.map(r=>r.slice());for(let i=0;i<W;i++){if((side?i>cx:i<cx)&&n[H-1][i]!=='.'){n[H-1][i]='.';if(n[H-2][i]!=='.')n[H-2][i]='k'}}return n.map(r=>r.join(''))};
   const im=mk(rows,pal);im.steps=[mk(step(0),pal),mk(step(1),pal)];return im}
-['zealot','ashcaller','chanter','acolyte'].forEach(k=>{IMG[k]=mkRobed(k)});
+['zealot','ashcaller','chanter','acolyte','mender','deacon','prior','bellringer','malrec'].forEach(k=>{IMG[k]=mkRobed(k)});
 IMG.wisp=mk(WISP_SPR[0],WISP_PAL);IMG.wisp2=mk(WISP_SPR[1],WISP_PAL);
+// Candle wisp (v0.63, Malrec's Candle Wake): the ash wisp's flame in pale candle gold, so it reads as a different thing to chase.
+IMG.cwisp=mk(WISP_SPR[0],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));IMG.cwisp2=mk(WISP_SPR[1],Object.assign({},WISP_PAL,{k:'#4a3a10',y:'#ffd070',Y:'#fff0b0',s:'#a89a70'}));
 // Default skin: lay each weapon over the shared body, then colour it from the class's SKINS entry.
 function mkSkin(id){
   const sk=SKINS[id];if(!sk)return null;
@@ -185,7 +195,15 @@ function render(){
   const CHA=curArea();if(CHA)CHA.chests.forEach(ch=>{const x=Math.round(ch.x),y=Math.round(ch.y),f=(X,Y,w,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,h)};
     if(ch.open){f(x-7,y-12,14,14,AP.out);f(x-6,y-11,12,3,AP.woodHi);f(x-6,y-8,12,1,AP.woodDk);f(x-6,y-7,12,8,AP.wood);f(x-5,y-7,10,3,'#120d0a');f(x-6,y-3,12,1,AP.bell)} // lid up, empty inside
     else{f(x-7,y-8,14,10,AP.out);f(x-6,y-7,12,8,AP.wood);f(x-6,y-7,12,2,AP.woodHi);f(x-6,y-4,12,1,AP.bell);f(x-1,y-5,2,3,AP.bellHi)}});
-  if(zoneId==='dun'&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
+  // Dungeon 1 (v0.63): the slab over the stairs until you touch the altar; Grasp of the Deep's hands; the Toll's ring of sound.
+  if(CHA)CHA.seals.forEach(sl=>{if(sl.open)return;const x=sl.x0*T,y=sl.y0*T,w=(sl.x1-sl.x0+1)*T,f=(X,Y,ww,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,ww,h)};
+    f(x-1,y-2,w+2,18,AP.out);f(x,y-1,w,16,AP.cst);f(x,y-1,w,2,AP.cstHi);f(x+w-3,y-1,3,16,AP.cstDk);f(x+9,y+3,1,5,AP.cstMor);f(x+10,y+7,1,4,AP.cstMor);f(x+20,y+4,4,1,AP.cstMor);f(x+4,y+12,w-8,1,AP.cstDk)});
+  hands.forEach(h=>{const p=Math.min(1,h.t/0.35),fade=h.on?1:Math.max(0,1-(h.t-0.9)/0.5),x=Math.round(h.x),y=Math.round(h.y),up=Math.round(6*p),f=(X,Y,w,hh,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,hh)};
+    lx.globalAlpha=fade;f(x-3,y-up,2,up+1,'#b8c8c0');f(x+1,y-up,2,up+1,'#9fb4ac');f(x-4,y-up-2,1,2,'#cfdcd4');f(x-2,y-up-3,1,3,'#cfdcd4');f(x,y-up-3,1,3,'#cfdcd4');f(x+2,y-up-2,1,2,'#cfdcd4');f(x-4,y,9,1,'#33505c');lx.globalAlpha=1});
+  rings.forEach(r=>{const p=r.t/r.life,rad=r.r*(0.4+0.6*p);lx.globalAlpha=1-p;lx.fillStyle='#ffd27a';for(let a=0;a<48;a++){const an=a/48*6.283;lx.fillRect(Math.round(r.x+Math.cos(an)*rad),Math.round(r.y+Math.sin(an)*rad*0.6),2,1)}lx.globalAlpha=1});
+  const instNow=zoneId==='dun'||(CHA&&CHA.instance);
+  if(instNow&&run.portal&&CHA){const p=run.portal,x=Math.round(p.x),y=Math.round(p.y);for(let a=0;a<32;a++){if((a+Math.floor(time*6))%4===0)continue;const an=a/32*6.283;lx.fillStyle=a%2?'#ffd27a':'#fff0c8';lx.fillRect(Math.round(x+Math.cos(an)*9),Math.round(y+Math.sin(an)*4),1,1)}} // the way out
+  if(instNow&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
   const t=player.target;
@@ -226,7 +244,7 @@ function render(){
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     // Ash wisps (v0.62) hover: a small shadow, a slow bob, the flame flickering between two frames, a thread of smoke.
-    if(m.def.float){const bob=Math.round(Math.sin(time*3+m.hx)*1.5);shadow(m.x,m.y,3);drawSprite(Math.floor(time*8+m.hx)%2?IMG.wisp2:img,m.x,m.y-5+bob,m.dir,0,false);
+    if(m.def.float){const bob=Math.round(Math.sin(time*3+m.hx)*1.5);shadow(m.x,m.y,3);drawSprite(Math.floor(time*8+m.hx)%2?(IMG[m.def.img+'2']||IMG.wisp2):img,m.x,m.y-5+bob,m.dir,0,false);
       if(Math.random()<0.2)parts.push({x:m.x+(Math.random()-0.5)*2,y:m.y-6+bob,vx:(Math.random()-0.5)*4,vy:-9,t:0,life:0.9,col:'#6a6670'});return}
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
     if(m.def.rare){const pr=0.5+0.5*Math.sin(time*3),rw=Math.round(img.w/2)+2;lx.globalAlpha=0.09+0.08*pr;lx.fillStyle='#d8c8ff';lx.beginPath();lx.ellipse(Math.round(m.x),Math.round(m.y),rw,Math.max(2,Math.round(rw/3)),0,0,7);lx.fill();lx.globalAlpha=1;

@@ -102,12 +102,26 @@ const ITEMS={
   tcoat:{name:"Troubadour's Coat",slot:'chest',rar:'rare',ac:5,sta:2,str:2,wis:2,value:90,cls:'bard'},
   b1rapier:{name:'Boss 1 Rapier',slot:'weapon',rar:'named',str:5,sta:2,value:120,cls:'bard'},
   b1lute:{name:'Boss 1 Lute',slot:'offhand',rar:'named',wis:3,int:2,sta:1,value:110,cls:'bard'},
-  b1coat:{name:'Boss 1 Coat',slot:'chest',rar:'named',ac:6,sta:3,str:2,value:120,cls:'bard'}
+  b1coat:{name:'Boss 1 Coat',slot:'chest',rar:'named',ac:6,sta:3,str:2,value:120,cls:'bard'},
+  // Dungeon 1 (v0.63). The Drowned Prior and the Bellringer each drop one item any class can wear; Brother Malrec's chest holds
+  // one for your gear group (a step above the Skeleton King's). Placeholder names until the setting is decided.
+  dcultjunk:{name:'Waterlogged Psalter',rar:'junk',value:11,stack:true},
+  priorcowl:{name:"Drowned Prior's Cowl",slot:'head',rar:'named',ac:4,sta:3,wis:2,value:150},
+  bellband:{name:"Bellringer's Band",slot:'ring',rar:'named',sta:3,str:2,int:1,value:150},
+  malstaff:{name:"Malrec's Censer-staff",slot:'weapon',rar:'named',int:7,wis:3,sta:1,value:200,cls:'caster'},
+  malaxe:{name:"Malrec's Headsman Axe",slot:'weapon',rar:'named',str:7,sta:3,value:200,cls:'warrior'},
+  malknife:{name:"Malrec's Ritual Knife",slot:'weapon',rar:'named',str:8,sta:2,value:200,cls:'rogue'},
+  malmace:{name:"Malrec's Ember Mace",slot:'weapon',rar:'named',str:4,wis:4,int:2,value:200,cls:'cleric'},
+  malblade:{name:"Malrec's Ashen Greatsword",slot:'weapon',rar:'named',str:7,wis:3,value:200,cls:'knight'},
+  malbow:{name:"Malrec's Pyre Bow",slot:'weapon',rar:'named',str:8,sta:2,value:200,cls:'ranger'},
+  malwraps:{name:"Malrec's Penitent Wraps",slot:'weapon',rar:'named',str:8,sta:2,value:200,cls:'monk'},
+  malspear:{name:"Malrec's Smoke Spear",slot:'weapon',rar:'named',int:5,wis:4,value:200,cls:'shaman'},
+  malrapier:{name:"Malrec's Vesper Rapier",slot:'weapon',rar:'named',str:7,sta:3,value:200,cls:'bard'}
 };
 // Which mobs drop which summon key, by area (zone id -> mob type -> key). One in KEY_CHANCE kills drops one.
 const KEY_DROPS={tunnel:{trat:'severed_paw',brat:'severed_paw'},crypt:{cskel:'crown_shard'}};
 const KEY_CHANCE=0.1;
 // Hidden chests (v0.32): each opening rolls one piece of gear your class can use. Chance of uncommon and rare by area (the rest is common), plus copper.
 // Deeper areas pay better. An opened chest fills again after CHEST_REFILL seconds.
-const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20},chapel:{unc:0.65,rare:0.15,cu:26}};
+const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20},chapel:{unc:0.65,rare:0.15,cu:26},dungeon1:{unc:0.75,rare:0.25,cu:34}};
 const CHEST_REFILL=600;

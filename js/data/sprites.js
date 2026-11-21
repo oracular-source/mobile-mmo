@@ -145,7 +145,14 @@ const RAG_WEAPONS={
 // zealot rust-red with a sickle, ashcaller grey with an ember held up, chanter purple with a censer; the Ashen Acolyte pale
 // grey, a size bigger, ember eyes and a censer trailing smoke.
 const ROBED={zealot:{w:14,h:19,robe:'#5a2a24',eye:'#ff4a30',item:'sickle'},ashcaller:{w:14,h:19,robe:'#5c5a5e',eye:'#ff4a30',item:'ember'},
-  chanter:{w:14,h:19,robe:'#3e3a56',eye:'#ff4a30',item:'censer'},acolyte:{w:16,h:21,robe:'#8a8682',eye:'#ffb060',item:'censer'}};
+  chanter:{w:14,h:19,robe:'#3e3a56',eye:'#ff4a30',item:'censer'},acolyte:{w:16,h:21,robe:'#8a8682',eye:'#ffb060',item:'censer'},
+  // Dungeon 1 (v0.63, placeholders until the character design pass): the mender in pale sage with a book; the deacon a size up,
+  // oxblood with a mace; the Drowned Prior bloated and big in a rotted grey-green habit, weed hanging off him, pale eyes, a dead
+  // lantern; the Bellringer the biggest, soot-brown, with the bell's clapper as a maul; Brother Malrec in black and red with
+  // ember eyes and a tall censer-staff.
+  mender:{w:14,h:19,robe:'#5a6a52',eye:'#ff4a30',item:'book'},deacon:{w:15,h:20,robe:'#4a1c1e',eye:'#ff4a30',item:'mace'},
+  prior:{w:20,h:23,robe:'#3e4a44',eye:'#d8f0e8',item:'lantern'},bellringer:{w:22,h:25,robe:'#4a3a2c',eye:'#ff6a30',item:'maul'},
+  malrec:{w:18,h:23,robe:'#2a1a1e',eye:'#ffb060',item:'staff'}};
 // Ash wisp: a floating candle flame with a smoky tail (9 x 15), two frames that flicker.
 const WISP_SPR=[["....k....","...kyk...","...kyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","...ss....","....s....","...s....."],
   ["...k.....","...kyk...","..kyyk...","..kyYyk..","..kYWYk..",".kyYWYyk.",".kyYWWYk.","kyYWWWYyk","kyYWWWYyk","kyyYWYyyk",".kyyYyyk.","..kkkkk..","....ss...","...s.....","....s...."]];

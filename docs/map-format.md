@@ -38,7 +38,10 @@ critter crow 22.5 4.9 1 high   # kind x y [how many] [high]: small living things
 - `bar x y id side` (v0.62): a gate tile that stays shut until you walk up to it from `side` (W, E, N or S); then it opens for good for every character (saved under `ashfen-gates`). From the other side it says it's barred. The chapel's east gate.
 - Mob camps (v0.62): spawns of mob types with `camp:1` (the cultists) standing within 3 tiles of each other fight as one camp; the first pulled shouts for the nearest other camp within 8 tiles if no wall or fence is in the way.
 - `rules: 'dead-inside'` turns on the dead-area check for this map.
-- `instance: 1` (Nov 20, Dungeon 1): an instanced area (just you, or your group later); the game side comes with the Dungeon 1 build.
+- `instance: 1` (Dungeon 1, in the game since v0.63): an instanced area (just you, or your group later). Nothing respawns while you're inside; walking in again is a fresh run (mobs, chests and seals all reset), timed for the run summary. A `chest` in an instance opens once per run, and won't open while a named within 5 tiles of it is still alive. `wake: '...'` is the line you see when you respawn there.
+- `seal x0 y0 x1 y1 object` (v0.63): those tiles are shut by a stone slab until you walk up to the first object of that kind (Dungeon 1: the stairs behind the altar). In an instance it shuts again every visit. The checker ignores it (it checks the map as if open).
+- `group=<name>` on a `spawn` or `named` line (v0.63): puts it in that group whatever its kind, so they fight together (Brother Malrec and his deacons). Without it, packs and camps group by distance as before.
+- Tile `z` **flood** (v0.63): walkable water that slows anyone wading it to 60% (you, pets and mobs; floating things skim over).
 - New in Nov 20 for the chapel and Dungeon 1: tiles `Y` pew, `z` flood water (walkable; it will slow you and mobs), `N` bone niche (a wall with a skull shelf), `V` steps (walk down between rooms of one map), `K` ember pit; objects well, book_pyre, torn_banner, pack, altar, window (stained glass, on a wall), table, cage, bell_mold.
 - Coordinates count from 0 at the top-left; x goes right, y goes down. The overview picture has a ruler every 4 tiles, so notes like "move the shack to 2,20" work.
 

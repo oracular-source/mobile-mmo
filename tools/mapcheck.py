@@ -85,6 +85,7 @@ def check(m, tiles, objs):
         elif k == 'exit': markers.append(dict(k=k, type=t[1], x=int(t[2]), y=int(t[3]), extra=t[4:]))
         elif k == 'fog': fogs.append(tuple(int(v) for v in t[1:5]))
         elif k == 'bar': markers.append(dict(k=k, type='bar', x=int(t[1]), y=int(t[2])))   # a barred gate (opens from one side in the game)
+        elif k == 'seal': pass   # tiles shut by a slab until you touch the named object (the game opens them)
         elif k == 'label': pass
         elif k == 'critter': critters.append(dict(kind=t[1], x=float(t[2]), y=float(t[3])))
         else: E.append(f'unknown line: {" ".join(t)}')
@@ -222,7 +223,7 @@ SPAWN_COL = {'corpse': (190, 220, 170, 255), 'rat': (220, 170, 130, 255), 'crypt
              'blight_wolf': (170, 176, 184, 255), 'thornback_boar': (176, 120, 80, 255),
              'cult_zealot': (200, 90, 70, 255), 'cult_ashcaller': (170, 168, 176, 255), 'cult_chanter': (170, 110, 210, 255), 'ash_wisp': (255, 230, 160, 255),
              'cult_mender': (120, 200, 140, 255), 'cult_deacon': (230, 200, 120, 255), 'skeleton': (220, 216, 200, 255), 'corpse': (140, 160, 120, 255)}
-TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), 'chapel': (50, 60, 100, 55), '': (0, 0, 0, 0)}
+TINTS = {'moonlit': (60, 110, 120, 70), 'crypt': (30, 50, 120, 55), 'dusk': (120, 70, 30, 40), 'earth': (40, 30, 20, 50), 'wood': (40, 70, 60, 60), 'chapel': (50, 60, 100, 55), 'vault': (30, 45, 110, 50), '': (0, 0, 0, 0)}
 OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030', 'mausoleum': '#6b6578', 'dead_oak': '#4a3e32',
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
            'throne': '#3a3446', 'brazier': '#ff9a3c', 'campfire': '#ff9a3c', 'signpost': '#8a6a4a', 'sinkhole': '#120d0a',

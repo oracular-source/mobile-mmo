@@ -38,7 +38,7 @@ const unhide=msg=>{if(player.buffs.hide>0){player.buffs.hide=0;if(msg)log(msg,'#
 // Mobs actively fighting you (Evade's confusion doesn't count).
 const fightingMe=()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.lost>0));
 function engage(m,byPet){
-  if(m.dead||player.dead)return;
+  if(m.dead||player.dead||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
@@ -69,12 +69,13 @@ function xpEven(lv){return lv*lv*4+6}
 // How tough a regular mob is next to a standard one of its level: (health with armor x damage), square-rooted so a mob
 // that's twice as tanky and hits twice as hard pays double. Capped by TOUGH_RANGE.
 function toughness(def,lv){
-  if(def.named||def.rare||def.boss)return 1;
+  if(def.named||def.rare||def.boss||def.end)return 1;
   const ehp=(def.hp+def.hpl*lv)/(1-(def.armor||0))/(STD_MOB.hp+STD_MOB.hpl*lv),hit=(def.dmg+def.dmgl*lv)/(STD_MOB.dmg+STD_MOB.dmgl*lv);
   return Math.max(TOUGH_RANGE[0],Math.min(TOUGH_RANGE[1],Math.sqrt(ehp*hit)));
 }
 function xpFor(lv,def,L){const mult=Math.max(0.1,Math.min(1.6,1+0.2*(lv-L)));
-  return Math.round(xpEven(lv)*toughness(def,lv)*mult*(def.boss?6:(def.named||def.rare)?3:1))}
+  if(def.noxp)return 0;
+  return Math.round(xpEven(lv)*toughness(def,lv)*mult*(def.boss||def.end?6:(def.named||def.rare)?3:1))}
 // XP needed for each level, worked out from KILLS_PER_LEVEL (mobs.js): that many even-level standard kills.
 const NEED=KILLS_PER_LEVEL.map((k,L)=>Math.round(k*xpEven(L)));
 const need=L=>NEED[L]||NEED[NEED.length-1];
@@ -89,13 +90,18 @@ function killMob(m){
   if(player.lvl>=LEVEL_CAP)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
-  if(zoneId==='dun'){run.kills++;run.xp+=credit?xp:0;}
+  const inst=zoneId==='dun'||(curArea()&&curArea().instance);
+  if(inst&&!m.def.noxp){run.kills++;run.xp+=credit?xp:0;}
+  // The end of an instanced dungeon (v0.63, Brother Malrec): his chest appears where he fell, and the way out behind it.
+  if(m.def.end&&inst){floatText(player.x,player.y-40,curArea().name+' cleared!','#ffd27a',true);log(m.def.name+' has fallen! A chest and a way out appear.','#ffd27a');
+    run.chest={x:m.hx,y:m.hy+14,open:false};run.portal={x:m.hx,y:m.hy-12};banner(curArea().name+' cleared','in '+Math.floor((time-run.t0)/60)+':'+String(Math.round(time-run.t0)%60).padStart(2,'0'))}
   if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
     run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!(m.def.named||m.def.rare),first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
     if((m.def.named||m.def.rare)&&k.count===1){log('Journal updated: first kill of '+m.def.name+'!','#ff9de2');banner('Journal: first kill',cap(m.def.name),'#ff9de2')}}
   // The crypt boss (v0.37): one banner with how long the visit took. Once per visit; the clock starts at the stairs.
   if(m.def.boss&&zoneId==='crypt'&&run.cryptT0!=null){const s=Math.round(time-run.cryptT0),mm=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');banner('Crypt cleared','in '+mm);log('Crypt cleared in '+mm+'.','#ffd27a');run.cryptT0=null}
+  if(m.def.noxp){if(player.target===m)player.target=null;return}
   if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<LEVEL_CAP&&player.xp>=need(player.lvl)){
@@ -268,7 +274,7 @@ function updatePetOne(dt,second){
     pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
-function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;log(zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':zoneId==='cross'?'You wake on the road by Town 1.':zoneId==='tunnel'?'You wake under the sinkhole.':'You return to the Gate Road.','#9aa')}
+function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;player.held=0;player.stunT=0;log(A&&A.wake?A.wake:zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':zoneId==='cross'?'You wake on the road by Town 1.':zoneId==='tunnel'?'You wake under the sinkhole.':'You return to the Gate Road.','#9aa')}
 
 // Pet orders (v0.34, owner): Attack sends the pet at your target, even one that isn't fighting you yet (so it can pull),
 // and lets it pick its own fights again. Back off pulls it out and keeps it out until you press Attack.
@@ -300,6 +306,12 @@ function rollLoot(m){
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
   if(m.def.rare){got.push(pick(UNCOMMONS));if(rng()<0.25&&RARES.length)got.push(pick(RARES));} // a rare always pays: an uncommon for your class, sometimes a rare
   if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
+  // Dungeon 1 (v0.63): the Prior and the Bellringer drop their own item (any class) and maybe an uncommon; Malrec's loot
+  // waits in his chest: one named item for your gear group and one uncommon every time, plus a small rare chance.
+  if(m.type==='prior'){got.push('priorcowl');if(rng()<0.6)got.push(pick(UNCOMMONS));}
+  if(m.type==='bellringer'){got.push('bellband');if(rng()<0.6)got.push(pick(UNCOMMONS));}
+  if(m.type==='malrec'){const c=[pick(MALREC.length?MALREC:BOSS1),pick(UNCOMMONS)];if(rng()<0.2&&RARES.length)c.push(pick(RARES));
+    if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
   if(m.type==='greyfang'){got.push('fangring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
   got.forEach((id,i)=>giveItem(id,1,i));
 }
@@ -308,7 +320,7 @@ function giveItem(id,n,k){
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
   if(i>=0)inv.bags[i].n+=n;
   else{i=inv.bags.indexOf(null);if(i<0){log('Your bags are full. The '+it.name+' is left behind.','#ff8a80');banner('Bags full',it.name+' left behind','#ff8a80');return false}inv.bags[i]={id:id,n:n}}
-  if(zoneId==='dun')run.loot.push(it.name);
+  if((zoneId==='dun'||(curArea()&&curArea().instance))&&it.rar!=='junk'&&it.rar!=='key')run.loot.push(it.name);
   // Junk and commons stay in the Log; anything better shows in the chat box and gets a banner (v0.37). Bags full shows in both too.
   const good=it.rar!=='junk'&&it.rar!=='common';
   log('You loot: '+it.name+(it.rar==='junk'?'':' ('+it.rar+')'),RAR[it.rar],good?'main':'loot');
@@ -321,6 +333,7 @@ function giveItem(id,n,k){
 // Returns true if the spell started. "quiet" skips spam messages during hold-to-repeat.
 function cast(a,quiet){
   if(!a||player.dead)return false;
+  if(player.stunT>0){if(!quiet)log('You are stunned!','#ffd27a');return false} // the Bellringer's Toll (v0.63)
   if(player.lvl<a.lvl){if(!quiet)log(a.name+' unlocks at level '+a.lvl+'.','#9aa');return false}
   // Bard: tapping a song that's playing stops it right away (no cost, no wait).
   if(a.kind==='song'&&songOn(a.id)){player.songs=player.songs.filter(id=>id!==a.id);log('You stop playing '+a.name+'.','#9aa');return true}

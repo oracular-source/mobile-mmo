@@ -2,10 +2,10 @@
 // through the chapel door on the chapel grounds. Draft 2 (owner, Nov 20: bigger and more substantial, with a named, but
 // still a 10-15 minute run): nave -> flooded catacomb -> drowned crypts -> the Drowned Prior (mini boss) -> refectory,
 // dormitory, ritual hall -> Malrec's sanctum; the Bellringer's foundry is an optional side lair. North is deeper.
-// Not loaded by the game yet (not in index.html). Format: docs/map-format.md
+// In the game since v0.63. Format: docs/map-format.md
 'use strict';
 MAPS.dungeon1 = {
-  name: 'Dungeon 1', zone: [27, -15], tint: 'crypt', start: 'out', rules: '', instance: 1,
+  name: 'Dungeon 1', zone: [27, -15], tint: 'vault', start: 'out', rules: '', instance: 1, wake: 'You wake in the nave, by the chapel door.',
   enter: 'Candles gutter on the altar. Behind it, steps lead down into the dark, and you can hear water.',
   tiles: [
     'XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX',
@@ -104,6 +104,8 @@ obj torn_banner 24 77
 obj candle 30 78
 obj candle 33 78
 exit out 31 79 to=chapel at=dungeon lit
+# the stairs behind the altar are sealed by a stone slab until you touch the altar (v0.63)
+seal 31 66 32 66 altar
 spawn cult_zealot 14 31 70
 spawn cult_ashcaller 14 33 69
 spawn cult_chanter 14 30 69
@@ -177,9 +179,9 @@ obj candle 45 8
 obj candle 52 8
 obj banner 46 0
 obj banner 51 0
-named malrec 15 48 2
-spawn cult_deacon 15 45 3
-spawn cult_deacon 15 52 3
+named malrec 15 48 2 group=sanctum
+spawn cult_deacon 15 45 3 group=sanctum
+spawn cult_deacon 15 52 3 group=sanctum
 # something alive
 critter bat 31.5 72 2
 critter moth 31.8 68.2 2

@@ -11,3 +11,4 @@ Every asset in the game is listed here with its source and license.
 | Minimap marker shapes in `js/minimap.js`, and the UI draft sheets `art/drafts/ui-minimap-options.png` and `art/drafts/ui-icon-styles.png` (drawn by `tools/ui_drafts.py`) (v0.48) | Original, made for this project | Owned by the project |
 | Fonts | System monospace fonts on the player's device | Not bundled |
 | `js/data/icons.js` (spell icon shapes) | Made for this game (Claude, Nov 20) | Original |
+| Dungeon 1 art drawn in `js/area.js` and `js/render.js` (pews, flood water, bone niches, stone steps, ember pits, the altar and its slab, stained-glass windows, refectory tables, the cage, the bell mould, Grasp of the Deep's hands, the Toll's ring) and its placeholder monsters (`ROBED` in `js/data/sprites.js`: mender, deacon, the Drowned Prior, the Bellringer, Brother Malrec; the candle wisp) (v0.63) | Original, made for this project | Owned by the project |
