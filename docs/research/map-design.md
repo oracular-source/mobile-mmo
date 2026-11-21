@@ -158,3 +158,23 @@ Steps 1 and 3 of `area-rules.md` for Brother Malrec's chapel. **Owner (Nov 20): 
 - **Reused:** cultists, ash wisps, skeletons and corpses (a drowned look later), braziers, candles, banners, censers, bedrolls, the crypt's floor and rock, chests, telegraph bars, the old dungeon's chest and run summary code.
 - **Map:** `js/data/maps/dungeon1.js` (draft 2, passes the checker; not loaded by the game yet).
 - **Owner (Nov 20): both maps approved** (chapel grounds draft 2, Dungeon 1 draft 2). **Malrec's move: Candle Wake.** **No monster review round:** new monsters get quick placeholder sprites during the build (readable, in the area's look); the owner redoes monster sprites in a **character design pass after Zone 1's map work** (build the rest of the zone, then brush up the older maps incl. the crypt, then characters). Next: build the chapel grounds and Dungeon 1.
+
+## Dungeon 1 rebuild (draft 3, approved by the owner Nov 21)
+Replaces the love pass card's tweaks with a rebuild. **Owner (Nov 21):** the v0.63 dungeon is too big, with a lot of empty walking; go for a **middle size** (big dungeons where you pull whole halls come later), **packs a bit tighter but still easy to pull, and more of them**, every room intentional. Sketched in chat as rough boxes (draft 3); the full text map is the build chat's job.
+- **Two floors** (new pattern, backlog card "Dungeon floors"). Floor 1 ends at a named whose death opens the way down.
+- **Floor 1**
+  1. **Catacomb (you enter here):** the chapel door takes you straight down; **no nave room** (Claude's reading of "let's enter in the catacomb"; this also fixes the nave being too big for the chapel outside). Dry now. Three packs of the dead, 2–3 each.
+  2. **West hall** and **East hall** side by side; both lead on from the catacomb and join again below it (a loop, pick either way first).
+     - **West hall:** a camp with a **mender** (healer first) and a second small camp; **the floor's chest**.
+     - **East hall:** a small pack with **one big wisp** (a bigger ash wisp, its own creature, hovers with the pack and joins the pull) whose move is an **area burn** round it: stay out of the ring or pull the fight away from it.
+  3. **Flooded chamber:** the **only water in the dungeon** (owner). **The Drowned Prior** (mini boss) with two adds. The water slows you a little all the time. **His grip (owner: "slow you down hard", not a hold):** ripples mark a spot under you, about 1.5 s to step off, then hands rise and **slow you hard** for a few seconds with light damage. Forgiving on purpose so players learn "watch the water" on a named before a boss asks more. **When he dies the flood drains and uncovers stairs down.**
+- **Floor 2**
+  4. **Landing:** one small pack, a breather.
+  5. **Wisp room:** two packs, each with a summoner and its **big wisp**, already summoned, hovering with its pack and joining the pull. **A wisp does not die when its summoner dies** (owner).
+  6. **Malrec's sanctum:** Brother Malrec with his two deacons (heals, Ash Bolt, Candle Wake as built).
+- **Size:** about 10 packs, ~25 mobs plus 3 big wisps; short links between rooms (no long empty corridors); still a **10–15 minute** run.
+- **Look (from the love pass card, still wanted):** dressed stone and flagstones where the monks lived (the halls), rough rock in the crypt parts.
+- **Open for the owner:** the **Bellringer** (optional named, v0.63) has no room in draft 3: drop him, or keep him as a side room off a hall? The refectory, dormitory and caged monk are gone too unless worked into the halls.
+
+### Crypt rework direction (owner, Nov 21)
+The same middle-size rules for the crypt when its rework comes up (step C): sketch approved as "the right idea": stairs → landing (its pack in a corner, so you're not jumped on arrival) → ossuary (west) and embalming room (east, chest) both leading into the **coffin hall** (a loop) → antechamber with a **mini named** → throne room with the Skeleton King → back tunnel to Wolfwood. **Fewer packs than the sketch's 11, about 8**, because it's an early area.
