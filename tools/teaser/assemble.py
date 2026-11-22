@@ -3,7 +3,7 @@ import os, sys, json, subprocess
 sys.path.insert(0, os.path.dirname(__file__))
 from shots import SHOTS
 from record import OUT, FPS
-FIGHTS = {'s2_rats', 's3a_necro', 's3b_wizard', 's3c_warrior', 's4_king', 's5_greyfang', 's6a_prior', 's6b_bell', 's6c_malrec'}
+FIGHTS = {'s2_rats', 's3a_necro', 's3b_wizard', 's3c_warrior', 's4_king', 's5_greyfang', 's6a_prior'}
 t = 0; cuts = []; fights = []
 for s in SHOTS:
     d = s['frames'] / FPS

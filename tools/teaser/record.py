@@ -32,13 +32,17 @@ CINE_CSS = "#view > :not(#c){display:none !important} .modal{display:none !impor
 HUD_CSS = "#devbtn{display:none !important} .modal{display:none !important}"
 
 # Recording-only patches to render.js: a camera override, the hero can be hidden, fakes join the depth sort, names on top.
-PATCHES = [
+PATCHES = {'render.js': [
     ("camY=sn(camY);}", "camY=sn(camY);}if(window.__cam){camX=window.__cam.x;camY=window.__cam.y}"),
     ("drawGlows();", "drawGlows();if(window.__spellFx)window.__spellFx();"),
     ("[player],trees)", "[player],trees,window.__fakes||[])"),
     ("const drawEnt=e=>{", "const drawEnt=e=>{if(e.fake){window.__drawFake(e);return}if(e===player&&window.__hideHero)return;"),
     ("if(player.dead>0){cx.fillStyle='rgba(60", "if(window.__names)window.__names();if(window.__overlayDraw)window.__overlayDraw();if(player.dead>0){cx.fillStyle='rgba(60"),
-]
+  ],
+  # Draft 3: a mob can fight a fake player (the group's tank), so the hero isn't the only one ever hit.
+  'combat.js': [("const victim=m=>(decoy", "const victim=m=>(m.fakeT&&window.__fakes&&__fakes.indexOf(m.fakeT)>=0)?m.fakeT:(decoy")],
+  'update.js': [("if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}", "if(v.fake){window.__hurtFake(m,v)}else if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}")],
+}
 
 def serve():
     class Quiet(http.server.SimpleHTTPRequestHandler):
@@ -50,13 +54,14 @@ def serve():
     threading.Thread(target=srv.serve_forever, daemon=True).start()
     return srv
 
-def patched_render():
-    src = open(os.path.join(ROOT, 'js', 'render.js')).read()
-    for a, b in PATCHES:
-        assert src.count(a) == 1, 'patch anchor missing or not unique: ' + a
+def patched(fn):
+    src = open(os.path.join(ROOT, 'js', fn)).read()
+    for a, b in PATCHES[fn]:
+        assert src.count(a) == 1, 'patch anchor missing or not unique in %s: %s' % (fn, a)
         src = src.replace(a, b)
     return src
 
+STUCK = {}
 FAKES = open(os.path.join(os.path.dirname(__file__), 'fakes.js')).read()
 
 def record(pw_browser, shot):
@@ -67,8 +72,9 @@ def record(pw_browser, shot):
     init = (INIT.replace('__SEED__', str(shot.get('seed', 7))).replace('__CLS__', shot.get('cls', 'druid'))
             .replace('__MM__', 'true' if shot.get('hud') else 'false').replace('__ZOOM__', str(shot.get('zoom', 999))))
     ctx.add_init_script(init)
-    rsrc = patched_render()
-    ctx.route(re.compile(r'.*/js/render\.js.*'), lambda r: r.fulfill(status=200, content_type='application/javascript', body=rsrc))
+    for fn in PATCHES:
+        body = patched(fn)
+        ctx.route(re.compile(r'.*/js/' + re.escape(fn) + r'.*'), (lambda b: lambda route, req: route.fulfill(status=200, content_type='application/javascript', body=b))(body))
     page = ctx.new_page()
     errs = []
     page.on('pageerror', lambda e: errs.append(str(e)))
@@ -81,14 +87,25 @@ def record(pw_browser, shot):
     for _ in range(3): page.evaluate('__step()')
     page.add_script_tag(content='(function(){' + shot.get('setup', '') + '})();')
     page.add_script_tag(content='window.__tick=function(i,dt){' + shot.get('tick', '') + '};')
-    for _ in range(shot.get('warm', 0)):
-        page.evaluate('(()=>{__tick(-1,1/30);__heroTick(1/30);__fakeTick(1/30);__step()})()')
+    # Warm-up frames run the scene before filming starts (negative frame numbers), so a shot opens mid-fight.
+    warm = shot.get('warm', 0)
+    for k in range(warm):
+        page.evaluate('(i)=>{window.__fi=i;__tick(i,1/30);__heroTick(1/30);__fakeTick(1/30);__step()}', k - warm)
+    page.evaluate('__stuck.length=0')
     n = shot['frames']
     for i in range(n):
         page.evaluate('(i)=>{window.__fi=i;__tick(i,1/30);__heroTick(1/30);__fakeTick(1/30);__step()}', i)
         if PREVIEW and i % PREVIEW: continue
         page.screenshot(path=os.path.join(d, '%04d.jpg' % i), type='jpeg', quality=92)
     if errs: print('  JS errors in', name, ':', errs[:3])
+    # Stuck check (owner: "people were getting stuck"): a stall is someone who wanted to move and didn't for 0.4 s. One is
+    # fine (they pick a new spot); the same player stalling again and again on camera means the shot needs fixing.
+    st = page.evaluate('__stuck')
+    by = {}
+    for e in st: by[e['name']] = by.get(e['name'], 0) + 1
+    bad = {k: v for k, v in by.items() if v >= 3}
+    print('  stalls:', by or 'none', ('  STUCK: ' + str(bad)) if bad else '')
+    STUCK[name] = bad
     ctx.close()
     return d
 
@@ -124,7 +141,7 @@ def encode(name, frames, fade_in=6, fade_out=6, extra=None):
 def main(shots, only):
     os.makedirs(OUT, exist_ok=True); srv = serve()
     with sync_playwright() as p:
-        b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--disable-gpu-vsync'])
+        b = p.chromium.launch(executable_path='/usr/bin/google-chrome', args=['--disable-gpu-vsync', '--no-proxy-server'])
         for s in shots:
             if only and s['name'] not in only: continue
             print('recording', s['name'], s['frames'], 'frames'); sys.stdout.flush()
