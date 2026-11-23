@@ -281,12 +281,15 @@ function renderSettings(){
     seg('Map pins','pins',[['S','Small'],['M','Medium'],['L','Large']])+
     grp('Game')+
     '<button class="go" id="chgcls" style="margin:2px 0 6px">Change class</button>'+
+    // v0.73: copy saved crash reports to send to Claude (js/crash.js).
+    '<button class="go" id="crashbtn" style="margin:2px 0 6px">Copy crash report'+(crashList().length?' ('+crashList().length+' saved)':' (none)')+'</button>'+
     // Prototype only: lets the home-screen app (which can't use ?dev) turn developer tools on.
     '<div class="srow"><div class="slbl">Developer tools</div><div class="seg"><button id="devoff" class="'+(dev.on?'':'active')+'">Off</button><button id="devon" class="'+(dev.on?'active':'')+'">On</button></div></div>';
 }
 $('setbox').addEventListener('click',e=>{
   if(e.target.id==='devon'||e.target.id==='devoff'){const on=e.target.id==='devon';if(on!==dev.on){store.set('ashfen-dev',on);location.reload()}return}
   if(e.target.id==='chgcls'){$('menuUI').classList.remove('show');openIntro();return}
+  if(e.target.id==='crashbtn'){crashCopy();return}
   const b=e.target.closest('button[data-k]');if(!b)return;
   let v=b.dataset.v;if(v==='true')v=true;else if(v==='false')v=false;else if(/^\d+$/.test(v))v=+v;
   settings[b.dataset.k]=v;saveSettings();renderSettings();buildControls();if(b.dataset.k==='zoom')applyZoom();

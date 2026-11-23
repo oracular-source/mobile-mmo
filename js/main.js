@@ -4,9 +4,10 @@
 let last=0,uiT=0;
 function loop(ts){
   const dt=Math.min(0.05,(ts-last)/1000||0);last=ts;
-  if(running&&!document.hidden&&!simState.busy){time+=dt;botTick();update(dt);} // the sim runs its own fixed steps
-  render();uiT+=dt;if(uiT>0.1){ui();pauseWatch();uiT=0}
+  // Each part runs inside crashGuard (js/crash.js): an error is reported and the next frame still comes (it used to freeze the game).
   requestAnimationFrame(loop);
+  if(running&&!document.hidden&&!simState.busy){time+=dt;crashGuard(()=>{botTick();update(dt)},'update')} // the sim runs its own fixed steps
+  crashGuard(render,'render');uiT+=dt;if(uiT>0.1){crashGuard(()=>{ui();pauseWatch()},'ui');uiT=0}
 }
 resize();buildControls();
 // Test hook for automated checks: only when the page is opened with ?debug in the address.
