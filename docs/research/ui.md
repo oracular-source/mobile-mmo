@@ -240,4 +240,9 @@ Owner: let the game also be played with the phone held sideways, as an extra opt
 - **B Side panels:** the HUD lives in two grey columns, EverQuest-window style: left = your frame, toggles, target, chat, Sit; right = Log / Menu, minimap, Back / Next and the 2 × 4 grid as in portrait. Nothing ever covers the world, but the world is only the middle square (about 225 game pixels wide), so it shows less than A.
 - **C Split spells:** 4 spells at each thumb (2 × 2 bottom left, 2 × 2 bottom right), chat along the bottom middle. Two-thumb casting like a console game, but the left thumb can't walk with the joystick and cast at once, and slot order splits across the screen.
 Claude leans **A**: it keeps the most world on screen, the same muscle memory as portrait (main spell bottom right, joystick bottom left), and it's the smallest change, so the two layouts won't drift apart. B is the pick if covering the world bothers you more than its size.
+**Owner (Nov 24): likes A, but the spell grid, Sit and pet buttons stay exactly as in portrait** (2 × 4 grid with Back / Next above it bottom right; Sit with Attack / Back off above it bottom left), **and use the free top right.** Second drafts: `art/drafts/ui-landscape-a.png`. In all three the grid drops to the bottom edge (portrait lifts it 1.6 buttons for the thumb; sideways there's no room), which frees the top right:
+- **A1 Top row:** frames top left; Log and Menu stacked beside the minimap in the top-right corner; chat bottom left under Sit.
+- **A2 You left, enemy right:** target frame in the top-right corner (like a fighting game), minimap next to it, Log and Menu join the toggles row.
+- **A3 Chat up top:** like A1, but the chat moves under the minimap (right-aligned, 3 lines), so bottom left holds only Sit and the pet buttons, all joystick space.
+Claude leans **A1** (closest to portrait: same corners for everything) or **A3** if the chat in the joystick corner bothers you.
 
