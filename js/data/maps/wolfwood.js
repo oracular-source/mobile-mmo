@@ -61,7 +61,7 @@ MAPS.wolfwood = {
 obj giant_tree 29 15
 obj tunnel_mouth 8 14
 obj wolf_den 26 4
-obj lean_to 52 25
+obj cot 53 26
 obj campfire 53 29
 obj drying_rack 56 28
 obj trap 50 31

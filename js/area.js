@@ -1260,35 +1260,44 @@ function drawObj(g,R,o){
     [[14,6],[22,9],[31,5]].forEach(([x,l])=>{for(let k=0;k<l;k++)R(X+x+(k>3?1:0),Y+2+k,1,1,k<l-1?AP.root:AP.rootHi)});
     R(X+4,top+6,4,2,AP.mossHi);R(X+W-10,top+4,5,2,AP.mossHi);return}
   if(k==='wolf_den'){
-    // Greyfang's den, third take (v0.83; owner: the v0.82 boulder pile still didn't read as a den). What makes a den read
-    // at this size: (1) a brown EARTH MOUND, not grey rock, so it stands apart from the boulder hillside round it;
-    // (2) a big black mouth dug into its face with a pale rim of fresh-dug dirt, so the hole is the first thing you see;
-    // (3) a worn dirt apron spilling out of it with white bones and a skull on it; (4) a wolf's eyes in the dark
-    // (drawn live after the lighting, world.js drawGlows). The hunter's gnawed bow still lies on the apron.
-    const base=Y+H-1,cx=X+32,cy=Y+5,rx=31,ry=22;shadow(X+2,base-2,W-4,5);
-    for(let y=-ry;y<=ry;y++)for(let x=-rx;x<=rx;x++){const e=x*x/(rx*rx)+y*y/(ry*ry)+(ah(cx+x,cy+y,81)-0.5)*0.10;if(e>1||cy+y>base-1)continue;
-      const lit=(x/rx)+(y/ry); // light from the upper left
-      R(cx+x,cy+y,1,1,e>0.9?AP.out:lit<-0.75?'#7a6244':lit<0.1?'#5a4630':lit<0.8?'#47372a':'#33281e')}
-    for(let i=0;i<46;i++){const a=ah(i,1,82)*Math.PI,r=0.35+ah(i,2,83)*0.6,x=Math.round(cx-Math.cos(a)*r*rx*0.9),y=Math.round(cy-Math.sin(a)*r*ry*0.85);
-      if(y>cy+2)continue;R(x,y,2,1,i%3?'#3e5530':'#58743f');if(i%4===0)R(x,y-1,1,1,'#6e8a4c')} // grass on the crown
-    const rock=(x0,y0,w,h)=>{R(x0-1,y0-1,w+2,h+2,AP.out);R(x0,y0,w,h,AP.bould);R(x0,y0,w-1,1,AP.bouldHi);R(x0,y0,1,h-1,AP.bouldHi);R(x0+1,y0+h-1,w-1,1,AP.bouldDk);R(x0+1,y0,Math.max(1,w-3),1,AP.mossHi)};
-    // (no stones on the crown: small square rocks read as windows, v0.83)
-    // the mouth: rim of fresh-dug pale dirt, then the black hole, darkest at the back
-    const my=base-4,mh=22,mw=14;
-    for(let y=0;y<=mh+3;y++){const t=(mh+3-y)/(mh+4),hw=Math.round((mw+3)*Math.sqrt(Math.max(0,1-t*t)));if(hw>0)R(cx-hw,my-mh-3+y,2*hw,1,y<2?'#a88a60':'#8a6e4a')}
+    // Greyfang's den as a cave (v0.84; owner: "change it to a cave style, that will read better"). A low outcrop of grey
+    // stone in layered ledges, lit from the upper left, moss on the ledge tops, with a big black arched mouth in its face;
+    // a worn dirt apron spills out with white bones, a skull, paw prints going in and the hunter's gnawed bow.
+    const base=Y+H-1,cx=X+32;shadow(X+1,base-2,W-2,5);
+    const topAt=x=>Y-12+Math.round(6*Math.pow((x-cx)/32,2)*1.6)+Math.round((ah(Math.floor(x/5),3,85)-0.5)*4); // humped top edge
+    for(let x=X;x<X+W;x++){const t=Math.max(Y-14,topAt(x)),side=Math.abs(x-cx)>27?Math.round((Math.abs(x-cx)-27)*2.2):0;
+      for(let y=t+side;y<base;y++){const edge=y===t+side||x===X||x===X+W-1;if(edge){R(x,y,1,1,AP.out);continue}
+        const band=Math.floor((y-Y+20+Math.floor(ah(Math.floor(x/9),1,86)*3))/6),inb=(y-Y+20+Math.floor(ah(Math.floor(x/9),1,86)*3))%6;
+        const lit=x<cx-8?1:x>cx+12?-1:0;
+        R(x,y,1,1,inb===0?AP.bouldDk:inb===1?(lit>0?AP.bouldHi:AP.bould):lit<0?AP.bouldDk:(band%2?AP.bould:'#646460'))}
+      if(ah(x,5,87)<0.7)R(x,Math.max(Y-14,topAt(x))+1,1,1,ah(x,6,88)<0.5?AP.mossHi:'#5f7a4a')} // moss on the top ledge
+    for(let i=0;i<5;i++){const x=X+6+Math.floor(ah(i,9,89)*52),y=Y-6+Math.floor(ah(i,10,90)*14);if(Math.abs(x-cx)<17&&y>Y)continue;treeLine(R,x,y,x+1+(i%2),y+4,1,AP.out)} // cracks
+    // the mouth
+    const my=base-1,mh=21,mw=15;
     for(let y=0;y<=mh;y++){const t=(mh-y)/(mh+1),hw=Math.round(mw*Math.sqrt(Math.max(0,1-t*t)))+(ah(y,7,84)<0.25?1:0);const yy=my-mh+y;
-      if(hw>0){R(cx-hw-1,yy,2*hw+2,1,AP.out);R(cx-hw,yy,2*hw,1,y<5?'#120d0a':'#030202')}}
-    [[-9,7],[-4,10],[2,6],[7,9],[11,5]].forEach(([x,l])=>{for(let j=0;j<l;j++)R(cx+x+(j>3?(x<0?-1:1):0),my-mh-2+j,1,1,j<l-1?AP.root:AP.rootHi)}); // roots hanging over the mouth
-    // the apron: worn dirt spilling out of the mouth, paler than the forest floor
-    for(let y=0;y<8;y++){const hw=mw+2+y*2;R(cx-hw,my-1+y,2*hw,1,y%2?'#5c4a36':'#66523c')}
-    for(let i=0;i<5;i++){const x=cx-10+i*5,y=my+2+(i%2)*2;treeLine(R,x,y,x+2,y-2,1,'#2e241a');treeLine(R,x+2,y,x+4,y-2,1,'#2e241a')} // claw rakes
-    [[cx-20,my+6],[cx-16,my+4],[cx+17,my+5],[cx+21,my+7]].forEach(([x,y])=>{R(x,y,2,2,'#2a2016');R(x-1,y-1,1,1,'#2a2016');R(x+1,y-2,1,1,'#2a2016');R(x+2,y-1,1,1,'#2a2016')}); // paw prints going in
-    // bones: pale shafts with knobbed ends, and a skull
+      if(hw>0){R(cx-hw-2,yy,2*hw+4,1,AP.out);R(cx-hw-1,yy,1,1,AP.bouldHi);R(cx-hw,yy,2*hw,1,y<5?'#120e0c':'#030202')}}
+    [[-8,6],[-3,8],[4,5],[9,7]].forEach(([x,l])=>{for(let j=0;j<l;j++)R(cx+x,my-mh+1+j,1,1,j<l-1?AP.root:AP.rootHi)}); // roots hanging into the mouth
+    // the apron: worn dirt spilling out, bones, a skull, prints going in, fur, the hunter's bow
+    for(let y=0;y<7;y++){const hw=mw+1+y*2;R(cx-hw,base+y-1,2*hw,1,y%2?'#4e3e2c':'#5a4834')}
+    [[cx-19,base+4],[cx-14,base+2],[cx+16,base+3],[cx+20,base+5]].forEach(([x,y])=>{R(x,y,2,2,'#2a2016');R(x-1,y-1,1,1,'#2a2016');R(x+1,y-2,1,1,'#2a2016');R(x+2,y-1,1,1,'#2a2016')});
     const bone=(x,y,l,d)=>{for(let j=0;j<l;j++)R(x+j,y+(d?Math.floor(j/2):0),1,1,'#e2dac6');R(x-1,y-1,2,3,AP.out);R(x-1,y-1,2,1,'#e2dac6');R(x-1,y+1,2,1,'#e2dac6');const ex=x+l-1,ey=y+(d?Math.floor((l-1)/2):0);R(ex,ey-1,2,3,AP.out);R(ex,ey-1,2,1,'#e2dac6');R(ex,ey+1,2,1,'#e2dac6');for(let j=1;j<l-1;j++)R(x+j,y+1+(d?Math.floor(j/2):0),1,1,'#9a907c')};
-    bone(cx-16,my+3,6,0);bone(cx+8,my+6,7,1);bone(cx-6,my+8,5,0);bone(cx+13,my+1,5,0);
-    R(cx-25,my+1,7,6,AP.out);R(cx-24,my+1,5,4,'#e2dac6');R(cx-24,my+1,5,1,'#f4eedc');R(cx-23,my+3,1,1,AP.out);R(cx-21,my+3,1,1,AP.out);R(cx-23,my+5,3,1,'#b8ae98'); // skull
-    [[cx-12,my-1],[cx+19,my+3]].forEach(([x,y])=>{R(x,y,3,1,'#8a8a88');R(x+1,y-1,1,1,'#b0b0ac')}); // grey fur tufts
-    R(cx+4,my+10,12,1,AP.out);R(cx+5,my+9,10,1,'#9a7448');R(cx+4,my+8,1,2,'#9a7448');R(cx+15,my+8,1,2,'#9a7448');R(cx+9,my+9,2,1,'#5a4030');return} // the hunter's gnawed bow
+    bone(cx-15,base+1,6,0);bone(cx+7,base+4,7,1);bone(cx-5,base+5,5,0);bone(cx+12,base,5,0);
+    R(cx-24,base-1,7,6,AP.out);R(cx-23,base-1,5,4,'#e2dac6');R(cx-23,base-1,5,1,'#f4eedc');R(cx-22,base+1,1,1,AP.out);R(cx-20,base+1,1,1,AP.out);R(cx-22,base+3,3,1,'#b8ae98'); // skull
+    [[cx-11,base-1],[cx+18,base+1]].forEach(([x,y])=>{R(x,y,3,1,'#8a8a88');R(x+1,y-1,1,1,'#b0b0ac')});
+    R(cx+4,base+8,12,1,AP.out);R(cx+5,base+7,10,1,'#9a7448');R(cx+4,base+6,1,2,'#9a7448');R(cx+15,base+6,1,2,'#9a7448');R(cx+9,base+7,2,1,'#5a4030');return}
+  if(k==='cot'){
+    // The hunter's sleeping cot (v0.84; owner: "just do a sleeping cot instead of the hunter shelter"): a camp cot by the
+    // fire, two side rails on crossed legs with a hide stretched between them, a grey wool blanket thrown over it and
+    // turned back, a rolled fur for a pillow at the head, his boots under it.
+    const top=Y+2,bw=W-2,bh=8;shadow(X+2,Y+H-3,W-3,3);
+    [[X+3],[X+W-6]].forEach(([lx2])=>{treeLine(R,lx2,top+bh,lx2+3,Y+H-2,1,AP.out);treeLine(R,lx2+3,top+bh,lx2,Y+H-2,1,AP.out);treeLine(R,lx2+1,top+bh,lx2+3,Y+H-3,1,AP.woodHi)}); // crossed legs
+    R(X,top-1,bw+2,bh+3,AP.out); // outline
+    R(X+1,top,bw,bh,'#8a6a48');R(X+1,top,bw,1,'#a8845a'); // stretched hide
+    R(X+1,top+bh,bw,1,AP.wood);R(X+1,top+bh+1,bw,1,AP.woodDk); // front rail
+    R(X+10,top+1,bw-10,bh-1,'#5e6268');R(X+10,top+1,bw-10,1,'#7c8088');for(let x=X+12;x<X+bw;x+=4)R(x,top+3,1,bh-4,'#4a4e54'); // grey blanket
+    R(X+9,top,3,bh,'#9aa0a6');R(X+9,top,3,1,'#b8bec4'); // the turned-back edge
+    R(X+2,top+1,7,5,AP.out);R(X+3,top+2,5,3,'#b08a60');R(X+3,top+2,5,1,'#cca478');R(X+4,top+3,3,1,'#8a6a48'); // rolled fur pillow
+    R(X+18,Y+H-3,4,2,AP.out);R(X+19,Y+H-3,2,1,'#4a3424');R(X+23,Y+H-3,4,2,AP.out);R(X+24,Y+H-3,2,1,'#4a3424');return} // boots
   if(k==='lean_to'){
     // The hunter's shelter, third take (v0.83; owner: the v0.82 lean-to seen from above still read as a box). Redrawn
     // as a bough A-frame, the shape anyone reads as "a shelter" at a glance: a steep triangle of layered fir boughs,
