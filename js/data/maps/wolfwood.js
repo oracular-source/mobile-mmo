@@ -95,14 +95,6 @@ obj camp_kit 55 29
 obj game_rack 50 28
 obj chop_block 48 25
 obj toadstools 10 26
-obj sunbeam 52 42
-obj sunbeam 47 34
-obj sunbeam 30 37
-obj sunbeam 20 38
-obj sunbeam 44 25
-obj sunbeam 58 26
-obj sunbeam 50 16
-obj sunbeam 12 21
 # Life: crows on the dead giant's branches and one at the deer bones, an owl on the giant, moths at every light,
 # rabbits at the crossroads end, fireflies on the road and in the glade, deer in the glade, a wolf watching from the treeline (eyes).
 critter crow 28.9 11.0 1 high
