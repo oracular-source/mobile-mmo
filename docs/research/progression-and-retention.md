@@ -101,24 +101,23 @@ Same rules. Each class forks an ability with no fork yet; this round leans on **
 - **Bard · Discord:** *Dissonance* (mobs near you take 15% more from your songs) / *Soothing Discord* (stronger slow, 30%, for packs).
 - **Sim check (when built):** single fight, pack and long named fight at levels 16–18, DPS tracked. Watch for: Vanish resets, Death Grip pulling a pack apart one by one, Riposte with Deflect uptime, Blood Rite letting a Shaman skip sitting.
 
-### Level 18 forks, all 14 classes (draft Nov 24, owner to approve)
-Same rules; each class forks an ability with no fork yet. After this, Druid and Necro have one unforked ability left (Thornlash; Feign Death), so their odd-level abilities (or Pet forks for the Necro) are needed before 23.
+### Level 18 forks, all 14 classes (approved Nov 24, with three swaps)
+Same rules; each class forks an ability with no fork yet. The owner swapped three "same but bigger" sides (Ironbark, Arcane Ward, Soul Bond) for ones that play differently, per the no-"+%" rule. After this, Druid and Necro have one unforked ability left (Thornlash; Feign Death), so their odd-level abilities (or Pet forks for the Necro) are needed before 23.
 - **Necromancer · Mend Bones:** *Bone Splint* (heals your skeleton over time, cheap, works while you sit) / *Ossify* (instant big heal, and the skeleton takes 30% less damage for 6s).
-- **Druid · Barkskin:** *Ironbark* (stronger and longer) / *Thornbark* (normal strength; mobs that hit you take thorn damage).
+- **Druid · Barkskin:** *Ironbark* (short burst that halves the damage you take, long cooldown: an emergency button) / *Thornbark* (normal strength; mobs that hit you take thorn damage).
 - **Warrior · Throw Stone:** *Heavy Stone* (stuns 1.5s and breaks a cast, from range) / *Taunting Throw* (lighter hit that bounces to up to 3 mobs with big threat: pull a pack onto you).
 - **Rogue · Throwing Knife:** *Crippling Knife* (snares, so a split mob can't run back; cleaner pulls) / *Fan of Knives* (light hit on every mob in front: a finisher for a hurt pack).
 - **Cleric · Daze:** *Concussion* (longer stun; the mob hits softer for 6s after) / *Hammer Toss* (short stun thrown from range: stop a caster or a runner).
 - **Enchanter · Phantasm:** *Mirror Images* (two copies, mobs split between them, shorter) / *Lingering Phantasm* (one copy, lasts longer, and mezzes mobs near it for 3s when it ends).
 - **Paladin · Mend:** *Swift Mend* (instant, smaller) / *Martyr's Mend* (bigger, also heals anyone near you).
 - **Shadow Knight · Harm Touch:** *Blood Price* (bigger hit, costs 30% health, heals back half the damage over 6s) / *Harm Wave* (hits every mob in front for less, same cost).
-- **Wizard · Mana Shield:** *Arcane Ward* (absorbs more and lasts longer) / *Mana Burst* (when it ends, blasts mobs near you based on what it soaked).
-- **Magician · Elemental Link:** *Soul Bond* (lasts twice as long) / *Shared Pain* (the pet takes less for you, but hits harder for everything it soaks).
+- **Wizard · Mana Shield:** *Arcane Ward* (while the shield is up, hits can't push back or break your casts) / *Mana Burst* (when it ends, blasts mobs near you based on what it soaked).
+- **Magician · Elemental Link:** *Soul Bond* (while linked, your pet's hits give you mana) / *Shared Pain* (the pet takes less for you, but hits harder for everything it soaks).
 - **Ranger · Ensnaring Shot:** *Crippling Shot* (stronger, longer snare) / *Scatter Shot* (lighter snare on every mob near the target).
 - **Monk · Dragon Strike:** *Dragon Fang* (bigger hit, no knockback, stuns 1s) / *Dragon Wave* (lighter hit that knocks back every mob in front).
 - **Shaman · Sicken:** *Virulent Sicken* (lasts much longer for less mana: long fights) / *Spreading Sickness* (recasting it also lands it on one more mob nearby).
 - **Bard · Song of Mending:** *Battle Hymn* (heals more while you're hitting something) / *Chorus* (normal heal, plus a small shield on you and anyone nearby each pulse).
-- **Sim check (when built):** same as level 16. Watch for: Taunting Throw dragging huge pulls, Mana Burst plus Mana Shield uptime, Bone Splint making the Necro pet unkillable, Spreading Sickness with Shaman DoT stacking.
-- **Sim check (when built):** same as level 12, at levels 14–15. Watch for: Tiger Leap chaining through a whole pull, Retaliation plus Iron Stance on tanks in groups later, Wraith healing on packs.
+- **Sim check (when built):** same as level 16. Watch for: Taunting Throw dragging huge pulls, Mana Burst plus Mana Shield uptime, Soul Bond letting a Magician skip sitting, Bone Splint making the Necro pet unkillable, Spreading Sickness with Shaman DoT stacking.
 
 ### Example: Necromancer (draft)
 - **Forks:** Raise Bones (10): *Bone Pair* (two weaker skeletons) or *Bone Knight* (one tougher, taunts; two pets need a threat check in the sim). Siphon Plague (12): jumps to a new mob when its target dies, or stacks twice on one mob. Lifetap (14): also heals your skeleton, or hits a second mob for half. Dread (16): fears everything near you, or feared mobs take extra DoT damage.
