@@ -1,7 +1,7 @@
 // Crypt rework, DRAFT 2 (Nov 25): the crypt under the Sunken Graveyard, open and shared, levels 5-7. Not loaded by the game yet:
 // when the owner OKs it, it replaces crypt.js (MAPS.crypt). Layout from the approved direction (owner, Nov 21; docs/research/map-design.md,
 // "Crypt rework direction"): stairs -> landing -> ossuary (west) and embalming room (east, chest) both into the coffin hall (a loop)
-// -> antechamber with a mini named -> throne room with the Skeleton King -> back tunnel to Wolfwood. North is deeper. 8 packs.
+// -> antechamber (the King's door guard; owner, Nov 25: no mini named) -> throne room with the Skeleton King -> back tunnel to Wolfwood. North is deeper. 8 packs.
 // Format: docs/map-format.md. Check and draw it: python3 tools/mapcheck.py js/data/maps/*.js
 'use strict';
 MAPS.crypt2 = {
@@ -113,13 +113,14 @@ spawn skeleton 6 29 29
 spawn skeleton 6 30 26
 fog 11 23 22 9
 
-# ANTECHAMBER (mini named, 7): the King's door warden, alone among four pillars. Braziers either side of the door
-# north: the way on is lit.
+# ANTECHAMBER (7): the King's door guard, a pair among four pillars. Owner (Nov 25): no mini named, just the
+# Skeleton King. Braziers either side of the door north: the way on is lit.
 obj brazier 20 14
 obj brazier 23 14
 obj weapon_rack 17 17
 obj weapon_rack 26 17
-named crypt_warden 7 21 17
+spawn skeleton 7 20 17
+spawn skeleton 7 23 17
 
 # THRONE ROOM (7): story 3, the King's court rotted at its feast: a long table with tipped goblets and guttered
 # candles, torn banners, weapon racks by the guards, and crown shards glinting on the dais steps (the summon key's story).
@@ -136,8 +137,6 @@ obj torn_banner 15 7
 obj weapon_rack 27 7
 obj crown_shards 23 6
 obj cobweb 31 10
-spawn skeleton 7 14 11
-spawn skeleton 7 16 12
 spawn skeleton 7 18 7
 spawn skeleton 7 25 7
 named skeleton_king 7 21 7 summon=throne key=crown_shard
