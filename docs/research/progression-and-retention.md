@@ -8,7 +8,7 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 1. **Plan the game as levels 1–50, launch with a cap of 30.** Open 31–40 and 41–50 in expansions. Design ability rhythm and growth for 50 now so nothing has to be redone.
 2. **Leveling time:** keep the early targets (level 10 in about 10 hours). Aim for **about 60–80 hours to level 30**: 2–3 months for a player with a job at about an hour a day. Hardcore players will always be faster; tune for the busy player.
 3. **Never more than about 3 sessions without something new:** a level, an upgrade, a named drop or a step in an ability quest.
-4. **Ability counts:** the core kit by about level 10 (classes have 7–8 now), then 3–4 more by level 30 (**about 10–12 total**), and about 3 more by 50 (**about 13–15**). Loadout stays at 8 slots, so a few abilities always sit on the bench, and that's the build.
+4. **Ability counts (decided Nov 25: the same for every class):** **8 core abilities by level 8**, then new abilities at **11, 17, 21 and 27** (**12 by 30**) and **31, 41 and 47** (**15 by 50**). Loadout is 6 slots (7th at 15, 8th at 25), so a few abilities always sit on the bench, and that's the build. Details: *Same kit size for every class* below.
 5. **Merge instead of adding:** abilities that do a similar job become fork options on one button (see the Druid example below). Replaces design.md's "15–20 abilities by 30".
 6. **Skill tree = forks (decided Nov 18).** No tree before level 10: players are still learning their kit. The **first fork at level 10 is the "first big step"**. One ability gets its **fork** (pick one of **two** versions) **every 2 levels up to 20 (10, 12, 14, 16, 18), then every 3 (23, 26, 29; then 33, 36, 39, 43, 46, 49)** (pacing decided by the owner Nov 24, option B: early levels stay exciting, later levels don't get overwhelming). Each ability gets one fork; utility like Gate or Circle Port may get none.
 7. **Majors at 20 and 30** (40 and 50 in the expansions). A major is class-wide, has **three** options, and changes the class's signature mechanic. Level 20 = *how you play* (solo or group, pet or self); level 30 = *your big moment* (a flashy new effect or a once-a-fight power). By 30: **8 ability forks (10, 12, 14, 16, 18, 23, 26, 29) + 2 majors** (10 picks). By 50: about **14 forks + 4 majors**, so with one fork per ability, forks and abilities (13–15 by 50) run out together. Classes with short kits (Druid and Necro have 6 today) need their odd-level abilities built before then. Past 50: decide later (AAs were proposed).
@@ -17,6 +17,26 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 10. **Swapping is free in town.** Until Town 1 exists: you pick at the ding (a "pick your new toy" card), then swap for free at any campfire (owner, Nov 19).
 11. **No skill points;** forks replace the old stat points, and stats come from gear.
 12. **Scaling rule (owner, Nov 19): breadth grows, depth stays flat, zones fixed.** What grows with level is how many mobs you can take at once (about 1–2 at 10, 3–4 at 30, 5–6 at 50), not how fast one dies. Forks pick *how* you get breadth. Details: `power-scaling.md`.
+
+### Same kit size for every class (decided Nov 25)
+Owner, Nov 25: every class gets **the same number of abilities at the same levels**, so all 14 can be tuned the same way and every class's forks line up. Building the core now, balancing later.
+- **Core kit:** exactly **8 abilities by level 8**, every class.
+- **New abilities, same levels for all:** 11, 17, 21, 27 (12 by 30); 31, 41, 47 (15 by 50). None land on a fork level (10, 12, 14, 16, 18, 23, 26, 29, 33, 36, 39, 43, 46, 49) or a major (20, 30, 40, 50).
+- **Forks line up:** 14 forks by 50 for 15 abilities, so **each class keeps exactly one ability with no fork** (its utility: Gate, Circle Port, Feign Death and the like; named per class later). Every fork level always has an unforked ability ready.
+- **Long buffs become class traits:** a buff you cast once and forget (until you die) is a chore, not a button. Folded ones turn into always-on traits.
+- **Approved forks are unchanged:** nothing below touches an ability that already has a fork.
+
+**Getting every class to 8 (draft Nov 25, owner to approve, then a build):**
+| Class | Today | Change |
+| --- | --- | --- |
+| Druid | 6 | **+ Stormcall (level 4):** lightning on the target that arcs to one mob nearby for half: the Druid's first burst and a light answer to two mobs. **+ Circle Port (level 7):** return to the last campfire or shrine you rested at (the Druid's no-fork utility, like the Wizard's Gate). |
+| Necromancer | 6 | **+ Clinging Darkness (level 2):** a small DoT that also snares: kite a runner, keep a second mob off you. **+ Dark Pact (level 7):** trade health for mana (the Necro's version of Cannibalize; a lifetap earns the health back). |
+| Warrior | 7 | **+ Provoke (level 5):** a shout that snaps one mob onto you with big threat. The Warrior is a tank with no taunt today; Taunting Throw (level 18 fork) is a pull, not a taunt. |
+| Enchanter | 9 | **Clarity becomes a trait:** faster mana regen, always on (no cast, no button). Mind Drain (Slow Mind fork) stays as the active mana tool. |
+| Shaman | 9 | **Spirit Ward becomes a trait:** a little more armor and health for you and anyone near you, always on. |
+| Everyone else | 8 | No change. |
+
+- **Sim check (when built):** each class's single fight, pack and Malrec run before and after; the new abilities should fill gaps (Druid burst, Necro snare, Warrior taunt), not raise the ceiling. Bots and playbooks get the new abilities.
 
 ### Example: Druid, 18 abilities folded into 11
 - **Kept as abilities:** Thornlash, Mending Touch, Creeping Rot, Tanglefoot, Rootgrip, Barkskin, Thorn Aura (the core 7), plus Stormcall, Mending Rain, Wolf Form and Circle Port (quest).
@@ -102,7 +122,7 @@ Same rules. Each class forks an ability with no fork yet; this round leans on **
 - **Sim check (when built):** single fight, pack and long named fight at levels 16–18, DPS tracked. Watch for: Vanish resets, Death Grip pulling a pack apart one by one, Riposte with Deflect uptime, Blood Rite letting a Shaman skip sitting.
 
 ### Level 18 forks, all 14 classes (approved Nov 24, with three swaps)
-Same rules; each class forks an ability with no fork yet. The owner swapped three "same but bigger" sides (Ironbark, Arcane Ward, Soul Bond) for ones that play differently, per the no-"+%" rule. After this, Druid and Necro have one unforked ability left (Thornlash; Feign Death), so their odd-level abilities (or Pet forks for the Necro) are needed before 23.
+Same rules; each class forks an ability with no fork yet. The owner swapped three "same but bigger" sides (Ironbark, Arcane Ward, Soul Bond) for ones that play differently, per the no-"+%" rule. After this, Druid and Necro had one unforked ability left; solved by *Same kit size for every class* (Nov 25).
 - **Necromancer · Mend Bones:** *Bone Splint* (heals your skeleton over time, cheap, works while you sit) / *Ossify* (instant big heal, and the skeleton takes 30% less damage for 6s).
 - **Druid · Barkskin:** *Ironbark* (short burst that halves the damage you take, long cooldown: an emergency button) / *Thornbark* (normal strength; mobs that hit you take thorn damage).
 - **Warrior · Throw Stone:** *Heavy Stone* (stuns 1.5s and breaks a cast, from range) / *Taunting Throw* (lighter hit that bounces to up to 3 mobs with big threat: pull a pack onto you).
@@ -126,7 +146,7 @@ Same rules; each class forks an ability with no fork yet. The owner swapped thre
 
 ### Keeping the work manageable
 - Forks use shared templates stored as data (two weaker pets vs one tougher, spreads vs stacks, longer vs area, instant vs over time), each with its own class flavor; only a few per class need custom work.
-- Launch six by 30: 6 × (9 forks + 2 majors) = 66 picks (about 140 options), versus about 180 upgrades in the old 30-per-class tree. Build the launch six first.
+- Launch six by 30: 6 × (8 forks + 2 majors) = 60 picks (about 130 options), versus about 180 upgrades in the old 30-per-class tree. Build the launch six first.
 
 ### Past the cap
 - Each expansion: one or two new abilities (each with its fork) and a new major (40, 50).
