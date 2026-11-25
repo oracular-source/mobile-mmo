@@ -7,6 +7,28 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
 
+## Dungeon 1 boss pass: vanish at half, the finale (v0.79, Nov 24, map chat)
+`runDungeon({seeds:2, lvl:15})` for each class, on top of the v0.76 bots (they step off ripples and back out of the Toll; updated here for Grasp's three spots and the Toll's stun reach). New: the Prior and the Bellringer **vanish at half health**, the Toll stuns close (1–3 s) and slows further out, Grasp lands on three spots and up to two of the Prior's dead rise per fight, and **Malrec's fight goes on into the finale** (both come back at half their solo health, 75% damage, taking turns). Limit: the arena has no rising water or drag in the finale (a best case there).
+
+| Class | Run (min) | Deaths | Drowned Prior | Bellringer | Malrec + finale |
+| --- | --- | --- | --- | --- | --- |
+| Druid | 11.7 / 13.4 | 3 / 3 | W ~62 s | 2nd try | lost |
+| Warrior | 14.1 / 14.2 | 4 / 4 | lost | W ~54 s | lost |
+| Rogue | 9.7 / 9.7 | 5 / 5 | lost | 2nd try | lost |
+| Necromancer | 8.4 / 9.7 | 0 / 2 | W / lost | W ~30 s | W 101–133 s |
+| Cleric | 13.9 / 13.5 | 0 / 0 | W ~68 s | W 80–90 s | W 214–244 s |
+| Enchanter | 11.2 / 11.2 | 0 / 0 | W | W | W ~140 s |
+| Paladin | 9.2 / 11.0 | 2 / 2 | W ~30 s | W ~55 s | lost |
+| Shadow Knight | 10.1 / 11.5 | 0 / 1 | W | W | W 113–139 s |
+| Wizard | 11.3 / 11.1 | 4 / 3 | W | W (2nd try once) | time out / lost |
+| Magician | 11.6 / 11.6 | 3 / 4 | W | lost | W ~120 s |
+| Ranger | 13.0 / 11.5 | 3 / 2 | lost | 2nd try / W | W ~130 s |
+| Monk | 9.9 / 11.0 | 2 / 0 | W | W | lost / W 193 s |
+| Shaman | 9.1 / 8.6 | 0 / 0 | W ~55 s | W 28 s | W ~100 s |
+| Bard | 19.6 / 23.0 | 4 / 6 | W ~165 s | lost | W 401 s / lost |
+
+**Pace:** 13 classes land at 8.4–14.2 min, inside the 10–15 target. The Bard runs 20–23 min because its slow, safe kite makes every named fight long (Malrec plus the finale takes it almost 7 min); that's its playstyle, not trash, so no floor 2 pack was trimmed (owner's call). **Found and fixed during the build:** the Prior's dead kept rising for as long as the fight lasted, so the kiting Bard timed out on him every try (420 s); now two per fight at most (Bard wins in about 155 s). **Balance chat:** 8 of 14 beat Malrec plus the finale (Necro, Cleric, Enchanter, Shadow Knight, Magician, Ranger, Shaman; Monk and Bard once); Druid, Warrior, Rogue, Paladin and Wizard lose it. The Prior still stops the Warrior, Rogue and Ranger; the Bellringer stops the Magician and Bard.
+
 ## Dungeon 1 named fights, bots play the mechanics (v0.76, Nov 24, balance chat)
 Each named group as one arena fight at level 15 (every mob at its map level), 10 fights each (seeds 7000–7009), the Prior's in wall-to-wall water. Cells: wins in 10, **before → after** the v0.76 bot changes (same game; median win time in brackets). Last column: wins with the tuning that was **tried but not shipped** (owner, Nov 24: the finale is being redone in the boss pass first): guards in the three rooms at level 14 (named stay 15) and the candle wisp heal 8% → 5%; measured before the Bard's speed nerf.
 

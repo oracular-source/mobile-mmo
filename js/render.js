@@ -190,6 +190,7 @@ function render(){
     camY=sn(camY);}
   cx.setTransform(S,0,0,S,0,0);cx.imageSmoothingEnabled=false;cx.globalAlpha=1;cx.globalCompositeOperation='source-over';
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
+  if(shakeT>0){const k=shakeA*Math.min(1,shakeT/0.25);camX+=Math.round((Math.random()*2-1)*k);camY+=Math.round((Math.random()*2-1)*k)} // the Toll (v0.79)
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
   // Past the map edges the ground carries on as a mirror of the edge instead of black (owner, v0.55 top and bottom; v0.76
@@ -225,7 +226,14 @@ function render(){
     if(ch.open){f(x-7,y-12,14,14,AP.out);f(x-6,y-11,12,3,AP.woodHi);f(x-6,y-8,12,1,AP.woodDk);f(x-6,y-7,12,8,AP.wood);f(x-5,y-7,10,3,'#120d0a');f(x-6,y-3,12,1,AP.bell)} // lid up, empty inside
     else{f(x-7,y-8,14,10,AP.out);f(x-6,y-7,12,8,AP.wood);f(x-6,y-7,12,2,AP.woodHi);f(x-6,y-4,12,1,AP.bell);f(x-1,y-5,2,3,AP.bellHi)}});
   // Dungeon 1 (v0.63): the slab over the stairs until you touch the altar; Grasp of the Deep's hands; the Toll's ring of sound.
-  if(CHA)CHA.seals.forEach(sl=>{if(sl.open)return;const x=sl.x0*T,y=sl.y0*T,w=(sl.x1-sl.x0+1)*T,f=(X,Y,ww,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,ww,h)};
+  if(CHA)CHA.seals.forEach(sl=>{const x=sl.x0*T,y=sl.y0*T,w=(sl.x1-sl.x0+1)*T,f=(X,Y,ww,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,ww,h)};
+    // v0.79: a seal held by a named that isn't the Prior (the Bellringer's foundry) is an iron gate: rusty bars, two crossbars
+    // with rivets, spiked feet in the floor; it rises slowly into the arch when he's driven off.
+    if(sl.named&&sl.by!=='drowned_prior'){const p=sl.open?1-Math.min(1,(time-(sl.openT||0))/1.4):1;if(p<=0)return;
+      const H=22,top=sl.y1*T-6,h=Math.round(H*p);f(x-1,top-2,w+2,3,'#0b0a0f');f(x,top-1,w,1,'#4a4652');
+      for(let bx=x+1;bx<x+w-1;bx+=4){f(bx,top,3,h,'#0b0a0f');f(bx+1,top,1,h,'#6a5a4e');if(h>=H-1)f(bx+1,top+h,1,2,'#0b0a0f')}
+      [5,14].forEach(cy=>{if(cy<h){f(x,top+cy,w,3,'#0b0a0f');f(x,top+cy+1,w,1,'#7a6458');for(let bx=x+2;bx<x+w-1;bx+=4)f(bx,top+cy+1,1,1,'#a08870')}});return}
+    if(sl.open)return;
     // v0.66: a seal a named holds (the Drowned Prior's stairs) is dark flood water over the steps, a slow ripple on it, until he dies.
     if(sl.named){const hh=(sl.y1-sl.y0+1)*T;f(x,y,w,hh,AP.flood[1]);f(x,y,w,1,AP.floodDk);for(let i=0;i<6;i++){const rx=x+((i*23+Math.floor(time*6))%(w-4)),ry=y+3+((i*11)%(hh-6));f(rx,ry,4,1,AP.floodHi)}
       f(x+4,y+hh-6,3,1,'#4a4652');f(x+w-9,y+hh-9,3,1,'#4a4652');return} // the top edge of a step just showing under the water
@@ -240,13 +248,13 @@ function render(){
     [5,12].forEach(cy=>{if(cy<h){f(x,top+cy,w,3,'#0b0a0f');f(x,top+cy+1,w,1,'#6e6a72');for(let bx=x+2;bx<x+w-1;bx+=4)f(bx,top+cy+1,1,1,'#8a8690')}}); // crossbars with rivets
   });
   // Grasp of the Deep (v0.66): rings of ripples spreading on the spot under you while the Prior casts; step off them.
-  mobs.forEach(m=>{const c=m.casting;if(!c||!c.spot||m.dead)return;const p=c.t/c.dur,sx=Math.round(c.spot.x),sy=Math.round(c.spot.y);
+  mobs.forEach(m=>{const c=m.casting;if(!c||!c.spots||m.dead)return;const p=c.t/c.dur;c.spots.forEach(s=>{const sx=Math.round(s.x),sy=Math.round(s.y);
     for(let k=0;k<3;k++){const q=((time*1.4+k/3)%1),r=GRASP.r*(0.25+0.75*q);lx.globalAlpha=(1-q)*(0.5+0.5*p);lx.fillStyle=k%2?'#9fd8c0':'#d8f0e8';
       for(let a=0;a<40;a++){if(a%5===0)continue;const an=a/40*6.283;lx.fillRect(Math.round(sx+Math.cos(an)*r),Math.round(sy+Math.sin(an)*r*0.6),2,1)}}
-    lx.globalAlpha=0.15+0.35*p;lx.fillStyle=p>0.75&&Math.floor(time*12)%2?'#d8f0e8':'#33505c';lx.beginPath();lx.ellipse(sx,sy,GRASP.r,GRASP.r*0.6,0,0,7);lx.fill();lx.globalAlpha=1});
+    lx.globalAlpha=0.15+0.35*p;lx.fillStyle=p>0.75&&Math.floor(time*12)%2?'#d8f0e8':'#33505c';lx.beginPath();lx.ellipse(sx,sy,GRASP.r,GRASP.r*0.6,0,0,7);lx.fill();lx.globalAlpha=1})});
   hands.forEach(h=>{const p=Math.min(1,h.t/0.35),fade=h.on?1:Math.max(0,1-(h.t-0.9)/0.5),x=Math.round(h.x),y=Math.round(h.y),up=Math.round(6*p),f=(X,Y,w,hh,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,hh)};
     lx.globalAlpha=fade;f(x-3,y-up,2,up+1,'#b8c8c0');f(x+1,y-up,2,up+1,'#9fb4ac');f(x-4,y-up-2,1,2,'#cfdcd4');f(x-2,y-up-3,1,3,'#cfdcd4');f(x,y-up-3,1,3,'#cfdcd4');f(x+2,y-up-2,1,2,'#cfdcd4');f(x-4,y,9,1,'#33505c');lx.globalAlpha=1});
-  rings.forEach(r=>{const p=r.t/r.life,rad=r.r*(0.4+0.6*p);lx.globalAlpha=1-p;lx.fillStyle='#ffd27a';for(let a=0;a<48;a++){const an=a/48*6.283;lx.fillRect(Math.round(r.x+Math.cos(an)*rad),Math.round(r.y+Math.sin(an)*rad*0.6),2,1)}lx.globalAlpha=1});
+  rings.forEach(r=>{if(r.t<0)return;const p=r.t/r.life,rad=r.r*(0.4+0.6*p);lx.globalAlpha=1-p;lx.fillStyle=r.col||'#ffd27a';for(let a=0;a<48;a++){const an=a/48*6.283;lx.fillRect(Math.round(r.x+Math.cos(an)*rad),Math.round(r.y+Math.sin(an)*rad*0.6),2,1)}lx.globalAlpha=1});
   const instNow=zoneId==='dun'||(CHA&&CHA.instance);
   if(instNow&&run.portal&&CHA){const p=run.portal,x=Math.round(p.x),y=Math.round(p.y);for(let a=0;a<32;a++){if((a+Math.floor(time*6))%4===0)continue;const an=a/32*6.283;lx.fillStyle=a%2?'#ffd27a':'#fff0c8';lx.fillRect(Math.round(x+Math.cos(an)*9),Math.round(y+Math.sin(an)*4),1,1)}} // the way out
   if(instNow&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}

@@ -191,7 +191,7 @@ Owner after playing the monastery: the Bellringer's Toll is quiet and bland, the
 - **Toll, graded by distance:** close in you're **stunned, longer the closer** (about 3 s right next to him down to 1 s); further out you're **slowed, fading with distance** to the edge of the room. Make it loud: a sound wave you can see rolling out, screen shake, dust from the ceiling. The 1.5 s wind-up stays readable so melee can step back.
 - **Grasp, harder to walk off:** more hands, some landing where you're heading; his two dead climbing out of the water now and then; in the finale the water rises over the fight so dry ground shrinks, and a drag toward him you fight against.
 
-**Claude's proposed details (owner to OK before building):**
+**Claude's proposed details (owner OK'd all six, Nov 24; built in v0.79):**
 1. **Turn order in the finale:** one shared clock: Toll, about 4 s, Grasp, about 4 s, Toll... Each telegraph keeps its bar. The bell's ring knocks the hands back down for a moment (so standing at mid range, slowed but not stunned, is the safe spot to fight from).
 2. **Finale strength:** each returns at **half his solo health** with about 75% damage (they arrive already hurt, which fits the story).
 3. **Malrec's room:** the flood rises in from the doorway when the two appear; a ring of dry stone round the middle shrinks over about 60 s, then holds (never zero ground).

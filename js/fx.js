@@ -43,6 +43,8 @@ const cap=s=>s.charAt(0).toUpperCase()+s.slice(1);
 /* ---------- Helpers ---------- */
 const dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
 function con(lv){const d=lv-player.lvl;return d<=-2?'#5fbf5f':d===-1?'#5fa8ff':d===0?'#f2f2f2':d===1?'#ffd23f':'#ff4d4d'}
+// Screen shake (v0.79, the Toll): looks only (Math.random in render), never touches a game roll.
+let shakeT=0,shakeA=0;function shake(a,d){if(logMute)return;if(shakeT<=0||a>shakeA)shakeA=a;shakeT=Math.max(shakeT,d)}
 let slowArea=null; // the current area if it has slow ground (set by enterZone), else null
 const WADE=0.6;    // speed in flood water
 function moveToward(e,tx,ty,spd,dt){

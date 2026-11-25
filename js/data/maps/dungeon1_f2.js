@@ -55,7 +55,8 @@ MAPS.dungeon1_f2 = {
   things: `
 # Floor 2: the Bellringer (+2), 2 packs (4 mobs + 2 big wisps), then Malrec and his two deacons.
 # 4. BELL FOUNDRY (named, 15): the cult's brute swinging the broken clapper, a half-cast bell in its mould, two
-# cultists with him (one pull). Toll: 1.5 s wind-up, then a ring that stuns anyone in reach for 2 s: step back.
+# cultists with him (one pull). Toll (v0.79): 1.5 s wind-up, then stunned close in (longer the closer), slowed further out.
+# At half health he wails and vanishes; the gate north opens.
 # He stands at the far end, so you get a breather off the stairs. His chest won't open while he stands.
 exit up 16 42 to=dungeon1 at=down lit
 obj brazier 13 38
@@ -66,6 +67,8 @@ named bellringer 15 17 33 group=bell
 spawn cult_zealot 15 14 34 group=bell
 spawn cult_ashcaller 15 20 34 group=bell
 chest 22 32
+# v0.79 (boss pass): the passage north stays shut by an iron gate until the Bellringer is driven off (wails and vanishes at half health)
+seal 16 29 17 30 bellringer
 # 5. WISP ROOM: the old ritual hall round its ember pit. Two packs, one each side, each a summoner with its big wisp
 # (already summoned, hovering with the pack). Killing the summoner does NOT kill its wisp.
 obj censer 13 21
@@ -96,6 +99,9 @@ obj candle 21 9
 named malrec 15 16 3 group=sanctum
 spawn cult_deacon 15 13 4 group=sanctum
 spawn cult_deacon 15 20 4 group=sanctum
+# v0.79 (boss pass): when Malrec dies the Bellringer and the Drowned Prior come back (the finale); the sanctum floods
+# from the door, all but a ring of dry stone 3 tiles round the middle
+finale 8 1 25 12 ring=3
 # something alive
 critter bat 16.5 36 2
 critter moth 6.3 17 1

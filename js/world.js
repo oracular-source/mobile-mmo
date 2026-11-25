@@ -164,8 +164,9 @@ function enterZone(id,from,at){
   // An instance (v0.63, Dungeon 1): a fresh run every time you walk in. The stairs are sealed again, its chests are full,
   // and the run clock and tally start (shown on the way out).
   // v0.66: only a fresh run resets (the floors were just rebuilt above); run.home = the floor you came in by.
+  if(fresh)finaleReset();else if(finale.on)finaleAbort(); // v0.79: a new run starts clean; leaving the floor mid-finale puts it back to wait
   if(A&&A.instance&&fresh){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.atPortal=false;run.wakes=0;run.home=A.id}
-  player.held=0;player.stunT=0;player.mireT=0;
+  player.held=0;player.stunT=0;player.mireT=0;player.tollT=0;
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
   if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null;}
@@ -235,7 +236,7 @@ function checkPortals(){
 // An attack slow on it slows the casting too (cast bar fills slower, longer wait between bolts).
 const BOLT={first:3,every:5,cast:2,range:110}; // first cast after 3s, then 5s between casts: one bolt about every 7s
 // A stun, fear, sleep, Evade or Feign Death (or the fight ending) breaks off a boss's cast.
-function interruptCast(m){if(!m.casting)return;const c=m.casting;m.casting=null;m.bolt=m.def.cast?m.def.cast.every:BOLT.every;if(c.heal)m.healCd=m.def.heal.every*0.6;if(c.grasp)m.graspCd=GRASP.every*0.6;if(c.toll)m.tollCd=TOLL.every*0.6;floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
+function interruptCast(m){if(!m.casting)return;const c=m.casting;m.casting=null;m.bolt=m.def.cast?m.def.cast.every:BOLT.every;if(c.heal)m.healCd=m.def.heal.every*0.6;if(c.grasp)m.graspCd=GRASP.every*0.6;if(c.toll)m.tollCd=TOLL.every*0.6;if(m.finale&&(c.toll||c.grasp))finaleNext(c.toll?'toll':'grasp');floatText(m.x,m.y-34,'Interrupted!','#9fb8e0');log(cap(m.def.name)+"'s spell is interrupted!",'#9fb8e0')}
 function bossThink(m,dt){
   // The Enchanter's Slow Mind slows its spellcasting too: longer casts, longer gaps. The Shaman's Drowsy only slows attacks (v0.24).
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
@@ -383,28 +384,54 @@ function healThink(m,dt){const h=m.def.heal;
   log(cap(m.def.name)+' begins casting '+h.name+' on '+hurt.def.name+'! Stun or fear it to stop the heal.',h.col);return true}
 // Player crowd control from mobs: held = can't move (you can still cast); stunT = can't move or act.
 // Grasp of the Deep (the Drowned Prior; reworked v0.66, owner Nov 21: "slow you down hard", not a hold): ripples spread on
-// a spot under you (a boss bar mid-screen, 1.5 s), then pale hands rise there: still on the spot = slowed hard for a few
-// seconds and a light hit. Forgiving on purpose: it teaches "watch the water" before Malrec asks more. Stun or fear stops it.
-const GRASP={first:5,every:9,dur:1.5,r:15,slow:3.5,x:0.6},MIRE_SLOW=0.35,TOLL={first:4,every:10,dur:1.5,r:30,stun:2,x:1.2};
+// spots round you (a boss bar mid-screen, 1.5 s), then pale hands rise there: still on one = slowed hard for a few seconds
+// and a light hit. Stun or fear stops it.
+// Boss pass (v0.79, owner Nov 24: "too easy to walk around"): three spots, not one: under you, one where you're heading
+// (so walking straight on doesn't save you) and one beside you. And every so often one of his drowned dead climbs out of
+// the water to join him (two at most).
+const GRASP={first:5,every:9,dur:1.5,r:15,slow:3.5,x:0.6,ahead:1.0,side:26},MIRE_SLOW=0.35;
+const RISEN={first:12,every:18,max:2,total:2,lv:14}; // total: per fight (v0.79: endless risers stalled a kiting Bard forever)
+// Toll (the Bellringer). Boss pass (v0.79, owner Nov 24: "quiet and bland"): graded by distance. Close in you're stunned,
+// longer the closer (stunMax right next to him down to stunMin at stunR); further out you're slowed, fading with distance
+// to slowR (about the size of his foundry). A sound wave rolls out, the screen shakes and dust falls from the ceiling.
+const TOLL={first:4,every:10,dur:1.5,stunR:36,stunMax:3,stunMin:1,slowR:150,slow:3,slowMax:0.5,x:1.2};
 const inWater=e=>{const A=slowArea;if(!A)return false;const x=Math.floor(e.x/T),y=Math.floor(e.y/T);return x>=0&&y>=0&&x<A.w&&y<A.h&&!!A.slow[y*A.w+x]};
+const finX=m=>m.finale?FINALE.dmg:1; // the finale's returning bosses hit softer
+const onSpot=(s)=>Math.hypot((player.x-s.x)/GRASP.r,(player.y-s.y)/(GRASP.r*0.6))<=1;
 function graspThink(m,dt){
-  if(m.casting&&m.casting.grasp){const c=m.casting;c.t+=dt;if(c.t<c.dur)return true;m.casting=null;m.graspCd=GRASP.every;
-    for(let k=0;k<5;k++){const an=k*1.257+rr(-0.3,0.3);hands.push({x:c.spot.x+Math.cos(an)*GRASP.r*0.7,y:c.spot.y+Math.sin(an)*GRASP.r*0.42,t:0,life:1.4})}
-    if(Math.hypot((player.x-c.spot.x)/GRASP.r,(player.y-c.spot.y)/(GRASP.r*0.6))<=1){player.mireT=GRASP.slow;hands.push({x:player.x,y:player.y,t:0,life:GRASP.slow,on:1});
-      floatText(player.x,player.y-28,'SLOWED','#9fd8c0',true);log('Pale hands rise out of the water and drag at your legs!','#9fd8c0');mobSpellHit(m,(8+2*m.lv)*GRASP.x,'Grasp of the Deep','#9fd8c0')}
-    else log('Pale hands rise where you stood and close on nothing.','#9fb8e0');
+  if(m.def.grasp&&m.state==='chase')riseDead(m,dt);
+  if(m.casting&&m.casting.grasp){const c=m.casting;c.t+=dt;if(c.t<c.dur)return true;m.casting=null;m.graspCd=GRASP.every;if(m.finale)finaleNext('grasp');
+    let caught=false;
+    c.spots.forEach(s=>{for(let k=0;k<5;k++){const an=k*1.257+rr(-0.3,0.3);hands.push({x:s.x+Math.cos(an)*GRASP.r*0.7,y:s.y+Math.sin(an)*GRASP.r*0.42,t:0,life:1.4})}
+      if(!caught&&onSpot(s))caught=true});
+    if(caught){player.mireT=GRASP.slow;hands.push({x:player.x,y:player.y,t:0,life:GRASP.slow,on:1});
+      floatText(player.x,player.y-28,'SLOWED','#9fd8c0',true);log('Pale hands rise out of the water and drag at your legs!','#9fd8c0');mobSpellHit(m,(8+2*m.lv)*GRASP.x*finX(m),'Grasp of the Deep','#9fd8c0')}
+    else log('Pale hands rise all round you and close on nothing.','#9fb8e0');
     return false}
   if(m.casting)return false;
-  m.graspCd=(m.graspCd===undefined?GRASP.first:m.graspCd)-dt;
-  if(m.graspCd<=0&&dist(m,player)<160){m.casting={name:'Grasp of the Deep',t:0,dur:GRASP.dur,grasp:1,boss:1,spot:{x:player.x,y:player.y}};floatText(m.x,m.y-34,'Grasp of the Deep!','#9fd8c0');
-    log('The water ripples under you! Step off the ripples.','#9fd8c0');return true}
-  return false}
+  if(m.finale){if(!finaleTurn('grasp')||dist(m,player)>200)return false}
+  else{m.graspCd=(m.graspCd===undefined?GRASP.first:m.graspCd)-dt;if(m.graspCd>0||dist(m,player)>=160)return false}
+  // Where you're heading: the way you face, about a second of walking on. A spot inside a wall slides back toward you.
+  const ah=PSPEED*GRASP.ahead,fx=player.fx||0,fy=player.fy||0,side=rng()<0.5?-1:1,spots=[{x:player.x,y:player.y}];
+  const fit=(x,y)=>{for(let k=0;k<4&&blocked(x,y);k++){x=(x+player.x)/2;y=(y+player.y)/2}return{x:x,y:y}};
+  if(fx||fy)spots.push(fit(player.x+fx*ah,player.y+fy*ah));
+  spots.push(fit(player.x+(fy?-fy:1)*side*GRASP.side,player.y+(fx||0)*side*GRASP.side*0.6));
+  m.casting={name:'Grasp of the Deep',t:0,dur:GRASP.dur,grasp:1,boss:1,spots:spots};floatText(m.x,m.y-34,'Grasp of the Deep!','#9fd8c0');
+  log('The water ripples all round you! Find still water.','#9fd8c0');return true}
+// His drowned dead (v0.79): now and then, while he fights in his water, one claws up out of it beside him (two up at most).
+// Two per fight at most (they reset if he walks home). They give no loot and never come back once killed.
+function riseDead(m,dt){if(!inWater(m))return;m.riseCd=(m.riseCd===undefined?RISEN.first:m.riseCd)-dt;if(m.riseCd>0)return;m.riseCd=RISEN.every;
+  m.risen=(m.risen||[]).filter(o=>!o.dead);if(m.risen.length>=RISEN.max||(m.riseN||0)>=RISEN.total)return;m.riseN=(m.riseN||0)+1;
+  let x=m.x,y=m.y;for(let k=0;k<8;k++){const an=rng()*6.283,qx=m.x+Math.cos(an)*rr(18,34),qy=m.y+Math.sin(an)*rr(12,22);if(!blocked(qx,qy)){x=qx;y=qy;break}}
+  const d=spawn({type:'dead',x:x,y:y,timer:0,mob:null,group:m.sp.group,lv:[RISEN.lv,RISEN.lv],noRespawn:true});d.noLoot=1;d.state='chase';d.threat.p=1;m.risen.push(d);
+  burst(x,y-4,'#9fd8c0',12,true);floatText(x,y-20,'rises','#9fd8c0');log('The water churns, and one of the drowned dead claws its way up!','#9fd8c0')}
 // A seal that opens when a named dies (v0.66, Dungeon 1: the Drowned Prior's death drains the flood and uncovers the stairs down).
+// v0.79: the Bellringer holds the way on from his foundry the same way (an iron gate over the passage north).
 function namedSeal(m){const A=curArea();if(!A)return;A.seals.forEach(sl=>{if(sl.open||!sl.named||sl.named.sp!==m.sp)return;
-  sl.open=true;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;pathReset();
-  const drained=drainFlood(A),cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+12;burst(cx,cy,'#9fd8c0',18,true);floatText(cx,cy-16,'The way down','#f0c890',true);
-  log(drained?cap(m.def.name)+' sinks, and the flood drains away through the cracks with a long gurgle. At the north wall, steps rise out of the silt.':'Behind you, stone grinds: a way down has opened.','#f0c890');
-  banner('The flood drains','Steps lead down at the north wall','#9fd8c0')})}
+  sl.open=true;sl.openT=time;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=0;pathReset();
+  const drained=drainFlood(A),cx=(sl.x0+sl.x1+1)*T/2,cy=sl.y0*T+12;burst(cx,cy,drained?'#9fd8c0':'#8a8690',18,true);floatText(cx,cy-16,'The way on','#f0c890',true);
+  if(drained){log('The flood drains away through the cracks with a long gurgle. At the north wall, steps rise out of the silt.','#f0c890');banner('The flood drains','Steps lead down at the north wall','#9fd8c0')}
+  else{log('With a groan of iron, the gate at the north end of the foundry swings open.','#f0c890');banner('The gate opens','The way north is clear','#f0c890')}})}
 // The flood goes: its water becomes wet stone (tile Z), nothing wades any more, and the floor is painted again.
 function drainFlood(A){if(!A.slow||A.slow.indexOf(1)<0)return false;
   A.rows=A.rows.map(r=>r.replace(/z/g,'Z'));A.slow.fill(0);if(slowArea===A)slowArea=null;
@@ -438,7 +465,7 @@ function checkLocks(A){if(!A.locks)return;A.locks.forEach(L=>{if(L.done)return;
 function riseStep(A,L){const t=time-L.t0;if(time-L.painted<RISE.step&&L.rise.length&&L.rise[L.rise.length-1].at>t)return;
   let n=0;while(L.rise.length&&L.rise[0].at<=t){const q=L.rise.shift();q.c=A.rows[q.y][q.x];A.rows[q.y]=A.rows[q.y].slice(0,q.x)+'z'+A.rows[q.y].slice(q.x+1);A.slow[q.y*A.w+q.x]=1;L.risen.push(q);n++}
   L.painted=time;if(n)repaintArea(A);
-  if(!L.rise.length){L.rise=null;log('The water stops rising: knee-deep from wall to wall.','#9fd8c0')}}
+  if(!L.rise.length){L.rise=null;log(L.doneMsg||'The water stops rising: knee-deep from wall to wall.','#9fd8c0')}}
 // You died in a locked room: the water sinks back to the middle pool and the portcullis lifts, ready for the next try.
 function resetLocks(){const A=curArea();if(!A||!A.locks)return;A.locks.forEach(L=>{if(!L.shut||L.done)return;
   L.shut=false;L.rise=null;setDoor(A,L,0);(L.risen||[]).forEach(q=>{A.rows[q.y]=A.rows[q.y].slice(0,q.x)+q.c+A.rows[q.y].slice(q.x+1);A.slow[q.y*A.w+q.x]=0});L.risen=[];repaintArea(A)})}
@@ -448,19 +475,28 @@ const GBURN={first:4,every:8,dur:1.6,r:34,x:1.1};
 function burnThink(m,dt){if(m.casting)return;m.burnCd=(m.burnCd===undefined?GBURN.first:m.burnCd)-dt;if(m.burnCd>0||dist(m,player)>GBURN.r+30)return;m.burnCd=GBURN.every;
   hazards.push({x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'});floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
   log(cap(m.def.name)+' flares up! Get out of the ring of fire.','#ff8a3c')}
-// Toll (the Bellringer): he heaves the bell's clapper up for 1.5 s (a bar over his head), then slams it down: a ring of sound
-// stuns anyone within reach for 2 s. Counter: step back out of the ring (or stun him first).
+// Toll: he heaves the bell's clapper up for 1.5 s (a bar over his head), then slams it down. Counter: step back to mid range
+// (slowed, not stunned), or stun him first. In the finale the ring also knocks Grasp's hands back down.
 function tollThink(m,dt){
-  if(m.casting&&m.casting.toll){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.tollCd=TOLL.every;
-    rings.push({x:m.x,y:m.y,r:TOLL.r,t:0,life:0.6});
-    if(dist(m,player)<=TOLL.r){player.stunT=TOLL.stun;player.cast=null;floatText(player.x,player.y-28,'STUNNED','#ffd27a',true);log('The toll rings through your skull! You are stunned.','#ffd27a');mobSpellHit(m,(m.def.dmg+m.def.dmgl*m.lv)*TOLL.x,'Toll','#ffd27a')}
-    else log('The toll booms out. You were out of reach.','#9fb8e0');
-    return false}
+  if(m.casting&&m.casting.toll){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.tollCd=TOLL.every;if(m.finale)finaleNext('toll');
+    tollRing(m);return false}
   if(m.casting)return false;
-  m.tollCd=(m.tollCd===undefined?TOLL.first:m.tollCd)-dt;
-  if(m.tollCd<=0&&dist(m,player)<TOLL.r*0.9){m.casting={name:'Toll',t:0,dur:TOLL.dur,toll:1};floatText(m.x,m.y-34,'heaves the clapper','#ffd27a');
-    log(cap(m.def.name)+' heaves the clapper overhead! Step back!','#ffd27a');return true}
-  return false}
+  if(m.finale){if(!finaleTurn('toll')||dist(m,player)>TOLL.slowR)return false}
+  else{m.tollCd=(m.tollCd===undefined?TOLL.first:m.tollCd)-dt;if(m.tollCd>0||dist(m,player)>=TOLL.slowR*0.8)return false}
+  m.casting={name:'Toll',t:0,dur:TOLL.dur,toll:1,boss:1};floatText(m.x,m.y-34,'heaves the clapper','#ffd27a');
+  log(cap(m.def.name)+' heaves the clapper overhead! Get back!','#ffd27a');return true}
+function tollRing(m){const d=dist(m,player);
+  rings.push({x:m.x,y:m.y,r:TOLL.stunR,t:0,life:0.5},{x:m.x,y:m.y,r:TOLL.slowR,t:0,life:1.1,col:'#e8dcc0'},{x:m.x,y:m.y,r:TOLL.slowR*0.7,t:-0.15,life:1.1,col:'#c8b890'});
+  shake(3,0.45);burst(m.x,m.y-10,'#ffd27a',14,true);
+  for(let k=0;k<26;k++)parts.push({x:player.x+rr(-110,110),y:player.y+rr(-130,30),vx:rr(-3,3),vy:rr(30,60),t:0,life:rr(0.7,1.3),col:k%3?'#6e6a72':'#8a8690'}); // dust off the ceiling
+  // The bell's ring knocks the hands back down (finale: the safe spot is mid range, slowed but not stunned).
+  for(let i=hands.length-1;i>=0;i--)hands.splice(i,1);player.mireT=0;
+  if(player.dead)return;
+  if(d<=TOLL.stunR){const s=TOLL.stunMax-(TOLL.stunMax-TOLL.stunMin)*(d/TOLL.stunR);player.stunT=s;player.cast=null;
+    floatText(player.x,player.y-28,'STUNNED','#ffd27a',true);log('The toll rings through your skull! You are stunned ('+s.toFixed(1)+' s).','#ffd27a');mobSpellHit(m,(m.def.dmg+m.def.dmgl*m.lv)*TOLL.x*finX(m),'Toll','#ffd27a')}
+  else if(d<=TOLL.slowR){const f=1-(d-TOLL.stunR)/(TOLL.slowR-TOLL.stunR);player.tollX=1-TOLL.slowMax*f;player.tollT=TOLL.slow;
+    floatText(player.x,player.y-28,'SLOWED','#e8dcc0',true);log('The toll booms through the room and your legs go heavy.','#e8dcc0')}
+  else log('The toll booms out. You were far enough away.','#9fb8e0')}
 // Candle Wake (Brother Malrec): each time he loses a sixth of his health, a candle in the room flares and a candle wisp drifts
 // slowly toward him; one that reaches him heals him. Kill, snare or root the wisps (they never fight back).
 const WAKE={heal:0.08,reach:12};
@@ -478,6 +514,64 @@ function wispDrift(m,dt,spd){const L=m.lord;if(!L||L.dead){killQuiet(m);return}
     log('A candle wisp melts into '+L.def.name+', and he heals for '+n+'.','#ffd27a');killQuiet(m)}}
 // Gone without a kill (no XP, no loot, no log line).
 function killQuiet(m){m.dead=true;m.hp=0;m.sp.timer=Infinity;m.sp.mob=null;if(player.target===m)player.target=null}
+/* ---------- Dungeon 1 boss pass (v0.79, owner Nov 24): wail and vanish, then the finale ---------- */
+// The Drowned Prior and the Bellringer can't be skipped (each holds the way on), and neither dies in his own room: at half
+// health he wails and vanishes (the Prior sinks into his water, the Bellringer into the dark; a proper animation comes
+// later). That ends his fight: XP, his drop, the lock and seal open, his chest is free. When Brother Malrec dies, both come
+// back to avenge him, toned down (FINALE.hp of their solo health, FINALE.dmg of the damage), and they take turns on one
+// clock (Toll, a gap, Grasp, a gap...), never both winding up at once. The flood rises in from the doorway, and a ring of
+// dry stone round the middle of the sanctum shrinks over FINALE.rise seconds, then holds. Water drags you toward the Prior.
+// Malrec's chest and the way out come after the finale. Die in it: the water sinks back, the two go, and walking back
+// into the sanctum starts it again.
+const VANISH={at:0.5};
+const FINALE={hp:0.5,dmg:0.75,gap:4,first:2.5,pass:3,rise:60,ring:3,drag:10};
+const finale={on:false,done:false,armed:false,turn:'toll',cd:0,mobs:[],L:null,at:null,A:null}; // A = the floor it's on
+function finaleReset(){finale.on=false;finale.done=false;finale.armed=false;finale.mobs=[];finale.L=null;finale.at=null;finale.A=null}
+function vanishMob(m){const prior=!!m.def.grasp;m.casting=null;m.vanished=1;
+  for(let k=0;k<26;k++)parts.push({x:m.x+rr(-6,6),y:m.y+rr(-16,2),vx:rr(-8,8),vy:prior?rr(-4,14):rr(-22,-6),t:0,life:rr(0.6,1.4),col:prior?(k%2?'#9fd8c0':'#33505c'):(k%2?'#2a2630':'#5c5866')});
+  floatText(m.x,m.y-34,'WAIL!','#d8e0ff',true);shake(2,0.3);
+  log(prior?cap(m.def.name)+' lets out a drowned wail and sinks into the black water. He is not gone.':cap(m.def.name)+' howls, swings the clapper wide, and melts into the dark. You haven\'t seen the last of him.','#d8e0ff');
+  killMob(m,'vanish');const i=mobs.indexOf(m);if(i>=0)mobs.splice(i,1)}
+// One clock for the finale's two casts: true when it's this kind's turn (or the other one is down) and the gap is over.
+function finaleTurn(kind){if(finale.cd>0)return false;const other=finale.mobs.find(o=>o.def[kind==='toll'?'grasp':'toll']);
+  return finale.turn===kind||!other||other.dead}
+function finaleNext(kind){finale.turn=kind==='toll'?'grasp':'toll';finale.cd=FINALE.gap}
+function startFinale(x,y,lv){const A=curArea();finale.A=A;finale.on=true;finale.armed=false;finale.at={x:x,y:y,lv:lv};finale.turn='toll';finale.cd=FINALE.first;finale.mobs=[];
+  ['bellringer','prior'].forEach((t,i)=>{let bx=x+(i?44:-44),by=y+14;if(blocked(bx,by)){bx=x;by=y+14}
+    const b=spawn({type:t,x:bx,y:by,timer:0,mob:null,group:'finale',lv:[lv,lv],noRespawn:true});
+    b.finale=1;b.noLoot=1;b.maxhp=Math.round(b.maxhp*FINALE.hp);b.hp=b.maxhp;b.state='chase';b.threat.p=1;b.graspCd=99;b.tollCd=99;finale.mobs.push(b);
+    for(let k=0;k<18;k++)parts.push({x:bx+rr(-6,6),y:by+rr(-14,4),vx:rr(-6,6),vy:rr(-20,-4),t:0,life:rr(0.6,1.2),col:i?'#9fd8c0':'#5c5866'})});
+  shake(3,0.5);log('Brother Malrec falls, and the bell tolls by itself. Out of the dark and the water they come back for him: the Bellringer and the Drowned Prior!','#d8e0ff');
+  banner('They return','The Bellringer and the Drowned Prior','#9fd8c0');
+  // The flood (an instance only): every open floor tile in the sanctum floods except a ring round the middle. Farthest
+  // from the middle first, the doorway sooner, so water pours in at the door and the dry ground closes in, then holds.
+  const R=A&&A.finale;if(!R)return;const cx=(R.x0+R.x1+1)/2,cy=(R.y0+R.y1+1)/2,dx=(R.x0+R.x1+1)/2,dy=R.y1+1,list=[];
+  for(let ty=R.y0;ty<=R.y1;ty++)for(let tx=R.x0;tx<=R.x1;tx++){const d=Math.hypot(tx+0.5-cx,ty+0.5-cy);
+    if(d<=R.ring||A.map[ty][tx]!==0||A.slow[ty*A.w+tx]||!AREA_TILES[A.rows[ty][tx]].walk)continue;list.push({x:tx,y:ty,d:d,dd:Math.hypot(tx+0.5-dx,ty+0.5-dy)})}
+  const dmax=Math.max(R.ring+0.01,...list.map(q=>q.d)),ddmax=Math.max(0.01,...list.map(q=>q.dd));
+  list.forEach(q=>{q.at=Math.max(0,FINALE.rise*(1-(q.d-R.ring)/(dmax-R.ring))-FINALE.rise*0.3*(1-q.dd/ddmax))});list.sort((a,b)=>a.at-b.at);
+  finale.L={rise:list,risen:[],t0:time,painted:time,doneMsg:'The water stops rising. Only the ring of stone round the middle is still dry.'};
+  log('Black water pours in under the door!','#9fd8c0')}
+function finaleTick(dt){if(!finale.on&&!finale.armed)return;const A=curArea();
+  // Died in it: walking back into the sanctum starts it again.
+  if(finale.armed){const R=A&&A.finale;if(!R||player.dead)return;const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T);
+    if(tx>=R.x0&&tx<=R.x1&&ty>=R.y0&&ty<=R.y1-2)startFinale(finale.at.x,finale.at.y,finale.at.lv);return}
+  if(finale.L&&finale.L.rise&&A)riseStep(A,finale.L);
+  finale.cd-=dt;if(finale.cd<-FINALE.pass){finale.turn=finale.turn==='toll'?'grasp':'toll';finale.cd=0} // the one whose turn it is can't reach you: pass
+  const pr=finale.mobs.find(o=>o.def.grasp&&!o.dead);
+  if(pr&&!player.dead&&!(player.stunT>0)&&inWater(player)&&dist(pr,player)>20)moveToward(player,pr.x,pr.y,FINALE.drag,dt); // the water drags you toward him
+  if(finale.mobs.length&&finale.mobs.every(o=>o.dead))finishFinale()}
+function finishFinale(){finale.on=false;finale.done=true;const A=curArea();finaleDrain(finale.A);
+  log('The two of them break apart into water and ash, and the monastery falls quiet at last.','#ffd27a');
+  if(A&&A.instance&&finale.at)dungeonCleared(finale.at.x,finale.at.y)}
+// The flood sinks back (the finale won, or you died in it).
+function finaleDrain(A){const L=finale.L;if(!L||!A)return;L.rise=null;(L.risen||[]).forEach(q=>{A.rows[q.y]=A.rows[q.y].slice(0,q.x)+q.c+A.rows[q.y].slice(q.x+1);A.slow[q.y*A.w+q.x]=0});L.risen=[];finale.L=null;repaintArea(A)}
+// You died, or left the floor, mid-finale: the two go, the water goes, and it waits for you in the sanctum.
+function finaleAbort(){if(!finale.on)return;finale.mobs.forEach(o=>{if(!o.dead)killQuiet(o);const i=mobs.indexOf(o);if(i>=0)mobs.splice(i,1)});
+  finale.mobs=[];finaleDrain(finale.A);finale.on=false;finale.armed=true}
+// The end of the dungeon: Malrec's chest where he fell and the way out behind it (moved here from killMob in v0.79).
+function dungeonCleared(x,y){const A=curArea();floatText(player.x,player.y-40,A.name+' cleared!','#ffd27a',true);log('A chest and a way out appear where Brother Malrec fell.','#ffd27a');
+  run.chest={x:x,y:y+14,open:false};run.portal={x:x,y:y-12};banner(A.name+' cleared','in '+Math.floor((time-run.t0)/60)+':'+String(Math.round(time-run.t0)%60).padStart(2,'0'))}
 const hands=[],rings=[]; // Grasp of the Deep's hands and the Toll's ring of sound (drawn in render.js)
 
 /* ---------- Named rares (v0.32) ---------- */

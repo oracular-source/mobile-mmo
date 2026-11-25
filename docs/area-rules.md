@@ -78,6 +78,13 @@ Every built area gets a pass with this list, and every new area (the Ruined Chap
 ## Every look decision gets saved here (owner, Nov 20)
 Whenever the owner makes a call on how things should look or feel (in any chat), write it into this file in the section it fits, with the date, in the same push. This file is how every chat keeps the world consistent; the board only tracks the work. **Also save the recipe (owner, Nov 20):** when a visual change ships, add a short "how it's drawn" line here (like the water and ground recipes above), so every new location is built the same way from day one. Each reply that changes a visual says which rule it saved. This is the best-practice file for every new location.
 
+## Boss moments: how they're drawn (v0.79, Dungeon 1 boss pass)
+- **A named that holds the way on** shows it: the Prior's stairs sit under dark flood water; the Bellringer's passage has an **iron gate** (rusty bars 4 px apart, two riveted crossbars, spiked feet in the floor, a dark slot in the arch above). It rises into the arch over about 1.4 s when he's driven off, the same way the Prior's portcullis lifts.
+- **A big ring of sound** (the Toll): a small gold ring for the stun reach, then two pale rings rolling out to the slow reach, one a beat behind the other; a short screen shake (about 3 px, under half a second) and grey dust falling from the ceiling across the screen. Shake is looks only and never touches a game roll.
+- **Wail and vanish** (placeholder until the animation is drafted): a burst of particles where he stood, cold teal and dark blue for the Prior (sinking, spreading low), dark grey smoke rising for the Bellringer, with a pale **WAIL!** over his head. The sprite goes at once.
+- **Grasp's spots**: each spot gets its own ripple rings and dark pool; hands rise on every spot, so where the safe water is reads at a glance.
+- **Finale flood**: water pours in at the sanctum door first and the dry floor shrinks to a ring round the middle, never to nothing (repainted in steps, like the Prior's room).
+
 ## Characters and monsters: size (owner, Nov 21)
 - **Player characters are 15 × 18 on screen (final).** How it's drawn: each class is authored at 20 × 24 in `RAGS` (`js/data/sprites.js`) and the renderer drops every 4th row and column (`js/render.js`) to show it at 15 × 18. New class looks are drawn the same way.
 - Humanoid monsters and NPCs are sized against that 15 × 18; undead (skeletons, the Skeleton King, zombies) get redrawn bigger than today in the character design pass. The rats, Old Gnawbone and the chapel placeholders are the bar to match.

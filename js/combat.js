@@ -74,7 +74,8 @@ function hitMob(m,dmg,kind,label,src){
   if(m.def.shell&&kind==='direct'&&!m.shellHint){m.shellHint=1;log('Your hit glances off '+m.def.name+"'s shell. Damage over time gets through.",'#c8b89a')}
   if(kind==='direct')m.lost=0; // a direct hit snaps an Evaded mob out of it (DoT ticks don't)
   if(kind==='direct'&&m.root>0&&rng()<0.25){m.root=0;log('Your Rootgrip on '+m.def.name+' breaks!','#ffb37a')}
-  if(m.hp<=0)killMob(m);
+  if(m.def.vanish&&!m.finale&&m.hp<=m.maxhp*VANISH.at)vanishMob(m); // v0.79: at half health he wails and vanishes
+  else if(m.hp<=0)killMob(m);
 }
 // XP for a kill (v0.34.1): the mob's level sets the base (xpEven), its toughness scales it, mobs above you pay more and
 // below you less, and named / rares pay 3x, bosses 6x. Shared with the Zone 1 pace sim (sim.js runPace).
@@ -92,12 +93,12 @@ function xpFor(lv,def,L){const mult=Math.max(0.1,Math.min(1.6,1+0.2*(lv-L)));
 // XP needed for each level, worked out from KILLS_PER_LEVEL (mobs.js): that many even-level standard kills.
 const NEED=KILLS_PER_LEVEL.map((k,L)=>Math.round(k*xpEven(L)));
 const need=L=>NEED[L]||NEED[NEED.length-1];
-function killMob(m){
+function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the Prior, the Bellringer)
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
   burst(m.x,m.y-6,'#cfc8b2',10,false);
-  log('You have slain '+m.def.name+'!','#ffd27a');
+  if(how!=='vanish')log('You have slain '+m.def.name+'!','#ffd27a');
   forkOnDeath(m);
   let xp=xpFor(m.lv,m.def,player.lvl);
   const credit=m.pdmg>=m.odmg;
@@ -107,8 +108,10 @@ function killMob(m){
   const inst=zoneId==='dun'||(curArea()&&curArea().instance);
   if(inst&&!m.def.noxp){run.kills++;run.xp+=credit?xp:0;}
   // The end of an instanced dungeon (v0.63, Brother Malrec): his chest appears where he fell, and the way out behind it.
-  if(m.def.end&&inst){floatText(player.x,player.y-40,curArea().name+' cleared!','#ffd27a',true);log(m.def.name+' has fallen! A chest and a way out appear.','#ffd27a');
-    run.chest={x:m.hx,y:m.hy+14,open:false};run.portal={x:m.hx,y:m.hy-12};banner(curArea().name+' cleared','in '+Math.floor((time-run.t0)/60)+':'+String(Math.round(time-run.t0)%60).padStart(2,'0'))}
+  // The end of an instanced dungeon (v0.63, Brother Malrec). v0.79: his death starts the finale (both bosses come back,
+  // world.js startFinale); the chest and the way out come after it (dungeonCleared). The sim's arena runs the finale too.
+  if(m.def.end&&inst){if(finale.done)dungeonCleared(m.hx,m.hy);else startFinale(m.hx,m.hy,m.lv)}
+  else if(m.def.end&&zoneId==='arena'&&simState.busy&&!finale.done&&!finale.on)startFinale(m.x,m.y,m.lv);
   if(m.def.boss&&zoneId==='dun'){floatText(player.x,player.y-40,'Dungeon 1 cleared!','#ffd27a',true);log(m.def.name+' has been defeated! A chest and a way out appear.','#ffd27a');
     run.chest={x:m.hx,y:m.hy+6,open:false};run.portal={x:m.hx,y:m.hy-22};}
   if(credit){const k=kills[m.def.name]||{count:0,named:!!(m.def.named||m.def.rare),first:new Date().toISOString().slice(0,10)};k.count++;kills[m.def.name]=k;store.set('ashfen-kills',kills);
@@ -116,7 +119,7 @@ function killMob(m){
   // The crypt boss (v0.37): one banner with how long the visit took. Once per visit; the clock starts at the stairs.
   if(m.def.boss&&zoneId==='crypt'&&run.cryptT0!=null){const s=Math.round(time-run.cryptT0),mm=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');banner('Crypt cleared','in '+mm);log('Crypt cleared in '+mm+'.','#ffd27a');run.cryptT0=null}
   if(m.def.noxp){if(player.target===m)player.target=null;return}
-  if(credit){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
+  if(credit&&!m.noLoot){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<LEVEL_CAP&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
@@ -144,6 +147,7 @@ function hurtPlayer(m){
   if(player.buffs.bark>0)dmg*=0.75;
   if(player.buffs.stance>0)dmg*=player.stanceX||0.5; // Iron Stance (Warrior fork) blocks more
   if(m.chantT>0)dmg*=CHANT.x; // a chanter's song (v0.62)
+  if(m.finale)dmg*=FINALE.dmg; // the finale's returning bosses hit softer (v0.79)
   dmg*=weakX(m); // Sap Strength, Judgment, Rebuke, Withering Cloud (forks): the mob hits softer
   dmg=tankMods(dmg);
   if(grounds.some(g=>g.sanct&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r))dmg*=grounds.find(g=>g.sanct).sanct; // Sanctuary (Paladin fork)
@@ -185,7 +189,8 @@ function tankMods(dmg){
   return dmg;
 }
 function playerDie(m){
-  player.hp=0;player.dead=1;player.cast=null;player.tx=null;player.target=null;player.sit=false;
+  player.hp=0;player.dead=1;player.cast=null;player.tx=null;player.target=null;player.sit=false;player.tollT=0;
+  finaleAbort(); // v0.79: die in the finale and it waits for you in the sanctum
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
   resetLocks(); // v0.71: a locked, flooded room (the Drowned Prior's) drains back and opens for the next try
   const loss=Math.min(player.xp,Math.floor(need(player.lvl)*0.1));player.xp-=loss;save();

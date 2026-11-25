@@ -67,10 +67,12 @@ const B={
     // Prior's ripples) and back out of the Bellringer's Toll, unless a stun that reaches stops the caster first.
     const inEll=(cx,cy,r)=>Math.hypot((player.x-cx)/r,(player.y-cy)/(r*0.6))<=1;
     const hz=hazards.find(h=>h.t<h.dur&&inEll(h.x,h.y,h.r+3));if(hz){B.stepOut(hz.x,hz.y,hz.r+8);return true}
-    const tg=B.live().find(x=>x.casting&&((x.casting.toll&&dist(x,player)<TOLL.r+4)||(x.casting.grasp&&inEll(x.casting.spot.x,x.casting.spot.y,GRASP.r+3))));
+    // v0.79: the Toll only stuns close in (step back to mid range, slowed but free), and Grasp has three spots: get off the one you're on.
+    const gs=x=>x.casting.spots.find(s=>inEll(s.x,s.y,GRASP.r+3));
+    const tg=B.live().find(x=>x.casting&&((x.casting.toll&&dist(x,player)<TOLL.stunR+4)||(x.casting.grasp&&gs(x))));
     if(tg){const st=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='fear'&&(!a.undeadOnly||isUndead(tg)))||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&dist(player,tg)<=(a.radius||a.range||18));
       if(st&&B.use(st.id,tg))return true;
-      if(tg.casting.toll)B.stepOut(tg.x,tg.y,TOLL.r+8);else B.stepOut(tg.casting.spot.x,tg.casting.spot.y,GRASP.r+8,tg);return true}
+      if(tg.casting.toll)B.stepOut(tg.x,tg.y,TOLL.stunR+8);else{const g=gs(tg);B.stepOut(g.x,g.y,GRASP.r+8,tg)}return true}
     // A heal cast (Mend, Malrec's Rite) is worth a stun but never worth running from.
     const hc=B.live().find(x=>x.casting&&x.casting.heal);
     if(hc){const st=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&dist(player,hc)<=(a.radius||a.range||18));if(st&&B.use(st.id,hc))return true}
@@ -549,7 +551,7 @@ function resetPlayer(L){
 const hpLeft=()=>{const a=mobs.filter(m=>m.maxhp);return a.reduce((s,m)=>s+Math.max(0,m.dead?0:m.hp),0)/(a.reduce((s,m)=>s+m.maxhp,0)||1)};
 function simFight(f,L,seed,mode){
   seedRng(seed);
-  pet=null;pet2=null;enterZone('arena');resetPlayer(L);
+  pet=null;pet2=null;enterZone('arena');finaleReset();resetPlayer(L);
   // wade: the whole arena is knee-deep flood (v0.71: the Drowned Prior locks you in and floods his room wall to wall), so
   // you, your pet and the mobs all walk slowed, as in the game.
   if(f.wade)slowArea={w:ARENA.w,h:ARENA.h,slow:new Uint8Array(ARENA.w*ARENA.h).fill(1)};
@@ -558,7 +560,7 @@ function simFight(f,L,seed,mode){
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
   player.hp=maxHP(L);player.mp=maxMP(L);player.sit=false;
   arenaSpawn(f,L);
-  const maxT=f.mobs[0]==='boss1'||f.mobs[0]==='gnaw'||f.mobs.some(t=>TYPES[t].named)?420:240;
+  const maxT=f.mobs.indexOf('malrec')>=0?600:f.mobs[0]==='boss1'||f.mobs[0]==='gnaw'||f.mobs.some(t=>TYPES[t].named)?420:240;
   let t=0,dmg=0,mana=0,hadPet=!!pet,petDied=false;
   while(t<maxT){
     const hp0=player.hp,mp0=player.mp;
@@ -591,6 +593,7 @@ function simBegin(){
   return keep;
 }
 function simEnd(keep){
+  finaleReset();
   seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;pet2=null;
   const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;
   Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));

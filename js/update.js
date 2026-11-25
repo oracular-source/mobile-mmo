@@ -14,6 +14,7 @@ function update(dt){
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     // Held by Grasp of the Deep or stunned by the Toll (v0.63): no walking until it wears off.
     if(player.mireT>0)player.mireT=Math.max(0,player.mireT-dt); // the Drowned Prior's grip (v0.66): slowed, not held
+    if(player.tollT>0)player.tollT=Math.max(0,player.tollT-dt); // the Toll's slow further out (v0.79)
     if(player.held>0||player.stunT>0){player.held=Math.max(0,(player.held||0)-dt);player.stunT=Math.max(0,(player.stunT||0)-dt);mx=0;my=0;player.tx=null}
     const steering=mx!==0||my!==0;if(steering)player.lastMove={x:mx,y:my}; // which way you were heading when you took an exit
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
@@ -152,10 +153,10 @@ function update(dt){
       else{m.dir=v.x>m.x?1:-1;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.wakes=0}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.riseCd=undefined;m.riseN=0;m.wakes=0}
     }
   });
-  updateHazards(dt);
+  updateHazards(dt);finaleTick(dt);if(shakeT>0)shakeT=Math.max(0,shakeT-dt);
   for(let i=hands.length-1;i>=0;i--){hands[i].t+=dt;if(hands[i].t>hands[i].life)hands.splice(i,1)}
   for(let i=rings.length-1;i>=0;i--){rings[i].t+=dt;if(rings[i].t>rings[i].life)rings.splice(i,1)}
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}
