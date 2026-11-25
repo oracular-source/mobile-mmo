@@ -198,3 +198,46 @@ Owner after playing the monastery: the Bellringer's Toll is quiet and bland, the
 4. **Run time:** the finale adds about 2–3 min; if the sim goes past 15 min, trim a trash pack on floor 2 rather than shorten the bosses.
 5. **Rewards:** each solo fight's chest opens when he vanishes; Malrec's chest drops after the finale.
 6. **Then:** dungeon sim across all 14 classes (balance chat tunes), and the owner plays it.
+
+## Zone 1 map pass C1: props and small stories (draft 1, Nov 25)
+Owner (Nov 25): start the Zone 1 map pass with **props and small stories** while the character pass runs in its own chat. Buildings (C2), borders and ways out (C3) and the overall look (C4) come after. One area per push; the owner looks on the phone before the next.
+
+**What each area has today (count of placed props and critters):** crossroads 15 props + 22 critters; graveyard 17 + 16 (heart pass v0.49); chapel 39 + 14 (built to the checklist); Dungeon 1 31 + 10; **Wolfwood 14 props, 0 critters**; **rat tunnel 3 props (a cart, the bone pile, light shafts), 0 critters**; **crypt 11 braziers and the throne, nothing else, 0 critters**.
+
+**Rules for the pass:** every area ends with 2–3 small stories you can read without words, everyday props that say people (or rats) use this place, and something alive on every screen. References first for every new prop, squint-tested at game zoom; sized for 15 × 18 characters; nothing overlapping, no mob standing in a prop (`tools/mapcheck.py`). Props are looks only: no new rules, sims unchanged.
+
+### 1. Wolfwood (first: busiest stretch, levels 8–11, nothing alive yet)
+- **Story: the hunter who didn't come back.** On Greyfang's loop near his den: a torn green cloak snagged on a bush, a snapped bow, a hunting horn in the needles, wolf prints round it. Ties to the hunter's camp (his bedroll still laid out, a second cup by the fire nobody drank from).
+- **Story: the woodcutters gave up.** By the main road: two felled firs, a two-man saw stuck halfway through a log, a stack of logs gone grey with moss, a handcart with a broken handle.
+- **Story: the blight kills.** Round the dead giant tree: a deer skeleton half in the grey, pale toadstools in rings, a dead crow under the branches.
+- **Everyday:** fern clumps, mossy boulders, a fallen branch or two, a mushroom-covered stump, wolf tracks on the deer trail.
+- **Alive (the waiting Wolfwood touches):** crows high in the dead tree, an owl near the den, moths at the hunter's fire and lantern, rabbits at the south edge, fireflies along the road, **a deer** on the deer trail that bolts when you come close (new critter), gold **light shafts** through canopy gaps.
+
+### 2. Rat tunnel
+- **Story: the dead adventurer** (side burrow) made to read: a skeleton slumped against the wall in a torn cloak, his sword dropped beside him, a satchel spilling copper, a burnt-out candle stub.
+- **Story: the rat-catcher's way down.** At the sinkhole foot: a rope hanging from the light, a ladder broken at the bottom rung, a dropped lantern on its side, a wire cage trap with a rat in it.
+- **Story: the rats' larder** (warren): things stolen from the crossroads: a gnawed cheese wheel, torn grain sacks spilling, an apple-core heap.
+- **Gnawbone's hoard:** rats keep shiny things: buttons, a ring glint, coins and a nest of torn cloth by the bone pile.
+- **Everyday:** puddles where water drips (a drip falls every few seconds), roots, small dirt piles, bone bits (drawn as real bones: shafts with knobbed ends, not blobs).
+- **Alive:** drips and puddle rings, moths turning in the light shafts, a few small bats under the sinkhole, beetles crawling on the soil faces (new critter).
+
+### 3. Crypt (props only; the room and loop rework stays its own step, see the question below)
+- **Story: grave robbers got in first** (stair hall): a smashed coffin with a crowbar left in it, a dropped sack spilling candlesticks, a burnt-out torch.
+- **Story: the dead got up** (coffin hall): lids pushed off from inside and lying askew, one cracked in two, scratch marks on a lid, an empty coffin with only dust.
+- **Ossuary:** skulls on shelves in the wall niches, a stacked skull pile, a mourner's candle shrine with old wax.
+- **Throne room:** a long rotted feast table with tipped goblets, torn royal banners, crown shards glinting on the steps (the summon key's story), racked rusty weapons by the guards.
+- **Alive:** bats, cobwebs in the corners (one with a spider), drips, moths at the braziers.
+
+### 4. Crossroads (light touch: already has stories)
+- **Woodcutter's clearing** in the south-west trees: a stump with the axe still in it, split logs stacked, wood chips.
+- **Rowboat** half-sunk in the marsh reeds.
+- **Waiting at Town 1's gate:** barrels and crates by the gate (goods waiting to go in), a milestone at the crossing.
+- A ring of toadstools in one tree pocket.
+
+### 5. Graveyard, chapel, Dungeon 1 (check only)
+- Graveyard: a wheelbarrow at the open grave, a new headstone leaning against the shack waiting to be set.
+- Chapel and Dungeon 1: built to the checklist; just the phone check for anything missing.
+
+### Open questions for the owner
+1. Crypt: props only now (as above), or fold the full crypt rework into this step (more rooms, a loop, light and fog changing room to room)?
+2. Order: Wolfwood → rat tunnel → crypt → crossroads → check pass. Change anything?
