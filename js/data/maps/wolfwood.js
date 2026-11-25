@@ -63,9 +63,11 @@ obj tunnel_mouth 8 14
 obj wolf_den 26 4
 obj cot 53 26
 obj campfire 53 29
-obj drying_rack 56 28
-obj trap 50 31
-obj trap 56 30
+# Hunter's camp laid out symmetrically round the fire (v0.85, owner): cot at the back; tripod | lantern; woodpile | tanning frame; bedroll | camp kit; trap | trap.
+obj lantern 56 27
+obj drying_rack 57 28
+obj trap 51 31
+obj trap 56 31
 obj fallen_log 36 27
 obj fallen_log 18 33
 obj stump 43 37
@@ -91,9 +93,9 @@ obj foxfire 27 13
 obj foxfire 33 24
 obj foxfire 17 32
 obj bedroll 51 29
-obj camp_kit 55 29
-obj game_rack 50 28
-obj chop_block 48 25
+obj camp_kit 56 29
+obj game_rack 51 27
+obj chop_block 48 28
 obj toadstools 10 26
 # Life: crows on the dead giant's branches and one at the deer bones, an owl on the giant, moths at every light,
 # rabbits at the crossroads end, fireflies on the road and in the glade, deer in the glade, a wolf watching from the treeline (eyes).

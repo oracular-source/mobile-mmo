@@ -1289,7 +1289,8 @@ function drawObj(g,R,o){
     // The hunter's sleeping cot (v0.84; owner: "just do a sleeping cot instead of the hunter shelter"): a camp cot by the
     // fire, two side rails on crossed legs with a hide stretched between them, a grey wool blanket thrown over it and
     // turned back, a rolled fur for a pillow at the head, his boots under it.
-    const top=Y+2,bw=W-2,bh=8;shadow(X+2,Y+H-3,W-3,3);
+    // footprint is one tile so it can sit centred on the fire's line; the cot itself is drawn 28 px wide over it
+    const X=o.x*T-6,W=28;const top=Y+2,bw=W-2,bh=8;shadow(X+2,Y+H-3,W-3,3);
     [[X+3],[X+W-6]].forEach(([lx2])=>{treeLine(R,lx2,top+bh,lx2+3,Y+H-2,1,AP.out);treeLine(R,lx2+3,top+bh,lx2,Y+H-2,1,AP.out);treeLine(R,lx2+1,top+bh,lx2+3,Y+H-3,1,AP.woodHi)}); // crossed legs
     R(X,top-1,bw+2,bh+3,AP.out); // outline
     R(X+1,top,bw,bh,'#8a6a48');R(X+1,top,bw,1,'#a8845a'); // stretched hide
