@@ -85,6 +85,14 @@ trap         1 1 0      ground 0     -    0
 wolf_den     4 2 1      ground 1     S    0
 fallen_log   3 1 1      ground 0     -    0
 stump        1 1 1      ground 0     -    0
+sunbeam      1 1 0      ground 0     -    3
+foxfire      1 1 0      ground 0     -    1
+hunter_remains 2 1 0    ground 0     -    0
+saw_log      3 1 1      ground 0     -    0
+log_stack    2 1 1      ground 0     -    0
+deer_bones   2 1 0      ground 0     -    0
+camp_kit     1 1 0      ground 0     -    0
+toadstools   1 1 0      ground 0     -    0
 chapel       7 9 1      ground 1     S    3
 fallen_bell  2 2 1      ground 1     -    0
 ash_circle   3 3 0      ground 0     -    1

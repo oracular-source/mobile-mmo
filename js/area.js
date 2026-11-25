@@ -83,6 +83,10 @@ function buildArea(id){
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
     if(o.kind==='town_gate'){const m=o.x*T+o.w*T/2;[m-22,m+23].forEach(x=>{A.lights.push({x:x,y:o.y*T+16-26,r:48,w:30});A.flames.push({x:x-6,y:o.y*T+16-22,big:0,lamp:1})})}
     if(o.kind==='lantern'){A.lights.push({x:cx,y:o.y*T-4,r:44,w:26});A.flames.push({x:cx,y:o.y*T-1,big:0,lamp:1})}
+    // Wolfwood heart pass (v0.81): low gold dusk light through gaps in the canopy (more near the crossroads, fewer deeper in),
+    // and foxfire's cold glow round the blight. Both drawn live too (world.js drawGlows).
+    if(o.kind==='sunbeam'){A.lights.push({x:cx,y:o.y*T+8,r:46,w:20});(A.beams=A.beams||[]).push({x:cx,y:o.y*T+12,ph:ah(o.x,o.y,63)*6.3})}
+    if(o.kind==='foxfire'){A.lights.push({x:cx,y:o.y*T+10,r:22,w:0,c:26});(A.fox=A.fox||[]).push({x:o.x*T,y:o.y*T,ph:ah(o.x,o.y,64)*6.3})}
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
@@ -1274,6 +1278,62 @@ function drawObj(g,R,o){
     [[-9,-7],[8,-7],[-9,6],[8,6]].forEach(([dx,dy])=>{R(hx+dx,hy+dy,2,2,'#a8825c');R(hx+dx+(dx<0?-2:2),hy+dy+(dy<0?-2:2),2,1,'#d8c8a0')}); // legs and lacing
     [[-11,0],[10,0],[0,-9],[0,8]].forEach(([dx,dy])=>R(hx+dx,hy+dy,1,1,'#d8c8a0'));
     return}
+  // ---- Wolfwood heart pass (v0.81): small stories you can read without words, references first (area-rules "Living detail"). ----
+  if(k==='hunter_remains'){
+    // The hunter who didn't come back: his green cloak torn and dropped on the wolf trail, his bow snapped in two, his horn
+    // in the needles, an old dark stain under it all and wolf prints walking away. (Reads as: something happened here.)
+    R(X+3,Y+9,14,5,'#24180f');R(X+5,Y+8,9,1,'#24180f'); // the old stain soaked into the ground
+    const cl=[[4,6,10],[3,7,12],[2,8,13],[3,9,12],[2,10,11],[4,11,8],[6,12,4]];
+    cl.forEach(([x,y,w])=>R(X+x-1,Y+y,w+2,1,AP.out));cl.forEach(([x,y,w],i)=>{R(X+x,Y+y,w,1,i<2?'#4a5e34':'#36472a');if(i>1&&i<5)R(X+x+3,Y+y,1,1,'#2a3820')});
+    R(X+13,Y+12,2,1,AP.out);R(X+15,Y+11,1,1,AP.out);R(X+5,Y+7,1,1,'#e0b838'); // ragged corner, brass clasp
+    R(X+1,Y+5,6,4,AP.out);R(X+2,Y+6,4,2,'#5a7040');R(X+3,Y+6,2,1,'#6e8650'); // the hood, crumpled at one end
+    R(X+8,Y+9,4,1,'#5a1e16');R(X+10,Y+10,2,1,'#4a1810'); // torn, and darker where it tore
+    // the bow: two halves at angles, the string slack between them
+    treeLine(R,X+17,Y+5,X+23,Y+8,2,AP.out);treeLine(R,X+17,Y+5,X+23,Y+8,1,'#b08a58');
+    treeLine(R,X+24,Y+11,X+30,Y+9,2,AP.out);treeLine(R,X+24,Y+11,X+30,Y+9,1,'#9a7448');R(X+23,Y+8,1,1,'#d8c8a0');R(X+24,Y+10,1,1,'#b8ac90');
+    // the horn: a pale curve with a brass band
+    R(X+18,Y+11,8,4,AP.out);R(X+19,Y+12,6,2,'#e8dcc0');R(X+19,Y+13,2,1,'#b8ac90');R(X+19,Y+12,2,2,AP.out);R(X+23,Y+13,1,1,'#c9a227');
+    // wolf prints going off to the right: a pad and three toes, 2 sets
+    [[27,13],[30,3]].forEach(([x,y])=>{R(X+x,Y+y+1,2,1,'#1a1610');R(X+x-1,Y+y,1,1,'#1a1610');R(X+x+1,Y+y-1,1,1,'#1a1610');R(X+x+2,Y+y,1,1,'#1a1610')});return}
+  if(k==='saw_log'){
+    // The woodcutters gave up: a felled fir half sawn through, the two-man saw still standing in the cut,
+    // a heap of pale sawdust under it and a wedge on the ground.
+    shadow(X+2,Y+12,W-2,3);R(X,Y+3,W,11,AP.out);R(X+1,Y+4,W-2,9,AP.trunk);R(X+1,Y+4,W-2,2,AP.trunkHi);for(let x=4;x<W-8;x+=6)R(X+x,Y+7+(x%4?1:0),3,1,AP.woodDk);
+    R(X+W-7,Y+3,7,11,AP.out);R(X+W-6,Y+4,5,9,'#a88a64');R(X+W-5,Y+6,3,5,'#8a6a4a');R(X+W-4,Y+8,1,1,'#6a5038'); // the cut end, rings
+    const sx=X+24;R(sx-1,Y+2,3,12,'#0b0907'); // the kerf
+    // the blade stands in the cut: its lower edge (the teeth) is hidden down in the kerf, so it reads as stuck, not floating
+    R(sx-10,Y-2,22,7,AP.out);R(sx-9,Y-1,20,5,'#8d8692');R(sx-9,Y-1,20,1,'#c8c2cc');R(sx-9,Y+3,20,1,'#6a6570');R(sx-1,Y+4,3,1,'#0b0907');
+    [sx-12,sx+11].forEach(x=>{R(x-1,Y-8,4,11,AP.out);R(x,Y-7,2,9,'#8a6a4a');R(x,Y-7,1,9,'#a88a64')}); // a handle at each end
+    for(let i=0;i<10;i++)R(X+18+Math.floor(ah(o.x,i,61)*12),Y+13+Math.floor(ah(o.y,i,62)*3),1,1,i%2?'#c8b088':'#a89070'); // sawdust
+    R(X+6,Y+13,4,2,AP.out);R(X+7,Y+13,2,1,AP.woodHi);return}
+  if(k==='log_stack'){
+    // A woodcutters' stack left to go grey: cut ends in rows of three, two and one, bark between, moss on the top.
+    shadow(X+1,Y+13,W-2,3);
+    // round cut ends (an octagon at this size), pale wood with a darker ring and the heart in the middle
+    const end=(x,y)=>{R(x+1,y-1,6,9,AP.out);R(x-1,y+1,10,5,AP.out);R(x,y,8,7,AP.out);R(x+1,y,6,7,'#9a9080');R(x,y+1,8,5,'#9a9080');R(x+2,y+1,4,5,'#b0a896');R(x+1,y+2,6,3,'#b0a896');R(x+3,y+2,2,3,'#7a7062');R(x+2,y,4,1,'#c4bca8')};
+    [[1,6],[11,6],[21,6],[6,-1],[16,-1],[11,-8]].forEach(([x,y])=>end(X+x,Y+y));
+    R(X+10,Y-9,6,2,AP.mossHi);R(X+4,Y-2,4,1,AP.mossHi);R(X+24,Y+4,5,1,AP.mossHi);return}
+  if(k==='deer_bones'){
+    // The blight kills: what's left of a deer in the grey. Skull with antlers, a curl of ribs, the spine and a leg bone.
+    const B=AP.bone,D=AP.boneDk;
+    for(let i=0;i<5;i++){const x=X+8+i*3;R(x,Y+6,1,7,AP.out);R(x+1,Y+7,1,5,i%2?D:B)} // ribs
+    R(X+6,Y+5,18,2,AP.out);R(X+7,Y+5,16,1,B); // spine
+    R(X+23,Y+4,7,5,AP.out);R(X+24,Y+5,5,3,B);R(X+25,Y+6,1,1,AP.out);R(X+28,Y+7,2,1,D); // skull
+    treeLine(R,X+25,Y+4,X+22,Y-1,1,B);treeLine(R,X+23,Y+1,X+20,Y+1,1,B);treeLine(R,X+27,Y+4,X+29,Y-1,1,B);treeLine(R,X+28,Y+1,X+31,Y,1,D); // antlers
+    R(X+2,Y+12,9,1,AP.out);R(X+3,Y+11,7,1,B);R(X+2,Y+11,1,1,B);R(X+10,Y+11,1,1,B);return}
+  if(k==='camp_kit'){
+    // By the hunter's fire: a blackened pot on two stones and two tin cups. One is still full: nobody came back to drink it.
+    R(X+1,Y+9,4,3,AP.out);R(X+2,Y+9,2,2,AP.bouldHi);R(X+8,Y+9,4,3,AP.out);R(X+9,Y+9,2,2,AP.bould);
+    R(X+2,Y+3,9,7,AP.out);R(X+3,Y+4,7,5,'#24222a');R(X+3,Y+4,7,1,'#3e3a46');R(X+5,Y+2,3,1,AP.out); // pot and its handle
+    [[11,10,0],[13,12,1]].forEach(([x,y,full])=>{R(X+x-1,Y+y-1,4,4,AP.out);R(X+x,Y+y,2,2,'#8d8692');R(X+x,Y+y,2,1,full?'#3a2a1e':'#b8b2bc')});return}
+  if(k==='toadstools'){
+    // A ring of pale toadstools where something rots under the needles.
+    [[3,10],[6,7],[10,6],[13,9],[11,12],[5,13]].forEach(([x,y],i)=>{R(X+x,Y+y,1,2,'#d8d0b8');R(X+x-2,Y+y-2,5,2,AP.out);R(X+x-1,Y+y-2,3,1,i%3?AP.fungus:'#d8b890');R(X+x-1,Y+y-1,3,1,AP.fungusDk)});return}
+  if(k==='foxfire'){
+    // Foxfire: a rotting stub of wood furred with pale fungus that glows a cold green in the dusk (the glow is drawn live).
+    shadow(X+3,Y+13,10,2);R(X+4,Y+6,8,8,AP.out);R(X+5,Y+7,6,6,'#3a2a20');R(X+5,Y+7,6,1,'#5a4030');R(X+7,Y+9,2,1,'#2a1e16');
+    [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y])=>R(X+x,Y+y,1,1,'#9ad8a8'));return}
+  if(k==='sunbeam')return; // just light: the gold shaft and its dust are drawn live after the lighting
   if(k==='trap'){
     // A sprung iron jaw trap, its teeth shut on nothing.
     R(X+3,Y+9,10,5,AP.out);R(X+4,Y+10,8,3,AP.iron);R(X+4,Y+10,8,1,AP.ironHi);[5,7,9,11].forEach(x=>R(X+x,Y+8,1,2,AP.ironTip));R(X+12,Y+11,4,1,AP.ironHi);return}

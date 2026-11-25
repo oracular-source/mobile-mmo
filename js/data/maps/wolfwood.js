@@ -71,6 +71,59 @@ obj fallen_log 18 33
 obj stump 43 37
 obj stump 21 20
 obj lantern 58 44
+# Heart pass (v0.81, docs/research/map-design.md "Wolfwood heart pass"): three small stories, light that has a reason, life everywhere.
+# Story 1, the hunter who didn't come back: his things on Greyfang's trail by the den; at his camp the fire is still kept,
+# a second bedroll is laid out and a second cup by the fire is still full.
+# Story 2, the woodcutters gave up: a fir half sawn through with the saw left in it, their stack gone grey, a cart.
+# Story 3, the blight kills: a deer's bones in the grey, toadstools, foxfire glowing on the rot.
+obj hunter_remains 31 7
+obj saw_log 45 13
+obj log_stack 47 15
+obj stump 49 14
+obj stump 45 17
+obj cart 48 17
+obj deer_bones 24 17
+obj toadstools 25 23
+obj toadstools 36 14
+obj foxfire 21 21
+obj foxfire 39 27
+obj foxfire 27 13
+obj foxfire 33 24
+obj foxfire 17 32
+obj bedroll 51 29
+obj camp_kit 55 29
+obj toadstools 10 26
+obj sunbeam 52 42
+obj sunbeam 47 34
+obj sunbeam 30 37
+obj sunbeam 20 38
+obj sunbeam 44 25
+obj sunbeam 58 26
+obj sunbeam 50 16
+obj sunbeam 12 21
+# Life: crows on the dead giant's branches and one at the deer bones, an owl on the giant, moths at every light,
+# rabbits at the crossroads end, fireflies on the road and in the glade, deer on the deer trail, eyes in the dark wood.
+critter crow 28.9 11.0 1 high
+critter crow 33.9 11.95 1 high
+critter crow 25.7 17.9
+critter owl 33.4 14.06
+critter moth 53.5 29.4 3
+critter moth 58.5 43.6 2
+critter moth 9.5 15.6 2
+critter rabbit 46.5 44.6
+critter rabbit 28.5 45.5
+critter rabbit 36.5 40.6
+critter firefly 50.5 38.5 4
+critter firefly 60 24.5 3
+critter firefly 15.5 24.5 2
+critter deer 58.5 22.8
+critter deer 60.2 26.6
+critter eyes 21.5 4.6
+critter eyes 2.5 10.6
+critter eyes 50.5 2.6
+critter eyes 2.5 36.6
+critter eyes 61.5 8.6
+critter eyes 17.5 13.6
 # ways in and out
 exit south 56 47 to=crossroads at=north
 exit graveyard 12 47 to=graveyard at=north

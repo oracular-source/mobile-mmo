@@ -91,6 +91,18 @@ function drawGlows(){
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
     // Dust turning in the daylight shafts (rat tunnel) and rising out of the sinkhole (crossroads).
     (A.motes||[]).forEach((m,j)=>{for(let i=0;i<5;i++){const ph=(time*0.25+i/5+j*0.13)%1;lx.fillStyle=i%2?'#c8c0a8':'#8f8a76';lx.fillRect(Math.round(m.x-6+i*3+Math.sin(time*0.7+i+j)*3),Math.round(m.y-ph*26),1,1)}});
+    // Wolfwood (v0.81): low gold light slanting in through a gap in the canopy (from the upper left, where the light comes
+    // from everywhere in the game), breathing slowly as the leaves move, with gold dust turning in it.
+    (A.beams||[]).forEach(b=>{if(b.x<camX-70||b.x>camX+VW+40||b.y<camY-10||b.y>camY+VH+80)return;
+      const br=0.6+0.4*Math.sin(time*0.5+b.ph);lx.fillStyle='#ffb860';
+      for(let i=0;i<64;i+=2){const t=i/64,x=Math.round(b.x-26*(1-t)),y=Math.round(b.y-64+i),w=Math.round(6+6*t);lx.globalAlpha=(0.05+0.06*t)*br;lx.fillRect(x-(w>>1),y,w,2)}
+      lx.globalAlpha=0.08*br;lx.fillRect(b.x-8,b.y-1,16,3);
+      for(let i=0;i<4;i++){const ph=(time*0.12+i/4+b.ph)%1;lx.globalAlpha=0.7*Math.sin(ph*Math.PI);lx.fillStyle=i%2?'#ffe8b0':'#d8b070';lx.fillRect(Math.round(b.x-26*(1-ph)+Math.sin(time*0.8+i)*2),Math.round(b.y-64*(1-ph)),1,1)}
+      lx.globalAlpha=1});
+    // Foxfire: the fungus on rotting wood glows a cold green, pulsing slowly, a mote drifting up off it now and then.
+    (A.fox||[]).forEach(f=>{const p=0.55+0.45*Math.sin(time*0.9+f.ph);
+      [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y],i)=>{lx.globalAlpha=Math.max(0,p-(i%3)*0.15);lx.fillStyle='#b8ffc8';lx.fillRect(f.x+x,f.y+y,1,1)});
+      const ph=(time*0.2+f.ph)%1;lx.globalAlpha=0.6*Math.sin(ph*Math.PI);lx.fillStyle='#9af0b0';lx.fillRect(f.x+8+Math.round(Math.sin(time+f.ph)*2),Math.round(f.y+8-ph*14),1,1);lx.globalAlpha=1});
     drawCritterGlows(A);
     A.objs.forEach(o=>{if(o.kind!=='sinkhole')return;const cx=o.x*T+o.w*T/2,cy=o.y*T+o.h*T/2;for(let i=0;i<6;i++){const ph=(time*0.35+i/6)%1;lx.fillStyle=i%2?'#8a7a62':'#6a5c4a';lx.fillRect(Math.round(cx-14+i*5+Math.sin(time*0.8+i)*3),Math.round(cy+2-ph*30),1,1)}});
     lx.restore();return}
@@ -666,6 +678,21 @@ function updateAreaCritters(A,dt){
       else if(c.st==='run'){const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;c.jump=Math.abs(Math.sin(c.t*14))*3;
         if(blocked(nx,ny)||c.t>1.1){c.st='gone';c.t=0;c.jump=0}else{c.x=nx;c.y=ny}} // into the undergrowth
       else if(c.t>10&&home>130){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='deer'){
+      // (v0.81, Wolfwood) a doe grazing by the trail: head down, now and then up to listen. Come closer and she freezes and
+      // watches you; closer still and she bounds off into the trees and is gone until you've left.
+      if(c.st==='sit'){c.hop-=dt;if(c.hop<=0){c.hop=vr(2,6);c.up=Math.random()<0.35?vr(1,2.5):0;if(Math.random()<0.3){const nx=c.hx+vr(-10,10),ny=c.hy+vr(-5,5);if(!blocked(nx,ny)){c.dir=nx>c.x?1:-1;c.x=nx;c.y=ny}}}
+        if(c.up>0)c.up-=dt;c.alert=d<96&&player.dead<=0;if(c.alert)c.dir=player.x>c.x?1:-1;
+        if(d<56&&player.dead<=0){const a=Math.atan2(c.y-player.y,c.x-player.x)+vr(-0.4,0.4);c.vx=Math.cos(a)*92;c.vy=Math.sin(a)*92;c.dir=c.vx>0?1:-1;c.st='run';c.t=0}}
+      else if(c.st==='run'){const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;c.jump=Math.abs(Math.sin(c.t*9))*4;
+        if(blocked(nx,ny)||c.t>1.6){c.st='gone';c.t=0;c.jump=0}else{c.x=nx;c.y=ny}}
+      else if(c.t>14&&home>170){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='eyes'){
+      // (v0.81) eyeshine in the dark under the trees: a pair of pale eyes that blink and watch. Walk toward them and they
+      // blink out (whatever it was slipped away); they come back once you've moved on. Pale gold-green, never red:
+      // red is kept for real monsters (pixel-world-alive, "ambient never looks like a threat").
+      c.blink-=dt;if(c.blink<-0.18)c.blink=vr(1.5,5);c.look=Math.sin(time*0.3+c.ph)>0.6?1:Math.sin(time*0.3+c.ph)<-0.6?-1:0;
+      if(c.st==='sit'&&d<70)c.st='gone',c.t=0;else if(c.st==='gone'&&c.t>12&&home>130)c.st='sit',c.t=0}
     else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
   });
   if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:0})}}}
@@ -682,7 +709,8 @@ function drawAreaCritters(A,layer){
     A.crit.forEach(c=>{if(c.st==='gone')return;
       if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.st==='leap'?c.jump:c.jump>0?2:0),c.dir);
       if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir);
-      if(c.kind==='rabbit')critGrid(c.jump>0.5?RABBIT_HOP:c.nib>0&&Math.floor(time*8)%2?RABBIT_NIB:RABBIT,c.x,c.y-c.jump,c.dir)});
+      if(c.kind==='rabbit')critGrid(c.jump>0.5?RABBIT_HOP:c.nib>0&&Math.floor(time*8)%2?RABBIT_NIB:RABBIT,c.x,c.y-c.jump,c.dir);
+      if(c.kind==='deer')critGrid(c.st==='run'?(c.jump>2?DEER_RUN:DEER):c.alert||c.up>0?DEER:DEER_GRAZE,c.x,c.y-(c.jump||0),c.dir)});
     return}
   A.crit.forEach(c=>{
     if(c.kind==='crow'&&(c.st==='fly'||(!c.ground&&c.st==='sit'))){const flap=c.st==='fly'&&Math.floor(time*10)%2;critGrid(c.st==='fly'?(flap?CROW_FLY2:CROW_FLY):c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)}
@@ -698,7 +726,11 @@ const CROW=['..kkk..','.kbbbky','kbhhbk.','kbbbbk.','.k.k...'],CROW_PECK=['.....
 const CROW_FLY=['k.....k','hk.k.kh','.kbbbky','..kbk..'],CROW_FLY2=['.......','.kkkkk.','hhbbbhy','..kbk..'];
 // Rabbit (v0.59), 8 x 6 facing right: long ears, a brown body with a lighter back, the white tail at the rear.
 const RABBIT=['.....kk.','....kRk.','.kkkkRRk','kwRRRRkk','krrrrrrk','.kk..kk.'],RABBIT_NIB=['........','....kk..','.kkkkRk.','kwRRRRkk','krrrrrrk','.kk..kk.'],RABBIT_HOP=['......kk','.....kRk','kkkkkkRR','wRRRRRkk','krrrrrk.','k.....k.'];
-const CRIT_PAL={k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692',r:'#6a5848',R:'#9a8670',w:'#e8e2d4'};
+// Deer (v0.81), 14 x 10 facing right: a doe, red-brown with a lighter back and a white tail; head up (listening), head down (grazing), bounding.
+const DEER=['...........kk.','..........kLLk','..........kLkk','..k.......kLk.','.kwkkkkkkkLLk.','.kLLLLLLLLLk..','.kDDDDDDDDDk..','..kDDDDDDDk...','..kk.k..k.kk..','..k..k..k..k..'];
+const DEER_GRAZE=['..............','..............','..............','..k...........','.kwkkkkkkkkk..','.kLLLLLLLLLLk.','.kDDDDDDDDDLLk','..kDDDDDDDkLLk','..kk.k..k.kkk.','..k..k..k..k..'];
+const DEER_RUN=['...........kk.','..........kLLk','..........kLkk','..........kLk.','.kkkkkkkkkLLk.','kwLLLLLLLLLk..','.kDDDDDDDDDk..','..kDDDDDDDk...','.k...kk....k..','k.....kk....k.'];
+const CRIT_PAL={D:'#6e4e34',L:'#9a7452',k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692',r:'#6a5848',R:'#9a8670',w:'#e8e2d4'};
 function critGrid(G,x,y,dir){const w=G[0].length,x0=Math.round(x)-(w>>1),y0=Math.round(y)-G.length;
   G.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[dir<0?w-1-i:i];if(ch==='.')continue;lx.fillStyle=CRIT_PAL[ch];lx.fillRect(x0+i,y0+j,1,1)}})}
 function drawOwl(c){
@@ -716,5 +748,6 @@ function drawCritterGlows(A){
       lx.fillStyle='#efe3c4';lx.fillRect(x,y,1,1);if(Math.floor(time*14+c.ph*3)%2){lx.fillStyle='#b8ad90';lx.fillRect(x-1,y,1,1);lx.fillRect(x+1,y,1,1)}}
     if(c.kind==='firefly'){const x=Math.round(c.hx+Math.cos(time*c.sp+c.ph)*c.r+Math.sin(time*c.sp*2.7+c.ph)*6),y=Math.round(c.hy+Math.sin(time*c.sp*1.3+c.ph)*c.r*0.5);
       const on=0.5+0.5*Math.sin(time*(1.3+c.sp*3)+c.ph*5);if(on>0.35){lx.globalAlpha=(on-0.35)*0.5;lx.fillStyle='#c8e070';lx.fillRect(x-1,y,3,1);lx.fillRect(x,y-1,1,3);lx.globalAlpha=Math.min(1,(on-0.35)*2.2);lx.fillStyle='#f0ff9a';lx.fillRect(x,y,1,1);lx.globalAlpha=1}}
+    if(c.kind==='eyes'&&c.st==='sit'&&c.blink>=0){const x=Math.round(c.hx)+c.look,y=Math.round(c.hy);lx.globalAlpha=0.35;lx.fillStyle='#c8d870';lx.fillRect(x-3,y-1,3,3);lx.fillRect(x+1,y-1,3,3);lx.globalAlpha=1;lx.fillStyle='#eef0a0';lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1)}
     if(c.kind==='owl'&&c.blink>=0){lx.fillStyle='#ffcf5a';const x0=Math.round(c.x)-3+c.look,y0=Math.round(c.y)-9;lx.fillRect(x0+2,y0+3,1,1);lx.fillRect(x0+4,y0+3,1,1)}});
 }
