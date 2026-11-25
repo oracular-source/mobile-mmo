@@ -62,8 +62,8 @@ obj giant_tree 29 15
 obj tunnel_mouth 8 14
 obj wolf_den 26 4
 obj cot 53 26
-obj campfire 53 29
-# Hunter's camp laid out symmetrically round the fire (v0.85, owner): cot at the back, tripod and tanning frame either side, bedroll and camp kit by the fire, the two traps side by side; his woodpile against the treeline to the north (v0.86).
+obj campfire 53 29 pot
+# Hunter's camp laid out symmetrically round the fire (v0.85, owner): cot at the back, tripod and tanning frame either side, a stew pot hung over the fire, the two traps side by side; his woodpile against the treeline to the north (v0.86).
 obj drying_rack 57 28
 obj trap 55 31
 obj trap 56 31
@@ -74,7 +74,7 @@ obj stump 21 20
 obj lantern 58 44
 # Heart pass (v0.81, docs/research/map-design.md "Wolfwood heart pass"): three small stories, light that has a reason, life everywhere.
 # Story 1, the hunter who didn't come back: his things on Greyfang's trail by the den; at his camp the fire is still kept,
-# a second bedroll is laid out and a second cup by the fire is still full.
+# a stew pot still hangs over the fire (v0.87; the second bedroll and the camp kit were cut: they did not read).
 # Story 2, the woodcutters gave up: a fir half sawn through with the saw left in it, their stack gone grey, a cart.
 # Story 3, the blight kills: a deer's bones in the grey, toadstools, foxfire glowing on the rot.
 obj hunter_remains 31 7
@@ -91,8 +91,6 @@ obj foxfire 39 27
 obj foxfire 27 13
 obj foxfire 33 24
 obj foxfire 17 32
-obj bedroll 51 29
-obj camp_kit 56 29
 obj game_rack 51 27
 obj chop_block 50 23
 obj toadstools 10 26

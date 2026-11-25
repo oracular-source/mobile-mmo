@@ -25,7 +25,7 @@ function buildArea(id){
   const A={id:id,name:M.name,w:w,h:h,rows:rows.slice(),map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||'',instance:!!M.instance,seals:[]};
   M.things.split('\n').forEach(line=>{const p=line.split('#')[0].trim().split(/\s+/);if(!p[0])return;
     const k=p[0],px=x=>x*T+8,py=y=>y*T+10;
-    if(k==='obj')A.objs.push(Object.assign({kind:p[1],x:+p[2],y:+p[3]},AREA_OBJS[p[1]]));
+    if(k==='obj')A.objs.push(Object.assign({kind:p[1],x:+p[2],y:+p[3],opt:p[4]||''},AREA_OBJS[p[1]])); // opt: an optional word after x y (e.g. campfire ... pot)
     const opt=n=>(p.find(s=>s.indexOf(n+'=')===0)||'').slice(n.length+1); // name=value extras on a line
     if(k==='spawn'||k==='named'){const lv=p[2].split('-').map(Number),sp={type:AREA_MOBS[p[1]]||'dead',x:px(+p[3]),y:py(+p[4]),timer:0,mob:null,group:null,lv:[lv[0],lv[lv.length-1]]};A.spawns.push(sp);
       // A named remembers its spawn, the object you touch to summon it and the key that takes (v0.31).
@@ -1215,7 +1215,13 @@ function drawObj(g,R,o){
   if(k==='campfire'){
     // The crossroads campfire: a ring of stones round a few burning logs (the flame is drawn live in world.js).
     shadow(X+1,Y+12,14,3);[[2,9],[5,12],[10,12],[13,9],[4,6],[11,6]].forEach(([x,y])=>{R(X+x-1,Y+y-1,4,3,AP.out);R(X+x,Y+y,2,1,AP.stoneHi)});
-    R(X+4,Y+8,9,3,AP.out);R(X+5,Y+9,7,1,AP.woodHi);R(X+6,Y+7,5,3,AP.out);R(X+7,Y+8,3,1,AP.wood);R(X+6,Y+10,5,1,'#ff7a2a');return}
+    R(X+4,Y+8,9,3,AP.out);R(X+5,Y+9,7,1,AP.woodHi);R(X+6,Y+7,5,3,AP.out);R(X+7,Y+8,3,1,AP.wood);R(X+6,Y+10,5,1,'#ff7a2a');
+    if(o.opt==='pot'){ // a stew pot hung over the fire on three sticks (v0.87, Wolfwood hunter's camp); steam drawn live in world.js
+      [[X-1,Y+13],[X+17,Y+13],[X+12,Y+10]].forEach(([fx,fy])=>{treeLine(R,fx,fy,X+8,Y-9,2,AP.out);treeLine(R,fx,fy,X+8,Y-9,1,AP.woodHi)});
+      R(X+7,Y-10,3,2,'#c8b48a');R(X+8,Y-8,1,3,'#8a8a90'); // lashing and the hook chain
+      R(X+3,Y-6,11,9,AP.out);R(X+4,Y-5,9,7,'#2a2a30');R(X+4,Y-5,2,6,'#4a4a54');R(X+3,Y-6,11,2,AP.out);R(X+4,Y-6,9,1,'#5a5a64'); // the black pot, lit on the left, a rim
+      R(X+5,Y-5,7,1,'#8a5a2a');R(X+6,Y-5,2,1,'#b07a3a');R(X+10,Y-5,1,1,'#6a8a3a')} // stew showing at the rim
+    return}
   if(k==='signpost'){
     // Wooden signpost at the crossroads (heart pass, v0.59): an old post with a cap, one arm for each road. The west arm
     // points to the graveyard, the east one to the sinkhole, the north one up toward Wolfwood; the lower arm has lost a

@@ -80,3 +80,6 @@ Pictures go to `out/` (not saved in the repo). Needs Python 3 with Pillow.
 
 ## Partly solid objects (v0.86)
 An object with `blocks = 1` is solid on its whole footprint unless `OBJECT_SOLID` in `js/data/tiles.js` gives it a mask: one string per footprint row, top to bottom, `#` = solid, `.` = open. Used for the giant tree, whose open ground behind the trunk you can walk on. The game and `tools/mapcheck.py` both read the mask.
+
+## Object options (v0.87)
+An `obj` line may end with one optional word after x y, passed to the drawing as `o.opt`. So far: `obj campfire x y pot` hangs a stew pot over the fire (steam drawn live).

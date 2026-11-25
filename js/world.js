@@ -111,6 +111,9 @@ function drawGlows(){
     (A.fox||[]).forEach(f=>{const p=0.55+0.45*Math.sin(time*0.9+f.ph);
       [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y],i)=>{lx.globalAlpha=Math.max(0,p-(i%3)*0.15);lx.fillStyle='#b8ffc8';lx.fillRect(f.x+x,f.y+y,1,1)});
       const ph=(time*0.2+f.ph)%1;lx.globalAlpha=0.6*Math.sin(ph*Math.PI);lx.fillStyle='#9af0b0';lx.fillRect(f.x+8+Math.round(Math.sin(time+f.ph)*2),Math.round(f.y+8-ph*14),1,1);lx.globalAlpha=1});
+    // Steam off the hunter's stew pot (v0.87): a few pale wisps rising and drifting.
+    A.objs.forEach(o=>{if(o.kind!=='campfire'||o.opt!=='pot')return;const px=o.x*T+8,py=o.y*T-7;
+      for(let i=0;i<4;i++){const ph=(time*0.45+i/4)%1;lx.globalAlpha=0.5*Math.sin(ph*Math.PI);lx.fillStyle='#d8d8d0';lx.fillRect(Math.round(px-2+i*1.5+Math.sin(time*1.3+i*2)*2),Math.round(py-ph*14),1+(i%2),1)}lx.globalAlpha=1});
     drawCritterGlows(A);
     A.objs.forEach(o=>{if(o.kind!=='sinkhole')return;const cx=o.x*T+o.w*T/2,cy=o.y*T+o.h*T/2;for(let i=0;i<6;i++){const ph=(time*0.35+i/6)%1;lx.fillStyle=i%2?'#8a7a62':'#6a5c4a';lx.fillRect(Math.round(cx-14+i*5+Math.sin(time*0.8+i)*3),Math.round(cy+2-ph*30),1,1)}});
     lx.restore();return}
