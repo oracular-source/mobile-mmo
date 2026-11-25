@@ -130,3 +130,11 @@ weapon_rack  1 1 1      floor  0     -    0
 crown_shards 1 1 0      floor  0     -    0
 cobweb       1 1 0      floor  0     -    0
 `;
+// Objects that are only partly solid (v0.86, owner: "invisible walls behind the tree"). One row per footprint row, top to
+// bottom, '#' = solid. Objects not listed are solid on their whole footprint when blocks = 1. The giant tree's trunk and
+// root flare stand on its bottom rows; the rest of its footprint is open ground behind the trunk that you can walk on
+// (the tree fades while you're behind it).
+const OBJECT_SOLID = {
+  giant_tree: ['....', '....', '.##.', '####'],
+};
+

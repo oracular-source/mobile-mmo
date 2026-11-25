@@ -76,3 +76,7 @@ It also prints the farthest walk from the way in, in tiles and seconds.
 3. Look at both pictures, then show the owner. Owner notes go back into the file, and any new rule goes into `docs/area-rules.md` and, if it can be checked, into the checker.
 
 Pictures go to `out/` (not saved in the repo). Needs Python 3 with Pillow.
+
+
+## Partly solid objects (v0.86)
+An object with `blocks = 1` is solid on its whole footprint unless `OBJECT_SOLID` in `js/data/tiles.js` gives it a mask: one string per footprint row, top to bottom, `#` = solid, `.` = open. Used for the giant tree, whose open ground behind the trunk you can walk on. The game and `tools/mapcheck.py` both read the mask.

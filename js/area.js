@@ -67,7 +67,8 @@ function buildArea(id){
   if(A.instance)A.spawns.forEach(sp=>{sp.noRespawn=true});
   // Walk map for the game's blocked(): 0 open, 2 water, 3 scenery, 5 buildings.
   for(let y=0;y<h;y++){A.map[y]=[];for(let x=0;x<w;x++){const t=AREA_TILES[rows[y][x]];A.map[y][x]=t.walk?0:(t.tags.indexOf('water')>=0?2:3)}}
-  A.objs.forEach(o=>{if(!o.blocks)return;for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)A.map[y][x]=5;});
+  A.objs.forEach(o=>{if(!o.blocks)return;const m=OBJECT_SOLID[o.kind]; // partly solid objects (the giant tree) only block their marked tiles
+    for(let y=o.y;y<o.y+o.h;y++)for(let x=o.x;x<o.x+o.w;x++)if(!m||m[y-o.y][x-o.x]==='#')A.map[y][x]=5;});
   // Slow ground (v0.63): flood water slows everyone who wades it, you and the mobs (moveToward, fx.js). Floaters skim over.
   A.slow=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)if(AREA_TILES[rows[y][x]].tags.indexOf('flood')>=0)A.slow[y*w+x]=1;
   // Wading water (v0.64, owner: the crossroads creek): wade: 1 on a map lets you walk into its water, slowed like the flood

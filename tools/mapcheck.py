@@ -33,6 +33,11 @@ def load_tables():
     objs = table(src, 'OBJECTS')
     for o in objs.values():
         for k in ('w', 'h', 'blocks', 'clear', 'light'): o[k] = int(o[k])
+    # partly solid objects (OBJECT_SOLID in tiles.js): one string per footprint row, '#' = solid
+    blk = re.search(r'const OBJECT_SOLID\s*=\s*\{(.*?)\};', src, re.S)
+    if blk:
+        for kind, rows in re.findall(r"(\w+)\s*:\s*\[([^\]]*)\]", blk.group(1)):
+            objs[kind]['solid'] = re.findall(r"'([^']*)'", rows)
     return tiles, objs
 
 def load_map(path):
@@ -113,7 +118,12 @@ def check(m, tiles, objs):
                 if o['on'] not in T(xx, yy)['tags']: E.append(f'{name}: tile {xx},{yy} is {T(xx,yy)["name"]}, needs {o["on"]}')
                 if (xx, yy) in foot: E.append(f'{name} overlaps {placed[foot[(xx, yy)]]["kind"]} at {xx},{yy}')
                 foot[(xx, yy)] = i
-    solid = {p for p, i in foot.items() if placed[i]['blocks']}
+    def solid_at(p, i):
+        o = placed[i]
+        if not o['blocks']: return False
+        m = o.get('solid')
+        return not m or m[p[1] - o['y']][p[0] - o['x']] == '#'
+    solid = {p for p, i in foot.items() if solid_at(p, i)}
     walk = lambda x, y: inb(x, y) and T(x, y)['walk'] and (x, y) not in solid
 
     def door(o):
