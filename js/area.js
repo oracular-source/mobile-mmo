@@ -323,10 +323,9 @@ function paintArea(A){
         if(i<3){R(x,y-2,1,3,dead?'#5e5638':AP.reed);R(x,y-2,1,1,dead?'#8a7d52':AP.reedHi);if(dead&&i===0&&r1<0.5)R(x,y-4,1,2,'#3b2a1e')}else if(i===3)R(x,y,3,1,AP.water)}
       else if(gname==='water'){if(i<2)R(x,y,3,1,AP.waterHi);if(i===2&&r1<0.15)R(x,y,1,1,AP.glint)}
       else if(gname==='floor'){if(i===0){R(bx,by+15,16,1,AP.flrLine);R(bx+((ty%2)?7:15),by,1,16,AP.flrLine)}else if(i===1&&r1<0.3)R(x,y,3,1,AP.flrLine);else if(i===2&&r1<0.2)R(x,y,1,1,AP.boneDk)}
-      else if(gname==='cave_dirt'){const wallAbove=AREA_TILES[tile(tx,ty-1)||'d'].tags.indexOf('wall')>=0;
+      else if(gname==='cave_dirt'){
         if(i<2)R(x,y,1,1,AP.caveHi);else if(i===2)R(x,y,2,1,AP.caveDk);
-        // pale mushrooms and hanging roots along the foot of the walls; drips darken the dirt
-        else if(i===3&&wallAbove&&r1<0.35){R(x,by+2,2,1,AP.fungus);R(x,by+3,1,1,AP.fungusDk);R(x+3,by+3,1,1,AP.fungus)}
+        // drips darken the dirt (mushrooms at the foot of the walls: paintEarthWalls)
         else if(i===4&&r1<0.2)R(x,y,2,2,'#251f19')}
       else if(gname==='dirt_slope'&&i===0){for(let k=0;k<4;k++){R(bx,by+k*4,16,3,k%2?'#3a3026':'#463a2c');R(bx,by+k*4,16,1,AP.root)}R(bx+3,by,1,16,AP.root);R(bx+11,by+2,1,14,AP.rootHi)}
       // Wolfwood floor (v0.40): rusty needles, soft moss, grey blight with ash and cracks, ferns.
@@ -377,6 +376,8 @@ function paintArea(A){
       R(bx+2,Y+8,12,1,AP.waterHi);R(bx+4,Y+9,8,1,'#0d1a22');R(bx+3,Y+10,4,1,'#1b3442')}
   }
 
+  // 1c) Rat tunnel earth walls with natural edges (v0.74), before the edge copies so the earth carries on past the map edge.
+  paintEarthWalls(A,g,name);
   // Ground-only copies of the top and bottom edges, taken before any scenery: render mirrors these past the map edge so the
   // strip under the top bars (or the spell grid) shows ground carrying on, never black and never a doubled building (v0.55).
   {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
@@ -400,7 +401,7 @@ function paintArea(A){
       else if(n==='stone_wall'){const isW=(x,y)=>{const m=name(x,y);return m==='stone_wall'||m==='gate'};drawStoneWall(R,g,bx,by,isW(tx,ty-1),isW(tx,ty+1),isW(tx+1,ty),isW(tx-1,ty),tx,ty)}
       else if(n==='pillar')drawColumn(R,g,bx,by,ah(tx,ty,17));
       else if(n==='palisade'){const isP=(x,y)=>name(x,y)==='palisade';drawPalisade(R,bx,by,isP(tx-1,ty),isP(tx+1,ty),tx,ty)}
-      else if(n==='earth_wall'||n==='rat_hole'){const solid=(x,y)=>{const m=name(x,y);return !m||m==='earth_wall'||m==='rat_hole'};drawEarth(R,bx,by,!solid(tx,ty+1),!solid(tx,ty-1),n==='rat_hole',ah(tx,ty,13))}
+      else if(n==='earth_wall'||n==='rat_hole'){} // drawn earlier as one shape (paintEarthWalls, v0.74)
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
       else if(n==='coffin')drawCoffin(R,bx,by,ah(tx,ty,12));
@@ -659,22 +660,62 @@ function drawCoffin(R,bx,by,r){
   R(bx+2,by+13,13,2,'rgba(0,0,0,0.35)');R(bx+3,by+1,10,14,AP.out);R(bx+4,by+2,8,12,AP.stoneDk);R(bx+4,by+2,8,1,AP.stone);R(bx+4,by+2,1,12,AP.stone);
   R(bx+7,by+4,2,7,AP.stoneDk2);R(bx+5,by+6,6,2,AP.stoneDk2);
   if(r<0.35){R(bx+4,by+11,8,3,AP.out);R(bx+5,by+12,6,1,'#0e0c12')}}
-// Rat tunnel walls: packed earth. Where the wall meets the floor below you see its face: dark soil, stones, roots hanging down.
-// A rat hole is a dark burrow in that face with a spill of loose dirt (where Old Gnawbone's rats come out).
-function drawEarth(R,bx,by,face,top,hole,r){
-  R(bx,by,16,16,AP.earth);
-  if(top){R(bx,by+1,16,1,AP.earthHi);R(bx,by+2,16,1,AP.out)}
-  for(let i=0;i<3;i++){const x=bx+Math.floor(ah(bx,by,80+i)*14),y=by+Math.floor(ah(bx,by,90+i)*(face?5:14));R(x,y,2,1,'#211b15')}
-  if(!face)return;
-  R(bx,by+5,16,11,AP.earthFace2);
-  for(let i=0;i<6;i++){const x=bx+Math.floor(ah(bx,by,100+i)*15),y=by+6+Math.floor(ah(bx,by,110+i)*9);R(x,y,i%2?2:1,1,i<3?AP.earthFace:'#241c15')}
-  if(r<0.5){const sx=bx+2+Math.floor(r*20);R(sx,by+9,3,2,AP.out);R(sx,by+9,2,1,AP.stoneDk);R(sx+1,by+10,1,1,AP.stoneDk2)} // a stone stuck in the soil
-  R(bx,by+5,16,1,'#46382a');R(bx,by+15,16,1,AP.out);
-  // roots: one or two hanging out of the face, a few with a pale tip
-  const nr=1+Math.floor(ah(bx,by,120)*2);for(let i=0;i<nr;i++){const x=bx+2+Math.floor(ah(bx,by,121+i)*12),len=4+Math.floor(ah(bx,by,125+i)*7);
-    for(let k=0;k<len;k++)R(x+(k>len/2&&i%2?1:0),by+5+k,1,1,k<len-1?AP.root:AP.rootHi)}
-  if(hole){R(bx+3,by+7,10,8,AP.out);R(bx+4,by+8,8,7,'#050404');R(bx+5,by+7,6,1,AP.out);R(bx+4,by+8,8,1,'#2a2018');
-    R(bx+2,by+14,12,2,AP.caveHi);R(bx+1,by+15,3,1,AP.earthFace);R(bx+12,by+15,3,1,AP.earthFace);R(bx+6,by+12,2,1,AP.boneDk)} // gnawed bone in the mouth of the hole
+// Rat tunnel walls with natural edges (v0.74, Zone 1 pass step 3): the earth walls used to follow the tile steps, so every
+// cave edge was a staircase. Now they're one shape, like water (v0.52): a smoothed wall field plus two layers of wobble picks,
+// pixel by pixel, wall or floor. Then, in the 3/4 view: a soil face 10 px tall wherever floor lies just below the wall (with
+// stones, roots hanging out of it, rat holes), a lit lip on the far (north) rims, a thin rim on the sides, a damp shadow at
+// the foot and pale mushrooms growing there. Walking stays on tiles: the drawn edge only moves a few pixels off the tile line,
+// and the middle of an open tile is never drawn over.
+const EARTH_FACE=10;
+function paintEarthWalls(A,g,name){
+  const solidT=(x,y)=>{if(x<0||y<0||x>=A.w||y>=A.h)return 1;const m=name(x,y);return m==='earth_wall'||m==='rat_hole'?1:0};
+  let any=0;for(let y=0;y<A.h&&!any;y++)for(let x=0;x<A.w;x++)if(name(x,y)==='earth_wall'){any=1;break}
+  if(!any)return;
+  const W=A.w*T,H=A.h*T,N1=noiseGrid(W+32,H+32,13,231),N2=noiseGrid(W+32,H+32,5,232);
+  // Wall-ness between tile centres (1 = wall), sampled in a small square so a staircase becomes a slope.
+  const bl=(px,py)=>{const u=px/T-0.5,v=py/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
+    return solidT(i,j)*(1-fx)*(1-fy)+solidT(i+1,j)*fx*(1-fy)+solidT(i,j+1)*(1-fx)*fy+solidT(i+1,j+1)*fx*fy};
+  const M=new Uint8Array(W*H);
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const tx=(px/T)|0,ty=(py/T)|0,ox=px-tx*T,oy=py-ty*T,st=solidT(tx,ty);
+    // the middle of an open tile always stays floor (you stand there), the middle of a wall tile always stays wall
+    if(ox>=4&&ox<12&&oy>=4&&oy<12){M[py*W+px]=st;continue}
+    let f=0;for(let sy=-5;sy<=5;sy+=5)for(let sx=-5;sx<=5;sx+=5)f+=bl(px+sx,py+sy);f/=9;
+    f+=(N1(px+16,py+16)-0.5)*0.36+(N2(px+16,py+16)-0.5)*0.16;
+    M[py*W+px]=f>0.5?1:0}
+  const wall=(x,y)=>x<0||y<0||x>=W||y>=H?1:M[y*W+x];
+  const img=g.getImageData(0,0,W,H),d=img.data;
+  const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const C={};const col=h=>C[h]||(C[h]=rgb(h));
+  const put=(x,y,h)=>{const c=col(h),k=(y*W+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255};
+  for(let py=0;py<H;py++)for(let px=0;px<W;px++){
+    if(!wall(px,py)){if(wall(px,py-1)&&py>0&&ah(px,py,41)<0.8)put(px,py,'#241e17');else if(wall(px,py-2)&&py>1&&ah(px,py,42)<0.4)put(px,py,'#2a231b');continue} // damp shadow at the foot
+    let k=0;for(let s=1;s<=EARTH_FACE;s++)if(py+s<H&&!wall(px,py+s)){k=s;break}
+    if(k){ // the soil face
+      if(k===1)put(px,py,AP.out);
+      else if(k===EARTH_FACE)put(px,py,'#46382a');
+      else{const r=ah(px,py,43),band=5+Math.round((N1(px*3+16,py+16)-0.5)*4); // a wavy darker layer of soil across the face
+        put(px,py,k===band?'#33281e':r<0.05?AP.earthFace:r<0.09?'#241c15':(k>7&&r<0.5)?'#4a3b2b':AP.earthFace2)}
+      continue}
+    if(py>0&&!wall(px,py-1))put(px,py,AP.earthHi);          // the lit far rim
+    else if(py>1&&!wall(px,py-2))put(px,py,AP.out);
+    else if(!wall(px-1,py)||!wall(px+1,py))put(px,py,'#1f1913'); // a thin rim on the sides
+    else put(px,py,ah(px,py,44)<0.02?'#211b15':AP.earth)}
+  g.putImageData(img,0,0);
+  const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
+  // Where a face column ends: the last wall pixel above the floor, searched down from y0. -1 if there's no full face there.
+  const footAt=(x,y0,y1)=>{for(let y=y0;y<y1&&y<H-1;y++)if(wall(x,y)&&!wall(x,y+1)){for(let s=1;s<EARTH_FACE;s++)if(!wall(x,y-s))return -1;return y}return -1};
+  for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const n=name(tx,ty);if(n!=='earth_wall'&&n!=='rat_hole')continue;
+    const bx=tx*T,by=ty*T;
+    if(n==='rat_hole'){const f=footAt(bx+8,by+4,by+22);if(f<0)continue;const hy=f-15; // the hole sits on the foot of the face
+      R(bx+3,hy+7,10,8,AP.out);R(bx+4,hy+8,8,7,'#050404');R(bx+5,hy+7,6,1,AP.out);R(bx+4,hy+8,8,1,'#2a2018');
+      R(bx+2,hy+14,12,2,AP.caveHi);R(bx+1,hy+15,3,1,AP.earthFace);R(bx+12,hy+15,3,1,AP.earthFace);R(bx+6,hy+12,2,1,AP.boneDk);
+      R(bx+3,f+1,9,1,AP.caveHi);R(bx+5,f+2,5,1,AP.cave[1]);continue} // gnawed bone in the mouth, loose dirt spilled out on the floor
+    // a stone stuck in the soil
+    if(ah(tx,ty,13)<0.5){const x=bx+2+Math.floor(ah(tx,ty,14)*11),f=footAt(x,by,by+22);if(f>=0&&footAt(x+2,f-1,f+3)===f){R(x,f-6,3,2,AP.out);R(x,f-6,2,1,AP.stoneDk);R(x+1,f-5,1,1,AP.stoneDk2)}}
+    // roots: one or two hanging out of the face, a few with a pale tip, the odd one reaching the floor
+    const nr=1+Math.floor(ah(tx,ty,15)*2);for(let i=0;i<nr;i++){const x=bx+1+Math.floor(ah(tx,ty,16+i)*14),f=footAt(x,by,by+22);if(f<0)continue;
+      const len=3+Math.floor(ah(tx,ty,18+i)*8),top=f-EARTH_FACE+2;for(let s=0;s<len;s++)R(x+(s>len/2&&i%2?1:0),top+s,1,1,s<len-1?AP.root:AP.rootHi)}
+    // pale mushrooms in the damp at the foot
+    if(ah(tx,ty,20)<0.4){const x=bx+1+Math.floor(ah(tx,ty,21)*11),f=footAt(x,by,by+22);if(f>=0&&!wall(x+3,f+2)){R(x,f+2,2,1,AP.fungus);R(x,f+3,1,1,AP.fungusDk);R(x+3,f+3,1,1,AP.fungus)}}}
 }
 // A heap of dug-out dirt, kicked out of a burrow.
 function drawDirtPile(R,bx,by,r){
