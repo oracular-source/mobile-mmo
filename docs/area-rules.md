@@ -61,6 +61,7 @@ Owner: make the world feel alive and dynamic, down to the smallest details. Ever
 - *Foxfire* (v0.81, object; **cut from Wolfwood in v0.88**, owner: it didn't read, the green dots on a stub looked like bugs): a rotting stub of dark wood furred with pale green dots that pulse slowly after the lighting, a mote drifting up now and then; a small cold light (22 px). It belongs on rot: fallen logs, stumps, the edge of blight.
 
 ## Natural placement, no mistakes
+- **Every repeated prop comes in versions (owner, Nov 25: "different versions of each of these things, kind of like broken pillars are different"):** when an area has two or more of the same kind of prop (open coffins, broken pillars, urns, bone heaps, skull piles), each one is drawn differently: a different break, lean, damage, what's spilled or left on it, so no two read as copies. Pick the version from the prop's position (`ah(o.x,o.y,..)`) or an option word on its map line (`obj open_coffin 21 24 cracked`), and give each kind at least 3 versions. Check the area on the phone view for any two that look the same.
 - Everything looks like it would really be there. Nothing overlaps what it shouldn't: no gravestones on a tower, no props in walls, holes or each other, no mobs standing in scenery.
 - Every object has a footprint (the space it takes up); buildings and paths keep about a tile of space around them.
 - Things sit where they'd really be: graves in rows on open ground, rubble at the foot of what it fell from, paths worn where people walk, puddles in low spots.
