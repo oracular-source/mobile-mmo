@@ -110,28 +110,37 @@ function buildArea(id){
   A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
   AREAS[id]=A;return A;
 }
-// The woods carry on past the map's top and bottom edges (v0.64, owner: "the trees show a definitive line of where the
-// map actually stops"). The camera shows a strip past those edges (v0.55) where the ground was mirrored but the trees
-// stopped dead in a straight line. Now trees grow out there too, a few rows deep: the edge's own trees carry on (so
-// roads and clearings that run off the map stay open), and further out the gaps close up into deeper forest, with the
-// odd dead snag. Outdoors only; you can never walk there. Shadows go into the mirrored ground strips.
+// The woods carry on past the map edges (v0.64 top and bottom; v0.76 all four sides and the corners, for "Character always
+// centred": the camera now shows past every edge). The edge's own trees carry on (so roads and clearings that run off the
+// map stay open), and further out the gaps close up into deeper forest, with the odd dead snag. Outdoors only; you can
+// never walk there. Shadows go into the mirrored ground strips.
+const EDGE_DEPTH=14; // tiles of woods past each edge (the camera shows at most about half a screen, ~13 tiles, past an edge)
 function edgeWoods(A){
   if(A.instance||A.tint==='earth'||A.tint==='crypt'||A.tint==='vault')return;
   const W=A.w,H=A.h,wd=A.world,treeN={tree:1,fir:1,dead_tree:1};
   const nm=(x,y)=>{x=Math.max(0,Math.min(W-1,x));y=Math.max(0,Math.min(H-1,y));return AREA_TILES[A.rows[y][x]].name};
   const open=n=>{const t=Object.values(AREA_TILES).find(t=>t.name===n);return t&&t.walk&&t.tags.indexOf('path')<0&&n!=='bridge'};
-  // The kind of wood an edge has: whatever tree is most common in its first few rows.
-  const kindNear=(tx,top)=>{const c={};for(let j=0;j<4;j++)for(let i=-4;i<=4;i++){const n=nm(tx+i,top?j:H-1-j);if(treeN[n])c[n]=(c[n]||0)+1}
-    return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||(A.tint==='wood'||A.tint==='chapel'?'fir':'tree')};
+  const fallback=A.tint==='wood'||A.tint==='chapel'?'fir':'tree';
   const sh=(cv,x,y,r)=>{if(!cv)return;const g=cv.getContext('2d');g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(x,y,r,Math.max(2,Math.round(r/3)),0,0,7);g.fill()};
-  [true,false].forEach(top=>{for(let k=1;k<=8;k++)for(let tx=0;tx<W;tx++){
-    const sy=top?k-1:H-k,src=nm(tx,sy);let n=null;
-    if(treeN[src])n=ah(tx,k,160+(top?0:1))<0.9?src:null; // the edge's own trees carry on (one in ten left out, so it isn't a mirror)
-    else if(k>=2&&open(src)&&[-1,0,1].every(i=>open(nm(tx+i,sy))&&open(nm(tx+i,top?0:H-1)))&&ah(tx,k,162+(top?0:1))<0.12+0.1*k)n=kindNear(tx,top); // gaps close up further out
-    if(!n)continue;if(n==='tree'&&ah(tx,k,164)<0.05)n='dead_tree'; // now and then a dead snag
-    const ty=top?-k:H-1+k,bx=tx*T,by=ty*T,im=pickTree(A,n,tx,ty);
-    if(top)sh(wd.edgeTop,bx+8+im.shx,-(by+14),im.sh);else sh(wd.edgeBot,bx+8+im.shx,wd.edgeBot.height-(by+14-H*T),im.sh);
-    A.trees.push(treeAt(im,bx,by,by+13))}});
+  // Each side: how long it runs, which map tile sits k rows in from it at position i, where tile k-out lands, and its shadow strip.
+  // Left and right run past both ends (i from -EDGE_DEPTH) so the corners fill too.
+  const SIDES=[
+    {n:W,lo:0,hi:W,src:(i,k)=>nm(i,k-1),at:(i,k)=>[i,-k],cv:wd.edgeTop,shp:(x,y)=>[x,-y]},
+    {n:W,lo:0,hi:W,src:(i,k)=>nm(i,H-k),at:(i,k)=>[i,H-1+k],cv:wd.edgeBot,shp:(x,y)=>[x,wd.edgeBot.height-(y-H*T)]},
+    {n:H,lo:-EDGE_DEPTH,hi:H+EDGE_DEPTH,src:(i,k)=>nm(k-1,i),at:(i,k)=>[-k,i],cv:wd.edgeLeft,shp:(x,y)=>[-x,y]},
+    {n:H,lo:-EDGE_DEPTH,hi:H+EDGE_DEPTH,src:(i,k)=>nm(W-k,i),at:(i,k)=>[W-1+k,i],cv:wd.edgeRight,shp:(x,y)=>[wd.edgeRight.width-(x-W*T),y]}];
+  SIDES.forEach((S,si)=>{
+    // The kind of wood an edge has: whatever tree is most common in its first few rows.
+    const kindNear=i=>{const c={};for(let j=1;j<=4;j++)for(let d=-4;d<=4;d++){const n=S.src(i+d,j);if(treeN[n])c[n]=(c[n]||0)+1}
+      return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||fallback};
+    for(let k=1;k<=EDGE_DEPTH;k++)for(let i=S.lo;i<S.hi;i++){
+      const src=S.src(i,k);let n=null;
+      if(treeN[src])n=ah(i,k,160+si*7)<0.9?src:null; // the edge's own trees carry on (one in ten left out, so it isn't a mirror)
+      else if(k>=2&&open(src)&&[-1,0,1].every(d=>open(S.src(i+d,k))&&open(S.src(i+d,1)))&&ah(i,k,162+si*7)<Math.min(0.85,0.12+0.1*k))n=kindNear(i); // gaps close up further out, a few clearings stay
+      if(!n)continue;if(n==='tree'&&ah(i,k,164+si*7)<0.05)n='dead_tree'; // now and then a dead snag
+      const [tx,ty]=S.at(i,k),bx=tx*T,by=ty*T,im=pickTree(A,n,tx,ty);
+      if(ty>=0&&ty<H||si<2){const [sx,sy]=S.shp(bx+8+im.shx,by+14);sh(S.cv,sx,sy,im.sh)} // corner shadows fall outside the strips
+      A.trees.push(treeAt(im,bx,by,by+13))}});
 }
 // Shut every seal again (a fresh instance visit) and block its tiles.
 function sealArea(A){A.seals.forEach(sl=>{sl.open=false;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=5})}
@@ -286,7 +295,7 @@ function paintGround(A,g,groundOf){
       d32[py*W+px]=pal[t][cell[((cy>>3)+1)*CW+(cx>>3)+1]]}}
   g.putImageData(img,0,0);
   return {types:types,at:at}}
-const EDGE_STRIP=160; // game pixels of edge ground kept for the mirror past the map edge (more than the camera ever shows)
+const EDGE_STRIP=256; // game pixels of edge ground kept for the mirror past each map edge (more than the camera ever shows: about half a screen)
 function paintArea(A){
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
@@ -381,7 +390,10 @@ function paintArea(A){
   // Ground-only copies of the top and bottom edges, taken before any scenery: render mirrors these past the map edge so the
   // strip under the top bars (or the spell grid) shows ground carrying on, never black and never a doubled building (v0.55).
   {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
-    c.edgeTop=cut(0);c.edgeBot=cut(H-E);}
+    c.edgeTop=cut(0);c.edgeBot=cut(H-E);
+    // Left and right too (v0.76, character always centred: the camera now shows past those edges as well).
+    const F=Math.min(W,EDGE_STRIP),cutX=x=>{const e=document.createElement('canvas');e.width=F;e.height=H;e.getContext('2d').drawImage(c,x,0,F,H,0,0,F,H);return e};
+    c.edgeLeft=cutX(0);c.edgeRight=cutX(W-F);}
 
   // 2) Scenery and objects, row by row. Objects are drawn when we reach their bottom row so trees in front cover them.
   const objsByRow={};A.objs.forEach(o=>{const r=o.y+o.h-1;(objsByRow[r]=objsByRow[r]||[]).push(o)});

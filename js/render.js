@@ -174,15 +174,14 @@ function render(){
   // not a whole game pixel. Art stays crisp (each game pixel is still an S x S block) but the world glides instead of
   // stepping one game pixel at a time, which made diagonal walking jitter (x and y stepped on different frames).
   const sn=v=>Math.round(v*S)/S,pxr=sn(player.x),pyr=sn(player.y);
-  // The camera may scroll a little past the map's top edge so the top bars never cover you, and past the bottom edge
-  // so the spell pad never covers you either (the crossroads starts at its bottom edge, v0.28).
-  const topPad=Math.round(66*dpr/S),botPad=Math.round(VH*0.28);
-  camX=Math.max(0,Math.min(WW-VW,pxr-Math.round(VW/2)));camY=Math.max(-topPad,Math.min(WH-VH+botPad,pyr-Math.round(VH/2)-10));
-  if(WW<VW)camX=Math.round((WW-VW)/2);if(WH<VH)camY=Math.round((WH-VH)/2);
-  // Never under the bars (v0.55, UI chat, owner picked A): the fixed pads above can't know how tall the top frames really
-  // are (buffs wrap, debuff tags pile up, the minimap sits lower). ui() measures the real bottom of whatever top UI sits
-  // over you and the real top of the spell grid / chat below you; if you'd be under either, the camera scrolls a bit further
-  // past the map edge (the empty strip ends up hidden behind the bars). Eased, so a buff wrapping never jolts the view.
+  // Character always centred (v0.76, UI chat, owner Nov 24, upright and sideways): the camera keeps you in the middle of the
+  // screen everywhere, map edges included, instead of stopping at the edges and letting you drift off centre. The ground
+  // and woods carry on past every edge (drawn below), so there's never a black box. CAM_LIFT: your middle, not your feet,
+  // sits at the screen's middle (sprites are 18 tall).
+  const CAM_LIFT=9;
+  camX=sn(pxr-VW/2);camY=sn(pyr-CAM_LIFT-VH/2);
+  // Safety net from v0.55 (never under the bars): the middle is clear of the top frames and the spell grid on any normal
+  // phone, but ui() still measures what sits over you and nudges the view if a very short screen ever puts you under one.
   if(camSafe.ready){const now=performance.now(),k=Math.min(1,(now-(camSafe.t||now))/90);camSafe.t=now;
     camSafe.top+=(camSafe.wantTop-camSafe.top)*k;camSafe.bot+=(camSafe.wantBot-camSafe.bot)*k;
     const g=S/dpr; // CSS pixels per game pixel
@@ -193,12 +192,23 @@ function render(){
   lx.fillStyle='#050507';lx.fillRect(0,0,VW,VH);
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(world,0,0);
-  // Past the map's top or bottom edge (the strip the camera shows so you're never under the bars or the spell grid), the
-  // ground carries on as a mirror of the edge instead of black (owner, v0.55): roads run on, grass and moss keep going.
-  // Areas keep ground-only edge strips (no buildings to double up); the older built-in maps mirror the whole edge.
-  {const H=world.height,eT=world.edgeTop||world,eB=world.edgeBot||world,ht=Math.min(Math.ceil(-camY)+1,eT.height),hb=Math.min(Math.ceil(camY+VH-H)+1,eB.height);
-    if(ht>1){lx.save();lx.scale(1,-1);lx.drawImage(eT,0,0,eT.width,ht,0,0,eT.width,ht);lx.restore()}
-    if(hb>1){lx.save();lx.translate(0,2*H);lx.scale(1,-1);lx.drawImage(eB,0,eB.height-hb,eB.width,hb,0,H-hb,eB.width,hb);lx.restore()}}
+  // Past the map edges the ground carries on as a mirror of the edge instead of black (owner, v0.55 top and bottom; v0.76
+  // left, right and the corners): roads run on, grass and moss keep going. Areas keep ground-only edge strips (no buildings
+  // to double up); the older built-in maps mirror the whole edge. Corners mirror the top or bottom strip both ways.
+  {const H=world.height,W=world.width,eT=world.edgeTop||world,eB=world.edgeBot||world,eL=world.edgeLeft||world,eR=world.edgeRight||world;
+    const ht=Math.min(Math.ceil(-camY)+1,eT.height),hb=Math.min(Math.ceil(camY+VH-H)+1,eB.height),
+      wl=Math.min(Math.ceil(-camX)+1,eL.width),wr=Math.min(Math.ceil(camX+VW-W)+1,eR.width);
+    // m(img, sx,sy,w,h, flipX,flipY, dx,dy): copy a piece of a strip, mirrored about the map edge at dx / dy.
+    const m=(im,sx,sy,w,h,fx,fy,ex,ey)=>{if(w<=1||h<=1)return;lx.save();lx.translate(ex,ey);lx.scale(fx?-1:1,fy?-1:1);lx.drawImage(im,sx,sy,w,h,0,0,w,h);lx.restore()};
+    m(eT,0,0,eT.width,ht,0,1,0,0);                              // above the top edge
+    m(eB,0,eB.height-hb,eB.width,hb,0,1,0,2*H-(H-hb));          // below the bottom edge
+    m(eL,0,0,wl,eL.height,1,0,0,0);                             // left of the left edge
+    m(eR,eR.width-wr,0,wr,eR.height,1,0,2*W-(W-wr),0);          // right of the right edge
+    const cw=Math.min(wl,eT.width),cr=Math.min(wr,eT.width);
+    m(eT,0,0,cw,ht,1,1,0,0);                                    // top-left corner
+    m(eT,eT.width-cr,0,cr,ht,1,1,2*W-(W-cr),0);                 // top-right corner
+    m(eB,0,eB.height-hb,cw,hb,1,1,0,2*H-(H-hb));                // bottom-left corner
+    m(eB,eB.width-cr,eB.height-hb,cr,hb,1,1,2*W-(W-cr),2*H-(H-hb));} // bottom-right corner
   if(curArea())drawAreaCritters(curArea(),0); // frogs, ripples, crows on the ground (v0.49)
   if(curArea())drawAreaFog(curArea());
   if(zoneId==='over'){drawCamp();drawCritters();}
