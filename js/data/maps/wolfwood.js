@@ -76,7 +76,7 @@ obj lantern 58 44
 # Story 1, the hunter who didn't come back: his things on Greyfang's trail by the den; at his camp the fire is still kept,
 # a stew pot still hangs over the fire (v0.87; the second bedroll and the camp kit were cut: they did not read).
 # Story 2, the woodcutters gave up: a fir half sawn through with the saw left in it, their stack gone grey, a cart.
-# Story 3, the blight kills: a deer's bones in the grey, toadstools, foxfire glowing on the rot.
+# Story 3, the blight kills: a deer's bones in the grey, toadstools (foxfire cut in v0.88: it did not read).
 obj hunter_remains 31 7
 obj saw_log 45 13
 obj log_stack 47 15
@@ -86,11 +86,6 @@ obj cart 48 17
 obj deer_bones 24 17
 obj toadstools 25 23
 obj toadstools 36 14
-obj foxfire 21 21
-obj foxfire 39 27
-obj foxfire 27 13
-obj foxfire 33 24
-obj foxfire 17 32
 obj game_rack 51 27
 obj chop_block 50 23
 obj toadstools 10 26
