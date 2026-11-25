@@ -117,4 +117,16 @@ window       1 1 0      wall   0     -    3
 table        3 1 1      floor  0     -    0
 cage         2 2 1      floor  0     -    0
 bell_mold    2 2 1      floor  1     -    0
+smashed_coffin 2 1 1      floor  0     -    0
+open_coffin  2 1 1      floor  0     -    0
+loot_sack    1 1 0      floor  0     -    0
+robber_remains 2 1 0    floor  0     -    0
+skull_pile   1 1 1      floor  0     -    0
+mourner_shrine 1 1 1    floor  0     -    2
+slab         2 1 1      floor  0     -    0
+urn          1 1 1      floor  0     -    0
+feast_table  3 1 1      floor  0     -    1
+weapon_rack  1 1 1      floor  0     -    0
+crown_shards 1 1 0      floor  0     -    0
+cobweb       1 1 0      floor  0     -    0
 `;
