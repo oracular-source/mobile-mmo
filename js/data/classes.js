@@ -144,7 +144,7 @@ const CLASSES={
     {id:'slash',icon:'sword',name:'Slash',short:'Slash',lvl:1,mana:0,cast:0,cd:null,range:18,col:'#cfd6e0',tgt:1,tag:'Melee',kind:'nuke',dmg:[7,2.8],melee:1},
     {id:'smend',icon:'note',name:'Song of Mending',short:'Mending',lvl:1,mana:5,cast:0,cd:[2,2,0],col:'#7dffa6',tgt:0,tag:'Song: heal',kind:'song',song:'heal',heal:[3,1.2]},
     {id:'dirge',icon:'note',name:'Dirge',short:'Dirge',lvl:2,mana:5,cast:0,cd:[2,2,0],col:'#c8506a',tgt:0,tag:'Song: hurt mobs near you',kind:'song',song:'dmg',dmg:[4,2],radius:32},
-    {id:'travel',icon:'note',name:'Song of Travel',short:'Travel',lvl:3,mana:3,cast:0,cd:[2,2,0],col:'#7dbbd0',tgt:0,tag:'Song: run faster',kind:'song',song:'speed'},
+    {id:'travel',icon:'note',name:'Song of Travel',short:'Travel',lvl:3,mana:3,cast:0,cd:[2,2,0],col:'#7dbbd0',tgt:0,tag:'Song: run faster (less in a fight)',kind:'song',song:'speed'},
     {id:'lullaby',icon:'moon',name:'Lullaby',short:'Lullaby',lvl:4,mana:8,cast:0,cd:[10,7,0.3],range:70,col:'#e0c3ff',tgt:1,tag:'Sleep',kind:'mez',dur:[9,0.2]},
     {id:'chant',icon:'note',name:'Chant of Blades',short:'Chant',lvl:5,mana:5,cast:0,cd:[2,2,0],col:'#cfd6e0',tgt:0,tag:'Song: swing faster',kind:'song',song:'haste'},
     {id:'discord',icon:'note',name:'Discord',short:'Discord',lvl:6,mana:5,cast:0,cd:[2,2,0],col:'#8a6ad0',tgt:0,tag:'Song: mobs attack slower',kind:'song',song:'discord',radius:32},

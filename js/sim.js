@@ -27,7 +27,8 @@ function arenaMob(type,lv,x,y,group){
 }
 function arenaSpawn(f,L){
   const lv=f.lv||L,x=player.x+80,y=player.y;
-  return f.mobs.map((t,i)=>arenaMob(t,lv,x+i*14,y+(i?14:0),f.mobs.length>1?'pair':null));
+  // lvs: each mob's own level. atPull marks the mobs there from the start (a named's guards), not ones raised mid-fight.
+  return f.mobs.map((t,i)=>{const m=arenaMob(t,f.lvs?f.lvs[i]:lv,x+i*14,y+(i?14:0),f.mobs.length>1?'pair':null);if(m)m.atPull=1;return m});
 }
 
 /* ---------- Bot helpers: what a player sees and can tap ---------- */
@@ -62,7 +63,18 @@ const B={
   // Boss telegraph (any class, checked before the playbook): when a boss starts its big cast, a player taps a stun or fear
   // that reaches; failing that, steps out of range if there's time to make it. Returns true if it acted this tick.
   counter:()=>{
-    const m=B.live().find(x=>x.casting&&victim(x)===player);if(!m)return false;
+    // Telegraphed ground (v0.76): a player steps out of rings marked under them (Ember Brand, a great wisp's Fire Ring, the
+    // Prior's ripples) and back out of the Bellringer's Toll, unless a stun that reaches stops the caster first.
+    const inEll=(cx,cy,r)=>Math.hypot((player.x-cx)/r,(player.y-cy)/(r*0.6))<=1;
+    const hz=hazards.find(h=>h.t<h.dur&&inEll(h.x,h.y,h.r+3));if(hz){B.stepOut(hz.x,hz.y,hz.r+8);return true}
+    const tg=B.live().find(x=>x.casting&&((x.casting.toll&&dist(x,player)<TOLL.r+4)||(x.casting.grasp&&inEll(x.casting.spot.x,x.casting.spot.y,GRASP.r+3))));
+    if(tg){const st=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='fear'&&(!a.undeadOnly||isUndead(tg)))||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&dist(player,tg)<=(a.radius||a.range||18));
+      if(st&&B.use(st.id,tg))return true;
+      if(tg.casting.toll)B.stepOut(tg.x,tg.y,TOLL.r+8);else B.stepOut(tg.casting.spot.x,tg.casting.spot.y,GRASP.r+8,tg);return true}
+    // A heal cast (Mend, Malrec's Rite) is worth a stun but never worth running from.
+    const hc=B.live().find(x=>x.casting&&x.casting.heal);
+    if(hc){const st=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&dist(player,hc)<=(a.radius||a.range||18));if(st&&B.use(st.id,hc))return true}
+    const m=B.live().find(x=>x.casting&&!x.casting.heal&&victim(x)===player&&!x.casting.toll&&!x.casting.grasp);if(!m)return false;
     const left=m.casting.dur-m.casting.t,d=dist(player,m);
     const a=C.abilities.find(a=>(a.kind==='stun'||(a.kind==='fear'&&(!a.undeadOnly||isUndead(m)))||(a.kind==='cleave'&&a.stun))&&B.can(a.id)&&d<=(a.radius||a.range||18));
     if(a&&B.use(a.id,m))return true;
@@ -72,8 +84,18 @@ const B={
       m.casting.fled=true;B.kite(m);return true}
     return false;
   },
+  // Walk to the nearest point r away from (cx,cy), straight out from it (backing away from the nearest mob if you stand on the centre).
+  stepOut:(cx,cy,r,m)=>{let dx=player.x-cx,dy=player.y-cy,d=Math.hypot(dx,dy);
+    if(d<2){const o=m&&dist(m,player)<60?m:B.onMe()[0];if(o){dx=player.x-o.x;dy=player.y-o.y}else{dx=1;dy=0}d=Math.hypot(dx,dy)||1}
+    player.sit=false;let px=cx+dx/d*r,py=cy+dy/d*r;if(blocked(px,py)){px=cx-dy/d*r;py=cy+dx/d*r}player.tx=px;player.ty=py},
   // Who to hit: the current target if it's alive, else whatever is fighting you, else the nearest mob.
-  target:()=>{const t=player.target;if(t&&!t.dead)return t;const f=B.fighting();return f[0]||nearestMob(999)}
+  // Adds first (v0.76): when a named comes with guards (there at the pull, not raised mid-fight like the King's skeletons),
+  // a player kills the guards first (lowest health first, ones in reach before far ones), and Malrec's candle wisps, leaving alone anything mezzed or charmed, then turns on the named
+  // (once a named is under a fifth of its health, a player finishes it).
+  target:()=>{let t=player.target;if(t&&t.dead)t=null;
+    if(!t||((t.def.named||t.def.boss)&&t.hp>t.maxhp*0.2)){const adds=B.live().filter(m=>((m.state==='chase'&&m.atPull)||m.def.drift)&&!m.def.named&&!m.def.boss&&!(m.mez>0)&&!m.charm); // drift: Malrec's candle wisps
+      if(adds.length&&(t||B.fighting().some(m=>m.def.named||m.def.boss))){const close=adds.filter(m=>dist(m,player)<=50);return (close.length?close:adds).sort((a,b)=>a.hp-b.hp)[0]}}
+    if(t)return t;const f=B.fighting();return f[0]||nearestMob(999)}
 };
 
 /* ---------- Playbooks as code ("when X, do Y", top rule first) ---------- */
@@ -328,7 +350,7 @@ const BOTS={
       const on=B.onMe().filter(m=>!(m.root>0)&&!(m.stun>0)).sort((a,b)=>dist(a,player)-dist(b,player));
       const th=on[0],d=th?dist(th,player):999;
       // 1. Low and losing: Gate out (an escape, not a death).
-      const bossM=fight.find(m=>m.def.boss),gl=bossM||t; // against a boss, judge by the boss, not one of its adds
+      const bossM=fight.find(m=>m.def.boss||m.def.named),gl=bossM||t; // against a boss, judge by the boss, not one of its adds
       if(B.hp()<0.35&&gl.hp/gl.maxhp>0.4&&B.can('gate')&&d>40){B.stop();B.use('gate');return}
       // 2. Low: Mana Shield, Blink away, Freeze.
       if(B.hp()<0.35){if(!(player.buffs.mshield>0)&&B.can('mshield')){B.use('mshield');return}
@@ -383,6 +405,8 @@ const BOTS={
       // 7. Nothing on you: sit for mana. 8. Otherwise Lash.
       if(!on.length){if(B.mp()<0.9){B.stop();player.sit=true}else if(B.near(t,38)&&B.can('lash'))B.use('lash',t);return}
       const th=on[0];if(th&&dist(th,player)<20)B.kite(th);else B.near(t,38);
+      // Something on you and the target out of reach: Lash what's on you (v0.76; kiting toward a far caster never got there).
+      if(B.can('lash')&&dist(player,t)>40&&th&&dist(th,player)<=40){B.use('lash',th);return}
       if(B.can('lash')&&dist(player,t)<=40)B.use('lash',t);
     }
   },
@@ -492,9 +516,9 @@ const BOTS={
       if(!fight.length){if(B.near(t,14)&&B.can('slash'))B.use('slash',t);return}
       // Boss: kite it (EverQuest bard style). Song of Travel + Dirge, staying just inside Dirge's reach so it keeps
       // pulsing while Boss 1 never catches you; when it starts casting, run out of range.
-      if(fight.some(m=>m.def.boss)&&player.lvl>=3){
+      if(fight.some(m=>m.def.boss||m.def.named)&&player.lvl>=3){ // named count as bosses (v0.76: Dungeon 1)
         for(const id of ['travel','dirge'])if(!songOn(id)){if(B.can(id)){B.use(id);return}}
-        const boss=fight.find(m=>m.def.boss);
+        const boss=fight.find(m=>m.def.boss||m.def.named);
         if(boss.casting){B.kite(boss);return}
         const near=fight.filter(m=>dist(m,player)<22);
         if(near.length)B.kite(near[0]);else if(dist(player,boss)>28)B.near(boss,24);else B.kite(boss);
@@ -721,9 +745,10 @@ function dungeonPace(L,seed,noWade){
     A.spawns.forEach(sp=>{const k=sp.group||('solo'+A.spawns.indexOf(sp));if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
     // nearest group next, as a player would walk it (the map's own order isn't the walking order)
     while(order.length){order.sort((a,b)=>Math.hypot(by[a][0].x-px,by[a][0].y-py)-Math.hypot(by[b][0].x-px,by[b][0].y-py));const g=by[order.shift()];
-      const types=g.map(sp=>sp.type).sort((a,b)=>(TYPES[b].named?1:0)-(TYPES[a].named?1:0)),lv=Math.max.apply(null,g.map(sp=>sp.lv[1]));
+      g.sort((a,b)=>(TYPES[b.type].named?1:0)-(TYPES[a.type].named?1:0));
+      const types=g.map(sp=>sp.type),lvs=g.map(sp=>sp.lv[1]); // each mob at the top of its own map level
       t+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
-      for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lv:lv,wade:!noWade&&types.some(x=>TYPES[x].grasp)},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
+      for(let tries=0;tries<2;tries++){fights++;const r=simFight({mobs:types,lvs:lvs,wade:!noWade&&types.some(x=>TYPES[x].grasp)},L,seed*104729+fights,'');t+=r.t+(r.rest||0);
         const nm=types.find(x=>TYPES[x].named);if(nm)named[TYPES[nm].name]=(named[TYPES[nm].name]||'')+(r.win?'W':r.death?'D':'T')+Math.round(r.t)+'s ';
         log.push(types.join('+')+' '+(r.win?'win':'lose')+' '+Math.round(r.t)+'s rest '+Math.round(r.rest||0)+'s');
         if(r.win)break;deaths++;t+=PACE_DEATH}}

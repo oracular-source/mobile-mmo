@@ -7,6 +7,35 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
 
+## Dungeon 1 named fights, bots play the mechanics (v0.76, Nov 24, balance chat)
+Each named group as one arena fight at level 15 (every mob at its map level), 10 fights each (seeds 7000–7009), the Prior's in wall-to-wall water. Cells: wins in 10, **before → after** the v0.76 bot changes (same game; median win time in brackets). Last column: wins with the tuning that was **tried but not shipped** (owner, Nov 24: the finale is being redone in the boss pass first): guards in the three rooms at level 14 (named stay 15) and the candle wisp heal 8% → 5%; measured before the Bard's speed nerf.
+
+**What the bots learned (all classes, `docs/playbooks.md`):** kill a named's guards first (lowest health first, ones in reach first; not adds a boss raises mid-fight, so the Skeleton King and Gnawbone sims don't change), kill Malrec's candle wisps, finish a named under a fifth; step out of Ember Brand, Fire Rings and the Prior's ripples; back out of the Toll (or stun him); stun heal casts, never run from them. The Wizard judges Gate by the named, the Bard kites named like bosses, the Magician Lashes what's on it when its target is out of reach.
+
+| Class | Drowned Prior + 2 dead | Bellringer + 2 | Malrec + 2 deacons | Parked tuning (Prior / Bell / Malrec) |
+| --- | --- | --- | --- | --- |
+| Druid | 10 → 10 (55s) | 6 → 8 (58s) | 0 → 2 (81s) | 10 / 7 / 8 |
+| Warrior | 0 → 10 (90s) | 0 → 9 (82s) | 0 → 7 (111s) | 10 / 10 / 8 |
+| Rogue | 0 → 2 (46s) | 0 → 4 (42s) | 0 → 1 (53s) | 5 / 3 / 1 |
+| Necromancer | 3 → 5 (49s) | 6 → 8 (54s) | 8 → 7 (68s) | 8 / 10 / 10 |
+| Cleric | 10 → 10 (84s) | 0 → 2 (107s) | 0 → 3 (163s) | 10 / 2 / 3 |
+| Enchanter | 10 → 10 (57s) | 9 → 10 (54s) | 10 → 10 (92s) | 10 / 10 / 10 |
+| Paladin | 3 → 10 (41s) | 0 → 10 (82s) | 0 → 5 (109s) | 10 / 10 / 10 |
+| Shadow Knight | 0 → 9 (61s) | 9 → 10 (53s) | 7 → 9 (77s) | 9 / 10 / 10 |
+| Wizard | 10 → 10 (54s) | 0 → 8 (60s) | 0 → 0 | 10 / 9 / 0 |
+| Magician | 6 → 10 (64s) | 0 → 0 | 10 → 10 (82s) | 10 / 7 / 10 |
+| Ranger | 9 → 10 (63s) | 9 → 6 (62s) | 10 → 10 (98s) | 10 / 10 / 10 |
+| Monk | 6 → 8 (77s) | 3 → 8 (64s) | 7 → 5 (102s) | 10 / 10 / 5 |
+| Shaman | 10 → 10 (55s) | 10 → 10 (49s) | 10 → 10 (64s) | 10 / 10 / 10 |
+| Bard | 0 → 10 (253s) | 0 → 0 | 0 → 0 | 10 / 0 / 3 |
+
+**Reading it:**
+- **Most of the old walls were the bots, not the fights.** Standing in the Toll (2 s stun plus a big hit) and tanking the named with both guards on you was what killed the Warrior, Paladin and Shadow Knight. Played properly, the Warrior now never dies in a full run.
+- **Still losing after the bot fixes:** the Rogue (everything: no self-heal, three at once), the Cleric (Bellringer and Malrec: too little damage for three level 15s), the Wizard vs Malrec (his Ash Bolt hits a fifth of its health every 9 s and it has no interrupt; it Gates out), the Magician and Bard vs the Bellringer, the Druid vs Malrec.
+- **Small drops:** Necro and Monk on Malrec and the Ranger on the Bellringer lose a fight or two more than before (killing guards first costs them time); within seed noise for the Necro.
+- **Bard speed nerf (v0.76):** with Song of Travel at 1.35x in fights the Bard still kites the Skeleton King (6/6 at 6, 8 and 10, same times as before). At 1.32x or less he can't get out of the bolt's range in time and **never** beats the King up to level 10 (the no-kite plan can't either), so there is no in-between: 1.35x is the lowest that keeps the Bard soloing bolt bosses. A perfect bot still makes it; a person has very little slack.
+- **Regression check** (Skeleton King and Old Gnawbone, levels 5–10, 6 seeds): unchanged except Magician beats the King at 6 (was 7) and the Bard beats Gnawbone at 5 (was 8; it now kites named).
+
 ## Dungeon 1 run (v0.63, Nov 20, map chat)
 `runDungeon({seeds:2})` (open with `?debug`; `optional:true` adds the Bellringer's foundry): one run through Brother Malrec's chapel at level 15 (the cap is 16). Each camp or group is one arena fight (all its mobs at once), then rest to 80%, plus walking at 1.4× the straight line; a lost fight costs 25 s and one retry. Best case: bots play perfectly, the arena has no flood water (so the Prior's Grasp always misses and nobody wades) and fights don't chain. **Target (owner): 10–15 minutes.** Malrec column = his fight with both deacons (W win, D death, T timeout; seconds), two seeds, up to two tries each.
 

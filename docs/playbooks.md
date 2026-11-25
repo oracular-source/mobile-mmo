@@ -10,6 +10,8 @@ Things all classes share (from the game rules today):
 - Sitting regenerates mana 4x and health about 4x faster (doubled again by the campfire). Getting hit while sitting does +25% damage and stands you up.
 - "Low health" below means about 35%; "low mana" means about 20%.
 - **Boss casts (every class, checked before the class rules, v0.18.3):** when Boss 1 starts its 2s Shadow Bolt cast (purple bar), use a stun or fear that reaches to interrupt it. If none is ready and you are below 60% health, step out of range (110) if you can get there before it lands, and wait there until it falls short.
+- **Named with guards (every class, v0.74):** when a named comes with guards (the Drowned Prior's dead, the Bellringer's pair, Malrec's deacons), kill the guards first, lowest health first and ones in reach before far ones; leave alone anything you have mezzed or charmed. Kill Malrec's candle wisps as they drift in. Once the named is under a fifth of its health, finish it. Adds a boss raises mid-fight (the Skeleton King's skeletons, Gnawbone's rats) don't count: keep on the boss.
+- **Telegraphs on the ground (every class, v0.74):** step out of a ring marked under you (Ember Brand, a great wisp's Fire Ring, the Prior's ripples), backing away from the nearest mob. When the Bellringer heaves his clapper (Toll), stun him if you can, else step back out of reach. A heal cast (a mender's Mend, Malrec's Rite) is worth a stun, never worth running from. Named count as bosses for class rules that say "boss" (the Wizard judges Gate by the named; the Bard kites them).
 
 ---
 
@@ -401,7 +403,7 @@ New rules this batch needs:
 | 1 | Slash | melee | Blade swing (main attack) |
 | 1 | Song of Mending | song | Heals you and anyone nearby a little every pulse |
 | 2 | Dirge | song | Hurts every mob near you a little every pulse |
-| 3 | Song of Travel | song | Much faster run speed while it plays |
+| 3 | Song of Travel | song | Much faster run speed while it plays (1.6x; 1.35x while anything fights you, v0.76) |
 | 4 | Lullaby | mez | Puts a mob to sleep (shorter than the Enchanter's) |
 | 5 | Chant of Blades | song | Your swings are 25% faster |
 | 6 | Discord | song | Mobs near you attack 20% slower |
@@ -413,7 +415,7 @@ New rules this batch needs:
 1. Health low → swap a song to Song of Mending; level 8: Crescendo with Mending playing.
 2. A second mob is coming and Lullaby ready → Lullaby it.
 3. Two or more mobs and Dirge playing → kite them in circles inside the Dirge (keep moving).
-**Bosses (owner, Nov 17, v0.18.4): kite, slow but safe.** From level 3, play Song of Travel and Dirge and drag Boss 1 around just inside Dirge's reach so it never catches you; when it starts casting, run out of range. Takes a few minutes, almost no risk.
+**Bosses (owner, Nov 17, v0.18.4): kite, slow but safe.** (v0.76: Travel is only 1.35x in a fight, so getting out of a bolt's range now takes a quick reaction; named count as bosses.) From level 3, play Song of Travel and Dirge and drag Boss 1 around just inside Dirge's reach so it never catches you; when it starts casting, run out of range. Takes a few minutes, almost no risk.
 4. Otherwise → Slash.
 **Getting around:** Song of Travel between fights.
 **Between fights:** sit with Song of Mending playing until health and mana are about 80%.
