@@ -10,9 +10,9 @@ Owner, Nov 17: items 1–5 are leaning, not locked; revisit once real leveling t
 3. **Never more than about 3 sessions without something new:** a level, an upgrade, a named drop or a step in an ability quest.
 4. **Ability counts:** the core kit by about level 10 (classes have 7–8 now), then 3–4 more by level 30 (**about 10–12 total**), and about 3 more by 50 (**about 13–15**). Loadout stays at 8 slots, so a few abilities always sit on the bench, and that's the build.
 5. **Merge instead of adding:** abilities that do a similar job become fork options on one button (see the Druid example below). Replaces design.md's "15–20 abilities by 30".
-6. **Skill tree = forks (decided Nov 18).** No tree before level 10: players are still learning their kit. The **first fork at level 10 is the "first big step"**. At **level 10 and every even level after**, one ability gets its **fork**: pick one of **two** versions. Each ability gets one fork; utility like Gate or Circle Port may get none.
-7. **Majors at 20 and 30** (40 and 50 in the expansions). A major is class-wide, has **three** options, and changes the class's signature mechanic. Level 20 = *how you play* (solo or group, pet or self); level 30 = *your big moment* (a flashy new effect or a once-a-fight power). A major takes that even level's slot, so by 30: **9 ability forks (10, 12, 14, 16, 18, 22, 24, 26, 28) + 2 majors**.
-8. **Odd levels:** new abilities, rank-ups, and the 7th and 8th loadout slots (15 and 25). Every level still brings something.
+6. **Skill tree = forks (decided Nov 18).** No tree before level 10: players are still learning their kit. The **first fork at level 10 is the "first big step"**. One ability gets its **fork** (pick one of **two** versions) **every 2 levels up to 20 (10, 12, 14, 16, 18), then every 3 (23, 26, 29; then 33, 36, 39, 43, 46, 49)** (pacing decided by the owner Nov 24, option B: early levels stay exciting, later levels don't get overwhelming). Each ability gets one fork; utility like Gate or Circle Port may get none.
+7. **Majors at 20 and 30** (40 and 50 in the expansions). A major is class-wide, has **three** options, and changes the class's signature mechanic. Level 20 = *how you play* (solo or group, pet or self); level 30 = *your big moment* (a flashy new effect or a once-a-fight power). By 30: **8 ability forks (10, 12, 14, 16, 18, 23, 26, 29) + 2 majors** (10 picks). By 50: about **14 forks + 4 majors**, so with one fork per ability, forks and abilities (13–15 by 50) run out together. Classes with short kits (Druid and Necro have 6 today) need their odd-level abilities built before then. Past 50: decide later (AAs were proposed).
+8. **Levels without a fork:** new abilities, rank-ups, and the 7th and 8th loadout slots (15 and 25). Every level still brings something.
 9. **Power comes from your level, not your picks.** Both sides of a fork are a bit stronger than the base ability and about equal to each other; they differ by situation (solo vs group, one mob vs many). Mobs are tuned assuming "has a fork at this level", whichever side. Abilities still grow a little every level on their own. No "+5%" options. Sim each side (solo, group, boss); if one wins everywhere, redesign it.
 10. **Swapping is free in town.** Until Town 1 exists: you pick at the ding (a "pick your new toy" card), then swap for free at any campfire (owner, Nov 19).
 11. **No skill points;** forks replace the old stat points, and stats come from gear.
@@ -82,6 +82,24 @@ Same rules again. Each class forks an ability that had no fork yet, and classes 
 - **Shaman · Venom Totem:** *Toxic Totem* (stronger poison on every mob near it) / *Mending Totem* (heals you while you stand near it; poisons one mob).
 - **Bard · Dirge:** *Dirge of Ruin* (damage builds the longer a mob stays near you) / *Requiem* (weaker, each mob it kills heals you).
 **Built (v0.44, Nov 19):** all 14 level 14 forks are in the game (`?level=14`). Lacerate's copies are about 75% each; Living Bomb burns 9s then explodes in a small circle; Double Hop keeps a second hop in store (0.6s between hops); Shared Flames falls back to you when no pet is out.
+
+### Level 16 forks, all 14 classes (draft Nov 24, owner to approve)
+Same rules. Each class forks an ability with no fork yet; this round leans on **offense vs defense** and **solo vs group later**, since 10–14 already did a lot of one mob vs many.
+- **Necromancer · Dread:** *Mass Dread* (fears every mob near you, shorter) / *Dread Rot* (one mob; your DoTs hit it 30% harder while it's feared).
+- **Druid · Rootgrip:** *Briar Wall* (roots every mob in an area) / *Strangling Roots* (one mob, longer root, takes damage while held).
+- **Warrior · Hamstring:** *Crippling Strike* (snared mob also attacks 20% slower) / *Hamstring Bleed* (snared mob bleeds; the bleed grows while it moves).
+- **Rogue · Hide:** *Vanish* (Hide mid-fight on a long cooldown: every mob loses you, and a Backstab within 4s counts as from Hide) / *Stalk* (full speed while hidden; your opener stuns 2s).
+- **Cleric · Greater Heal:** *Flash Heal* (1s cast, about 70% size) / *Blessed Heal* (full size, plus a short Renew on you and anyone nearby).
+- **Enchanter · Animate Blade:** *Blade Pair* (two weaker swords) / *Runeblade* (one tougher sword that lasts until it dies and can hold a mob briefly).
+- **Paladin · Holy Bash:** *Hammer of Justice* (thrown from range, longer stun, always breaks a cast) / *Bash of Light* (normal stun, heals you for a chunk).
+- **Shadow Knight · Terror:** *Mass Terror* (fears every mob near you, short) / *Death Grip* (yanks one mob to you and taunts it: a pull, or a tank tool in groups).
+- **Wizard · Blink:** *Frost Blink* (leaves an icy patch that roots the first mob to cross it) / *Arcane Blink* (your next spell after Blink is instant).
+- **Magician · Mend Elemental:** *Rejuvenate* (heals your pet over time and you a little) / *Empowering Mend* (normal heal; the pet's next 5 hits are stronger).
+- **Ranger · Rapid Fire:** *Barrage* (shots pierce through to mobs behind the target) / *Focused Fire* (lasts twice as long; each shot on the marked mob raises the Mark bonus).
+- **Monk · Deflect:** *Riposte* (every dodged hit strikes back) / *Iron Body* (lasts longer and also dodges spells and arrows).
+- **Shaman · Cannibalize:** *Ancestral Gift* (mana over time for you and anyone nearby) / *Blood Rite* (instant mana; your next DoT ticks 30% harder).
+- **Bard · Discord:** *Dissonance* (mobs near you take 15% more from your songs) / *Soothing Discord* (stronger slow, 30%, for packs).
+- **Sim check (when built):** single fight, pack and long named fight at levels 16–18, DPS tracked. Watch for: Vanish resets, Death Grip pulling a pack apart one by one, Riposte with Deflect uptime, Blood Rite letting a Shaman skip sitting.
 - **Sim check (when built):** same as level 12, at levels 14–15. Watch for: Tiger Leap chaining through a whole pull, Retaliation plus Iron Stance on tanks in groups later, Wraith healing on packs.
 
 ### Example: Necromancer (draft)
