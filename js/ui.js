@@ -48,7 +48,7 @@ function buildControls(){
     // The thumb rests a little high on the grid, so the first spells go on top. Arrange still moves anything anywhere.
     // Above it: Back and Next target, which cycle through nearby enemies in opposite directions.
     // v0.33.2 (owner): the grid sits one button higher off the bottom edge (GRID_LIFT buttons; owner may try 1.5).
-    const [W,H,G,FS]=GRID_PX[settings.gridSize]||GRID_PX.M,M=10,MB=M+Math.round(GRID_LIFT*(H+G)); // M = side margin, MB = bottom margin
+    const [W,H,G,FS]=GRID_PX[settings.gridSize]||GRID_PX.M,M=10,MB=M+(LAND?0:Math.round(GRID_LIFT*(H+G))); // sideways (v0.75): no lift, the screen is too short // M = side margin, MB = bottom margin
     for(let i=0;i<8;i++){
       const row=Math.floor(i/2), onLeft=i%2===0; // row 0 = top
       const fromEdge=(side==='right')===onLeft?1:0; // distance in columns from the screen edge the grid hugs
@@ -96,7 +96,7 @@ function buildControls(){
 // Kept to 2 spells so the screen never shows more than 8 ability buttons (a design rule).
 // Sit lives here (not in a menu) because Necros sit a lot while the pet and DoTs do the work.
 function sideBar(side,sitOnly){
-  const sz=48,gap=8,base=8+96+8+44; // chat box bottom + height + gap, lifted 44px (v0.27.1 play-test: was too low)
+  const sz=48,gap=8,base=LAND?84:8+96+8+44; // chat box bottom + height + gap, lifted 44px (v0.27.1 play-test: was too low); sideways (v0.75) just above the chat box
   // v0.30.2 (owner): Sit is a square in the same plain grey style as the spell grid, so both sides match, but smaller
   // (about 80% of a spell button) since the left side has less on it. Pet buttons will use this size later.
   const g=GRID_PX[settings.gridSize]||GRID_PX.M,W=Math.round(g[0]*0.8),H=Math.round(g[1]*0.8),FS=g[3]-1;

@@ -120,20 +120,29 @@ function measureSafe(){
 // The game scales up by whole steps (S) so pixels stay crisp, so the real width snaps to the nearest step.
 // Resolution cap is 3x (was 2x) so phones get finer zoom steps.
 const ZOOM_MIN=150, ZOOM_MAX=210; // farthest zoom is one notch past a 210-pixel-wide view (tuned by play-test in v0.11.7)
-function zoomSteps(){const lo=Math.max(2,Math.ceil(cv.width/ZOOM_MAX)-1),hi=Math.max(lo,Math.floor(cv.width/ZOOM_MIN));return [lo,hi]}
+// Landscape (v0.75, UI breakdown 22, owner picked A1 with centred frames): zoom is measured across the screen's SHORT side,
+// so a phone on its side shows the same amount of world as upright, just turned. settings.zoom means that short side.
+const zoomSide=()=>Math.min(cv.width,cv.height);
+function zoomSteps(){const sd=zoomSide(),lo=Math.max(2,Math.ceil(sd/ZOOM_MAX)-1),hi=Math.max(lo,Math.floor(sd/ZOOM_MIN));return [lo,hi]}
 function applyZoom(){
   const [lo,hi]=zoomSteps();
-  S=Math.min(hi,Math.max(lo,Math.round(cv.width/settings.zoom)));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
+  S=Math.min(hi,Math.max(lo,Math.round(zoomSide()/settings.zoom)));VW=Math.ceil(cv.width/S);VH=Math.ceil(cv.height/S);
 }
+// LAND = phone held sideways. Turning the phone just re-lays the HUD (class "land" on <body>, controls rebuilt); nothing reloads.
+let LAND=false;
 function resize(){
   const r=$('view').getBoundingClientRect();dpr=Math.min(3,window.devicePixelRatio||1);
   cv.width=Math.round(r.width*dpr);cv.height=Math.round(r.height*dpr);
+  const land=r.width>r.height;
+  if(land!==LAND){LAND=land;document.body.classList.toggle('land',land);
+    ['toggles','topbtns','mm','logpanel','devbtn'].forEach(id=>{const el=$(id);if(el){el.style.top='';delete el.dataset.dy;delete el.dataset.top}});
+    if(typeof ctrl!=='undefined'&&ctrl.children.length)buildControls();}
   applyZoom();
 }
 // Step the zoom by one notch (+1 = closer, -1 = farther) and remember it.
 function zoomStep(d){
   const [lo,hi]=zoomSteps(),n=Math.min(hi,Math.max(lo,S+d));if(n===S)return;
-  S=n;settings.zoom=Math.round(cv.width/S);saveSettings();applyZoom();
+  S=n;settings.zoom=Math.round(zoomSide()/S);saveSettings();applyZoom();
 }
 window.addEventListener('resize',resize);
 const bay=[0,8,2,10,12,4,14,6,3,11,1,9,15,7,13,5];
@@ -422,7 +431,8 @@ function ui(){
   if(cm){bc.style.display='block';$('bcastname').textContent=cap(cm.def.name)+': '+cm.casting.name;$('bcastfill').style.width=Math.min(100,100*cm.casting.t/cm.casting.dur)+'%'}else bc.style.display='none';
   // Log, Menu, the minimap and DEV sit under the top frames and move down when the frames grow (debuff tags, buffs wrapping).
   {const hb=$('hud').getBoundingClientRect(),vt=$('view').getBoundingClientRect().top,base=$('hud').offsetTop+52,dy=Math.max(0,Math.round(hb.bottom-vt-base));
-    [['topbtns',62],['mm',100],['logpanel',100],['devbtn',194]].forEach(([id,top])=>{const el=$(id);if(el&&el.dataset.dy!==String(dy)){el.dataset.dy=dy;el.style.top='calc('+(top+dy)+'px + env(safe-area-inset-top))'}})}
+    // Sideways (v0.75) only the Log window sits under the centred frames; Log/Menu, the minimap and DEV live in the top-right corner.
+    (LAND?[['logpanel',76]]:[['topbtns',62],['mm',100],['logpanel',100],['devbtn',194]]).forEach(([id,top])=>{const el=$(id);if(el&&el.dataset.dy!==String(dy)){el.dataset.dy=dy;el.style.top='calc('+(top+dy)+'px + env(safe-area-inset-top))'}})}
 
   const cb=$('castbar');
   if(player.cast){cb.style.display='block';$('castname').textContent=player.cast.a.name;$('castfill').style.width=(100*player.cast.time/player.cast.a.cast)+'%'}else cb.style.display='none';
@@ -445,7 +455,7 @@ function ui(){
     (player.songs||[]).forEach(id=>{const a=ABI[id];if(a)fx.push({k:'song'+id,icon:a.icon||'note',col:a.col,name:a.name})});
     fxRow(bb,fx);
     // Keep the 1st hit / Auto toggles just under the portrait, which grows when buffs wrap to a new line.
-    const tg=$('toggles');if(tg){const top=Math.round($('pframe').getBoundingClientRect().bottom-tg.parentNode.getBoundingClientRect().top+4);if(tg.dataset.top!==String(top)){tg.dataset.top=top;tg.style.top=top+'px'}}}
+    const tg=$('toggles');if(tg&&!LAND){const top=Math.round($('pframe').getBoundingClientRect().bottom-tg.parentNode.getBoundingClientRect().top+4);if(tg.dataset.top!==String(top)){tg.dataset.top=top;tg.style.top=top+'px'}}}
   // Songs that are playing light up their buttons.
   ctrlEls.forEach(el=>{const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];el.classList.toggle('playing',!!(a&&a.kind==='song'&&songOn(a.id)))});
   const sb=$('bsit');if(sb){sb.classList.toggle('sitting',player.sit);sb.textContent=player.sit?'Stand':'Sit'}
