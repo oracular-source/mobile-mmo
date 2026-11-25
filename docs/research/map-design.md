@@ -182,3 +182,19 @@ Replaces the love pass card's tweaks with a rebuild. **Owner (Nov 21):** the v0.
 
 ### Crypt rework direction (owner, Nov 21)
 The same middle-size rules for the crypt when its rework comes up (step C): sketch approved as "the right idea": stairs → landing (its pack in a corner, so you're not jumped on arrival) → ossuary (west) and embalming room (east, chest) both leading into the **coffin hall** (a loop) → antechamber with a **mini named** → throne room with the Skeleton King → back tunnel to Wolfwood. **Fewer packs than the sketch's 11, about 8**, because it's an early area.
+
+## Dungeon 1 boss pass: the finale (direction approved by the owner, Nov 24)
+Owner after playing the monastery: the Bellringer's Toll is quiet and bland, the Drowned Prior is easy to walk around, and Malrec doesn't feel like the last boss (the Prior is the coolest of the three). **Decision (owner, Nov 24):**
+- **Neither can be skipped.** The Prior already seals the stairs down; the Bellringer gets the same: the way on from his foundry stays shut until he's driven off.
+- **At half health each one wails and vanishes** (the Prior sinks into the water, the Bellringer into the dark; a proper animation drafted later). The fight ends there: the lock-in opens, the flood drains, the seal opens, his chest opens.
+- **Finale:** when Brother Malrec dies, **both come back together** in his sanctum to avenge him, toned down from their solo fights, and **they take turns**: never both winding up at once. No options or "harder mode": always both.
+- **Toll, graded by distance:** close in you're **stunned, longer the closer** (about 3 s right next to him down to 1 s); further out you're **slowed, fading with distance** to the edge of the room. Make it loud: a sound wave you can see rolling out, screen shake, dust from the ceiling. The 1.5 s wind-up stays readable so melee can step back.
+- **Grasp, harder to walk off:** more hands, some landing where you're heading; his two dead climbing out of the water now and then; in the finale the water rises over the fight so dry ground shrinks, and a drag toward him you fight against.
+
+**Claude's proposed details (owner to OK before building):**
+1. **Turn order in the finale:** one shared clock: Toll, about 4 s, Grasp, about 4 s, Toll... Each telegraph keeps its bar. The bell's ring knocks the hands back down for a moment (so standing at mid range, slowed but not stunned, is the safe spot to fight from).
+2. **Finale strength:** each returns at **half his solo health** with about 75% damage (they arrive already hurt, which fits the story).
+3. **Malrec's room:** the flood rises in from the doorway when the two appear; a ring of dry stone round the middle shrinks over about 60 s, then holds (never zero ground).
+4. **Run time:** the finale adds about 2–3 min; if the sim goes past 15 min, trim a trash pack on floor 2 rather than shorten the bosses.
+5. **Rewards:** each solo fight's chest opens when he vanishes; Malrec's chest drops after the finale.
+6. **Then:** dungeon sim across all 14 classes (balance chat tunes), and the owner plays it.
