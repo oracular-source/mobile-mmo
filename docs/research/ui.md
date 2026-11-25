@@ -30,6 +30,9 @@ Notes for the UI pass (the "UI double-tap" card on the board). Rough breakdowns 
 17. Never pause: windows and the skill pick (owner picked A, built v0.56)
 18. Buff and debuff icons with timers (owner picked B, built v0.58)
 19. Windows match the HUD, plus small fixes (owner picked B and all six fixes, built v0.60)
+20. Minimap and full map cleanup (built v0.61, v0.61.1)
+21. You on the minimap (built v0.61.2, v0.62.1)
+22. Landscape mode (options drawn Nov 24, owner to pick)
 
 ## 1. Spell pad and Next ⟳
 Now: a round pad, main attack in the middle, five round buttons around it (about 43px, 9px labels), flick or tap; Next ⟳ floats above it. A "classic" fan layout exists in Settings.
@@ -222,3 +225,19 @@ Owner: the "you" marker is much more detailed than everything else. Cause: it's 
 - **C Closer, richer map:** 3 px a tile (~29 tiles across), trees as separate crowns with a shadow, bigger pins and arrow.
 Claude leaned A (fixes the mismatch, no extra clutter; C's zoom could later be a setting). **Owner picked A. Built v0.61.2.**
 **v0.62.1 (owner):** the pixel arrow looked chunky (the full black outline doubles its size); now a slim white navigation pointer with a thin black edge, turned to the exact heading. Code: `mmYou(g,x,y,u)` in `js/minimap.js`.
+
+
+## 22. Landscape mode (owner, Nov 21; drafts Nov 24)
+Owner: let the game also be played with the phone held sideways, as an extra option next to portrait (portrait stays the main way). Drafts: `art/drafts/ui-landscape.png`, made from the real game at 844 × 390 (an iPhone on its side) with the HUD moved for each option.
+**What happens today if you turn the phone:** the home-screen app is locked to portrait (`manifest.json`), and in a browser the game goes wrong: zoom is worked out from the screen's **width**, so sideways it zooms right in (about 210 game pixels wide but under 100 tall: you see a strip), the minimap sits on top of the spell grid, and the target frame stretches across half the screen.
+**Same in every option:**
+- **Zoom from the short side:** sideways, the screen's height gets the 200-ish game pixels the width gets in portrait, so you see the same amount of world, just turned (about 420 × 195 game pixels). Pinch and Near / Far work as now.
+- **Frames keep their portrait width** (about 200 px each) instead of stretching.
+- **Turning the phone mid-game just re-lays the HUD** (no reload, nothing lost); the home-screen app unlocks so it can turn.
+- Windows (Menu, character, map) stay centred at their portrait width.
+**Options:**
+- **A Corners:** today's layout kept to the corners: frames top left, Log / Menu and minimap top right, chat and Sit bottom left (left thumb stays joystick space), the **spell grid turns 4 wide × 2 tall** in the bottom right with Back / Next above it. Biggest view of the world, nothing new to learn.
+- **B Side panels:** the HUD lives in two grey columns, EverQuest-window style: left = your frame, toggles, target, chat, Sit; right = Log / Menu, minimap, Back / Next and the 2 × 4 grid as in portrait. Nothing ever covers the world, but the world is only the middle square (about 225 game pixels wide), so it shows less than A.
+- **C Split spells:** 4 spells at each thumb (2 × 2 bottom left, 2 × 2 bottom right), chat along the bottom middle. Two-thumb casting like a console game, but the left thumb can't walk with the joystick and cast at once, and slot order splits across the screen.
+Claude leans **A**: it keeps the most world on screen, the same muscle memory as portrait (main spell bottom right, joystick bottom left), and it's the smallest change, so the two layouts won't drift apart. B is the pick if covering the world bothers you more than its size.
+
