@@ -63,7 +63,9 @@ function tapWorld(clientX,clientY,targetOnly){
   if(!targetOnly&&tapSummon(wx,wy))return; // the throne or bone pile, when you're standing at it
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering
   if(settings.move!=='tap')return; // only tap-to-walk walks on a ground tap
-  player.tx=wx;player.ty=wy;player.sit=false;
+  // Find the way round trees and walls (js/path.js). tapGoal marks this walk as yours, so it paths; anything else that
+  // sets tx (the sim's bots) keeps walking straight, and the sims stay the same.
+  const g=walkGoal(player,wx,wy);player.tx=g.x;player.ty=g.y;player.tapGoal=g;player.stuckT=0;player.sit=false;
 }
 window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();if(e.shiftKey)backTarget();else nextTarget()}});
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});

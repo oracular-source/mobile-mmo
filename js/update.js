@@ -23,7 +23,17 @@ function update(dt){
       // Perfect Split (Monk fork): standing up stuns the mob you kept.
       if(!(player.fd>0)&&player.fdStand){const k=player.fdKeep;if(k&&!k.dead){k.stun=player.fdStand*durMult(k);k.mez=0;floatText(k.x,k.y-26,'STUNNED','#9fb8e0')}player.fdStand=0}}
     if(steering&&!(player.fd>0)){const d=Math.hypot(mx,my);player.fx=mx/d;player.fy=my/d;player.tx=null;player.sit=false;moveToward(player,player.x+mx/d*20,player.y+my/d*20,pSpeed(),dt);}
-    else if(player.tx!==null){const fd=Math.hypot(player.tx-player.x,player.ty-player.y);if(fd>1){player.fx=(player.tx-player.x)/fd;player.fy=(player.ty-player.y)/fd}if(moveToward(player,player.tx,player.ty,pSpeed(),dt))player.tx=null;}
+    else if(player.tx!==null){const fd=Math.hypot(player.tx-player.x,player.ty-player.y);if(fd>1){player.fx=(player.tx-player.x)/fd;player.fy=(player.ty-player.y)/fd}const tg=player.tapGoal,mine=tg&&tg.x===player.tx&&tg.y===player.ty,ox=player.x,oy=player.y;
+      let done=mine?pathTo(player,player.tx,player.ty,pSpeed(),dt,tg.W):moveToward(player,player.tx,player.ty,pSpeed(),dt);
+      // Safety net: a tapped walk never steps onto a way-out tile you didn't tap (sliding along a wall could), so it can't carry
+      // you out of the area by accident. Step back; if that keeps happening, the stuck check below ends the walk.
+      if(mine&&tg.W){const G=tg.W.G,nx=Math.floor(player.x/T),ny=Math.floor(player.y/T);
+        if(!okIn(G,nx,ny)&&okIn(G,Math.floor(ox/T),Math.floor(oy/T))){player.x=ox;player.y=oy;done=false}}
+      if(done){player.tx=null;player.tapGoal=null}
+      else if(mine){const mvx=player.x-ox,mvy=player.y-oy,md=Math.hypot(mvx,mvy);
+        if(md>0.01){player.fx=mvx/md;player.fy=mvy/md} // face the way you actually walk round things, not straight at the goal
+        // A tapped walk that stops getting anywhere (a mob or pet standing in a gap) ends after half a second instead of walking on the spot.
+        player.stuckT=md<pSpeed()*dt*0.2?(player.stuckT||0)+dt:0;if(player.stuckT>0.5){player.tx=null;player.tapGoal=null}}}
     if(player.cast&&(steering||player.tx!==null)){player.cast=null;log('Your spell is interrupted. Stand still to cast.','#ffb37a')}
     if(player.cast){player.cast.time+=dt;const a=player.cast.a,t=player.cast.t;
       if(player.cast.time>=a.cast){player.cast=null;
