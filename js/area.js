@@ -1260,69 +1260,68 @@ function drawObj(g,R,o){
     [[14,6],[22,9],[31,5]].forEach(([x,l])=>{for(let k=0;k<l;k++)R(X+x+(k>3?1:0),Y+2+k,1,1,k<l-1?AP.root:AP.rootHi)});
     R(X+4,top+6,4,2,AP.mossHi);R(X+W-10,top+4,5,2,AP.mossHi);return}
   if(k==='wolf_den'){
-    // Greyfang's den, rebuilt (v0.82, owner: the old smooth dome with a square door read as a bunker). A real wolf den:
-    // a hole dug in under a pile of mossy boulders, its mouth a ragged dark arch with old roots hanging over it, a fan
-    // of bare trodden earth spilling out with claw marks and prints, bones and grey fur tufts, a skull, and the
-    // gnawed bow of the hunter who came looking (his cloak lies a few steps away: hunter_remains).
-    const base=Y+H-1;shadow(X,base-3,W,5);
-    const rock=(cx,cy,rx,ry,s)=>{for(let y=-ry;y<=ry;y++)for(let x=-rx;x<=rx;x++){const e=x*x/(rx*rx)+y*y/(ry*ry)+(ah(cx+x,cy+y,s)-0.5)*0.12;if(e>1)continue;
-        R(cx+x,cy+y,1,1,e>0.86?AP.out:(x+y<-rx*0.5?AP.bouldHi:(x+y>rx*0.6?AP.bouldDk:AP.bould)))}
-      treeLine(R,cx-2,cy-ry+4,cx+3,cy+1,1,AP.bouldDk);R(cx-rx+3,cy-ry+2,Math.round(rx*0.9),2,AP.mossHi);R(cx-rx+5,cy-ry+1,Math.round(rx*0.5),1,'#5f7a4a')};
-    rock(X+31,Y-3,17,13,86);rock(X+11,Y+4,12,10,87);rock(X+52,Y+3,12,10,88);rock(X+47,Y+13,8,6,89);rock(X+8,Y+15,6,4,90);
-    // the mouth: a ragged arch dug in under the big rock
-    for(let y=0;y<=20;y++){const hw=Math.round(10*Math.sqrt(Math.max(0,1-Math.pow((20-y)/21,2)))+(ah(y,1,95)<0.3?1:0));const yy=base-22+y;
-      if(hw>0){R(X+32-hw-1,yy,2*hw+2,1,AP.out);R(X+32-hw,yy,2*hw,1,y<4?'#140f0c':'#040303')}}
-    R(X+24,base-4,17,2,'#1a1410');
-    [[27,6],[31,9],[36,5],[34,3]].forEach(([x,l])=>{for(let k2=0;k2<l;k2++)R(X+x+(k2>2?1:0),base-22+k2,1,1,k2<l-1?AP.root:AP.rootHi)}); // roots over the mouth
-    // trodden earth fanning out, claw marks and prints
-    for(let y=0;y<6;y++){const hw=9+y*2;R(X+32-hw,base-2+y-3,2*hw,1,y%2?'#3e3226':'#463a2c')}
-    [[24,base-1],[38,base],[29,base+1]].forEach(([x,y])=>{treeLine(R,X+x,y,X+x+2,y-2,1,'#241c14');treeLine(R,X+x+2,y,X+x+4,y-2,1,'#241c14')});
-    [[18,base+1],[46,base]].forEach(([x,y])=>{R(X+x,y,2,1,'#1a1610');R(X+x-1,y-1,1,1,'#1a1610');R(X+x+1,y-2,1,1,'#1a1610');R(X+x+2,y-1,1,1,'#1a1610')});
-    // bones, a skull, tufts of grey fur, the gnawed bow
-    for(let i=0;i<7;i++){const x=X+14+Math.floor(ah(o.x,i,25)*36),y=base-2+Math.floor(ah(o.y,i,26)*4);R(x,y,3,1,AP.bone);R(x,y+1,1,1,AP.out);R(x+2,y-1,1,1,AP.boneDk)}
-    R(X+43,base-5,6,5,AP.out);R(X+44,base-4,4,3,AP.bone);R(X+45,base-3,1,1,AP.out);R(X+47,base-3,1,1,AP.out); // skull
-    [[16,base-4],[50,base-1],[21,base+2]].forEach(([x,y])=>{R(X+x,y,3,1,'#8a8a88');R(X+x+1,y-1,1,1,'#a8a8a4')});
-    R(X+W-16,base+1,12,1,AP.out);R(X+W-15,base,10,1,'#9a7448');R(X+W-16,base-1,1,2,'#9a7448');R(X+W-5,base-1,1,2,'#9a7448');R(X+W-11,base,2,1,'#5a4030');return}
+    // Greyfang's den, third take (v0.83; owner: the v0.82 boulder pile still didn't read as a den). What makes a den read
+    // at this size: (1) a brown EARTH MOUND, not grey rock, so it stands apart from the boulder hillside round it;
+    // (2) a big black mouth dug into its face with a pale rim of fresh-dug dirt, so the hole is the first thing you see;
+    // (3) a worn dirt apron spilling out of it with white bones and a skull on it; (4) a wolf's eyes in the dark
+    // (drawn live after the lighting, world.js drawGlows). The hunter's gnawed bow still lies on the apron.
+    const base=Y+H-1,cx=X+32,cy=Y+5,rx=31,ry=22;shadow(X+2,base-2,W-4,5);
+    for(let y=-ry;y<=ry;y++)for(let x=-rx;x<=rx;x++){const e=x*x/(rx*rx)+y*y/(ry*ry)+(ah(cx+x,cy+y,81)-0.5)*0.10;if(e>1||cy+y>base-1)continue;
+      const lit=(x/rx)+(y/ry); // light from the upper left
+      R(cx+x,cy+y,1,1,e>0.9?AP.out:lit<-0.75?'#7a6244':lit<0.1?'#5a4630':lit<0.8?'#47372a':'#33281e')}
+    for(let i=0;i<46;i++){const a=ah(i,1,82)*Math.PI,r=0.35+ah(i,2,83)*0.6,x=Math.round(cx-Math.cos(a)*r*rx*0.9),y=Math.round(cy-Math.sin(a)*r*ry*0.85);
+      if(y>cy+2)continue;R(x,y,2,1,i%3?'#3e5530':'#58743f');if(i%4===0)R(x,y-1,1,1,'#6e8a4c')} // grass on the crown
+    const rock=(x0,y0,w,h)=>{R(x0-1,y0-1,w+2,h+2,AP.out);R(x0,y0,w,h,AP.bould);R(x0,y0,w-1,1,AP.bouldHi);R(x0,y0,1,h-1,AP.bouldHi);R(x0+1,y0+h-1,w-1,1,AP.bouldDk);R(x0+1,y0,Math.max(1,w-3),1,AP.mossHi)};
+    // (no stones on the crown: small square rocks read as windows, v0.83)
+    // the mouth: rim of fresh-dug pale dirt, then the black hole, darkest at the back
+    const my=base-4,mh=22,mw=14;
+    for(let y=0;y<=mh+3;y++){const t=(mh+3-y)/(mh+4),hw=Math.round((mw+3)*Math.sqrt(Math.max(0,1-t*t)));if(hw>0)R(cx-hw,my-mh-3+y,2*hw,1,y<2?'#a88a60':'#8a6e4a')}
+    for(let y=0;y<=mh;y++){const t=(mh-y)/(mh+1),hw=Math.round(mw*Math.sqrt(Math.max(0,1-t*t)))+(ah(y,7,84)<0.25?1:0);const yy=my-mh+y;
+      if(hw>0){R(cx-hw-1,yy,2*hw+2,1,AP.out);R(cx-hw,yy,2*hw,1,y<5?'#120d0a':'#030202')}}
+    [[-9,7],[-4,10],[2,6],[7,9],[11,5]].forEach(([x,l])=>{for(let j=0;j<l;j++)R(cx+x+(j>3?(x<0?-1:1):0),my-mh-2+j,1,1,j<l-1?AP.root:AP.rootHi)}); // roots hanging over the mouth
+    // the apron: worn dirt spilling out of the mouth, paler than the forest floor
+    for(let y=0;y<8;y++){const hw=mw+2+y*2;R(cx-hw,my-1+y,2*hw,1,y%2?'#5c4a36':'#66523c')}
+    for(let i=0;i<5;i++){const x=cx-10+i*5,y=my+2+(i%2)*2;treeLine(R,x,y,x+2,y-2,1,'#2e241a');treeLine(R,x+2,y,x+4,y-2,1,'#2e241a')} // claw rakes
+    [[cx-20,my+6],[cx-16,my+4],[cx+17,my+5],[cx+21,my+7]].forEach(([x,y])=>{R(x,y,2,2,'#2a2016');R(x-1,y-1,1,1,'#2a2016');R(x+1,y-2,1,1,'#2a2016');R(x+2,y-1,1,1,'#2a2016')}); // paw prints going in
+    // bones: pale shafts with knobbed ends, and a skull
+    const bone=(x,y,l,d)=>{for(let j=0;j<l;j++)R(x+j,y+(d?Math.floor(j/2):0),1,1,'#e2dac6');R(x-1,y-1,2,3,AP.out);R(x-1,y-1,2,1,'#e2dac6');R(x-1,y+1,2,1,'#e2dac6');const ex=x+l-1,ey=y+(d?Math.floor((l-1)/2):0);R(ex,ey-1,2,3,AP.out);R(ex,ey-1,2,1,'#e2dac6');R(ex,ey+1,2,1,'#e2dac6');for(let j=1;j<l-1;j++)R(x+j,y+1+(d?Math.floor(j/2):0),1,1,'#9a907c')};
+    bone(cx-16,my+3,6,0);bone(cx+8,my+6,7,1);bone(cx-6,my+8,5,0);bone(cx+13,my+1,5,0);
+    R(cx-25,my+1,7,6,AP.out);R(cx-24,my+1,5,4,'#e2dac6');R(cx-24,my+1,5,1,'#f4eedc');R(cx-23,my+3,1,1,AP.out);R(cx-21,my+3,1,1,AP.out);R(cx-23,my+5,3,1,'#b8ae98'); // skull
+    [[cx-12,my-1],[cx+19,my+3]].forEach(([x,y])=>{R(x,y,3,1,'#8a8a88');R(x+1,y-1,1,1,'#b0b0ac')}); // grey fur tufts
+    R(cx+4,my+10,12,1,AP.out);R(cx+5,my+9,10,1,'#9a7448');R(cx+4,my+8,1,2,'#9a7448');R(cx+15,my+8,1,2,'#9a7448');R(cx+9,my+9,2,1,'#5a4030');return} // the hunter's gnawed bow
   if(k==='lean_to'){
-    // The hunter's lean-to, rebuilt (v0.82, owner: "the hideouts aren't built very well"), drawn the way a real one is
-    // built: a ridge pole lashed into two forked posts, slender poles leaned back from it to the ground, the frame piled
-    // with fir boughs in overlapping rows (like shingles), a couple of poles laid over the top to hold them down, a deep
-    // bough bed under the ridge with a fur on it, the open side facing the fire. Antlers nailed to the ridge, his quiver
-    // on a post, boughs packed in at the left end, a hide hung over the right end against the wind.
-    const ridge=Y+4,back=Y-18,base=Y+H-1;shadow(X,base-3,W,4);
-    // the roof seen from above-front: back edge (top) narrower, ridge (bottom) full width
-    const G0='#1a2a1c',G1='#26402a',G2='#365a36',G3='#4e7444',DN='#5a4a2a';
-    for(let y=back;y<=ridge;y++){const f=(y-back)/(ridge-back),x0=X+5-Math.round(4*f),x1=X+W-5+Math.round(4*f);R(x0,y,x1-x0,1,G0)}
-    for(let row=0,y=back-1;y<ridge;row++,y+=3){const f=(y-back)/(ridge-back),x0=X+3-Math.round(4*f),x1=X+W-3+Math.round(4*f);
-      for(let x=x0+(row%2?3:0);x<x1;x+=5+Math.floor(ah(x,row,71)*3)){const dead=ah(x,row,72)<0.12,c1=dead?DN:G1,c2=dead?'#7a6438':G2;
-        R(x,y,6,3,c1);R(x+1,y,4,1,c2);R(x,y+3,1,1,c1);R(x+5,y+3,1,1,c1);R(x+2,y+3,2,1,G0); // a drooping clump with its tips
-        if(!dead&&ah(x,row,73)<0.75)R(x+1+Math.floor(ah(x,row,70)*3),y,2,1,G3)}
-      R(x0+1,y+3,x1-x0-2,1,'rgba(10,20,12,0.45)')}
-    for(let i=0;i<8;i++){const x=X+6+Math.floor(ah(o.x,i,74)*(W-12));R(x,back-2,2,2,G1);R(x,back-2,1,1,G3)} // ragged tips along the back edge
-    R(X+4,back-1,W-8,1,'rgba(0,0,0,0.5)');R(X+6,back-3,W-12,1,'rgba(0,0,0,0.35)'); // where the roof meets the ground behind: shadow
-    for(let i=0;i<7;i++){const x=X+7+i*6+Math.floor(ah(i,o.y,79)*3);R(x,back-5,2,5,AP.out);R(x,back-4,1,4,AP.woodHi)} // the ribs' ends poking out past the boughs
-    for(let y=back;y<back+8;y++)R(X+5,y,W-10,1,'rgba(0,0,0,'+(0.32-(y-back)*0.04).toFixed(2)+')'); // the far rows sit lower, darker
-    treeLine(R,X+11,back+1,X+15,ridge-1,2,AP.out);treeLine(R,X+11,back+1,X+15,ridge-1,1,AP.woodHi); // poles laid over the boughs
-    treeLine(R,X+34,back+2,X+31,ridge-1,2,AP.out);treeLine(R,X+34,back+2,X+31,ridge-1,1,AP.woodHi);
-    // the dark space under the ridge, boughs hanging from its underside, the bough bed and the fur
-    R(X+5,ridge+4,W-10,base-ridge-5,'#090705');R(X+5,ridge+4,W-10,3,'#040302');
-    for(let x=X+6;x<X+W-6;x+=3)R(x,ridge+4,2,1+Math.floor(ah(x,1,75)*3),G1);
-    R(X+6,base-8,W-12,6,G1);for(let x=X+6;x<X+W-6;x+=2)R(x,base-8+Math.floor(ah(x,2,76)*2),1,1,G2);R(X+6,base-3,W-12,1,G0);
-    R(X+12,base-9,17,5,AP.out);R(X+13,base-8,15,3,'#8a6a4a');R(X+13,base-8,15,1,'#b08a60');R(X+26,base-6,3,1,'#6a5038'); // the fur
-    // the left end packed with boughs, a hide over the right end
-    for(let y=ridge+3;y<base;y++){const w=Math.round(2+(y-ridge)*0.35);R(X+3-w,y,w+2,1,(y%3)?G1:G2)}
-    R(X+W-11,ridge+3,9,15,AP.out);R(X+W-10,ridge+3,7,14,'#9a7a54');R(X+W-10,ridge+3,7,1,'#c4a074');R(X+W-9,ridge+16,5,1,'#6a5038');R(X+W-8,ridge+8,1,4,'#7a5a3c');
-    // forked posts, the ridge pole lashed into the forks, its cut ends
-    [X+3,X+W-6].forEach(px=>{R(px-1,ridge-3,5,base-ridge+3,AP.out);R(px,ridge-2,3,base-ridge+1,AP.wood);R(px,ridge-2,1,base-ridge+1,AP.woodHi);
-      R(px-2,ridge-7,2,5,AP.out);R(px-1,ridge-6,1,4,AP.wood);R(px+3,ridge-7,2,5,AP.out);R(px+3,ridge-6,1,4,AP.woodDk)});
-    R(X-3,ridge,W+6,5,AP.out);R(X-2,ridge+1,W+4,3,AP.trunk);R(X-2,ridge+1,W+4,1,AP.trunkHi);for(let x=6;x<W;x+=9)R(X+x,ridge+2,2,1,AP.woodDk);
-    [X-3,X+W+1].forEach(ex=>{R(ex,ridge,3,5,AP.out);R(ex+1,ridge+1,1,3,'#a88a64')});
-    [X+3,X+W-6].forEach(px=>{R(px-1,ridge+1,5,1,'#c8b48a');R(px,ridge+3,4,1,'#c8b48a');R(px+1,ridge+2,1,1,'#e0cca0')}); // rope lashings
-    // antlers nailed to the middle of the ridge
-    const ax=X+W/2;R(ax-2,ridge-2,4,3,AP.out);R(ax-1,ridge-1,2,1,'#d8ccb0');
-    treeLine(R,ax-2,ridge-2,ax-7,ridge-9,1,'#d8ccb0');treeLine(R,ax-5,ridge-5,ax-8,ridge-5,1,'#d8ccb0');treeLine(R,ax+1,ridge-2,ax+6,ridge-9,1,'#d8ccb0');treeLine(R,ax+4,ridge-5,ax+7,ridge-5,1,'#c8bca0');
-    // his quiver hanging on the right post, fletchings showing
-    R(X+W-9,ridge+6,4,10,AP.out);R(X+W-8,ridge+7,2,8,'#6a4a30');R(X+W-9,ridge+4,1,2,'#e8e0d0');R(X+W-7,ridge+3,1,3,'#b84a3a');R(X+W-6,ridge+4,1,2,'#e8e0d0');
+    // The hunter's shelter, third take (v0.83; owner: the v0.82 lean-to seen from above still read as a box). Redrawn
+    // as a bough A-frame, the shape anyone reads as "a shelter" at a glance: a steep triangle of layered fir boughs,
+    // two poles crossed at the top and sticking out past the ridge, a dark triangular doorway facing the fire with his
+    // fur bed showing, antlers hung at the peak, his quiver propped by the door. The back gable sits a little higher
+    // (3/4 view), so you see the lit left slope and the shaded right slope running back.
+    const base=Y+H-1,cx=X+24,fA=Y-6,bA=Y-15,bB=base-8;shadow(X,base-2,W,4);
+    const inTri=(px,py,ax,ay,bx,by,qx,qy)=>{const d=(x1,y1,x2,y2,x3,y3)=>(x1-x3)*(y2-y3)-(x2-x3)*(y1-y3);const d1=d(px,py,ax,ay,bx,by),d2=d(px,py,bx,by,qx,qy),d3=d(px,py,qx,qy,ax,ay);return !((d1<0||d2<0||d3<0)&&(d1>0||d2>0||d3>0))};
+    const G0='#16241a',G1='#25402a',G2='#36593a',G3='#4f7848',D1='#5a4a2a',D2='#7a6438';
+    const front=(x,y)=>inTri(x,y,X+1,base,cx,fA,X+W-1,base),back=(x,y)=>inTri(x,y,X+4,bB,cx,bA,X+W-4,bB);
+    const slope=(x,y)=>back(x,y)||inTri(x,y,X+1,base,cx,fA,cx,bA)||inTri(x,y,X+1,base,X+4,bB,cx,bA)||inTri(x,y,X+W-1,base,cx,fA,cx,bA)||inTri(x,y,X+W-1,base,X+W-4,bB,cx,bA);
+    // roof slopes running back: boughs in drooping rows, lit on the left, shaded on the right
+    for(let y=bA-1;y<=base;y++)for(let x=X-1;x<=X+W;x++){if(!slope(x,y)||front(x,y))continue;
+      const edge=!slope(x-1,y)||!slope(x+1,y)||!slope(x,y-1);if(edge){R(x,y,1,1,AP.out);continue}
+      const left=x<cx,row=(y+Math.floor(x/5))%4,dead=ah(Math.floor(x/5),Math.floor(y/4),71)<0.1;
+      R(x,y,1,1,dead?(row?D1:D2):left?(row===0?G3:row===3?G1:G2):(row===0?G2:G0))}
+    // the front gable: a border of boughs round a dark triangular doorway
+    for(let y=fA;y<=base;y++)for(let x=X;x<=X+W;x++){if(!front(x,y))continue;
+      const edge=!front(x-1,y)||!front(x+1,y)||!front(x,y-1);if(edge){R(x,y,1,1,AP.out);continue}
+      const door=inTri(x,y,cx-11,base,cx,fA+9,cx+11,base);
+      if(door){R(x,y,1,1,y<fA+16?'#020101':'#080605');continue}
+      const row=(y+Math.floor((x-cx)/4))%3;R(x,y,1,1,x<cx?(row===0?G3:G2):(row===0?G2:G1))}
+    for(let y=fA+9;y<base;y+=3){const hw=Math.round((y-fA-9)*11/(base-fA-9));R(cx-hw-1,y,2,1,G3);R(cx+hw,y,1,1,G1)} // bough tips round the doorway
+    R(cx-8,base-4,16,3,AP.out);R(cx-7,base-4,14,2,'#9a7650');R(cx-7,base-4,14,1,'#c09a6a');R(cx+3,base-3,2,1,'#6a5038'); // his fur bed inside
+    R(cx-11,base,23,1,'rgba(0,0,0,0.6)');
+    // the ridge pole running back, and the two poles crossed at each peak
+    treeLine(R,cx,fA,cx,bA,2,AP.out);treeLine(R,cx,fA+1,cx,bA+1,1,AP.woodHi);
+    [[fA,0],[bA,1]].forEach(([ay,b])=>{treeLine(R,cx-1,ay+2,cx+5,ay-5,2,AP.out);treeLine(R,cx+1,ay+2,cx-5,ay-5,2,AP.out);
+      treeLine(R,cx-1,ay+2,cx+5,ay-5,1,b?AP.woodDk:AP.woodHi);treeLine(R,cx+1,ay+2,cx-5,ay-5,1,b?AP.woodDk:AP.wood);R(cx-1,ay,3,1,'#c8b48a')}); // rope at the cross
+    // antlers hung under the front peak
+    const ay=fA+5;R(cx-1,ay,3,2,'#d8ccb0');treeLine(R,cx-1,ay,cx-6,ay-4,1,'#d8ccb0');treeLine(R,cx-4,ay-2,cx-6,ay,1,'#d8ccb0');treeLine(R,cx+1,ay,cx+6,ay-4,1,'#d8ccb0');treeLine(R,cx+4,ay-2,cx+6,ay,1,'#c8bca0');
+    // his quiver propped against the right side of the door, red and white fletchings
+    R(X+W-13,base-11,4,11,AP.out);R(X+W-12,base-10,2,9,'#6a4a30');R(X+W-12,base-13,1,3,'#e8e0d0');R(X+W-11,base-14,1,3,'#b84a3a');R(X+W-10,base-13,1,2,'#e8e0d0');
     return}
   if(k==='game_rack'){
     // A meat tripod by the camp (v0.82): three poles lashed at the top, a cross-stick hung with two rabbits by their hind

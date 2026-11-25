@@ -111,6 +111,12 @@ function drawGlows(){
     (A.fox||[]).forEach(f=>{const p=0.55+0.45*Math.sin(time*0.9+f.ph);
       [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y],i)=>{lx.globalAlpha=Math.max(0,p-(i%3)*0.15);lx.fillStyle='#b8ffc8';lx.fillRect(f.x+x,f.y+y,1,1)});
       const ph=(time*0.2+f.ph)%1;lx.globalAlpha=0.6*Math.sin(ph*Math.PI);lx.fillStyle='#9af0b0';lx.fillRect(f.x+8+Math.round(Math.sin(time+f.ph)*2),Math.round(f.y+8-ph*14),1,1);lx.globalAlpha=1});
+    // Eyes in Greyfang's den (v0.83): two amber eyes low in the dark mouth, blinking now and then, so the hole reads as
+    // somewhere a wolf lives. They go out while you stand right at the mouth (it backs into the dark).
+    A.objs.forEach(o=>{if(o.kind!=='wolf_den')return;const ex=o.x*T+32,ey=(o.y+o.h)*T-14;
+      if(Math.hypot(player.x-ex,player.y-ey)<28)return;const bl=(time*0.5+o.x)%4<0.12;if(bl)return;
+      lx.globalAlpha=0.35;lx.fillStyle='#ffb030';lx.fillRect(ex-6,ey-1,5,3);lx.fillRect(ex+2,ey-1,5,3);
+      lx.globalAlpha=1;lx.fillStyle='#ffd25a';lx.fillRect(ex-5,ey,3,1);lx.fillRect(ex+3,ey,3,1);lx.fillStyle='#fff2b0';lx.fillRect(ex-4,ey,1,1);lx.fillRect(ex+4,ey,1,1)});
     drawCritterGlows(A);
     A.objs.forEach(o=>{if(o.kind!=='sinkhole')return;const cx=o.x*T+o.w*T/2,cy=o.y*T+o.h*T/2;for(let i=0;i<6;i++){const ph=(time*0.35+i/6)%1;lx.fillStyle=i%2?'#8a7a62':'#6a5c4a';lx.fillRect(Math.round(cx-14+i*5+Math.sin(time*0.8+i)*3),Math.round(cy+2-ph*30),1,1)}});
     lx.restore();return}
