@@ -75,7 +75,8 @@ function mmZone(id){
   // Load the saved bits.
   // A dungeon's maps get rebuilt (v0.66: Dungeon 1 went from one big floor to two), so its explored bits are kept per map
   // size: an old mask never lands on a new map. Outdoor areas keep their plain key.
-  Z.key=AREA_OF[id]&&MAPS[AREA_OF[id]].instance?id+'@'+w+'x'+h:id;
+  // v0.89: a redrawn map (the crypt rework) gets a sized key too, so the old map's bits don't land scrambled on the new one.
+  Z.key=AREA_OF[id]&&(MAPS[AREA_OF[id]].instance||MAPS[AREA_OF[id]].redrawn)?id+'@'+w+'x'+h:id;
   const hx=mmSaved[Z.key]||'';
   for(let i=0;i<hx.length;i++){const v=parseInt(hx[i],16)||0;for(let j=0;j<4;j++)if(v&(8>>j)){const k=i*4+j;if(k<w*h)mmMark(Z,k)}}
   Z.pins.forEach(p=>p.found=!!Z.seen[p.y*w+p.x]);

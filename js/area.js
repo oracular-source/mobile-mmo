@@ -77,6 +77,9 @@ function buildArea(id){
   A.seals.forEach(sl=>{sl.obj=A.objs.find(o=>o.kind===sl.by)||null;sl.named=A.named.find(n=>n.name===sl.by)||null});sealArea(A);
   (A.locks||[]).forEach(L=>{L.named=A.named.find(n=>n.name===L.by)||null});
   (A.bars||[]).forEach(b=>{b.open=!!store.get('ashfen-gates',{})[b.id];if(!b.open)A.map[b.ty][b.tx]=5});
+  // Cobwebs (v0.89) hang in whichever corner of their tile has the most wall round it.
+  A.objs.forEach(o=>{if(o.kind!=='cobweb')return;const wall=(x,y)=>x<0||y<0||x>=w||y>=h||!AREA_TILES[rows[y][x]].walk;let best=-1;
+    [[0,0],[1,0],[0,1],[1,1]].forEach(([r,b])=>{const dx=r?1:-1,dy=b?1:-1,n=wall(o.x+dx,o.y)+wall(o.x,o.y+dy)+wall(o.x+dx,o.y+dy);if(n>best){best=n;o.cornerR=r;o.cornerB=b}})});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
@@ -104,6 +107,8 @@ function buildArea(id){
     if(o.kind==='bell_mold'){A.lights.push({x:o.x*T+16,y:o.y*T+26,r:26,w:30})}
     if(o.kind==='window'){A.lights.push({x:cx,y:o.y*T+22,r:40,w:16,c:22})}
     if(o.kind==='altar'){A.lights.push({x:cx,y:o.y*T+4,r:34,w:26});A.flames.push({x:o.x*T+6,y:o.y*T-3,big:0,tiny:1},{x:o.x*T+o.w*T-6,y:o.y*T-3,big:0,tiny:1})}
+    if(o.kind==='mourner_shrine'){A.lights.push({x:o.x*T+8,y:o.y*T+2,r:30,w:22});A.flames.push({x:o.x*T+4,y:o.y*T,big:0,tiny:1},{x:o.x*T+8,y:o.y*T+1,big:0,tiny:1},{x:o.x*T+11,y:o.y*T,big:0,tiny:1})} // someone still lights these (crypt, v0.89)
+    if(o.kind==='feast_table'){A.lights.push({x:o.x*T+36,y:o.y*T,r:30,w:20});A.flames.push({x:o.x*T+36,y:o.y*T-4,big:0,tiny:1})} // the King's last candle, burnt low
     if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   // Ember pits glow from below (every other tile is enough light).
@@ -672,10 +677,12 @@ function drawRock(R,bx,by,face,top,r){
     R(bx,by+6,16,1,AP.stoneDk);R(bx,by+15,16,1,AP.out);if(r<0.25)R(bx+3+Math.floor(r*30),by+11,2,2,AP.moss)}
 }
 // A heap of old bones against the wall.
+// Bone heaps (v0.89 redraw; owner: the old ones read as white blobs): real bone shapes, a thin shaft with a knob of
+// two bumps at each end, two or three lying across each other, and a skull with dark eye holes on top.
 function drawBones(R,bx,by,r){
-  R(bx+1,by+9,14,6,'rgba(0,0,0,0.3)');R(bx+2,by+6,12,8,AP.boneDk);
-  for(let i=0;i<7;i++){const x=bx+2+Math.floor(ah(bx,i,1)*11),y=by+5+Math.floor(ah(by,i,2)*7);R(x,y,3+(i%2),1,AP.bone);R(x,y+1,1,1,AP.out)}
-  R(bx+5+Math.floor(r*4),by+4,4,4,AP.out);R(bx+6+Math.floor(r*4),by+4,2,2,AP.bone);R(bx+6+Math.floor(r*4),by+6,2,1,AP.boneDk)} // a skull on top
+  R(bx+1,by+10,14,5,'rgba(0,0,0,0.3)');R(bx+3,by+11,10,3,AP.boneDk);
+  cryptBone(R,bx+1,by+12,13);cryptBone(R,bx+r*4+3|0,by+5,9,true);if(r>0.4)cryptBone(R,bx+2,by+8,10);
+  cryptSkull(R,bx+(r<0.5?8:3),by+4+(r*3|0),true)}
 // Stone coffin seen from above, lid slightly ajar on some.
 function drawCoffin(R,bx,by,r){
   R(bx+2,by+13,13,2,'rgba(0,0,0,0.35)');R(bx+3,by+1,10,14,AP.out);R(bx+4,by+2,8,12,AP.stoneDk);R(bx+4,by+2,8,1,AP.stone);R(bx+4,by+2,1,12,AP.stone);
@@ -937,6 +944,102 @@ function drawDungeonProp(g,R,o,X,Y,W,H,shadow){const k=o.kind;
     R(cx-12,cy-3,24,2,AP.out);R(cx-11,cy-3,22,1,AP.emb);R(cx-6,cy-3,4,1,AP.embHi);R(cx-2,cy-21,4,3,AP.out);R(cx-1,cy-20,2,2,AP.clayDk); // hot seam, the pour hole
     R(X+W-4,Y+H-4,5,3,AP.out);R(X+W-3,Y+H-4,3,1,AP.ironHi);return true} // tongs left by the pit
   return false}
+// Crypt props (v0.89, crypt rework). Recipes in docs/area-rules.md ("Crypt"). Shapes that make each read at game size:
+// a bone = a thin shaft with a knob of two bumps at each end; a skull = a round pale dome, two dark eye holes, a jaw;
+// a coffin = a long stone box whose open inside is black; a crowbar = a dark iron bar with a hook at the top.
+function cryptBone(R,x,y,l,vert){ // a long bone, knobbed at both ends, with a dark line under it so it lifts off the floor
+  if(vert){R(x-1,y+1,3,l-2,AP.out);R(x,y+2,1,l-4,AP.bone);R(x-1,y,1,2,AP.bone);R(x+1,y,1,2,AP.bone);R(x-1,y+l-2,1,2,AP.bone);R(x+1,y+l-2,1,2,AP.bone);R(x,y+1,1,1,'#d8d0c0');return}
+  R(x+1,y+1,l-2,1,AP.out);R(x+1,y+2,l-2,1,'rgba(0,0,0,0.35)');R(x+2,y,l-4,1,AP.bone);R(x,y-1,2,1,AP.bone);R(x,y+1,2,1,AP.boneDk);R(x+l-2,y-1,2,1,AP.bone);R(x+l-2,y+1,2,1,AP.boneDk);R(x+1,y,1,1,'#d8d0c0');R(x+l-2,y,1,1,'#d8d0c0')}
+function cryptSkull(R,x,y,small){ // 6 x 6 (5 x 5 small): dome, eye holes, jaw
+  if(small){R(x-1,y-1,7,6,AP.out);R(x,y,5,3,AP.bone);R(x+1,y,3,1,'#d8d0c0');R(x+1,y+1,1,1,AP.out);R(x+3,y+1,1,1,AP.out);R(x+1,y+3,3,1,AP.boneDk);return}
+  R(x-1,y-1,8,8,AP.out);R(x,y,6,4,AP.bone);R(x+1,y,4,1,'#d8d0c0');R(x+1,y+2,2,2,AP.out);R(x+4,y+2,1,2,AP.out);R(x+3,y+3,1,1,AP.boneDk);R(x+1,y+4,4,2,AP.bone);R(x+1,y+5,4,1,AP.boneDk);R(x+2,y+5,1,1,AP.out)}
+function cryptBox(R,X,Y,shadow){ // a stone coffin seen in 3/4: the box 30 x 12 on a 2-tile footprint, lid gone, black inside
+  shadow(X+2,Y+13,30,3);R(X+1,Y+1,30,13,AP.out);R(X+2,Y+2,28,11,AP.stoneDk);R(X+2,Y+2,28,1,AP.stone);R(X+2,Y+10,28,3,AP.stoneDk2);R(X+2,Y+10,28,1,AP.stoneDk);
+  R(X+4,Y+4,24,6,'#0c0a10');R(X+4,Y+4,24,1,'#050408')}
+function drawCryptProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,r=ah(o.x,o.y,90);
+  if(k==='smashed_coffin'){
+    // Grave robbers: the lid smashed, its big piece still on the left end, shards on the floor, the crowbar left wedged in.
+    cryptBox(R,X,Y,shadow);cryptBone(R,X+13,Y+7,8);
+    R(X+1,Y,12,10,AP.out);R(X+2,Y+1,10,8,AP.stone);R(X+2,Y+1,10,1,AP.stoneHi);R(X+9,Y+1,3,3,AP.out);R(X+11,Y+4,1,5,AP.out);R(X+7,Y+5,1,1,AP.stoneDk); // jagged broken edge
+    [[22,13],[26,15],[17,14]].forEach(([dx,dy],i)=>{R(X+dx-1,Y+dy-1,5-i,3,AP.out);R(X+dx,Y+dy-1,3-i,1,AP.stoneHi);R(X+dx,Y+dy,3-i,1,AP.stone)}); // shards
+    treeLine(R,X+20,Y+9,X+28,Y-3,3,AP.out);treeLine(R,X+20,Y+9,X+28,Y-3,1,AP.ironTip);R(X+27,Y-5,4,2,AP.out);R(X+28,Y-4,2,1,AP.ironTip);R(X+30,Y-3,1,2,AP.ironTip); // crowbar
+    return true}
+  if(k==='open_coffin'){
+    // The dead got up: the lid shoved off from inside, lying slewed across the floor; scratch marks on its underside.
+    cryptBox(R,X,Y,shadow);if(r<0.5)cryptBone(R,X+8,Y+6,6);
+    const lx=r<0.5?X+12:X-2;for(let j=0;j<7;j++){R(lx+j-1,Y+6+j,20,1,AP.out);R(lx+j,Y+6+j,18,1,j===0?AP.stoneHi:j>4?AP.stoneDk:AP.stone)}R(lx+6,Y+13,20,1,AP.out); // the slab, sheared so it reads askew
+    [[4,8],[8,9],[12,8]].forEach(([dx,dy])=>{R(lx+dx,Y+dy,1,1,AP.stoneDk2);R(lx+dx+1,Y+dy+1,1,1,AP.stoneDk2);R(lx+dx+2,Y+dy+2,1,1,AP.stoneDk2)}); // claw scratches
+    return true}
+  if(k==='loot_sack'){
+    // A sack dropped in a hurry, tipped on its side, gold candlesticks and a plate spilling out of its mouth.
+    shadow(X+1,Y+12,14,3);R(X,Y+4,10,10,AP.out);R(X+1,Y+5,8,8,'#7a5e3e');R(X+1,Y+5,3,8,'#94744c');R(X+3,Y+9,4,1,'#5a4430');R(X+8,Y+6,3,6,AP.out);R(X+8,Y+7,2,4,'#3a2a1c'); // sack, its dark mouth
+    R(X+10,Y+9,6,3,AP.out);R(X+11,Y+10,4,1,AP.bellHi);R(X+15,Y+8,1,5,AP.out);R(X+15,Y+9,1,3,AP.bell); // a candlestick lying: stem, cup and foot
+    R(X+9,Y+12,5,3,AP.out);R(X+10,Y+13,3,1,AP.bellHi); // a plate
+    return true}
+  if(k==='candlestick'){ // one dropped on the way: the robbers' trail
+    shadow(X+4,Y+11,9,2);R(X+3,Y+8,10,3,AP.out);R(X+5,Y+9,6,1,AP.bellHi);R(X+3,Y+7,2,5,AP.out);R(X+3,Y+8,1,3,AP.bell);R(X+12,Y+7,2,5,AP.out);R(X+12,Y+8,1,3,AP.bellHi);return true}
+  if(k==='robber_remains'){
+    // A robber who didn't get out: bones in a brown hooded cloak face down on the floor, a hand reaching ahead, his torch burnt out.
+    shadow(X+3,Y+12,26,3);R(X+6,Y+5,20,8,AP.out);R(X+7,Y+6,18,6,'#4a3a2a');R(X+7,Y+6,18,1,'#5e4a36');for(let i=X+10;i<X+24;i+=4)R(i,Y+7,1,5,'#33281c'); // the cloak
+    R(X+3,Y+5,6,7,AP.out);R(X+4,Y+6,4,5,'#3e3022');cryptSkull(R,X+3,Y+7,true); // hood, the skull in it
+    R(X,Y+11,5,2,AP.out);R(X+1,Y+11,3,1,AP.bone);R(X,Y+10,1,1,AP.bone);R(X+2,Y+10,1,1,AP.bone); // finger bones reaching
+    R(X+22,Y+12,8,3,AP.out);R(X+23,Y+13,5,1,AP.wood);R(X+28,Y+11,3,4,AP.out);R(X+29,Y+12,1,2,'#1a1410'); // torch, charred head
+    return true}
+  if(k==='skull_pile'){
+    // Skulls stacked three, two, one like the Paris ossuary walls, a long bone across the foot.
+    shadow(X,Y+14,16,2);cryptSkull(R,X+5,Y+1,true);cryptSkull(R,X+2,Y+5,true);cryptSkull(R,X+8,Y+5,true);
+    cryptSkull(R,X-1,Y+9,true);cryptSkull(R,X+5,Y+9,true);cryptSkull(R,X+11,Y+9,true);cryptBone(R,X+1,Y+14,14);return true}
+  if(k==='mourner_shrine'){
+    // A small stone shelf where someone still lights candles: wax run down the front, dried flowers. The flames are live.
+    shadow(X+2,Y+13,13,2);R(X+2,Y+3,12,11,AP.out);R(X+3,Y+4,10,9,AP.stoneDk);R(X+3,Y+4,10,1,AP.stoneHi);R(X+3,Y+5,10,1,AP.stone);
+    [[4,0,4],[8,1,3],[11,0,4]].forEach(([dx,dy,h])=>{R(X+dx-1,Y+dy,3,h+1,AP.out);R(X+dx,Y+dy+1,1,h,'#e8e0c8')}); // candle stubs
+    R(X+5,Y+5,1,4,'#d8d0b8');R(X+9,Y+5,1,6,'#d8d0b8');R(X+12,Y+5,1,3,'#d8d0b8'); // wax runs
+    R(X+5,Y+11,6,2,'#6a4a52');R(X+6,Y+10,1,1,'#8a6a5a');R(X+9,Y+10,1,1,'#7a5a4a');return true} // dried flowers
+  if(k==='slab'){
+    // Embalming slab: a thick stone table on two legs. One still has its body under a grey shroud (head, chest, feet).
+    shadow(X+2,Y+13,30,3);R(X+3,Y+8,5,7,AP.out);R(X+4,Y+9,3,5,AP.stoneDk2);R(X+W-8,Y+8,5,7,AP.out);R(X+W-7,Y+9,3,5,AP.stoneDk2);
+    R(X,Y+2,W,8,AP.out);R(X+1,Y+3,W-2,6,AP.stone);R(X+1,Y+3,W-2,1,AP.stoneHi);R(X+1,Y+7,W-2,2,AP.stoneDk);
+    if((o.x+o.y)>>2&1){R(X+3,Y-1,26,6,AP.out);R(X+4,Y,24,4,'#a8a296');R(X+4,Y,24,1,'#c4beb2');R(X+3,Y-3,7,5,AP.out);R(X+4,Y-2,5,4,'#b4aea2');R(X+5,Y-2,3,1,'#cfc9bd'); // shroud and head
+      R(X+12,Y-2,9,3,AP.out);R(X+13,Y-1,7,2,'#b0aa9e');R(X+25,Y-2,4,3,AP.out);R(X+26,Y-1,2,2,'#b0aa9e');R(X+11,Y+2,1,2,'#86807a');R(X+21,Y+2,1,2,'#86807a')} // chest, feet, folds
+    else{R(X+8,Y+4,10,2,'#3a2226');R(X+20,Y+3,6,3,AP.out);R(X+21,Y+3,4,1,AP.ironHi);R(X+4,Y+4,3,1,AP.ironTip);R(X+6,Y+3,1,1,AP.ironTip)} // an old stain, a basin, a hook
+    return true}
+  if(k==='urn'){
+    // A burial urn: lid knob, narrow neck, round belly, a foot. Some cracked; one tipped over with ash spilled.
+    if(r<0.3){shadow(X+1,Y+12,14,2);R(X+2,Y+6,10,7,AP.out);R(X+3,Y+7,8,5,AP.clay);R(X+3,Y+7,8,1,AP.clayHi);R(X+11,Y+7,3,5,AP.out);R(X+11,Y+8,2,3,'#1a1210');R(X+14,Y+10,2,2,AP.ashHi);return true}
+    shadow(X+3,Y+13,10,2);R(X+6,Y,4,2,AP.out);R(X+7,Y,2,1,AP.clayHi);R(X+5,Y+2,6,2,AP.out);R(X+6,Y+2,4,1,AP.clayHi);
+    R(X+3,Y+4,10,9,AP.out);R(X+4,Y+5,8,7,AP.clay);R(X+4,Y+5,3,7,AP.clayHi);R(X+10,Y+5,2,7,AP.clayDk);R(X+5,Y+13,6,2,AP.out);R(X+4,Y+8,8,1,AP.clayDk);
+    if(r>0.7){R(X+8,Y+6,1,2,AP.out);R(X+9,Y+8,1,2,AP.out)}return true}
+  if(k==='feast_table'){
+    // The King's feast, left to rot: dark dusty boards, a tipped goblet and its dried spill, plates of bones, a candle burnt low.
+    shadow(X+2,Y+12,W-2,3);R(X,Y+2,W,6,AP.out);R(X+1,Y+3,W-2,4,AP.woodDk);R(X+1,Y+3,W-2,1,AP.wood);for(let i=X+12;i<X+W-4;i+=12)R(i,Y+3,1,4,'#2a1e14');
+    R(X+3,Y+7,3,7,AP.out);R(X+4,Y+7,1,6,AP.woodDk);R(X+W-6,Y+7,3,7,AP.out);R(X+W-5,Y+7,1,6,AP.woodDk);
+    R(X+6,Y+1,7,3,AP.out);R(X+7,Y+2,4,1,AP.bellHi);R(X+11,Y+1,2,3,AP.bell);R(X+13,Y+3,6,1,'#3a1418'); // goblet on its side, its spill
+    R(X+22,Y,8,4,AP.out);R(X+23,Y+1,6,2,'#8a8478');R(X+24,Y+1,3,1,AP.bone); // a plate, a bone on it
+    R(X+35,Y-4,3,7,AP.out);R(X+36,Y-3,1,5,'#d8d0b8');R(X+33,Y+2,7,2,AP.out);R(X+34,Y+2,5,1,AP.bellHi); // candle burnt low (flame live)
+    return true}
+  if(k==='weapon_rack'){
+    // A guard's rack: two posts and a crossbar, three rusty spears standing in it, a dented round shield at the foot.
+    shadow(X+1,Y+13,15,2);R(X+1,Y+2,3,12,AP.out);R(X+2,Y+3,1,10,AP.wood);R(X+12,Y+2,3,12,AP.out);R(X+13,Y+3,1,10,AP.wood);R(X+1,Y+5,14,2,AP.out);R(X+2,Y+5,12,1,AP.woodHi);
+    [5,8,11].forEach((dx,i)=>{R(X+dx-1,Y-6+i,3,19-i,AP.out);R(X+dx,Y-3+i,1,15-i,AP.woodDk);R(X+dx-1,Y-7+i,3,4,AP.out);R(X+dx,Y-6+i,1,3,i===1?'#7a4a2a':AP.ironTip)}); // spears, one tip rusted through
+    R(X+6,Y+8,8,7,AP.out);R(X+7,Y+9,6,5,'#4a3424');R(X+9,Y+10,2,2,AP.ironHi);return true}
+  if(k==='crown_shards'){
+    // Broken pieces of the King's crown on the steps: three gold points, a lost red stone. The key you summon him with.
+    [[3,9],[8,6],[11,11]].forEach(([dx,dy])=>{R(X+dx-1,Y+dy-1,5,4,AP.out);R(X+dx,Y+dy+1,3,1,AP.bell);R(X+dx+1,Y+dy,1,1,AP.bellHi);R(X+dx+1,Y+dy-1,1,1,AP.goldHi)});R(X+6,Y+12,2,2,AP.out);R(X+6,Y+12,1,1,AP.redHi);return true}
+  if(k==='king_banner'){
+    // The King's banner on the wall: a pole, purple cloth with a gold crown, rotted to rags at the bottom.
+    const x=X+4,y=Y+1;R(x-2,y-1,12,2,AP.out);R(x-1,y-1,10,1,AP.woodHi);
+    for(let j=0;j<15;j++)for(let i=0;i<8;i++){const rag=j>9&&ah(o.x*8+i,j,91)<(j-9)*0.18;if(rag)continue;
+      R(x+i,y+1+j,1,1,i===0||i===7?AP.out:i<4?'#4a3270':'#3a2658')}
+    R(x+2,y+4,4,3,AP.bell);R(x+2,y+3,1,1,AP.bellHi);R(x+4,y+3,1,1,AP.bellHi);R(x+5,y+3,1,1,AP.bellHi);R(x+2,y+6,4,1,AP.bellHi);return true}
+  if(k==='cobweb'){
+    // A web in the corner where the walls meet (corner worked out in buildArea): threads out from the corner, three sagging
+    // rings across them, faint so it reads as web, not a crack. One in three has its spider.
+    const cx=o.cornerR?X+15:X,cy=o.cornerB?Y+15:Y,sx=o.cornerR?-1:1,sy=o.cornerB?-1:1,c='rgba(205,205,215,0.55)';
+    for(let a=0;a<4;a++){const ang=a*Math.PI/6+0.05,L=14;for(let t=0;t<L;t++)R(cx+sx*Math.round(Math.cos(ang)*t),cy+sy*Math.round(Math.sin(ang)*t),1,1,c)}
+    [5,9,13].forEach(rad=>{for(let t=0;t<=12;t++){const ang=t/12*Math.PI/2,rr=rad-Math.sin(ang*2)*1.2;R(cx+sx*Math.round(Math.cos(ang)*rr),cy+sy*Math.round(Math.sin(ang)*rr),1,1,c)}});
+    if(r<0.34){const px=cx+sx*7,py=cy+sy*6;R(px-1,py-1,3,3,AP.out);R(px,py,1,1,'#5a3a2a');R(px-2,py-2,1,1,AP.out);R(px+2,py-2,1,1,AP.out);R(px-2,py+2,1,1,AP.out);R(px+2,py+2,1,1,AP.out)}
+    return true}
+  return false}
 function drawPillar(R,x,y){R(x,y,8,14,AP.out);R(x+1,y+2,6,11,AP.brick);R(x+1,y+2,2,11,AP.brickHi);R(x,y,8,3,AP.stoneDk2);R(x+1,y,6,1,AP.stone);R(x+1,y+6,6,1,AP.mortar);R(x+1,y+10,6,1,AP.mortar)}
 
 /* ---------- Ruined Chapel props (v0.62, Vesper embers; shapes from tools/chapel_takes.py take A, references first) ----------
@@ -1063,6 +1166,7 @@ function drawObj(g,R,o){
   const bricks=(x,y,w,h,base,hi)=>{R(x,y,w,h,base);for(let yy=0;yy<h;yy+=4){R(x,y+yy,w,1,AP.mortar);const off=(yy/4)%2?4:0;for(let xx=off;xx<w;xx+=8)R(x+xx,y+yy,1,4,AP.mortar);if(hi)for(let xx=off+1;xx<w;xx+=8)R(x+xx,y+yy+1,3,1,hi)}};
   if(drawChapelProp(g,R,o,X,Y,W,H,shadow))return;
   if(drawDungeonProp(g,R,o,X,Y,W,H,shadow))return;
+  if(drawCryptProp(g,R,o,X,Y,W,H,shadow))return;
   if(k==='bell_tower'){
     // Broken stone bell tower: it rises well above its footprint; the right side of the top has crumbled away (rubble lies at its foot).
     const top=Y-34;shadow(X+3,Y+H-4,W,5);

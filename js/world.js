@@ -179,7 +179,7 @@ function enterZone(id,from,at){
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
   else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex,player.lastMove):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.exitGuard=ex||null;player.exitGuardT=time;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
-    log(id==='crypt'&&from==='wolfwood'?'You duck into the old tunnel. It slopes down into cold blue light.':id==='crypt'?'You descend the stairs into the crypt. Cold blue light, and the smell of old bone.':from==='crypt'&&id==='wolf'?'You climb out of the tunnel into a hillside of mossy boulders. Firs all around.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
+    log(id==='crypt'&&from==='wolfwood'?'You duck into the old tunnel. It slopes down into cold blue light.':id==='crypt'?'You descend the stairs into the crypt. Cold air and old bone, and somewhere below, candles still burning.':from==='crypt'&&id==='wolf'?'You climb out of the tunnel into a hillside of mossy boulders. Firs all around.':from==='crypt'?'You climb back up into the Sunken Graveyard.':from==='rat_tunnel'?'You climb out of the dark into the open air.':A.enter||('You stand in the '+A.name+'.'),col);
     floatText(player.x,player.y-30,A.name,col,true)}
   else{player.x=DOOR.x;player.y=DOOR.y+22;log('You climb back out into the graveyard.','#9aa')}
   run.cryptT0=id==='crypt'?time:null;
