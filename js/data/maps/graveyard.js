@@ -97,7 +97,7 @@ spawn corpse 6 22 30
 spawn corpse 6-7 20 25
 spawn corpse 6-7 17 22
 spawn corpse 5-6 25 13
-spawn corpse 6 14 21
+spawn corpse 6 16 25
 # critters (Heart pass, v0.49): crows on the fence, the tower, the angel and the open graves, frogs round the flooded
 # corner, moths at every light, an owl on the dead oak, bats round the belfry
 critter crow 13.5 5.1 1 high

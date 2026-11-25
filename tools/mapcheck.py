@@ -99,6 +99,12 @@ def check(m, tiles, objs):
             if not tiles[g[cy][cx]]['walk']: E.append(f"frog at {c['x']},{c['y']} sits in scenery or water")
             if not any(0 <= cy+dy < H and 0 <= cx+dx < Wd and g[cy+dy][cx+dx] == '~' for dy in range(-2, 3) for dx in range(-2, 3)): W.append(f"frog at {c['x']},{c['y']} has no water near it")
         if c['kind'] == 'moth' and not any(o.get('light', 0) and abs(o['x'] + o['w']/2 - c['x']) < 3 and abs(o['y'] - c['y']) < 3 for o in placed): W.append(f"moth at {c['x']},{c['y']} has no light near it")
+    # safe arrival (v0.77, owner Nov 21): no mob on the doorstep of a way in. You land about 2 tiles off an exit, and most
+    # mobs notice you from about 3, so nothing stands within 4 tiles of an exit (the game also keeps mobs calm on arrival).
+    for ex in (mk for mk in markers if mk['k'] == 'exit'):
+        for mk in markers:
+            if mk['k'] in ('spawn', 'named', 'rare') and ((mk['x'] - ex['x']) ** 2 + (mk['y'] - ex['y']) ** 2) ** 0.5 < 4:
+                E.append(f"{mk['type']} at {mk['x']},{mk['y']} stands on the doorstep of exit {ex['type']} (keep 4 tiles clear)")
     for i, o in enumerate(placed):
         name = f"{o['kind']} at {o['x']},{o['y']}"
         for yy in range(o['y'], o['y'] + o['h']):

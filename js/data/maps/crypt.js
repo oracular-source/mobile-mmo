@@ -49,9 +49,9 @@ obj brazier 27 24
 exit stairs_up 6 25 to=graveyard lit
 exit back_tunnel 39 8 to=wolfwood at=crypt_tunnel lit
 # stair hall: crypt rats
-spawn crypt_rat 5 5 21
-spawn crypt_rat 5 8 22
-spawn crypt_rat 5 8 20
+spawn crypt_rat 5 4 18
+spawn crypt_rat 5 9 19
+spawn crypt_rat 5 7 18
 # ossuary: rats and the first skeletons
 spawn crypt_rat 6 5 8
 spawn skeleton 6 8 5
@@ -63,9 +63,9 @@ spawn skeleton 6 21 23
 spawn crypt_rat 6 19 21
 # throne room: the King's guard
 spawn skeleton 7 27 7
-spawn skeleton 7 35 7
+spawn skeleton 7 33 3
 spawn skeleton 7 28 10
-spawn skeleton 7 34 10
+spawn skeleton 7 30 8
 spawn crypt_rat 5 5 12
 spawn skeleton 5-6 12 22
 spawn skeleton 6 26 20

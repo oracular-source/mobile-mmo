@@ -123,10 +123,11 @@ function update(dt){
     if(m.state==='idle'){
       if(m.sp.route)walkRoute(m,dt); // Greyfang walks his loop
       else if(m.sp.follow&&m.sp.follow.mob&&!m.sp.follow.mob.dead){const L=m.sp.follow.mob;m.wx=L.x+m.sp.fo.x;m.wy=L.y+m.sp.fo.y;pathTo(m,m.wx,m.wy,m.def.spd*0.5,dt);m.hx=m.x;m.hy=m.y} // pack wolves keep at his side
+      else if(m.arrCalm&&arriveHold(m)){} // calm after your arrival: stands its ground, doesn't wander into you
       else{m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);}
-      if(!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
-      else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
+      if(!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
       if(m.fear>0){m.fear-=dt;const dx=m.x-player.x,dy=m.y-player.y,dd=Math.hypot(dx,dy)||1;if(spd>0)moveToward(m,m.x+dx/dd*20,m.y+dy/dd*20,spd*0.7,dt);return} // feared: runs from you

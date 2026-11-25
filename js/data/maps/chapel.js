@@ -138,9 +138,9 @@ spawn cult_ashcaller 14 27 10
 spawn cult_chanter 14 26 8
 spawn ash_wisp 14 22 6
 # the chapel steps (14)
-spawn cult_zealot 14 25 24
-spawn cult_ashcaller 14 29 24
-spawn cult_chanter 14 27 25
+spawn cult_zealot 14 21 25
+spawn cult_ashcaller 14 23 26
+spawn cult_chanter 14 22 26
 rare ashen_acolyte 13 10
 # secret: under the fallen bell's lip
 chest 38 7

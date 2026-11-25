@@ -64,7 +64,7 @@ exit sinkhole 38 23 to=rat_tunnel at=mouth
 exit east_path 47 10 to=chapel at=east_path   # v0.62: the steep path up to the chapel's east gate (it opens from the chapel side)
 # by the town road: the easiest rats
 spawn rat 1 21 37
-spawn rat 1 26 35
+spawn rat 1 28 33
 spawn rat 1 19 31
 # west road toward the graveyard
 spawn rat 1-2 13 31

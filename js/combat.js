@@ -37,8 +37,21 @@ const openTo=m=>m.stun>0||m.lost>0;
 const unhide=msg=>{if(player.buffs.hide>0){player.buffs.hide=0;if(msg)log(msg,'#9aa')}};
 // Mobs actively fighting you (Evade's confusion doesn't count).
 const fightingMe=()=>mobs.filter(m=>!m.dead&&m.state==='chase'&&victim(m)===player&&!(m.lost>0));
+// Safe arrival (v0.77, owner Nov 21: "every arrival should be safe"). Arriving anywhere (a way between areas, a dungeon's
+// way out, waking after death), nothing jumps you. For the first few seconds no mob notices you at all, and any mob already
+// within reach when you land stays calm and stands still (no wandering into you) until you attack anything (any fight
+// starting, yours or your pet's, ends it for all), walk well toward it, or step out of its range (then the normal rules).
+// So you can get your bearings, buff, and pick your own fight; big pulls you choose stay allowed.
+const ARRIVE={grace:3,pad:32,close:0.6}; // grace seconds; pad: counts as "within reach" this far past its notice range (covers idle wandering, ~1.5 tiles); close: wakes if you get this much nearer than you landed
+function arriveSafe(){if(zoneId==='arena'||simState.busy){arriveEnd();return}player.arriveT=time+ARRIVE.grace;player.arriving=1;
+  mobs.forEach(m=>{if(m.dead)return;const d=dist(m,player);if(d<m.def.aggro+ARRIVE.pad){m.arrCalm=1;m.arrD=d;m.wx=m.x;m.wy=m.y}})}
+function arriveEnd(){if(!player.arriving)return;player.arriving=0;player.arriveT=0;mobs.forEach(m=>{m.arrCalm=0})}
+// True while m should leave you (and your pet beside you) alone because you just arrived.
+function arriveHold(m){if(!player.arriving)return false;if(time<player.arriveT)return true;if(!m.arrCalm)return false;
+  const d=dist(m,player);if(d>m.def.aggro+ARRIVE.pad||d<Math.min(m.arrD,m.def.aggro)*ARRIVE.close){m.arrCalm=0;return false}return true}
 function engage(m,byPet){
   if(m.dead||player.dead||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
+  arriveEnd(); // a fight started: arrival calm is over
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
@@ -276,7 +289,7 @@ function updatePetOne(dt,second){
     pet.hp=Math.min(pet.maxhp,pet.hp+pet.maxhp*0.02*dt);}
   if(dist(pet,player)>240){pet.x=player.x;pet.y=player.y;pet.target=null;}
 }
-function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;player.held=0;player.stunT=0;log(A&&A.wake?A.wake:zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':zoneId==='cross'?'You wake on the road by Town 1.':zoneId==='tunnel'?'You wake under the sinkhole.':'You return to the Gate Road.','#9aa')}
+function respawnPlayer(){const A=curArea();if(A){player.x=A.start.x;player.y=A.start.y}else if(zoneId==='dun'){player.x=DUN.start.x;player.y=DUN.start.y}else if(zoneId==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y}else{player.x=3.5*T;player.y=15*T+8}player.hp=Math.round(maxHP(player.lvl)*0.5);player.mp=Math.round(maxMP(player.lvl)*0.5);player.dead=0;player.held=0;player.stunT=0;arriveSafe();log(A&&A.wake?A.wake:zoneId==='dun'||zoneId==='crypt'?'You wake at the foot of the crypt stairs.':zoneId==='gy'?'You wake by the graveyard gate.':zoneId==='cross'?'You wake on the road by Town 1.':zoneId==='tunnel'?'You wake under the sinkhole.':'You return to the Gate Road.','#9aa')}
 
 // Pet orders (v0.34, owner): Attack sends the pet at your target, even one that isn't fighting you yet (so it can pull),
 // and lets it pick its own fights again. Back off pulls it out and keeps it out until you press Attack.

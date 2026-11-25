@@ -171,6 +171,7 @@ function enterZone(id,from,at){
   if(pet2){pet2.x=player.x+10;pet2.y=player.y+4;pet2.target=null;}
   decoy=null;grounds.length=0;traps.length=0;hazards.length=0;
   player.onTile=tileAt(player.x,player.y);
+  arriveSafe(); // v0.77: nothing jumps you on arrival
 }
 /* ---------- Summoning a named (v0.31) ---------- */
 // At a named's spot (the crypt throne, Gnawbone's bone pile) you can call it back if it isn't up, so a trip is never wasted.
