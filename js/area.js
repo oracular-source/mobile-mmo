@@ -87,6 +87,7 @@ function buildArea(id){
     // and foxfire's cold glow round the blight. Both drawn live too (world.js drawGlows).
     if(o.kind==='sunbeam'){A.lights.push({x:cx,y:o.y*T+8,r:46,w:20});(A.beams=A.beams||[]).push({x:cx,y:o.y*T+12,ph:ah(o.x,o.y,63)*6.3})}
     if(o.kind==='foxfire'){A.lights.push({x:cx,y:o.y*T+10,r:22,w:0,c:26});(A.fox=A.fox||[]).push({x:o.x*T,y:o.y*T,ph:ah(o.x,o.y,64)*6.3})}
+    if(o.kind==='shack')A.lights.push({x:o.x*T+15,y:o.y*T+30,r:30,w:24}); // the gravedigger is home: his window throws a little warm light (v0.82)
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
     if(o.kind==='brazier'){A.lights.push({x:cx,y:o.y*T-2,r:56,w:30});A.flames.push({x:cx,y:o.y*T+3,big:1})}
@@ -1136,33 +1137,50 @@ function drawObj(g,R,o){
     R(ux,Y+H-8,5,7,AP.out);R(ux+1,Y+H-7,3,5,AP.stone);R(ux+1,Y+H-7,1,5,AP.stoneHi);R(ux-1,Y+H-8,7,1,AP.out);
     R(ux+1,Y+H-12,1,4,'#6a5a3a');R(ux+3,Y+H-11,1,3,'#6a5a3a');R(ux+2,Y+H-13,1,2,'#7a6a48');return}
   if(k==='shack'){
-    // Gravedigger's shack (Heart pass, v0.49): the door is sized for a person now (the old one came up to your waist),
-    // planks gone dark and damp at the foot, one sprung loose, a shuttered lit window with one shutter hanging off,
-    // moss and a missing shingle on the roof, a woodpile against the wall and his spade leaning by the door. Smoke from
-    // the chimney is drawn live (world.js, area critters).
-    const top=Y-12;shadow(X+3,Y+H-3,W,4);
-    R(X-1,top+11,W+2,H+2,AP.out);R(X,top+12,W,H,AP.wood);for(let x=0;x<W;x+=4){R(X+x,top+12,1,H,AP.woodDk);R(X+x+1,top+12,1,H,AP.woodHi)}
-    R(X,Y+H-5,W,5,'#463225');for(let x=0;x<W;x+=4)R(X+x,Y+H-5,1,5,AP.woodDk);
-    R(X+28,Y+9,1,13,AP.woodHi);R(X+29,Y+9,1,13,'#2a1c14'); // a sprung plank
-    for(let i=0;i<16;i++){R(X-3+Math.floor(i/6),top+i,W+6-Math.floor(i/6)*2,1,i<1||i===15?AP.out:i%3===0?AP.roof:AP.roofHi)}
-    for(let x=0;x<W+4;x+=5)R(X-2+x,top+2,1,12,AP.roof);
-    R(X+39,top+5,6,4,AP.out);R(X+40,top+6,4,2,'#140d08'); // missing shingle
-    R(X+4,top+1,9,2,AP.moss);R(X+6,top,4,1,'#5f7a4a');R(X+20,top+13,7,2,AP.moss);R(X+52,top+10,6,2,AP.moss);R(X+54,top+9,2,1,'#5f7a4a');
-    // door: a full-height plank door with a Z brace, an iron ring, a lintel and a stone step
-    const dx=X+36,dy=Y+H-26;R(dx-1,dy-2,16,2,AP.woodDk);R(dx,dy,14,26,AP.out);R(dx+1,dy+1,12,25,AP.wood);R(dx+4,dy+1,1,25,AP.woodDk);R(dx+8,dy+1,1,25,AP.woodDk);
-    R(dx+1,dy+3,12,2,AP.woodHi);R(dx+1,dy+20,12,2,AP.woodHi);treeLine(R,dx+2,dy+19,dx+11,dy+6,1,AP.woodHi);R(dx+10,dy+12,2,2,AP.bellHi);
-    R(dx-1,Y+H,16,3,AP.out);R(dx,Y+H,14,2,AP.stone);R(dx,Y+H,14,1,AP.stoneHi);
-    // window with shutters (the right one hangs crooked from one hinge)
-    R(X+9,Y+12,12,10,AP.out);R(X+10,Y+13,10,8,'#ffb860');R(X+10,Y+17,10,4,'#e08a3a');R(X+14,Y+13,1,8,AP.out);R(X+10,Y+16,10,1,AP.out);
-    R(X+5,Y+12,4,10,AP.out);R(X+6,Y+13,2,8,AP.woodDk);R(X+21,Y+14,4,10,AP.out);R(X+22,Y+15,2,8,AP.woodDk);R(X+8,Y+22,14,1,AP.woodHi);
-    // woodpile against the wall: log ends stacked three high
-    R(X+1,Y+H+3,21,1,'rgba(0,0,0,0.45)');R(X+2,Y+H+2,19,1,'rgba(0,0,0,0.3)'); // the pile sits out on the ground (v0.49.1), with its shadow
-    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+2+i*5+j*2,ly=Y+H-1-j*4;R(lx2,ly,5,4,AP.out);R(lx2+1,ly+1,3,2,'#a88a64');R(lx2+2,ly+1,1,1,'#7a5a42')}
-    // the spade, leaning on the wall beside the door
-    R(X+50,Y+H+3,9,1,'rgba(0,0,0,0.45)'); // its foot on the ground in front of the wall, top leaning on the wall (v0.49.1)
-    treeLine(R,X+57,Y+H-23,X+54,Y+H-5,3,AP.out);treeLine(R,X+57,Y+H-22,X+54,Y+H-5,1,AP.woodHi);R(X+55,Y+H-24,5,2,AP.out);R(X+56,Y+H-24,3,1,AP.wood);
-    R(X+51,Y+H-6,6,9,AP.out);R(X+52,Y+H-5,4,7,AP.stone);R(X+52,Y+H-5,1,6,AP.stoneHi);R(X+53,Y+H+1,2,1,AP.stoneDk);
-    R(X+W-6,top+4,4,8,AP.out);R(X+W-5,top+2,2,9,AP.stoneDk);R(X+W-6,top+1,4,2,AP.out);return} // chimney
+    // Gravedigger's shack, rebuilt (v0.82, owner: the little shacks could look a lot better). Drawn like a real timber
+    // hut in 3/4 view: a stone footing, a board wall between two corner posts, and a big roof of wooden shakes seen
+    // from above, overhanging the wall with a shadow under the eaves (the old roof was a thin strip, so it read as a box).
+    // Still the person-sized door, the lit window with a shutter hanging off, his woodpile and spade, a rain barrel at
+    // the corner and a bucksaw hung on the wall. Smoke from the stone chimney is drawn live (world.js).
+    const base=Y+H,wallTop=Y+12,eave=Y+15,ridge=Y-20;shadow(X-2,base-2,W+6,5);
+    // stone footing
+    R(X-1,base-6,W+2,6,AP.out);for(let x=0,i=0;x<W;i++){const w=5+Math.floor(ah(o.x+i,1,81)*4);R(X+x,base-5,w-1,4,i%2?AP.stoneDk:AP.stone);R(X+x,base-5,w-1,1,AP.stoneHi);x+=w}
+    // the board wall, darker and damp toward the foot, nail heads, a beam across
+    R(X-1,wallTop,W+2,base-6-wallTop,AP.out);
+    for(let x=0,i=0;x<W;x+=5,i++){const c=['#5a4030','#523a2b','#614634','#4e3828'][Math.floor(ah(o.x,i,82)*4)];R(X+x,wallTop,4,base-6-wallTop,c);R(X+x,wallTop,1,base-6-wallTop,'#6e523c');R(X+x+4,wallTop,1,base-6-wallTop,'#2e2018');R(X+x+2,base-13,1,1,'#2e2018');R(X+x+2,eave+5,1,1,'#2e2018')}
+    R(X,base-12,W,6,'rgba(20,14,10,0.35)');R(X,base-21,W,3,AP.out);R(X,base-20,W,1,AP.woodHi);
+    [X-2,X+W-3].forEach(px=>{R(px,wallTop,5,base-6-wallTop,AP.out);R(px+1,wallTop,3,base-6-wallTop,'#3e2c1e');R(px+1,wallTop,1,base-6-wallTop,'#5a4030')}); // corner posts
+    R(X+28,eave+6,1,14,'#6e523c');R(X+29,eave+6,1,14,'#1e140e'); // one sprung board
+    // the roof: rows of overlapping shakes, each lit on its top edge with a dark line under each row
+    const rx0=X-5,rx1=X+W+5;R(rx0-1,ridge-1,rx1-rx0+2,eave-ridge+3,AP.out);
+    for(let row=0,y=ridge+1;y<eave;row++,y+=4){for(let x=rx0+(row%2?3:0),i=0;x<rx1;i++){const w=5+Math.floor(ah(i,row,83)*3),c=['#4a2e1a','#3b2616','#5a3a22','#45291a'][Math.floor(ah(i,row,84)*4)];
+        R(x,y,Math.min(w-1,rx1-x),4,c);R(x,y,Math.min(w-1,rx1-x),1,'#6e4a2c');R(x+w-1,y,1,4,'#24160c');x+=w}
+      R(rx0,y+3,rx1-rx0,1,'#1e120a')}
+    R(rx0-2,ridge-3,rx1-rx0+4,4,AP.out);R(rx0-1,ridge-2,rx1-rx0+2,2,'#2e1c10');R(rx0-1,ridge-2,rx1-rx0+2,1,'#4a2e1a'); // ridge cap
+    R(rx0,eave,rx1-rx0,2,'#24160c');R(X,eave+2,W,3,'rgba(0,0,0,0.4)'); // fascia and the shadow under the eaves
+    R(X+8,ridge+18,7,6,AP.out);R(X+9,ridge+19,5,4,'#120b06');R(X+10,ridge+20,1,3,'#4a2e1a');R(X+16,ridge+24,6,3,'#5a3a22'); // a missing shake (rafter showing) and one slipped
+    [[X-3,eave-5,10,3],[X+2,eave-2,5,2],[X+22,ridge+2,8,2],[X+48,eave-6,9,3]].forEach(([x,y,w,h])=>{R(x,y,w,h,AP.moss);R(x+1,y,w-3,1,'#5f7a4a')});
+    // stone chimney up through the roof near the ridge (smoke comes from its top)
+    const cx0=X+W-10;R(cx0-1,Y-14,10,20,AP.out);for(let y=Y-13;y<Y+5;y+=3)for(let x=cx0+((y-Y)%2?0:2);x<cx0+8;x+=4)R(x,y,3,2,ah(x,y,85)<0.5?AP.stone:AP.stoneDk);
+    R(cx0,Y-13,8,1,AP.stoneHi);R(cx0-2,Y-15,12,3,AP.out);R(cx0-1,Y-14,10,1,AP.stoneDk);R(cx0+2,Y-15,4,1,'#0a0806');
+    // door: frame, plank door with a Z brace and iron ring, a stone step
+    const dx=X+36,dy=base-30;R(dx-2,dy-3,18,3,AP.out);R(dx-1,dy-2,16,1,AP.woodHi);R(dx-2,dy,2,24,'#2e2018');R(dx+14,dy,2,24,'#2e2018');
+    R(dx,dy,14,24,AP.out);R(dx+1,dy+1,12,23,'#5a4030');R(dx+4,dy+1,1,23,'#3b2a1e');R(dx+8,dy+1,1,23,'#3b2a1e');R(dx+1,dy+3,12,2,AP.woodHi);R(dx+1,dy+18,12,2,AP.woodHi);
+    treeLine(R,dx+2,dy+17,dx+11,dy+6,1,AP.woodHi);R(dx+10,dy+12,2,2,AP.bellHi);
+    R(dx-2,base-6,18,4,AP.out);R(dx-1,base-6,16,3,AP.stone);R(dx-1,base-6,16,1,AP.stoneHi);
+    // window: frame, lit panes with a cross, a sill, the left shutter open, the right one hanging from one hinge
+    const wx=X+9,wy=eave+5;R(wx-1,wy-1,14,12,AP.out);R(wx,wy,12,10,'#ffb860');R(wx,wy+5,12,5,'#e08a3a');R(wx+6,wy,1,10,AP.out);R(wx,wy+4,12,1,AP.out);R(wx+1,wy,2,1,'#ffe0a0');
+    R(wx-2,wy+10,16,2,AP.out);R(wx-1,wy+10,14,1,AP.woodHi);
+    R(wx-6,wy-1,5,12,AP.out);R(wx-5,wy,3,10,AP.woodDk);R(wx+13,wy+2,5,11,AP.out);R(wx+14,wy+3,3,9,AP.woodDk);R(wx+14,wy+3,1,9,AP.wood);
+    // a bucksaw hung on the wall between the window and the door
+    R(X+25,eave+7,9,1,AP.out);R(X+25,eave+7,1,8,AP.out);R(X+33,eave+7,1,8,AP.out);R(X+25,eave+14,9,1,'#9a98a4');R(X+29,eave+6,1,2,'#2e2018');
+    // rain barrel at the left corner, woodpile under the window, the spade by the door
+    const bx=X-4;R(bx,base-14,10,15,AP.out);R(bx+1,base-13,8,13,'#4e3828');R(bx+1,base-13,2,13,'#6a4c36');R(bx,base-11,10,1,AP.iron);R(bx,base-4,10,1,AP.iron);R(bx+1,base-14,8,2,'#1a2830');R(bx+2,base-14,3,1,'#3a5260');
+    R(X+9,base+2,22,1,'rgba(0,0,0,0.45)');
+    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+10+i*5+j*2,ly=base-3-j*4;R(lx2,ly,5,4,AP.out);R(lx2+1,ly+1,3,2,'#a88a64');R(lx2+2,ly+1,1,1,'#7a5a42')}
+    R(X+51,base+2,9,1,'rgba(0,0,0,0.45)');
+    treeLine(R,X+58,base-25,X+55,base-6,3,AP.out);treeLine(R,X+58,base-24,X+55,base-6,1,AP.woodHi);R(X+56,base-26,5,2,AP.out);R(X+57,base-26,3,1,AP.wood);
+    R(X+52,base-7,6,9,AP.out);R(X+53,base-6,4,7,AP.stone);R(X+53,base-6,1,6,AP.stoneHi);return}
   if(k==='flowers'){
     // Small story (Heart pass, v0.49): fresh flowers and a stub of candle at the foot of one grave. Someone still visits.
     R(X+2,Y+1,1,5,'#3e5a32');R(X+4,Y,1,6,'#3e5a32');R(X+6,Y+2,1,4,'#3e5a32');R(X+3,Y+5,4,1,'#6a3a4a'); // stems tied with a ribbon
@@ -1242,27 +1260,88 @@ function drawObj(g,R,o){
     [[14,6],[22,9],[31,5]].forEach(([x,l])=>{for(let k=0;k<l;k++)R(X+x+(k>3?1:0),Y+2+k,1,1,k<l-1?AP.root:AP.rootHi)});
     R(X+4,top+6,4,2,AP.mossHi);R(X+W-10,top+4,5,2,AP.mossHi);return}
   if(k==='wolf_den'){
-    // Greyfang's den: a low rocky mound with a dark hole, bones scattered in front and a gnawed hunter's bow.
-    const top=Y-8;shadow(X+2,Y+H-3,W-2,4);
-    for(let y=0;y<H+8;y++){const hw=Math.round(W/2*Math.sqrt(Math.max(0,1-Math.pow((H+8-y)/(H+10),2)))+1);R(X+W/2-hw-1,top+y,2*hw+2,1,AP.out);if(hw>1)R(X+W/2-hw,top+y,2*hw,1,y<4?AP.bouldHi:(ah(o.x,y,24)<0.2?AP.bouldDk:AP.bould))}
-    R(X+W/2-10,Y+6,20,H-6,AP.out);R(X+W/2-9,Y+7,18,H-7,'#050404');R(X+W/2-11,Y+5,22,2,AP.out);
-    for(let i=0;i<8;i++){const x=X+4+Math.floor(ah(o.x,i,25)*(W-8)),y=Y+H-4+Math.floor(ah(o.y,i,26)*5);R(x,y,3,1,AP.bone);R(x,y+1,1,1,AP.out)}
-    R(X+W-14,Y+H-2,12,1,AP.out);R(X+W-13,Y+H-3,10,1,AP.wood);R(X+W-14,Y+H-4,1,2,AP.wood);R(X+W-3,Y+H-4,1,2,AP.wood);return} // the bow
+    // Greyfang's den, rebuilt (v0.82, owner: the old smooth dome with a square door read as a bunker). A real wolf den:
+    // a hole dug in under a pile of mossy boulders, its mouth a ragged dark arch with old roots hanging over it, a fan
+    // of bare trodden earth spilling out with claw marks and prints, bones and grey fur tufts, a skull, and the
+    // gnawed bow of the hunter who came looking (his cloak lies a few steps away: hunter_remains).
+    const base=Y+H-1;shadow(X,base-3,W,5);
+    const rock=(cx,cy,rx,ry,s)=>{for(let y=-ry;y<=ry;y++)for(let x=-rx;x<=rx;x++){const e=x*x/(rx*rx)+y*y/(ry*ry)+(ah(cx+x,cy+y,s)-0.5)*0.12;if(e>1)continue;
+        R(cx+x,cy+y,1,1,e>0.86?AP.out:(x+y<-rx*0.5?AP.bouldHi:(x+y>rx*0.6?AP.bouldDk:AP.bould)))}
+      treeLine(R,cx-2,cy-ry+4,cx+3,cy+1,1,AP.bouldDk);R(cx-rx+3,cy-ry+2,Math.round(rx*0.9),2,AP.mossHi);R(cx-rx+5,cy-ry+1,Math.round(rx*0.5),1,'#5f7a4a')};
+    rock(X+31,Y-3,17,13,86);rock(X+11,Y+4,12,10,87);rock(X+52,Y+3,12,10,88);rock(X+47,Y+13,8,6,89);rock(X+8,Y+15,6,4,90);
+    // the mouth: a ragged arch dug in under the big rock
+    for(let y=0;y<=20;y++){const hw=Math.round(10*Math.sqrt(Math.max(0,1-Math.pow((20-y)/21,2)))+(ah(y,1,95)<0.3?1:0));const yy=base-22+y;
+      if(hw>0){R(X+32-hw-1,yy,2*hw+2,1,AP.out);R(X+32-hw,yy,2*hw,1,y<4?'#140f0c':'#040303')}}
+    R(X+24,base-4,17,2,'#1a1410');
+    [[27,6],[31,9],[36,5],[34,3]].forEach(([x,l])=>{for(let k2=0;k2<l;k2++)R(X+x+(k2>2?1:0),base-22+k2,1,1,k2<l-1?AP.root:AP.rootHi)}); // roots over the mouth
+    // trodden earth fanning out, claw marks and prints
+    for(let y=0;y<6;y++){const hw=9+y*2;R(X+32-hw,base-2+y-3,2*hw,1,y%2?'#3e3226':'#463a2c')}
+    [[24,base-1],[38,base],[29,base+1]].forEach(([x,y])=>{treeLine(R,X+x,y,X+x+2,y-2,1,'#241c14');treeLine(R,X+x+2,y,X+x+4,y-2,1,'#241c14')});
+    [[18,base+1],[46,base]].forEach(([x,y])=>{R(X+x,y,2,1,'#1a1610');R(X+x-1,y-1,1,1,'#1a1610');R(X+x+1,y-2,1,1,'#1a1610');R(X+x+2,y-1,1,1,'#1a1610')});
+    // bones, a skull, tufts of grey fur, the gnawed bow
+    for(let i=0;i<7;i++){const x=X+14+Math.floor(ah(o.x,i,25)*36),y=base-2+Math.floor(ah(o.y,i,26)*4);R(x,y,3,1,AP.bone);R(x,y+1,1,1,AP.out);R(x+2,y-1,1,1,AP.boneDk)}
+    R(X+43,base-5,6,5,AP.out);R(X+44,base-4,4,3,AP.bone);R(X+45,base-3,1,1,AP.out);R(X+47,base-3,1,1,AP.out); // skull
+    [[16,base-4],[50,base-1],[21,base+2]].forEach(([x,y])=>{R(X+x,y,3,1,'#8a8a88');R(X+x+1,y-1,1,1,'#a8a8a4')});
+    R(X+W-16,base+1,12,1,AP.out);R(X+W-15,base,10,1,'#9a7448');R(X+W-16,base-1,1,2,'#9a7448');R(X+W-5,base-1,1,2,'#9a7448');R(X+W-11,base,2,1,'#5a4030');return}
   if(k==='lean_to'){
-    // The hunter's lean-to (v0.41.1, owner: the first one read as an upside-down pyramid). Open side faces you:
-    // a pole roof sloping up and back from a ridge pole on two forked posts, a dark sleeping space under it with a fur on the ground,
-    // a hide hung over one end against the wind.
-    const ridge=Y+3,top=Y-15;shadow(X+1,Y+H-3,W-2,4);
-    // roof: wider at the ridge, narrowing a little toward the back (top), poles running down the slope
-    for(let y=top;y<=ridge;y++){const f=(y-top)/(ridge-top),inset=Math.round(5*(1-f)),x0=X+1+inset,x1=X+W-1-inset;
-      R(x0-1,y,x1-x0+2,1,AP.out);for(let x=x0;x<x1;x++){const c=(x-X)%4===0?AP.woodDk:(x-X)%4===1?AP.woodHi:AP.wood;R(x,y,1,1,y===top?AP.out:c)}}
-    R(X+8,top+3,10,2,AP.mossHi);R(X+28,top+6,7,2,AP.mossHi); // moss and needles on the poles
-    // ridge pole, posts, the space under it
-    R(X+1,ridge,W-2,4,AP.out);R(X+2,ridge+1,W-4,2,AP.trunk);R(X+2,ridge+1,W-4,1,AP.trunkHi);
-    R(X+5,ridge+4,W-10,H-ridge+Y-7,'#0b0907');R(X+8,Y+H-8,W-20,3,'#6a5038');R(X+8,Y+H-8,W-20,1,'#8a6a4a'); // the dark inside, a fur bed
-    [X+3,X+W-6].forEach(x=>{R(x-1,ridge-2,5,Y+H-ridge,AP.out);R(x,ridge-1,3,Y+H-ridge-2,AP.wood);R(x,ridge-1,1,Y+H-ridge-2,AP.woodHi);R(x-1,ridge-3,1,2,AP.out);R(x+3,ridge-3,1,2,AP.out)});
-    R(X+W-15,ridge+3,9,13,AP.out);R(X+W-14,ridge+3,7,12,'#8a6a4a');R(X+W-14,ridge+3,7,1,'#a88a64');R(X+W-13,ridge+14,5,1,'#6a5038'); // hide over the end
+    // The hunter's lean-to, rebuilt (v0.82, owner: "the hideouts aren't built very well"), drawn the way a real one is
+    // built: a ridge pole lashed into two forked posts, slender poles leaned back from it to the ground, the frame piled
+    // with fir boughs in overlapping rows (like shingles), a couple of poles laid over the top to hold them down, a deep
+    // bough bed under the ridge with a fur on it, the open side facing the fire. Antlers nailed to the ridge, his quiver
+    // on a post, boughs packed in at the left end, a hide hung over the right end against the wind.
+    const ridge=Y+4,back=Y-18,base=Y+H-1;shadow(X,base-3,W,4);
+    // the roof seen from above-front: back edge (top) narrower, ridge (bottom) full width
+    const G0='#1a2a1c',G1='#26402a',G2='#365a36',G3='#4e7444',DN='#5a4a2a';
+    for(let y=back;y<=ridge;y++){const f=(y-back)/(ridge-back),x0=X+5-Math.round(4*f),x1=X+W-5+Math.round(4*f);R(x0,y,x1-x0,1,G0)}
+    for(let row=0,y=back-1;y<ridge;row++,y+=3){const f=(y-back)/(ridge-back),x0=X+3-Math.round(4*f),x1=X+W-3+Math.round(4*f);
+      for(let x=x0+(row%2?3:0);x<x1;x+=5+Math.floor(ah(x,row,71)*3)){const dead=ah(x,row,72)<0.12,c1=dead?DN:G1,c2=dead?'#7a6438':G2;
+        R(x,y,6,3,c1);R(x+1,y,4,1,c2);R(x,y+3,1,1,c1);R(x+5,y+3,1,1,c1);R(x+2,y+3,2,1,G0); // a drooping clump with its tips
+        if(!dead&&ah(x,row,73)<0.75)R(x+1+Math.floor(ah(x,row,70)*3),y,2,1,G3)}
+      R(x0+1,y+3,x1-x0-2,1,'rgba(10,20,12,0.45)')}
+    for(let i=0;i<8;i++){const x=X+6+Math.floor(ah(o.x,i,74)*(W-12));R(x,back-2,2,2,G1);R(x,back-2,1,1,G3)} // ragged tips along the back edge
+    R(X+4,back-1,W-8,1,'rgba(0,0,0,0.5)');R(X+6,back-3,W-12,1,'rgba(0,0,0,0.35)'); // where the roof meets the ground behind: shadow
+    for(let i=0;i<7;i++){const x=X+7+i*6+Math.floor(ah(i,o.y,79)*3);R(x,back-5,2,5,AP.out);R(x,back-4,1,4,AP.woodHi)} // the ribs' ends poking out past the boughs
+    for(let y=back;y<back+8;y++)R(X+5,y,W-10,1,'rgba(0,0,0,'+(0.32-(y-back)*0.04).toFixed(2)+')'); // the far rows sit lower, darker
+    treeLine(R,X+11,back+1,X+15,ridge-1,2,AP.out);treeLine(R,X+11,back+1,X+15,ridge-1,1,AP.woodHi); // poles laid over the boughs
+    treeLine(R,X+34,back+2,X+31,ridge-1,2,AP.out);treeLine(R,X+34,back+2,X+31,ridge-1,1,AP.woodHi);
+    // the dark space under the ridge, boughs hanging from its underside, the bough bed and the fur
+    R(X+5,ridge+4,W-10,base-ridge-5,'#090705');R(X+5,ridge+4,W-10,3,'#040302');
+    for(let x=X+6;x<X+W-6;x+=3)R(x,ridge+4,2,1+Math.floor(ah(x,1,75)*3),G1);
+    R(X+6,base-8,W-12,6,G1);for(let x=X+6;x<X+W-6;x+=2)R(x,base-8+Math.floor(ah(x,2,76)*2),1,1,G2);R(X+6,base-3,W-12,1,G0);
+    R(X+12,base-9,17,5,AP.out);R(X+13,base-8,15,3,'#8a6a4a');R(X+13,base-8,15,1,'#b08a60');R(X+26,base-6,3,1,'#6a5038'); // the fur
+    // the left end packed with boughs, a hide over the right end
+    for(let y=ridge+3;y<base;y++){const w=Math.round(2+(y-ridge)*0.35);R(X+3-w,y,w+2,1,(y%3)?G1:G2)}
+    R(X+W-11,ridge+3,9,15,AP.out);R(X+W-10,ridge+3,7,14,'#9a7a54');R(X+W-10,ridge+3,7,1,'#c4a074');R(X+W-9,ridge+16,5,1,'#6a5038');R(X+W-8,ridge+8,1,4,'#7a5a3c');
+    // forked posts, the ridge pole lashed into the forks, its cut ends
+    [X+3,X+W-6].forEach(px=>{R(px-1,ridge-3,5,base-ridge+3,AP.out);R(px,ridge-2,3,base-ridge+1,AP.wood);R(px,ridge-2,1,base-ridge+1,AP.woodHi);
+      R(px-2,ridge-7,2,5,AP.out);R(px-1,ridge-6,1,4,AP.wood);R(px+3,ridge-7,2,5,AP.out);R(px+3,ridge-6,1,4,AP.woodDk)});
+    R(X-3,ridge,W+6,5,AP.out);R(X-2,ridge+1,W+4,3,AP.trunk);R(X-2,ridge+1,W+4,1,AP.trunkHi);for(let x=6;x<W;x+=9)R(X+x,ridge+2,2,1,AP.woodDk);
+    [X-3,X+W+1].forEach(ex=>{R(ex,ridge,3,5,AP.out);R(ex+1,ridge+1,1,3,'#a88a64')});
+    [X+3,X+W-6].forEach(px=>{R(px-1,ridge+1,5,1,'#c8b48a');R(px,ridge+3,4,1,'#c8b48a');R(px+1,ridge+2,1,1,'#e0cca0')}); // rope lashings
+    // antlers nailed to the middle of the ridge
+    const ax=X+W/2;R(ax-2,ridge-2,4,3,AP.out);R(ax-1,ridge-1,2,1,'#d8ccb0');
+    treeLine(R,ax-2,ridge-2,ax-7,ridge-9,1,'#d8ccb0');treeLine(R,ax-5,ridge-5,ax-8,ridge-5,1,'#d8ccb0');treeLine(R,ax+1,ridge-2,ax+6,ridge-9,1,'#d8ccb0');treeLine(R,ax+4,ridge-5,ax+7,ridge-5,1,'#c8bca0');
+    // his quiver hanging on the right post, fletchings showing
+    R(X+W-9,ridge+6,4,10,AP.out);R(X+W-8,ridge+7,2,8,'#6a4a30');R(X+W-9,ridge+4,1,2,'#e8e0d0');R(X+W-7,ridge+3,1,3,'#b84a3a');R(X+W-6,ridge+4,1,2,'#e8e0d0');
     return}
+  if(k==='game_rack'){
+    // A meat tripod by the camp (v0.82): three poles lashed at the top, a cross-stick hung with two rabbits by their hind
+    // feet and a grouse, so you know the hunter was a hunter. Blood dark on the ground under them.
+    const tx=X+8,ty=Y-15;shadow(X+2,Y+14,13,2);R(X+4,Y+12,9,2,'#2a1810');
+    [[X+1,Y+15],[X+15,Y+15],[X+9,Y+12]].forEach(([fx,fy])=>{treeLine(R,fx,fy,tx,ty,2,AP.out);treeLine(R,fx,fy,tx,ty,1,AP.woodHi)});
+    R(tx-1,ty-1,3,3,'#c8b48a');R(X+1,ty+4,14,2,AP.out);R(X+2,ty+4,12,1,AP.wood);
+    const rab=(x)=>{R(x,ty+6,1,3,'#c8b48a');R(x-2,ty+9,5,9,AP.out);R(x-1,ty+9,3,8,'#8a7660');R(x-1,ty+9,1,8,'#a8927a');R(x-1,ty+16,3,2,'#6a5848');R(x-2,ty+18,1,2,AP.out);R(x+1,ty+18,1,2,AP.out);R(x,ty+11,1,1,'#e8e2d4')};
+    rab(X+4);rab(X+12);
+    R(X+8,ty+6,1,2,'#c8b48a');R(X+6,ty+8,5,7,AP.out);R(X+7,ty+9,3,5,'#4a3a2a');R(X+7,ty+9,3,1,'#6a5a44');R(X+8,ty+14,1,2,'#c9a227');return} // the grouse
+  if(k==='chop_block'){
+    // The hunter's woodpile and chopping block: split logs stacked bark-side out, the block (a big round of fir) with
+    // the axe left bitten into it, pale chips round its foot.
+    shadow(X+1,Y+13,W-2,3);
+    for(let j=0;j<3;j++)for(let i=0;i<4-j;i++){const lx2=X+1+i*5+j*2,ly=Y+9-j*4;R(lx2,ly,6,5,AP.out);R(lx2+1,ly+1,4,3,'#a88a64');R(lx2+1,ly+1,4,1,'#c8a878');R(lx2+3,ly+2,1,1,'#7a5a42')}
+    const bx=X+22;R(bx,Y+5,9,10,AP.out);R(bx+1,Y+8,7,6,AP.trunk);R(bx+1,Y+8,1,6,AP.trunkHi);R(bx,Y+4,9,5,AP.out);R(bx+1,Y+5,7,3,'#b8986c');R(bx+3,Y+6,3,1,'#8a6a4a');
+    R(bx+3,Y+1,5,4,AP.out);R(bx+4,Y+2,3,2,'#9a98a4');R(bx+4,Y+2,3,1,'#c8c6d0'); // the axe head, bitten in
+    treeLine(R,bx+6,Y+3,bx+12,Y-6,2,AP.out);treeLine(R,bx+6,Y+3,bx+12,Y-6,1,'#a07a50');
+    for(let i=0;i<9;i++)R(bx-3+Math.floor(ah(o.x,i,77)*15),Y+13+Math.floor(ah(o.y,i,78)*3),1+(i%2),1,i%3?'#c8a878':'#e0c898');return}
   if(k==='drying_rack'){
     // A tanning frame (v0.41, owner: the old pole rack didn't read): a square wooden frame standing on its feet,
     // a wolf hide stretched inside it, laced to the frame at the edges.

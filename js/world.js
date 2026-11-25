@@ -91,14 +91,22 @@ function drawGlows(){
     A.objs.forEach(o=>{if(o.kind!=='crypt_mouth')return;const cx=o.x*T+o.w*T/2,cy=(o.y+o.h)*T-8;for(let i=0;i<4;i++){const ph=(time*0.6+i/4)%1;lx.fillStyle=i%2?'#6f8fe0':'#b9cbbf';lx.fillRect(Math.round(cx-8+i*5+Math.sin(time+i)*2),Math.round(cy-ph*22),1,1)}});
     // Dust turning in the daylight shafts (rat tunnel) and rising out of the sinkhole (crossroads).
     (A.motes||[]).forEach((m,j)=>{for(let i=0;i<5;i++){const ph=(time*0.25+i/5+j*0.13)%1;lx.fillStyle=i%2?'#c8c0a8':'#8f8a76';lx.fillRect(Math.round(m.x-6+i*3+Math.sin(time*0.7+i+j)*3),Math.round(m.y-ph*26),1,1)}});
-    // Wolfwood (v0.81): low gold light slanting in through a gap in the canopy (from the upper left, where the light comes
-    // from everywhere in the game), breathing slowly as the leaves move, with gold dust turning in it.
-    (A.beams||[]).forEach(b=>{if(b.x<camX-70||b.x>camX+VW+40||b.y<camY-10||b.y>camY+VH+80)return;
-      const br=0.6+0.4*Math.sin(time*0.5+b.ph);lx.fillStyle='#ffb860';
-      for(let i=0;i<64;i+=2){const t=i/64,x=Math.round(b.x-26*(1-t)),y=Math.round(b.y-64+i),w=Math.round(6+6*t);lx.globalAlpha=(0.05+0.06*t)*br;lx.fillRect(x-(w>>1),y,w,2)}
-      lx.globalAlpha=0.08*br;lx.fillRect(b.x-8,b.y-1,16,3);
-      for(let i=0;i<4;i++){const ph=(time*0.12+i/4+b.ph)%1;lx.globalAlpha=0.7*Math.sin(ph*Math.PI);lx.fillStyle=i%2?'#ffe8b0':'#d8b070';lx.fillRect(Math.round(b.x-26*(1-ph)+Math.sin(time*0.8+i)*2),Math.round(b.y-64*(1-ph)),1,1)}
-      lx.globalAlpha=1});
+    // Wolfwood sunbeams (v0.82, owner: the v0.81 smear didn't read). What makes canopy light read: (1) sun flecks, a
+    // dapple of bright leaf-shaped spots on the ground that shimmer as the leaves above move; (2) a few crisp, parallel
+    // shafts slanting down from the upper left (the game's light direction), brightest where they land and fading out
+    // toward the canopy, each breathing on its own; (3) dust motes twinkling inside them. Drawn with 'screen' so the
+    // light brightens what's under it instead of painting over it.
+    (A.beams||[]).forEach(b=>{if(b.x<camX-110||b.x>camX+VW+30||b.y<camY-20||b.y>camY+VH+110)return;
+      lx.globalCompositeOperation='screen';
+      const S=[[0,3,0.0],[6,5,1.7],[14,2,3.1]];
+      S.forEach(([off,w,ph])=>{const br=0.55+0.45*Math.sin(time*0.6+b.ph+ph);
+        for(let i=0;i<88;i++){const t=i/88,x=Math.round(b.x-14+off-(88-i)*0.6),y=b.y-88+i;lx.globalAlpha=br*0.30*Math.pow(t,1.6);lx.fillStyle=i>80?'#ffe6a0':'#ffc860';lx.fillRect(x,y,w,1)}});
+      // sun flecks on the ground: a dapple of small bright spots, each fading in and out on its own
+      for(let i=0;i<14;i++){const a=ah(i,b.ph*100|0,91)*6.283,r=ah(i,3,92),fx=Math.round(b.x+Math.cos(a)*r*17),fy=Math.round(b.y+Math.sin(a)*r*8),on=0.5+0.5*Math.sin(time*(0.7+ah(i,4,93))+i*1.9+b.ph);
+        if(on<0.25)continue;lx.globalAlpha=0.55*on;lx.fillStyle='#ffd27a';const w=1+Math.floor(ah(i,5,94)*3);lx.fillRect(fx,fy,w,1+(w>2?1:0));lx.globalAlpha=0.25*on;lx.fillRect(fx-1,fy,w+2,1)}
+      lx.globalAlpha=0.10;lx.fillStyle='#ffc860';lx.beginPath();lx.ellipse(b.x,b.y,18,8,0,0,6.283);lx.fill();
+      for(let i=0;i<6;i++){const ph=(time*0.08+i/6+b.ph)%1,y=b.y-88*(1-ph);lx.globalAlpha=0.9*Math.sin(ph*Math.PI)*(0.5+0.5*Math.sin(time*3+i*2));lx.fillStyle='#fff2c8';lx.fillRect(Math.round(b.x-14+i*3-(88*(1-ph))*0.6+Math.sin(time*0.7+i)*1.5),Math.round(y),1,1)}
+      lx.globalCompositeOperation='source-over';lx.globalAlpha=1});
     // Foxfire: the fungus on rotting wood glows a cold green, pulsing slowly, a mote drifting up off it now and then.
     (A.fox||[]).forEach(f=>{const p=0.55+0.45*Math.sin(time*0.9+f.ph);
       [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y],i)=>{lx.globalAlpha=Math.max(0,p-(i%3)*0.15);lx.fillStyle='#b8ffc8';lx.fillRect(f.x+x,f.y+y,1,1)});
@@ -688,11 +696,13 @@ function updateAreaCritters(A,dt){
         if(blocked(nx,ny)||c.t>1.6){c.st='gone';c.t=0;c.jump=0}else{c.x=nx;c.y=ny}}
       else if(c.t>14&&home>170){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
     else if(c.kind==='eyes'){
-      // (v0.81) eyeshine in the dark under the trees: a pair of pale eyes that blink and watch. Walk toward them and they
-      // blink out (whatever it was slipped away); they come back once you've moved on. Pale gold-green, never red:
-      // red is kept for real monsters (pixel-world-alive, "ambient never looks like a threat").
-      c.blink-=dt;if(c.blink<-0.18)c.blink=vr(1.5,5);c.look=Math.sin(time*0.3+c.ph)>0.6?1:Math.sin(time*0.3+c.ph)<-0.6?-1:0;
-      if(c.st==='sit'&&d<70)c.st='gone',c.t=0;else if(c.st==='gone'&&c.t>12&&home>130)c.st='sit',c.t=0}
+      // (v0.82, owner: v0.81's two dots didn't read) a wolf watching from the treeline: a low dark head-and-shoulders
+      // shape you can just make out against the trunks, two eyes with real eyeshine. It blinks and tilts its head;
+      // walk toward it and it turns away (the eyes flick sideways and go out) and the shape slinks back into the trees.
+      c.blink-=dt;if(c.blink<-0.18)c.blink=vr(1.8,5);c.tilt=Math.sin(time*0.4+c.ph)>0.7?1:0;
+      if(c.st==='sit'&&d<84&&player.dead<=0){c.st='slink';c.t=0;c.away=player.x<c.x?1:-1}
+      else if(c.st==='slink'){c.x+=c.away*22*dt;c.y-=10*dt;if(c.t>0.9){c.st='gone';c.t=0}}
+      else if(c.st==='gone'&&c.t>14&&home>140){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
     else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
   });
   if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:0})}}}
@@ -714,6 +724,8 @@ function drawAreaCritters(A,layer){
     return}
   A.crit.forEach(c=>{
     if(c.kind==='crow'&&(c.st==='fly'||(!c.ground&&c.st==='sit'))){const flap=c.st==='fly'&&Math.floor(time*10)%2;critGrid(c.st==='fly'?(flap?CROW_FLY2:CROW_FLY):c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir)}
+    else if(c.kind==='eyes'&&c.st!=='gone'){const x=Math.round(c.x),y=Math.round(c.y),a=c.st==='slink'?Math.max(0,1-c.t/0.9):1;lx.globalAlpha=0.85*a;lx.fillStyle='#050607';
+      lx.fillRect(x-5,y-3,11,6);lx.fillRect(x-4,y-5,2,2);lx.fillRect(x+3,y-5,2,2);lx.fillRect(x-7,y+2,15,4);lx.fillRect(x-3,y+3,7,2);lx.globalAlpha=1} // ears, head, shoulders
     else if(c.kind==='owl')drawOwl(c);
     else if(c.kind==='bat'){const x=c.hx+Math.cos(time*c.sp+c.ph)*c.r*1.4,y=c.hy+Math.sin(time*c.sp*2+c.ph)*c.r*0.5,up=Math.floor(time*12+c.ph)%2;
       f(x-1,y,3,1,'#120e16');if(up){f(x-3,y-1,2,1,'#120e16');f(x+2,y-1,2,1,'#120e16')}else{f(x-3,y+1,2,1,'#120e16');f(x+2,y+1,2,1,'#120e16')}}});
@@ -748,6 +760,9 @@ function drawCritterGlows(A){
       lx.fillStyle='#efe3c4';lx.fillRect(x,y,1,1);if(Math.floor(time*14+c.ph*3)%2){lx.fillStyle='#b8ad90';lx.fillRect(x-1,y,1,1);lx.fillRect(x+1,y,1,1)}}
     if(c.kind==='firefly'){const x=Math.round(c.hx+Math.cos(time*c.sp+c.ph)*c.r+Math.sin(time*c.sp*2.7+c.ph)*6),y=Math.round(c.hy+Math.sin(time*c.sp*1.3+c.ph)*c.r*0.5);
       const on=0.5+0.5*Math.sin(time*(1.3+c.sp*3)+c.ph*5);if(on>0.35){lx.globalAlpha=(on-0.35)*0.5;lx.fillStyle='#c8e070';lx.fillRect(x-1,y,3,1);lx.fillRect(x,y-1,1,3);lx.globalAlpha=Math.min(1,(on-0.35)*2.2);lx.fillStyle='#f0ff9a';lx.fillRect(x,y,1,1);lx.globalAlpha=1}}
-    if(c.kind==='eyes'&&c.st==='sit'&&c.blink>=0){const x=Math.round(c.hx)+c.look,y=Math.round(c.hy);lx.globalAlpha=0.35;lx.fillStyle='#c8d870';lx.fillRect(x-3,y-1,3,3);lx.fillRect(x+1,y-1,3,3);lx.globalAlpha=1;lx.fillStyle='#eef0a0';lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1)}
+    if(c.kind==='eyes'&&(c.st==='sit'||(c.st==='slink'&&c.t<0.25))&&c.blink>=0){const x=Math.round(c.x)+(c.st==='slink'?c.away*2:0),y=Math.round(c.y)-1+c.tilt,ey=c.tilt;
+      // eyeshine: a soft halo, an almond of pale gold with a bright core toward the nose; red is kept for monsters
+      lx.globalCompositeOperation='screen';lx.globalAlpha=0.35;lx.fillStyle='#d8c860';lx.fillRect(x-5,y-1,4,3);lx.fillRect(x+2,y-1+ey,4,3);
+      lx.globalAlpha=1;lx.fillStyle='#e8d870';lx.fillRect(x-4,y,3,1);lx.fillRect(x+2,y+ey,3,1);lx.fillStyle='#fffbd0';lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y+ey,1,1);lx.globalCompositeOperation='source-over'}
     if(c.kind==='owl'&&c.blink>=0){lx.fillStyle='#ffcf5a';const x0=Math.round(c.x)-3+c.look,y0=Math.round(c.y)-9;lx.fillRect(x0+2,y0+3,1,1);lx.fillRect(x0+4,y0+3,1,1)}});
 }

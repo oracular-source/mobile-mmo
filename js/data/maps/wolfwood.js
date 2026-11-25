@@ -92,6 +92,8 @@ obj foxfire 33 24
 obj foxfire 17 32
 obj bedroll 51 29
 obj camp_kit 55 29
+obj game_rack 50 28
+obj chop_block 48 25
 obj toadstools 10 26
 obj sunbeam 52 42
 obj sunbeam 47 34
@@ -102,7 +104,7 @@ obj sunbeam 58 26
 obj sunbeam 50 16
 obj sunbeam 12 21
 # Life: crows on the dead giant's branches and one at the deer bones, an owl on the giant, moths at every light,
-# rabbits at the crossroads end, fireflies on the road and in the glade, deer on the deer trail, eyes in the dark wood.
+# rabbits at the crossroads end, fireflies on the road and in the glade, deer in the glade, a wolf watching from the treeline (eyes).
 critter crow 28.9 11.0 1 high
 critter crow 33.9 11.95 1 high
 critter crow 25.7 17.9
@@ -118,12 +120,11 @@ critter firefly 60 24.5 3
 critter firefly 15.5 24.5 2
 critter deer 58.5 22.8
 critter deer 60.2 26.6
-critter eyes 21.5 4.6
-critter eyes 2.5 10.6
-critter eyes 50.5 2.6
-critter eyes 2.5 36.6
-critter eyes 61.5 8.6
-critter eyes 17.5 13.6
+critter eyes 18.5 8.5
+critter eyes 7.5 6.5
+critter eyes 54.5 2.6
+critter eyes 60.5 9.5
+critter eyes 21.5 13.5
 # ways in and out
 exit south 56 47 to=crossroads at=north
 exit graveyard 12 47 to=graveyard at=north
