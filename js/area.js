@@ -134,6 +134,7 @@ function* buildAreaGen(id){
     if(o.kind==='sconce'){A.lights.push({x:cx,y:(o.y+1)*T+3,r:50,w:32});A.flames.push({x:cx,y:o.y*T+3,big:0})}
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
     if(o.kind==='town_gate'){const m=o.x*T+o.w*T/2;[m-22,m+23].forEach(x=>{A.lights.push({x:x,y:o.y*T+16-26,r:48,w:30});A.flames.push({x:x-6,y:o.y*T+16-22,big:0,lamp:1})})}
+    if(o.kind==='ground_lantern'){A.lights.push({x:o.x*T+8,y:o.y*T+9,r:30,w:24});A.flames.push({x:o.x*T+7,y:o.y*T+10,big:0,tiny:1})} // the gravedigger's lantern, left burning (v0.111)
     if(o.kind==='lantern'){A.lights.push({x:cx,y:o.y*T-4,r:44,w:26});A.flames.push({x:cx,y:o.y*T-1,big:0,lamp:1})}
     // Wolfwood heart pass (v0.81): low gold dusk light through gaps in the canopy (more near the crossroads, fewer deeper in),
     // and foxfire's cold glow round the blight. Both drawn live too (world.js drawGlows).
@@ -1696,6 +1697,58 @@ function drawObj(g,R,o){
     R(X+4,Y+7,8,1,AP.out);R(X+2,Y+8,12,1,AP.out);R(X+1,Y+9,14,5,AP.out);R(X+2,Y+14,12,1,AP.out); // a rounded heap, not a box
     R(X+5,Y+8,6,1,AP.dirtHi);R(X+3,Y+9,10,1,AP.dirtHi);R(X+2,Y+10,12,4,AP.dirt);R(X+4,Y+10,4,1,AP.dirtHi);
     R(X+3,Y+12,2,1,'#2a221c');R(X+10,Y+11,2,1,'#2a221c');R(X+7,Y+13,1,1,AP.dirtHi);return}
+  // ---- The half-dug grave (love pass v0.111, owner's mark G4): the middle of the graveyard was empty, so the
+  // gravedigger's work-in-progress sits there. A fresh hole half dug, the spade left in the heap, a barrow of dirt, a plain
+  // pine box waiting on its lowering ropes with an unnamed cross laid on the lid, and his lantern still burning on the
+  // grass. He left in a hurry: the corpses walk here. Fresh dirt is warmer and lighter than the old grave mounds so it reads
+  // as just dug. Refs: "pixel grave digging", "pixel wheelbarrow", "video game coffin" (hexagon lid = coffin).
+  if(k==='fresh_dig'){
+    const FD='#5a4632',FH='#76603f',FK='#2e241a';
+    // trampled ground and dirt kicked about round the hole
+    [[0,1],[1,12],[4,15],[14,15],[21,14],[30,1],[31,13],[26,15],[9,0],[17,-1]].forEach(([x,y])=>{R(X+x,Y+y,2,1,FD);R(X+x,Y+y,1,1,FH)});
+    // the hole: ragged rim, the far wall in raw earth (3/4 view: you see the side away from you), a shallow floor (half dug)
+    R(X+2,Y+2,28,12,AP.out);R(X+1,Y+4,1,8,AP.out);R(X+30,Y+3,1,9,AP.out);
+    R(X+3,Y+3,26,4,FK);R(X+3,Y+3,26,1,FD);R(X+5,Y+5,6,1,'#3a2e22');R(X+16,Y+4,7,1,'#3a2e22');R(X+12,Y+6,2,1,'#6a6470'); // strata and a stone in the wall
+    R(X+3,Y+7,26,6,'#1a1510');R(X+6,Y+9,7,2,'#241c14');R(X+18,Y+10,6,2,'#241c14');R(X+24,Y+8,3,1,FK); // the floor, dug unevenly
+    R(X+2,Y+13,28,1,FD);R(X+5,Y+13,4,1,FH);R(X+19,Y+13,5,1,FH); // the near lip, crumbling
+    R(X+8,Y+2,3,1,FH);R(X+22,Y+2,4,1,FD);
+    // the heap at the east end: a rounded mound (not a box), higher than the old graves, clods and a pale root in it
+    const hx=X+32,hc=hx+8;R(hx,Y+14,17,2,'rgba(0,0,0,0.4)');
+    for(let y=1;y<=14;y++){const t=(14-y)/14,hw=Math.round(8.5*Math.sqrt(Math.max(0,1-t*t)));R(hc-hw-1,Y+y,hw*2+2,1,AP.out)}
+    for(let y=2;y<=13;y++){const t=(14-y)/14,hw=Math.round(8.5*Math.sqrt(Math.max(0,1-t*t)))-1;if(hw<1)continue;
+      R(hc-hw,Y+y,hw*2,1,y<4?FH:y<10?FD:'#4a3a2a');R(hc-hw,Y+y,Math.max(1,Math.round(hw*0.6)),1,y<7?FH:FD)} // lit from the top left
+    R(hc-5,Y+6,2,1,FK);R(hc+3,Y+9,2,1,FK);R(hc-2,Y+11,2,1,FK);R(hc+5,Y+5,2,1,'#6a6470');R(hc-4,Y+8,2,1,FH);
+    R(hc-1,Y+7,4,1,'#9a8a66');R(hc+2,Y+6,1,1,'#9a8a66'); // a root he cut through
+    R(hx-3,Y+10,4,3,AP.out);R(hx-2,Y+10,3,2,FD);R(hx-2,Y+10,2,1,FH); // dirt spilling back toward the hole
+    // the spade driven into the heap at a lean, blade buried, a T grip on top
+    treeLine(R,hx+11,Y-12,hx+9,Y+3,3,AP.out);treeLine(R,hx+11,Y-12,hx+9,Y+3,1,AP.woodHi);R(hx+8,Y-14,6,3,AP.out);R(hx+9,Y-13,4,1,AP.wood);
+    R(hx+6,Y+2,6,3,AP.out);R(hx+7,Y+3,4,1,AP.stoneHi);R(hx+6,Y+4,6,2,FD);R(hx+7,Y+4,3,1,FH);return}
+  if(k==='barrow'){
+    // His wheelbarrow, seen from the side: wheel at the front toward the hole, a sloped iron tub heaped with dirt, long
+    // handles back to a leg on the grass.
+    R(X+1,Y+14,15,2,'rgba(0,0,0,0.4)');
+    treeLine(R,X+11,Y+7,X+16,Y+10,2,AP.out);treeLine(R,X+11,Y+7,X+15,Y+9,1,AP.woodHi);R(X+11,Y+9,2,6,AP.out);R(X+11,Y+10,1,4,AP.woodDk); // handle, leg
+    for(let y=0;y<8;y++){const l=X+3+Math.max(0,4-y),r=X+13-Math.floor(y/3);R(l-1,Y+3+y,r-l+2,1,AP.out);if(y<7)R(l,Y+3+y,r-l,1,y<1?AP.ironTip:y<4?'#4e4e58':'#3a3a44')} // tub, front sloping to the wheel
+    R(X+3,Y+1,10,3,AP.out);R(X+4,Y,8,2,AP.out);R(X+5,Y,6,2,'#76603f');R(X+4,Y+2,8,1,'#5a4632');R(X+9,Y+1,1,1,'#2e241a'); // dirt over the rim
+    R(X+1,Y+8,5,7,AP.out);R(X,Y+9,7,5,AP.out);R(X+2,Y+9,3,5,AP.woodDk);R(X+1,Y+10,5,3,AP.woodDk);R(X+2,Y+9,3,1,AP.woodHi);R(X+3,Y+11,1,1,AP.ironHi); // the wheel and its hub
+    return}
+  if(k==='pine_box'){
+    // A plain pine coffin waiting beside the hole: the six-sided lid that says "coffin" at a glance, two lowering ropes
+    // under it with their ends on the grass, and a bare wooden cross laid on the lid: no name carved yet.
+    const P='#8a6a48',PH='#a8845a',PK='#5a4030';R(X+2,Y+13,30,3,'rgba(0,0,0,0.4)');
+    const prof=x=>x<7?Math.round((7-x)*0.5):Math.round((x-7)*0.15); // inset from top and bottom: widest at the shoulders
+    for(let x=0;x<30;x++){const i=prof(x);R(X+1+x,Y+i-1,1,14-2*i+3,AP.out)}
+    for(let x=1;x<29;x++){const i=prof(x);R(X+1+x,Y+i,1,12-2*i,P);R(X+1+x,Y+i,1,1,PH);R(X+1+x,Y+12-i,1,2,PK)}
+    R(X+3,Y+6,26,1,PK);R(X+5,Y+3,1,1,AP.out);R(X+27,Y+4,1,1,AP.out);R(X+5,Y+9,1,1,AP.out);R(X+27,Y+8,1,1,AP.out); // plank seam and nails
+    [[8,'#6e5c40'],[22,'#6e5c40']].forEach(([x,c])=>{R(X+x,Y,1,14,c);R(X+x-1,Y-1,2,1,c);R(X+x+1,Y+14,2,1,c)}); // ropes, ends on the grass
+    R(X+13,Y+5,11,3,AP.out);R(X+14,Y+6,9,1,PH);R(X+16,Y+3,3,7,AP.out);R(X+17,Y+4,1,5,PH); // the bare cross on the lid
+    return}
+  if(k==='ground_lantern'){
+    // His hand lantern, set down on the grass and still burning (the flame is drawn live). Moths find it.
+    R(X+3,Y+14,10,2,'rgba(0,0,0,0.4)');R(X+4,Y+3,8,12,AP.out);R(X+5,Y+6,6,6,'#ffb860');R(X+5,Y+10,6,2,'#e08a3a');R(X+7,Y+6,2,6,'#ffe0a0');
+    R(X+5,Y+4,6,2,AP.iron);R(X+5,Y+12,6,2,AP.iron);R(X+5,Y+12,6,1,AP.ironHi);R(X+7,Y+1,2,1,AP.out);R(X+6,Y+2,1,2,AP.out);R(X+9,Y+2,1,2,AP.out); // cap and bail
+    R(X+12,Y+13,3,1,'#5a4632'); // a crumb of fresh dirt from his boots
+    return}
   if(k==='statue'){
     // Weathered angel on a plinth (Heart pass, v0.49): its right wing has broken off at the tip (the piece lies on the
     // plinth), dark rain streaks run down it, lichen on the robe, moss on the plinth and the wing tops.

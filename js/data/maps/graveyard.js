@@ -64,9 +64,14 @@ obj torch 42 30
 obj torch 42 35
 obj candle 12 18
 obj candle 14 18
-# small stories (Heart pass, v0.49): someone still brings flowers; the gravedigger's spade stands by an open grave
+# small stories (Heart pass, v0.49): someone still brings flowers
 obj flowers 34 35
-obj shovel 21 28
+# the half-dug grave (love pass v0.111, G4): the gravedigger's work in the empty middle, left in a hurry. His spade moved
+# here from the open grave in the south rows (one spade in the graveyard, not two).
+obj ground_lantern 17 19
+obj fresh_dig 18 19
+obj pine_box 19 20
+obj barrow 21 20
 # ways in and out
 exit east 47 35 to=crossroads
 exit north 30 0 to=wolfwood
@@ -114,6 +119,7 @@ critter moth 7.5 27.6 3
 critter moth 42.5 29.6 2
 critter moth 42.5 34.6 2
 critter moth 13.5 18.6 2
+critter moth 17.5 19.1 1
 critter owl 17.5 14.9
 critter bat 23.5 6.4 2
 # secrets

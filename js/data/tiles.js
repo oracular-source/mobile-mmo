@@ -106,6 +106,10 @@ bedroll      1 1 0      ground 0     -    0
 cot          1 1 1      ground 0     -    0
 flowers      1 1 0      ground 0     -    1
 shovel       1 1 0      ground 0     -    0
+fresh_dig    3 1 1      ground 0     -    0
+barrow       1 1 1      ground 0     -    0
+pine_box     2 1 1      ground 0     -    0
+ground_lantern 1 1 0    ground 0     -    2
 wagon        3 2 1      ground 0     -    0
 fishing_rod  1 1 0      ground 0     -    0
 town_gate    6 1 1      ground 0     -    3
