@@ -102,6 +102,29 @@ Deep dive for the "Items and gold rethink" card on the board. Must be settled be
 - **Gold uses, all in one place:** forge fees, shop orbs, shop teleport orbs, moving enchants to new gear, and later cosmetic extras (like dye colours) that are looks only. Never bank space for gold (that's what the game sells for real money).
 - **Risk to watch:** if shop orbs are too cheap, gold becomes power you can grind without fighting new things. Keep the shop price well above what a normal session earns (e.g. one shop orb ≈ an hour of copper), and tune in the sim.
 
+## Items lane, draft 1: drops that feel good (Nov 27)
+
+**Owner's brief (Nov 27):** items don't *feel* like anything yet. Too many drops; blues and pinks should be saved for real moments; you shouldn't be in full pink by the end of the first run. Gear should feel sparser. Work out boss drops (loot stays personal), how enchanting works, and what gold does.
+
+**Where the game is today (v0.92, `rollLoot` in `js/combat.js`):**
+- Every kill: 60% junk; about 11–15% a white (common); about 3–5% a green (uncommon), doubled in the rat tunnel and crypt; 1% a blue (rare) from level 4 mobs (3% in the tunnel and crypt).
+- **Every named always drops a pink:** Old Gnawbone (ring), Greyfang (ring), the Skeleton King (one of his items), the Drowned Prior (cowl), the Bellringer (ring), Malrec (weapon), plus a green 50–100% of the time. That's **6 pinks guaranteed in one lap of Zone 1**, and there are only 8 gear slots. This is why it feels like full pink by the end of the first run.
+- A rare mob always drops a green, 25% a blue. Chests roll a white, green or blue (up to 25% blue in Dungeon 1).
+- Rough count over a climb to 15 (about 1,000 kills): ~130 whites, ~40 greens, ~10–20 blues, 6+ pinks. Too much of everything.
+
+**Proposal (owner to pick and tune):**
+1. **Fewer drops, so each one counts.** Normal mobs mostly drop copper and junk (junk turns to copper on pickup, so nothing to sell). Gear about 1 kill in 30, nearly all white or green. **Blues are a session highlight** (about one per hour of play: rares, chests, bosses, very rarely mobs). **Pinks only from named, rares and bosses**, each with its own twist (the Meaningful named loot card). Target for a fresh character after Dungeon 1's first clear: mostly greens, 2–3 blues, maybe 1 pink; a full pink set comes from farming.
+2. **Drops that feel like an event.** A light beam in the item's colour on the ground, its own sound, and the existing banner for blues and pinks.
+3. **Boss loot (still personal).** Each boss drops one item for your class: about 60% green, 30% blue, 10% pink. **First kill of each boss is always blue or better.** **Bad-luck protection:** each kill without a pink raises the pink chance a little, reset when one drops. **Malrec's chest: pick 1 of 3** (three items for your class, you choose one). The dungeon journal lists each boss's drops once seen, so you know what you're farming.
+4. **Enchanting (+1 to +5, already decided).** Small sure steps, no fail or break. **+3 adds a faint glow, +5 a strong one** (ties to gear showing on the character). Orbs are rare drops, one tier per zone; merge 3 into 1; a lower orb on better gear gives less. **Moving an enchant to new gear costs gold**, so a new drop never feels like losing your +4. Unwanted gear breaks into orb dust; an auto setting does it for whites.
+5. **What gold is for (one loop).** Main: forge fees (enchanting, moving enchants). Backstop: orbs at a very high price. Small: teleport orbs, dyes, maybe repairs after death (older card). Never bank space (that's sold for real money).
+
+**Open questions for the owner:**
+1. Pinks from named and bosses only, or can rares drop them too?
+2. Malrec's chest: pick 1 of 3, or a straight random roll?
+3. Should normal mobs drop gear at all, or only copper and junk (gear from chests, rares and named)?
+4. Repairs after death: keep that card or drop it?
+
 ## Sources
 - Path of Exile dev diary, "Rethinking Gold as a Currency": https://pathofexile.com/forum/view-thread/55102
 - Path of Exile economy (Game Developer): https://gamedeveloper.com/design/path-of-exile-economy-currency-trading
