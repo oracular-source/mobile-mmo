@@ -5,6 +5,7 @@ A tab-target fantasy MMO for phones, inspired by EverQuest (camps, pulls, classe
 ## About me
 - I'm not a developer. Explain things in plain words, and skip the jargon unless you define it.
 - After every change, tell me exactly how to test it: what to open, what to tap, and what I should see.
+- **I never look at GitHub myself (owner, Nov 27).** Show me everything right in the chat: screenshots, review sheets, docs and changes, ideally as an artifact page I can open on my phone. Never point me to a file in the repo to read.
 - If something needs me to install or set up a tool, give me step-by-step instructions.
 - Ask before big or hard-to-undo changes (deleting files, restructuring folders, adding new tools or frameworks).
 
