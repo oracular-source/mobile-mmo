@@ -451,7 +451,7 @@ function paintArea(A){
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
       else if(n==='coffin')drawCoffin(R,bx,by,ah(tx,ty,12));
       else if(n==='pew')drawPew(R,g,bx,by,name(tx-1,ty)==='pew',name(tx+1,ty)==='pew',ah(tx,ty,18));
-      else if(n==='bone_niche')drawNiche(R,bx,by,name(tx,ty+1)!=='rock'&&name(tx,ty+1)!=='bone_niche',ah(tx,ty,19));
+      else if(n==='bone_niche'){const wl=m=>m==='rock'||m==='bone_niche';drawNiche(R,bx,by,!wl(name(tx,ty+1)),ah(tx,ty,19),!wl(name(tx+1,ty))?'e':!wl(name(tx-1,ty))?'w':'',tx,ty)}
       else if(n==='ember_pit'){const K=(x,y)=>name(x,y)==='ember_pit';drawEmberPit(R,bx,by,K(tx,ty-1),K(tx,ty+1),K(tx-1,ty),K(tx+1,ty),tx,ty)}
       else if(n==='iron_fence'||n==='fence_grate'){const isF=(x,y)=>{const m=name(x,y);return m==='iron_fence'||m==='fence_grate'||m==='gate'||m==='broken_fence'};
         drawFence(R,bx,by,isF(tx-1,ty),isF(tx+1,ty),isF(tx,ty-1),isF(tx,ty+1),n==='fence_grate',tx,ty);
@@ -788,11 +788,22 @@ function drawBones(R,bx,by,r){
   R(bx+1,by+10,14,5,'rgba(0,0,0,0.3)');R(bx+3,by+11,10,3,AP.boneDk);
   cryptBone(R,bx+1,by+12,13);cryptBone(R,bx+r*4+3|0,by+5,9,true);if(r>0.4)cryptBone(R,bx+2,by+8,10);
   cryptSkull(R,bx+(r<0.5?8:3),by+4+(r*3|0),true)}
-// Stone coffin seen from above, lid slightly ajar on some.
+// Closed coffin (v0.91 redraw; owner: the old ones read as little headstones). What makes it a coffin: the tapered outline,
+// narrow at the head, widest at the shoulders, narrowing to the feet, and a cross carved down the lid; a thin front face
+// gives it depth. Versions: plain, lid ajar (slid down off the head end, a black gap showing), cracked lid, a candle stub on top.
+function coffinHW(t,L,a,b,c){a=a||3;b=b||5.5;c=c||2.9;const s=L*0.28;return t<s?a+t/s*(b-a):b-(t-s)/(L-s)*(b-c)} // half width t px from the head (head a, shoulders b, feet c)
 function drawCoffin(R,bx,by,r){
-  R(bx+2,by+13,13,2,'rgba(0,0,0,0.35)');R(bx+3,by+1,10,14,AP.out);R(bx+4,by+2,8,12,AP.stoneDk);R(bx+4,by+2,8,1,AP.stone);R(bx+4,by+2,1,12,AP.stone);
-  R(bx+7,by+4,2,7,AP.stoneDk2);R(bx+5,by+6,6,2,AP.stoneDk2);
-  if(r<0.35){R(bx+4,by+11,8,3,AP.out);R(bx+5,by+12,6,1,'#0e0c12')}}
+  const cx=bx+8,top=by,L=14,HW=t=>Math.round(coffinHW(t,L,1.6,4.2,1.8)),ajar=r<0.22?2:0,v=r<0.22?0:r<0.45?1:r>0.82?2:3;
+  R(cx-5,by+14,11,2,'rgba(0,0,0,0.4)');
+  if(ajar){for(let t=0;t<3;t++){const h=HW(t);R(cx-h-1,top+t-1,h*2+3,2,AP.out);R(cx-h,top+t,h*2+1,1,'#0b090d')}} // the open head end
+  for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h-1,y-1,h*2+3,3,AP.out)}
+  for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h,y,h*2+1,1,AP.stone);R(cx-h,y,1,1,AP.stoneHi);R(cx+h,y,1,1,AP.stoneDk)}
+  {const h=HW(L-1),y=top+L+ajar;R(cx-h,y,h*2+1,2,AP.stoneDk2);R(cx-h-1,y+2,h*2+3,1,AP.out)} // front face at the foot
+  R(cx-1,top+ajar,3,1,AP.stoneHi); // lit head edge
+  R(cx,top+2+ajar,1,10,AP.stoneDk2);R(cx-2,top+4+ajar,5,1,AP.stoneDk2); // the carved cross
+  if(v===1){R(cx+2,top+5+ajar,1,2,AP.out);R(cx+3,top+7+ajar,1,2,AP.out);R(cx+2,top+9+ajar,1,1,AP.out)} // a crack across the lid
+  if(v===2){R(cx-3,top+8+ajar,3,4,AP.out);R(cx-2,top+9+ajar,1,2,'#e8e0c8');R(cx-3,top+12+ajar,3,1,'#d8d0b8')} // a candle stub, wax run down
+  if(r>0.6&&r<0.7)R(cx+1,top+10+ajar,2,1,AP.moss)}
 // Rat tunnel walls with natural edges (v0.74, Zone 1 pass step 3): the earth walls used to follow the tile steps, so every
 // cave edge was a staircase. Now they're one shape, like water (v0.52): a smoothed wall field plus two layers of wobble picks,
 // pixel by pixel, wall or floor. Then, in the 3/4 view: a soil face 10 px tall wherever floor lies just below the wall (with
@@ -999,13 +1010,28 @@ function drawPew(R,g,bx,by,l,rt,r){
   if(r<0.25)R(x0+4+Math.floor(r*20),by+8,3,2,'#3a3238'); // a hymnal left on the seat
   if(r>0.85)R(x0+2,by+3,4,1,'#2a1e16'); // a crack in the back
 }
-function drawNiche(R,bx,by,face,r){
-  drawRock(R,bx,by,face,false,r);
-  const y=face?by+2:by+3;R(bx+3,y,10,10,AP.out);R(bx+4,y+2,8,8,'#08070b');R(bx+5,y+1,6,1,'#08070b');R(bx+4,y+10,8,1,AP.rockHi); // the arched hole and its sill
-  if(r<0.75){R(bx+6,y+5,4,3,AP.bone);R(bx+6,y+5,4,1,'#d8d0c0');R(bx+6,y+6,1,1,AP.out);R(bx+9,y+6,1,1,AP.out);R(bx+7,y+8,2,1,AP.boneDk)} // a skull
-  else{R(bx+5,y+8,6,1,AP.bone);R(bx+5,y+7,1,2,AP.bone);R(bx+10,y+7,1,2,AP.bone)} // a long bone
-  if(r>0.5){R(bx+4,y+9,2,1,AP.boneDk);R(bx+11,y+9,1,1,AP.boneDk)}
-}
+// Burial vault wall (v0.91; owner: the bones in the niches didn't read, make it a tomb). What makes it read: rows of pale sealed
+// slabs set in the wall like a mausoleum, each with a small bronze name plaque and corner bolts; the odd slab cracked, one
+// broken open with a skull looking out, one with its plaque gone. A wall facing the room shows two rows of slabs over the whole
+// tile (taller than plain wall, like a carved vault panel); side walls stay plain (a 3/4 view shows only their tops).
+function vaultSlot(R,x,y,w,h,q,q2){
+  R(x,y,w,h,AP.out);
+  if(q<0.13){R(x+1,y+1,w-2,h-2,'#08070b');R(x+1,y+h-2,w-2,1,'#1a1720'); // broken open: dark inside, rubble on the sill
+    if(w>8){R(x+3,y+h-4,4,3,AP.bone);R(x+3,y+h-4,4,1,'#d8d0c0');R(x+4,y+h-3,1,1,AP.out);R(x+6,y+h-3,1,1,AP.out)} // a skull looking out
+    R(x+w-4,y+1,3,2,'#6a6470');R(x+w-3,y+3,2,1,'#6a6470');return} // a jagged piece of slab still in the frame
+  R(x+1,y+1,w-2,h-2,'#77717d');R(x+1,y+1,w-2,1,'#958f9b');R(x+1,y+h-2,w-2,1,'#5e5864');
+  R(x+1,y+1,1,1,AP.mortar);R(x+w-2,y+1,1,1,AP.mortar);R(x+1,y+h-2,1,1,AP.mortar);R(x+w-2,y+h-2,1,1,AP.mortar); // corner bolts
+  const px=x+(w>>1)-2,py=y+(h>>1)-1;
+  if(q<0.25){R(px,py+1,1,1,AP.mortar);R(px+3,py+1,1,1,AP.mortar)} // plaque gone, its bolt holes left
+  else if(w>8){R(px,py,4,2,AP.bell);R(px,py,4,1,AP.bellHi)}else R(px+1,py,2,2,AP.bell)
+  if(q>0.86){R(x+3,y+1,1,1,AP.out);R(x+4,y+2,1,1,AP.out);R(x+5,y+3,1,1,AP.out);R(x+6,y+3,1,1,AP.out)} // cracked
+  if(q2<0.15)R(x+w-4,y+h-2,2,1,AP.moss)}
+function drawNiche(R,bx,by,face,r,side,tx,ty){
+  if(face){
+    R(bx,by,16,16,AP.stoneDk2);R(bx,by,16,1,AP.stone);R(bx,by+1,16,1,AP.out); // carved lintel along the top
+    vaultSlot(R,bx+1,by+2,15,7,ah(tx,ty,301),ah(tx,ty,302));vaultSlot(R,bx+1,by+8,15,7,ah(tx,ty,303),ah(tx,ty,304));
+    R(bx,by+15,16,1,AP.out);return}
+  drawRock(R,bx,by,false,false,r)} // a side wall shows only its top in 3/4, so a niche there stays plain wall
 function drawEmberPit(R,bx,by,n,s,w,e,tx,ty){
   R(bx,by,16,16,AP.pit);
   for(let i=0;i<14;i++){const x=bx+Math.floor(ah(tx,ty,200+i)*15),y=by+Math.floor(ah(tx,ty,220+i)*15),q=ah(tx,ty,240+i);R(x,y,2,1,q<0.35?AP.coal:q<0.7?AP.emb:q<0.85?'#c4471f':AP.embHi)}
@@ -1058,22 +1084,50 @@ function cryptBone(R,x,y,l,vert){ // a long bone, knobbed at both ends, with a d
 function cryptSkull(R,x,y,small){ // 6 x 6 (5 x 5 small): dome, eye holes, jaw
   if(small){R(x-1,y-1,7,6,AP.out);R(x,y,5,3,AP.bone);R(x+1,y,3,1,'#d8d0c0');R(x+1,y+1,1,1,AP.out);R(x+3,y+1,1,1,AP.out);R(x+1,y+3,3,1,AP.boneDk);return}
   R(x-1,y-1,8,8,AP.out);R(x,y,6,4,AP.bone);R(x+1,y,4,1,'#d8d0c0');R(x+1,y+2,2,2,AP.out);R(x+4,y+2,1,2,AP.out);R(x+3,y+3,1,1,AP.boneDk);R(x+1,y+4,4,2,AP.bone);R(x+1,y+5,4,1,AP.boneDk);R(x+2,y+5,1,1,AP.out)}
-function cryptBox(R,X,Y,shadow){ // a stone coffin seen in 3/4: the box 30 x 12 on a 2-tile footprint, lid gone, black inside
-  shadow(X+2,Y+13,30,3);R(X+1,Y+1,30,13,AP.out);R(X+2,Y+2,28,11,AP.stoneDk);R(X+2,Y+2,28,1,AP.stone);R(X+2,Y+10,28,3,AP.stoneDk2);R(X+2,Y+10,28,1,AP.stoneDk);
-  R(X+4,Y+4,24,6,'#0c0a10');R(X+4,Y+4,24,1,'#050408')}
+// Open stone coffins (v0.91 redraw; owner: the lids didn't read and the two open coffins looked alike). The box is the tapered
+// coffin shape lying head-left, its open top showing a pale rim, the lit inner face of the far side and a black inside; the lid
+// is the same shape, lighter, with its carved cross and a dark edge showing how thick it is. Four versions (crypt rule: every
+// repeated prop comes in versions): lid slid off the foot end onto the floor, lid fallen in front and cracked in two, lid shoved
+// half off toward the back, lid stood on end against the head.
+function coffinCols(L,f,k){k=k||1;for(let t=0;t<L;t++)f(t,Math.round(coffinHW(t,L,2.4,6,2.6)*k))}
+function cryptBox(R,X,Y,shadow,inside){ // the open box: 28 px long, head at X+2, middle row Y+7; inside: 0 empty, 1 bones, 2 shroud
+  const x0=X+2,cy=Y+7,L=28;shadow(X+2,Y+13,30,3);
+  coffinCols(L,(t,h)=>R(x0+t-1,cy-h-1,3,h*2+7,AP.out));
+  coffinCols(L,(t,h)=>{const x=x0+t,rim=t<2||t>L-3;R(x,cy-h,1,h*2+1,rim?AP.stoneHi:AP.stone);
+    if(!rim&&h>2){R(x,cy-h+1,1,2,AP.stoneDk);R(x,cy-h+3,1,h*2-3,'#0b090d')} // inner face of the far side, then the dark inside
+    R(x,cy+h+1,1,3,AP.stoneDk2);R(x,cy+h+1,1,1,AP.stoneDk)}); // the front face
+  if(inside===1){cryptSkull(R,x0+4,cy-1,true);cryptBone(R,x0+11,cy+1,9);cryptBone(R,x0+14,cy-1,6)}
+  if(inside===2){R(x0+6,cy,14,2,'#8e8a82');R(x0+6,cy,14,1,'#a8a49a');R(x0+19,cy+2,2,2,'#8e8a82');R(x0+10,cy+1,1,1,'#6e6a64')}}
+function coffinLid(R,x0,cy,L,shear,skip,k){ // the lid lying flat, the same tapered shape; shear tilts it so it sits askew
+  const dy=t=>Math.round(t*shear);
+  coffinCols(L,(t,h)=>{if(skip&&skip(t))return;R(x0+t-1,cy+dy(t)-h-1,3,h*2+5,AP.out)},k);
+  coffinCols(L,(t,h)=>{if(skip&&skip(t))return;const x=x0+t,y=cy+dy(t);R(x,y-h,1,h*2+1,AP.cstHi);R(x,y-h,1,1,'#a8a8b2');R(x,y+h+1,1,2,AP.stoneDk2)},k); // top and thick edge
+  for(let t=4;t<L-4;t++)if(!(skip&&skip(t)))R(x0+t,cy+dy(t),1,1,AP.stoneDk); // the cross, lying along the lid
+  const c=Math.round(L*0.3);if(!(skip&&skip(c)))R(x0+c,cy+dy(c)-2,1,5,AP.stoneDk)}
 function drawCryptProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,r=ah(o.x,o.y,90);
   if(k==='smashed_coffin'){
-    // Grave robbers: the lid smashed, its big piece still on the left end, shards on the floor, the crowbar left wedged in.
-    cryptBox(R,X,Y,shadow);cryptBone(R,X+13,Y+7,8);
-    R(X+1,Y,12,10,AP.out);R(X+2,Y+1,10,8,AP.stone);R(X+2,Y+1,10,1,AP.stoneHi);R(X+9,Y+1,3,3,AP.out);R(X+11,Y+4,1,5,AP.out);R(X+7,Y+5,1,1,AP.stoneDk); // jagged broken edge
-    [[22,13],[26,15],[17,14]].forEach(([dx,dy],i)=>{R(X+dx-1,Y+dy-1,5-i,3,AP.out);R(X+dx,Y+dy-1,3-i,1,AP.stoneHi);R(X+dx,Y+dy,3-i,1,AP.stone)}); // shards
-    treeLine(R,X+20,Y+9,X+28,Y-3,3,AP.out);treeLine(R,X+20,Y+9,X+28,Y-3,1,AP.ironTip);R(X+27,Y-5,4,2,AP.out);R(X+28,Y-4,2,1,AP.ironTip);R(X+30,Y-3,1,2,AP.ironTip); // crowbar
+    // Grave robbers: the lid smashed, its head-end piece still on, pieces on the floor, the crowbar left wedged under it.
+    cryptBox(R,X,Y,shadow,1);coffinLid(R,X+1,Y+6,11,0.05,t=>t>8+(t&1),0.9);
+    [[22,14],[27,15],[17,15]].forEach(([dx,dy],i)=>{R(X+dx-1,Y+dy-1,5-i,3,AP.out);R(X+dx,Y+dy-1,3-i,1,'#a8a8b2');R(X+dx,Y+dy,3-i,1,AP.cstHi)}); // lid pieces
+    treeLine(R,X+12,Y+8,X+20,Y-4,3,AP.out);treeLine(R,X+12,Y+8,X+20,Y-4,1,AP.ironTip);R(X+19,Y-6,4,2,AP.out);R(X+20,Y-5,2,1,AP.ironTip);R(X+22,Y-4,1,2,AP.ironTip); // crowbar
     return true}
   if(k==='open_coffin'){
-    // The dead got up: the lid shoved off from inside, lying slewed across the floor; scratch marks on its underside.
-    cryptBox(R,X,Y,shadow);if(r<0.5)cryptBone(R,X+8,Y+6,6);
-    const lx=r<0.5?X+12:X-2;for(let j=0;j<7;j++){R(lx+j-1,Y+6+j,20,1,AP.out);R(lx+j,Y+6+j,18,1,j===0?AP.stoneHi:j>4?AP.stoneDk:AP.stone)}R(lx+6,Y+13,20,1,AP.out); // the slab, sheared so it reads askew
-    [[4,8],[8,9],[12,8]].forEach(([dx,dy])=>{R(lx+dx,Y+dy,1,1,AP.stoneDk2);R(lx+dx+1,Y+dy+1,1,1,AP.stoneDk2);R(lx+dx+2,Y+dy+2,1,1,AP.stoneDk2)}); // claw scratches
+    // The dead got up: four ways the lid ended up (see cryptBox above). Picked from the spot so neighbours differ.
+    const v=(o.x*7+o.y*3)%4;
+    if(v===3){ // lid stood on end against the head: a tall tapered slab, cross upright, its foot on the floor
+      const lx=X-3;for(let t=0;t<20;t++){const h=Math.round(coffinHW(t,20)*0.75),y=Y-12+t,sx=lx+Math.round((19-t)*0.15);R(sx-h-1,y-1,h*2+3,3,AP.out)}
+      for(let t=0;t<20;t++){const h=Math.round(coffinHW(t,20)*0.75),y=Y-12+t,sx=lx+Math.round((19-t)*0.15);R(sx-h,y,h*2+1,1,AP.cstHi);R(sx-h,y,1,1,'#a8a8b2');R(sx+h,y,1,1,AP.stoneDk2)}
+      R(lx+2,Y-9,1,13,AP.stoneDk);R(lx,Y-6,5,1,AP.stoneDk); // the cross
+      cryptBox(R,X+4,Y,shadow,2);return true}
+    if(v===2){ // shoved half off toward the back: the lid sits high on the far rim, the front half open, a bony hand over the edge
+      cryptBox(R,X,Y,shadow,0);coffinLid(R,X+5,Y-3,27,0.05,null,0.7);
+      R(X+12,Y+10,5,3,AP.out);R(X+13,Y+11,3,1,AP.bone);R(X+12,Y+12,1,2,AP.bone);R(X+14,Y+12,1,2,AP.bone);R(X+16,Y+12,1,2,AP.bone);return true}
+    if(v===1){ // fell off in front onto the floor, lying flat and askew with a crack right across it
+      cryptBox(R,X,Y,shadow,1);shadow(X+4,Y+21,30,3);coffinLid(R,X+3,Y+18,27,-0.06,null,0.7);
+      R(X+18,Y+14,1,2,AP.out);R(X+17,Y+16,1,2,AP.out);R(X+18,Y+18,1,2,AP.out);R(X+17,Y+20,1,1,AP.out);R(X+21,Y+19,2,1,AP.cstHi);return true} // the crack, a chip off it
+    // v0: slid off the foot end, tilted, its far end down on the floor
+    cryptBox(R,X,Y,shadow,2);coffinLid(R,X+14,Y+6,24,0.2,null,0.85);
+    [[4,9],[7,10]].forEach(([dx,dy])=>{R(X+14+dx,Y+dy,1,1,AP.stoneDk2);R(X+15+dx,Y+dy+1,1,1,AP.stoneDk2)}); // scratches on it
     return true}
   if(k==='loot_sack'){
     // A sack dropped in a hurry, tipped on its side, gold candlesticks and a plate spilling out of its mouth.

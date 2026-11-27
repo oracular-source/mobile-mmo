@@ -27,7 +27,7 @@ MAPS.crypt = {
     'XXXXXXXXXXXXXXXXssssssssssssXXXXXXXXXXXXXXXX',
     'XXXXXXXXXXXXXXXXssPssssssPssXXXXXXXXXXXXXXXX',
     'XXXXXXXXXXXXXXXXXssssssssssXXXXXXXXXXXXXXXXX',
-    'XXXNXNXNXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXX',
+    'XXNNNNNNNNXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXX',
     'XN_______BX_____________________BX________XX',
     'XX________X______________________X________XX',
     'XN________X__C__C__C____C__C__C__X________XX',
