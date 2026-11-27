@@ -65,7 +65,11 @@ function* buildAreaGen(id){
   const A={id:id,name:M.name,w:w,h:h,rows:rows.slice(),map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||'',instance:!!M.instance,seals:[]};
   M.things.split('\n').forEach(line=>{const p=line.split('#')[0].trim().split(/\s+/);if(!p[0])return;
     const k=p[0],px=x=>x*T+8,py=y=>y*T+10;
-    if(k==='obj')A.objs.push(Object.assign({kind:p[1],x:+p[2],y:+p[3],opt:p[4]||''},AREA_OBJS[p[1]])); // opt: an optional word after x y (e.g. campfire ... pot)
+    if(k==='obj'){const o=Object.assign({kind:p[1],x:+p[2],y:+p[3],opt:p[4]||''},AREA_OBJS[p[1]]); // opt: an optional word after x y (e.g. campfire ... pot)
+      // 'half' (love pass, v0.103): drawn half a tile to the right, to sit on a room's middle line when its width doesn't
+      // match (the Skeleton King's throne, the ossuary shrine). It still blocks its own tiles.
+      if(o.opt==='half'||p[5]==='half'){o.ox=8;if(o.opt==='half')o.opt=''}
+      A.objs.push(o)}
     const opt=n=>(p.find(s=>s.indexOf(n+'=')===0)||'').slice(n.length+1); // name=value extras on a line
     if(k==='spawn'||k==='named'){const lv=p[2].split('-').map(Number),sp={type:AREA_MOBS[p[1]]||'dead',x:px(+p[3]),y:py(+p[4]),timer:0,mob:null,group:null,lv:[lv[0],lv[lv.length-1]]};A.spawns.push(sp);
       // A named remembers its spawn, the object you touch to summon it and the key that takes (v0.31).
@@ -120,10 +124,12 @@ function* buildAreaGen(id){
   // Cobwebs (v0.89) hang in whichever corner of their tile has the most wall round it.
   A.objs.forEach(o=>{if(o.kind!=='cobweb')return;const wall=(x,y)=>x<0||y<0||x>=w||y>=h||!AREA_TILES[rows[y][x]].walk;let best=-1;
     [[0,0],[1,0],[0,1],[1,1]].forEach(([r,b])=>{const dx=r?1:-1,dy=b?1:-1,n=wall(o.x+dx,o.y)+wall(o.x,o.y+dy)+wall(o.x+dx,o.y+dy);if(n>best){best=n;o.cornerR=r;o.cornerB=b}})});
+  // Bone walls (love pass, v0.103): a run of them is drawn as one stack, so each knows whether its neighbours are bone walls too.
+  A.objs.forEach(o=>{if(o.kind!=='bone_wall')return;o.nl=A.objs.some(q=>q.kind==='bone_wall'&&q.y===o.y&&q.x===o.x-1);o.nr=A.objs.some(q=>q.kind==='bone_wall'&&q.y===o.y&&q.x===o.x+1)});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
-  A.objs.forEach(o=>{const cx=o.x*T+o.w*T/2;
+  A.objs.forEach(o=>{const cx=o.x*T+(o.ox||0)+o.w*T/2;
     // Wall torch (v0.96): hangs on the face of a north wall; its light starts on the floor just in front (never inside the wall).
     if(o.kind==='sconce'){A.lights.push({x:cx,y:(o.y+1)*T+3,r:50,w:32});A.flames.push({x:cx,y:o.y*T+3,big:0})}
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
@@ -149,8 +155,12 @@ function* buildAreaGen(id){
     if(o.kind==='bell_mold'){A.lights.push({x:o.x*T+16,y:o.y*T+26,r:26,w:30})}
     if(o.kind==='window'){A.lights.push({x:cx,y:o.y*T+22,r:40,w:16,c:22})}
     if(o.kind==='altar'){A.lights.push({x:cx,y:o.y*T+4,r:34,w:26});A.flames.push({x:o.x*T+6,y:o.y*T-3,big:0,tiny:1},{x:o.x*T+o.w*T-6,y:o.y*T-3,big:0,tiny:1})}
-    if(o.kind==='mourner_shrine'){A.lights.push({x:o.x*T+8,y:o.y*T+2,r:30,w:22});A.flames.push({x:o.x*T+4,y:o.y*T,big:0,tiny:1},{x:o.x*T+8,y:o.y*T+1,big:0,tiny:1},{x:o.x*T+11,y:o.y*T,big:0,tiny:1})} // someone still lights these (crypt, v0.89)
-    if(o.kind==='feast_table'){A.lights.push({x:o.x*T+36,y:o.y*T,r:30,w:20});A.flames.push({x:o.x*T+36,y:o.y*T-4,big:0,tiny:1})} // the King's last candle, burnt low
+    if(o.kind==='mourner_shrine'){const sx=o.x*T+(o.ox||0);A.lights.push({x:sx+8,y:o.y*T+2,r:30,w:22});A.flames.push({x:sx+4,y:o.y*T,big:0,tiny:1},{x:sx+8,y:o.y*T+1,big:0,tiny:1},{x:sx+11,y:o.y*T,big:0,tiny:1})} // someone still lights these (crypt, v0.89)
+    // The King's feast (love pass v0.103): candles from the table's outer end inward, burning lower as they go, the inner one out.
+    if(o.kind==='feast_table'){const C=feastCandles(o);C.forEach(c=>{if(c.lit)A.flames.push({x:c.x,y:c.top-2,big:0,tiny:1})});
+      const lit=C.filter(c=>c.lit);if(lit.length)A.lights.push({x:lit.reduce((a,c)=>a+c.x,0)/lit.length,y:o.y*T+2,r:34,w:22})}
+    // A robber's candle stuck on a coffin lid (love pass v0.103: candles off the floor).
+    if(o.kind==='coffin'&&o.opt==='candle'){A.lights.push({x:o.x*T+5,y:o.y*T+18,r:28,w:20});A.flames.push({x:o.x*T+5,y:o.y*T+14,big:0,tiny:1})}
     if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   // Ember pits glow from below (every other tile is enough light).
@@ -529,10 +539,16 @@ function* paintAreaGen(A){ // pauses between rows (see Build in slices)
   yield* paintEarthWallsGen(A,g,name);
   // Ground-only copies of the top and bottom edges, taken before any scenery: render mirrors these past the map edge so the
   // strip under the top bars (or the spell grid) shows ground carrying on, never black and never a doubled building (v0.55).
-  {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
+  // Underground (crypt, Dungeon 1), the map is cut out of solid rock, so past the edge is solid rock too: the mirror used to
+  // copy the rooms by the edge (love pass C7: the landing's floor carried on below the crypt stairs). The strips are tiled
+  // from the corner tile, which is always plain wall there.
+  const rock=A.tint==='crypt'||A.tint==='vault';
+  const fillRock=(e,w,h)=>{const t=document.createElement('canvas');t.width=T;t.height=T;t.getContext('2d').drawImage(c,0,0,T,T,0,0,T,T);
+    const eg=e.getContext('2d');eg.fillStyle=eg.createPattern(t,'repeat');eg.fillRect(0,0,w,h)};
+  {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;if(rock)fillRock(e,W,E);else e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
     c.edgeTop=cut(0);c.edgeBot=cut(H-E);
     // Left and right too (v0.76, character always centred: the camera now shows past those edges as well).
-    const F=Math.min(W,EDGE_STRIP),cutX=x=>{const e=document.createElement('canvas');e.width=F;e.height=H;e.getContext('2d').drawImage(c,x,0,F,H,0,0,F,H);return e};
+    const F=Math.min(W,EDGE_STRIP),cutX=x=>{const e=document.createElement('canvas');e.width=F;e.height=H;if(rock)fillRock(e,F,H);else e.getContext('2d').drawImage(c,x,0,F,H,0,0,F,H);return e};
     c.edgeLeft=cutX(0);c.edgeRight=cutX(W-F);}
 
   // 2) Scenery and objects, row by row. Objects are drawn when we reach their bottom row so trees in front cover them.
@@ -911,14 +927,33 @@ function drawBones(R,bx,by,r){
 // narrow at the head, widest at the shoulders, narrowing to the feet, and a cross carved down the lid; a thin front face
 // gives it depth. Versions: plain, lid ajar (slid down off the head end, a black gap showing), cracked lid, a candle stub on top.
 function coffinHW(t,L,a,b,c){a=a||3;b=b||5.5;c=c||2.9;const s=L*0.28;return t<s?a+t/s*(b-a):b-(t-s)/(L-s)*(b-c)} // half width t px from the head (head a, shoulders b, feet c)
-function drawCoffin(R,bx,by,r){ // two tiles tall (map: a C with another C under it), drawn from the top tile; person-sized
-  const cx=bx+8,top=by+3,L=24,HW=t=>Math.round(coffinHW(t,L,2.6,6,2.8)),ajar=r<0.22?3:0,v=r<0.22?0:r<0.45?1:r>0.82?2:3;
+// Love pass (v0.103, owner: the coffin hall's coffins all looked alike): a coffin placed as an object names its version
+// (obj coffin x y wood): stone, cracked, ajar, candle (a lit stub), wood, wood_ajar, wood_broken (lid caved in, bones showing),
+// small (a child's coffin with dried flowers). The C tiles in Dungeon 1 still pick stone versions from the spot.
+function drawCoffin(R,bx,by,r,ver){ // two tiles tall (map: a C with another C under it), drawn from the top tile; person-sized
+  const small=ver==='small',wood=ver&&ver.indexOf('wood')===0,cx=bx+8,top=by+3+(small?8:0),L=small?15:24,k=small?0.72:1;
+  const HW=t=>Math.round(coffinHW(t,L,2.6,6,2.8)*k);
+  let ajar=r<0.22?3:0,v=r<0.22?0:r<0.45?1:r>0.82?2:3;
+  if(ver){ajar=ver==='ajar'||ver==='wood_ajar'?3:0;v={stone:3,cracked:1,ajar:0,candle:2}[ver];if(v===undefined)v=3}
+  const C=wood?{f:AP.wood,hi:AP.woodHi,dk:AP.woodDk,face:'#2e2016',edge:AP.woodHi}:{f:AP.stone,hi:AP.stoneHi,dk:AP.stoneDk,face:AP.stoneDk2,edge:AP.stoneHi};
   R(cx-7,top+L+1,15,3,'rgba(0,0,0,0.4)');
-  if(ajar){for(let t=0;t<4;t++){const h=HW(t);R(cx-h-1,top+t-1,h*2+3,2,AP.out);R(cx-h,top+t,h*2+1,1,'#0b090d')}} // the open head end
+  if(ajar){for(let t=0;t<4;t++){const h=HW(t);R(cx-h-1,top+t-1,h*2+3,2,AP.out);R(cx-h,top+t,h*2+1,1,'#0b090d')} // the open head end
+    if(ver==='wood_ajar'){R(cx-2,top+1,5,2,'#8e8a82');R(cx-1,top+1,3,1,'#a8a49a')}} // the shroud showing in the gap
   for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h-1,y-1,h*2+3,3,AP.out)}
-  for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h,y,h*2+1,1,AP.stone);R(cx-h,y,1,1,AP.stoneHi);R(cx+h,y,1,1,AP.stoneDk)}
-  {const h=HW(L-1),y=top+L+ajar;R(cx-h,y,h*2+1,2,AP.stoneDk2);R(cx-h-1,y+2,h*2+3,1,AP.out)} // front face at the foot
-  R(cx-2,top+ajar,5,1,AP.stoneHi); // lit head edge
+  for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h,y,h*2+1,1,C.f);R(cx-h,y,1,1,C.hi);R(cx+h,y,1,1,C.dk)}
+  {const h=HW(L-1),y=top+L+ajar;R(cx-h,y,h*2+1,2,C.face);R(cx-h-1,y+2,h*2+3,1,AP.out)} // front face at the foot
+  R(cx-2,top+ajar,5,1,C.edge); // lit head edge
+  if(wood){ // planks: two dark seams down the lid, nail heads at the head and foot boards
+    for(let t=2;t<L-1;t++){const y=top+t+ajar;if(ah(bx+t,by,97)>0.12){R(cx-2,y,1,1,'#3a281c');R(cx+2,y,1,1,'#3a281c')}}
+    [3,L-3].forEach(t=>{const y=top+t+ajar,h=HW(t);R(cx-h+1,y,1,1,AP.ironHi);R(cx+h-1,y,1,1,AP.ironHi)});
+    if(ver==='wood_broken'){ // the middle of the lid caved in: a black hole with splintered ends, ribs and a skull below
+      for(let t=8;t<16;t++){const y=top+t,h=HW(t)-2-(t===8||t===15?2:0);R(cx-h,y,h*2+1,1,'#0b090d')}
+      R(cx-2,top+9,5,4,AP.out);R(cx-1,top+9,3,3,AP.bone);R(cx-1,top+10,1,1,AP.out);R(cx+1,top+10,1,1,AP.out); // skull
+      [13,14].forEach(y=>R(cx-3,top+y,7,1,AP.boneDk));R(cx,top+13,1,2,AP.bone); // ribs
+      [[-3,7],[1,7],[3,16],[-2,16]].forEach(([dx,dy])=>{R(cx+dx,top+dy,1,1,AP.woodHi);R(cx+dx,top+dy+(dy<10?1:-1),1,1,AP.wood)})} // splinters
+    return}
+  if(small){R(cx,top+2,1,10,AP.stoneDk2);R(cx-2,top+5,5,1,AP.stoneDk2); // a small cross, dried flowers laid on it
+    R(cx-3,top+9,2,2,'#6a4a52');R(cx+1,top+8,2,2,'#7a5a4a');R(cx-1,top+10,2,1,'#5a4a3a');R(cx-3,top+9,1,1,'#8a6a5a');return}
   R(cx,top+3+ajar,1,17,AP.stoneDk2);R(cx-3,top+7+ajar,7,1,AP.stoneDk2); // the carved cross
   if(v===1){R(cx+2,top+10+ajar,1,2,AP.out);R(cx+3,top+12+ajar,1,2,AP.out);R(cx+2,top+14+ajar,1,2,AP.out);R(cx+3,top+16+ajar,1,1,AP.out)} // a crack across the lid
   if(v===2){R(cx-4,top+13+ajar,3,5,AP.out);R(cx-3,top+14+ajar,1,3,'#e8e0c8');R(cx-4,top+18+ajar,3,1,'#d8d0b8')} // a candle stub, wax run down
@@ -1241,7 +1276,58 @@ function coffinLid(R,x0,cy,L,shear,skip,k){ // the lid lying flat, the same tape
   coffinCols(L,(t,h)=>{if(skip&&skip(t))return;const x=x0+t,y=cy+dy(t);R(x,y-h,1,h*2+1,AP.cstHi);R(x,y-h,1,1,'#a8a8b2');R(x,y+h+1,1,2,AP.stoneDk2)},k); // top and thick edge
   for(let t=4;t<L-4;t++)if(!(skip&&skip(t)))R(x0+t,cy+dy(t),1,1,AP.stoneDk); // the cross, lying along the lid
   const c=Math.round(L*0.3);if(!(skip&&skip(c)))R(x0+c,cy+dy(c)-2,1,5,AP.stoneDk)}
+// Feast table candles (love pass v0.103): x, wax top, height and lit, from the outer end inward (opt L = outer end on the left).
+function feastCandles(o){const X=o.x*T+(o.ox||0),W=o.w*T,L=o.opt!=='R';
+  return [[4,7,1],[12,5,1],[20,2,0]].map(([dx,h,lit])=>{const x=L?X+dx:X+W-1-dx;return{x:x,h:h,top:o.y*T+2-h,lit:lit}})}
 function drawCryptProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,r=ah(o.x,o.y,90);
+
+  if(k==='coffin'){drawCoffin(R,X,Y,r,o.opt||'stone');return true} // a placed coffin and its version (love pass v0.103)
+  if(k==='sarcophagus'){
+    // A noble's stone tomb (love pass v0.103; refs: "pixel sarcophagus", medieval tomb effigies): a box carved with three arched
+    // panels on a plinth, a thick lid with its edge showing. Versions: knight (his effigy on the lid, hands joined, sword along
+    // him, a little dog at his feet), cracked (the lid shoved askew, the dark inside showing, a crack across it), plain (a carved
+    // cross and moss).
+    const v=o.opt||'plain',lx=v==='cracked'?3:0,E='#a29eaa',Eh='#c0bcc6',Ed='#76727e';
+    shadow(X+1,Y+29,32,3);
+    R(X,Y+25,32,6,AP.out);R(X+1,Y+26,30,4,AP.stoneDk);R(X+1,Y+26,30,1,AP.stone); // plinth
+    R(X+2,Y+13,28,13,AP.out);R(X+3,Y+14,26,11,AP.stoneDk2);R(X+3,Y+14,26,1,AP.stoneDk); // box front
+    [5,13,21].forEach(dx=>{R(X+dx,Y+18,6,6,AP.out);R(X+dx+1,Y+17,4,1,AP.out);R(X+dx+1,Y+18,4,6,'#1c1924');R(X+dx+1,Y+18,1,6,AP.stoneDk)}); // arched panels
+    if(v==='cracked'){R(X+1,Y+3,6,10,AP.out);R(X+2,Y+4,5,8,'#08070b')} // the open end the lid was shoved off
+    R(X+lx,Y+2,32-lx+(lx?2:0),13,AP.out);R(X+lx+1,Y+3,30-lx+(lx?2:0),9,AP.stone);R(X+lx+1,Y+3,30-lx+(lx?2:0),1,AP.stoneHi);R(X+lx+1,Y+12,30-lx+(lx?2:0),2,AP.stoneDk); // lid, its thick edge
+    if(v==='plain'){R(X+6,Y+7,20,1,AP.stoneDk2);R(X+10,Y+5,1,5,AP.stoneDk2);R(X+24,Y+11,3,1,AP.moss);R(X+4,Y+20,2,1,AP.moss);return true}
+    const ex=X+lx; // the effigy, head at the left on a pillow
+    R(ex+3,Y+5,6,6,AP.out);R(ex+4,Y+6,4,4,Ed);R(ex+4,Y+6,4,1,E); // pillow
+    R(ex+6,Y+4,7,7,AP.out);R(ex+7,Y+5,5,5,E);R(ex+7,Y+5,5,1,Eh);R(ex+11,Y+6,1,3,Ed); // head
+    R(ex+12,Y+4,14,8,AP.out);R(ex+13,Y+5,12,6,E);R(ex+13,Y+5,12,1,Eh);R(ex+13,Y+10,12,1,Ed);R(ex+19,Y+5,1,6,Ed); // body, a belt
+    R(ex+15,Y+2,3,4,AP.out);R(ex+16,Y+3,1,2,Eh); // hands joined, pointing up
+    R(ex+25,Y+5,4,6,AP.out);R(ex+26,Y+6,2,4,Ed); // feet
+    R(ex+28,Y+6,4,5,AP.out);R(ex+29,Y+7,2,3,E);R(ex+29,Y+6,1,1,AP.out); // the little dog curled at his feet
+    if(v==='knight'){R(ex+13,Y+8,13,1,'#5e5e6a');R(ex+14,Y+7,1,3,'#5e5e6a');R(ex+13,Y+8,1,1,AP.bell)} // the sword along him, gold pommel
+    if(v==='cracked'){[[14,4],[15,5],[16,6],[16,7],[17,8],[18,9],[18,10],[19,11]].forEach(([dx,dy])=>R(ex+dx,Y+dy,1,1,AP.out));R(X+2,Y+12,3,2,AP.stone)} // a crack through him, a chip on the floor
+    return true}
+  if(k==='bone_wall'){
+    // Ossuary bone wall (love pass v0.103, owner: the ossuary was big and empty, bones dropped at random; refs: Paris catacombs).
+    // Bones stacked into low walls: rows of femur ends seen end-on, a band of skulls across the middle, long bones lying along
+    // the top. A run of them is one wall (outline only at its ends). 'slump': the top half has slid off onto the floor in front.
+    const l=o.nl,rt=o.nr,sl=o.opt==='slump',top=Y-4+(sl?6:0),x0=X-(l?0:1),w=16+(l?0:1)+(rt?0:1);
+    shadow(X,Y+14,16,3);R(x0,top-1,w,Y+15-top+1,AP.out);
+    R(X+(l?0:0),top,16-(rt?0:1),3,AP.boneDk);for(let i=0;i<16;i+=5)R(X+i+((o.y&1)?2:0),top+(i%2),4,1,AP.bone); // long bones lying along the top
+    const fy=top+3;R(X,fy,16-(rt?0:1),Y+14-fy,'#141018');
+    const ends=(y,st)=>{for(let x=X+st;x<X+15;x+=3){R(x,y,2,2,AP.bone);R(x,y,1,1,'#d8d0c0');R(x+1,y+1,1,1,AP.boneDk)}}; // femur ends
+    if(!sl){ends(fy,0);ends(fy+3,1)}
+    const sy=sl?fy:fy+6;cryptSkull(R,X+2,sy+1,true);cryptSkull(R,X+9,sy+1,true);ends(Y+12,0); // the skull band, a row of ends at the foot
+    if(sl){cryptBone(R,X+1,Y+17,10);cryptBone(R,X+6,Y+19,9);cryptSkull(R,X+11,Y+16,true);R(X+3,Y+15,3,2,AP.bone)} // slid off onto the floor
+    return true}
+  if(k==='carpet'){
+    // The King's runner (love pass v0.103, owner: the throne room's floor was bare): a long red carpet from the door to the
+    // dais steps, gold border, rotted through in places (the floor shows in the holes), dusty, frayed edges, a fringe at the door end.
+    const x0=X+3,w=W-6,y0=Y+1,h=H-5;
+    for(let j=0;j<h;j++)for(let i=0;i<w;i++){const n=ah(o.x*40+i,o.y*90+j,92),edge=i===0||i===w-1;
+      const hole=(ah((o.x*40+i)>>2,(o.y*90+j)>>2,93)<0.07)&&n<0.8;if(hole)continue; // rotted through
+      if(edge&&n<0.25)continue; // frayed edge
+      const b=i===2||i===w-3;R(x0+i,y0+j,1,1,edge?'#2e0e12':b?(n<0.15?'#4a3a1c':'#7a6230'):n<0.18?'#5a3a3a':n>0.9?'#5e1e24':'#4a161c')}
+    for(let i=0;i<w;i+=2)R(x0+i,y0+h,1,2+((i>>1)&1),'#5a3a2a'); // fringe at the door end
+    return true}
   if(k==='smashed_coffin'){
     // Grave robbers: the lid smashed, its head-end piece still on, pieces on the floor, the crowbar left wedged under it.
     cryptBox(R,X,Y,shadow,1);coffinLid(R,X+1,Y+6,11,0.05,t=>t>8+(t&1),0.9);
@@ -1306,12 +1392,19 @@ function drawCryptProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,r=ah(o.x,o.y,90);
     R(X+3,Y+4,10,9,AP.out);R(X+4,Y+5,8,7,AP.clay);R(X+4,Y+5,3,7,AP.clayHi);R(X+10,Y+5,2,7,AP.clayDk);R(X+5,Y+13,6,2,AP.out);R(X+4,Y+8,8,1,AP.clayDk);
     if(r>0.7){R(X+8,Y+6,1,2,AP.out);R(X+9,Y+8,1,2,AP.out)}return true}
   if(k==='feast_table'){
-    // The King's feast, left to rot: dark dusty boards, a tipped goblet and its dried spill, plates of bones, a candle burnt low.
+    // The King's feast, left to rot (love pass v0.103, owner: the two tables mirror down the middle but aren't identical; the
+    // candles start at the outer ends and work inward). Dark dusty boards on trestles; three candles from the outer end in,
+    // each burnt lower than the last, the inner one guttered out in a puddle of wax. Left table: a tipped goblet and its spill,
+    // a plate with a bone. Right table: a platter with a boar's skull, a jug knocked over.
+    const L=o.opt!=='R',m=dx=>L?X+dx:X+W-1-dx;
     shadow(X+2,Y+12,W-2,3);R(X,Y+2,W,6,AP.out);R(X+1,Y+3,W-2,4,AP.woodDk);R(X+1,Y+3,W-2,1,AP.wood);for(let i=X+12;i<X+W-4;i+=12)R(i,Y+3,1,4,'#2a1e14');
     R(X+3,Y+7,3,7,AP.out);R(X+4,Y+7,1,6,AP.woodDk);R(X+W-6,Y+7,3,7,AP.out);R(X+W-5,Y+7,1,6,AP.woodDk);
-    R(X+6,Y+1,7,3,AP.out);R(X+7,Y+2,4,1,AP.bellHi);R(X+11,Y+1,2,3,AP.bell);R(X+13,Y+3,6,1,'#3a1418'); // goblet on its side, its spill
-    R(X+22,Y,8,4,AP.out);R(X+23,Y+1,6,2,'#8a8478');R(X+24,Y+1,3,1,AP.bone); // a plate, a bone on it
-    R(X+35,Y-4,3,7,AP.out);R(X+36,Y-3,1,5,'#d8d0b8');R(X+33,Y+2,7,2,AP.out);R(X+34,Y+2,5,1,AP.bellHi); // candle burnt low (flame live)
+    feastCandles(o).forEach(c=>{R(c.x-1,c.top-1,3,c.h+2,AP.out);R(c.x,c.top,1,c.h,'#d8d0b8');R(c.x-2,Y+2,5,2,AP.out);R(c.x-1,Y+2,3,1,AP.bellHi); // holder
+      if(!c.lit){R(c.x-2,Y+3,5,1,'#cfc7b0');R(c.x,c.top-2,1,1,'#3a3640')}}); // the guttered one: wax run over the holder, a black wick
+    if(L){R(m(26),Y+1,7,3,AP.out);R(m(27),Y+2,4,1,AP.bellHi);R(m(31),Y+1,2,3,AP.bell);R(m(33),Y+3,6,1,'#3a1418'); // goblet on its side, its spill
+      R(m(37),Y,8,4,AP.out);R(m(38),Y+1,6,2,'#8a8478');R(m(39),Y+1,3,1,AP.bone)} // a plate, a bone on it
+    else{const px=Math.min(m(4),m(15));R(px,Y,12,4,AP.out);R(px+1,Y+1,10,2,'#8a8478');R(px+3,Y-2,6,4,AP.out);R(px+4,Y-1,4,2,AP.bone);R(px+4,Y-1,4,1,'#d8d0c0');R(px+5,Y,1,1,AP.out);R(px+8,Y,1,1,AP.bone); // platter, a boar's skull, a tusk
+      const jx=Math.min(m(18),m(24));R(jx,Y,7,4,AP.out);R(jx+1,Y+1,5,2,AP.clay);R(jx+1,Y+1,5,1,AP.clayHi);R(jx-4,Y+3,4,1,'#3a1418')} // a jug on its side, its spill
     return true}
   if(k==='weapon_rack'){
     // A guard's rack: two posts and a crossbar, three rusty spears standing in it, a dented round shield at the foot.
@@ -1457,7 +1550,7 @@ function chapelImg(o){
   R(mid-11,fy-1,23,2,AP.cstDk); // the step
   return {c:c,ox:PAD,oy:UP,box:null}}
 function drawObj(g,R,o){
-  const X=o.x*T,Y=o.y*T,W=o.w*T,H=o.h*T,k=o.kind;
+  const X=o.x*T+(o.ox||0),Y=o.y*T,W=o.w*T,H=o.h*T,k=o.kind;
   const shadow=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,0.35)';g.fillRect(x,y,w,h)};
   const bricks=(x,y,w,h,base,hi)=>{R(x,y,w,h,base);for(let yy=0;yy<h;yy+=4){R(x,y+yy,w,1,AP.mortar);const off=(yy/4)%2?4:0;for(let xx=off;xx<w;xx+=8)R(x+xx,y+yy,1,4,AP.mortar);if(hi)for(let xx=off+1;xx<w;xx+=8)R(x+xx,y+yy+1,3,1,hi)}};
   if(drawChapelProp(g,R,o,X,Y,W,H,shadow))return;

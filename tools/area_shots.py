@@ -10,7 +10,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 async def main(area, out, spots):
     os.makedirs(out, exist_ok=True)
     async with async_playwright() as p:
-        b = await p.chromium.launch()
+        b = await p.chromium.launch(executable_path=os.environ.get("CHROME") or None)
         pg = await b.new_page(viewport={'width': 390, 'height': 844}, device_scale_factor=2)
         errs = []; pg.on('pageerror', lambda e: errs.append(str(e)))
         await pg.goto('file://' + ROOT + '/index.html?debug&area=' + area)

@@ -104,6 +104,11 @@ def check(m, tiles, objs):
             if not tiles[g[cy][cx]]['walk']: E.append(f"frog at {c['x']},{c['y']} sits in scenery or water")
             if not any(0 <= cy+dy < H and 0 <= cx+dx < Wd and g[cy+dy][cx+dx] == '~' for dy in range(-2, 3) for dx in range(-2, 3)): W.append(f"frog at {c['x']},{c['y']} has no water near it")
         if c['kind'] == 'moth' and not any(o.get('light', 0) and abs(o['x'] + o['w']/2 - c['x']) < 3 and abs(o['y'] - c['y']) < 3 for o in placed): W.append(f"moth at {c['x']},{c['y']} has no light near it")
+    # cobwebs hang in corners (love pass v0.103, owner: a web on a flat wall reads wrong): two walls must meet at its tile
+    for o in placed:
+        if o['kind'] != 'cobweb': continue
+        x, y = o['x'], o['y']; wl = lambda a, b: not (0 <= a < Wd and 0 <= b < H) or not tiles[g[b][a]]['walk']
+        if not ((wl(x-1, y) or wl(x+1, y)) and (wl(x, y-1) or wl(x, y+1))): W.append(f"cobweb at {x},{y} isn't in a corner")
     # safe arrival (v0.77, owner Nov 21): no mob on the doorstep of a way in. You land about 2 tiles off an exit, and most
     # mobs notice you from about 3, so nothing stands within 4 tiles of an exit (the game also keeps mobs calm on arrival).
     for ex in (mk for mk in markers if mk['k'] == 'exit'):
