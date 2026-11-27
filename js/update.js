@@ -141,7 +141,7 @@ function update(dt){
       else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
-      if(m.fear>0){m.fear-=dt;if(spd>0)fleeFrom(m,player,spd*0.7,dt);return} // feared: runs from you along open ground (safety map, js/path.js)
+      if(m.fear>0){m.fear-=dt;if(spd>0)fearThink(m,player,spd*0.7,dt);return} // feared: zig-zags away from you and steers clear of other camps (js/path.js)
       // Evaded: stands confused, doesn't turn or attack. If you Hide meanwhile, it gives up and walks home.
       if(m.lost>0){m.lost-=dt;if(hidden()){m.lost=0;m.state='return';m.threat.p=0;log(cap(m.def.name)+' loses track of you.','#9aa')}return}
       const v=victim(m);

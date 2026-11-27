@@ -155,3 +155,50 @@ function fleeFrom(e,from,spd,dt){
     if(!aim||clearLine(e.x,e.y,cx,cy))aim={x:cx,y:cy};else break}
   if(!aim){moveToward(e,x*T+8,y*T+8,spd,dt);return}
   moveToward(e,aim.x,aim.y,spd,dt)}
+
+// Fear wanders, and is afraid of everything (owner, Nov 27, after v0.101). A feared mob doesn't run one straight line any more:
+// like WoW's fear it picks a new spot every 1-1.5 s, 3-5 tiles off, usually away from you but sometimes sideways, so it
+// zig-zags. Unlike WoW it's afraid of everything, so it never runs into another camp: any spot (or the run to it) that comes
+// within a camp's notice range plus a tile is thrown out. A feared mob never drags you, or your pet chasing it, into a
+// second pack; kinder for phone play and for new players. Boxed in by camps, it cowers where it is. All rolls use rng(),
+// so the sim stays repeatable.
+const FEAR_PICK=[1,1.5],FEAR_R=[3,5],FEAR_TRIES=20,FEAR_STEPS=8, // re-pick time (s), spot distance (tiles), samples, max route steps
+  FEAR_LEAN=0.6,  // how strongly it prefers "away": higher = straighter runs, lower = wilder zig-zags
+  FEAR_NEAR=2.5;  // never picks a spot closer than this many tiles to you
+// How close does the segment a->b pass to point p?
+function segDist(ax,ay,bx,by,px,py){const dx=bx-ax,dy=by-ay,L=dx*dx+dy*dy;let t=L?((px-ax)*dx+(py-ay)*dy)/L:0;t=Math.max(0,Math.min(1,t));
+  return Math.hypot(ax+dx*t-px,ay+dy*t-py)}
+function fearPick(e,from){pathSync();
+  const ex=Math.floor(e.x/T),ey=Math.floor(e.y/T),gx=Math.floor(from.x/T),gy=Math.floor(from.y/T);
+  if(!pathOk(ex,ey)||!pathOk(gx,gy))return{cower:false};
+  // Other camps nearby: anything alive and idle (not already in this fight), with how close is too close.
+  // Its own pack doesn't count (it pulls with it). A camp it's already inside the edge of: just never get closer to it.
+  const camps=[];for(const o of mobs)if(o!==e&&!o.dead&&o.state==='idle'&&!(e.sp.group&&o.sp.group===e.sp.group)&&Math.hypot(o.x-e.x,o.y-e.y)<(FEAR_R[1]+6)*T)camps.push(o);
+  const tooClose=(o,sx,sy)=>{const R=o.def.aggro+T,now=Math.hypot(e.x-o.x,e.y-o.y);
+    return now<R?Math.hypot(sx-o.x,sy-o.y)<now:segDist(e.x,e.y,sx,sy,o.x,o.y)<R};
+  const f=pathField(ex,ey),s=fleeField(gx,gy),here=s[ey*MW+ex];
+  const opts=[];let campHit=false;
+  for(let i=0;i<FEAR_TRIES;i++){const a=rng()*Math.PI*2,r=(FEAR_R[0]+rng()*(FEAR_R[1]-FEAR_R[0]))*T;
+    const x=Math.floor((e.x+Math.cos(a)*r)/T),y=Math.floor((e.y+Math.sin(a)*r)/T);
+    if(!pathOk(x,y))continue;const st=f[y*MW+x];if(st===PATH_FAR||st>FEAR_STEPS)continue;
+    const sx=x*T+8,sy=y*T+8;if(Math.hypot(sx-from.x,sy-from.y)<FEAR_NEAR*T)continue;
+    if(camps.some(o=>tooClose(o,sx,sy))){campHit=true;continue}
+    const gain=(here===Infinity||s[y*MW+x]===Infinity)?0:here-s[y*MW+x]; // tiles safer than where it stands (dead ends count as worse)
+    opts.push({x:sx,y:sy,w:Math.exp(Math.max(-8,Math.min(8,gain*FEAR_LEAN)))})}
+  if(!opts.length)return{cower:campHit};
+  let sum=0;for(const o of opts)sum+=o.w;let p=rng()*sum;
+  for(const o of opts){p-=o.w;if(p<=0)return{to:o}}
+  return{to:opts[opts.length-1]}}
+// One tick of a feared mob running from `from` (you).
+function fearThink(e,from,spd,dt){
+  e.fearT=(e.fearT||0)-dt;
+  if(e.fearT<=0||(!e.fearTo&&!e.fearCower)){e.fearT=FEAR_PICK[0]+rng()*(FEAR_PICK[1]-FEAR_PICK[0]);
+    const r=fearPick(e,from);e.fearTo=r.to||null;e.fearCower=!!r.cower}
+  if(e.fearTo){const px=e.x,py=e.y;if(pathTo(e,e.fearTo.x,e.fearTo.y,spd,dt))e.fearT=0; // arrived early: pick the next spot now
+    // Guard: the route bent round a wall, or a camp mob wandered, and this step took it closer to a camp's edge: flinch back, pick again.
+    for(const o of mobs){if(o===e||o.dead||o.state!=='idle'||(e.sp.group&&o.sp.group===e.sp.group))continue;
+      const R=o.def.aggro+T*0.5,d=Math.hypot(e.x-o.x,e.y-o.y);
+      if(d<R&&d<Math.hypot(px-o.x,py-o.y)){e.x=px;e.y=py;e.fearTo=null;e.fearCower=true;e.fearT=0.4;break}} // a short flinch, then a new heading
+    return}
+  if(e.fearCower){moveToward(e,Math.floor(e.x/T)*T+8,Math.floor(e.y/T)*T+8,spd,dt);return} // boxed in by camps: cowers
+  fleeFrom(e,from,spd,dt)} // nothing fit and no camp in the way: the v0.101 safety-map run

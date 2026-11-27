@@ -571,7 +571,7 @@ function applyAbility(a,t,fromHide){
   else if(a.kind==='gate'){gateHome();}
   else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult),tp=pet2&&pet2.hp/pet2.maxhp<pet.hp/pet.maxhp?pet2:pet; // Bone Pair: mends the more hurt skeleton
     tp.hp=Math.min(tp.maxhp,tp.hp+h);floatText(tp.x,tp.y-20,'+'+h,'#7dffa6');burst(tp.x,tp.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight');}
-  else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
+  else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);t.fearT=0;t.fearTo=null;t.fearCower=false;burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
   // Feign Death. The Monk's version ("split") sends every mob home except your target, which keeps coming:
   // a pack becomes a single. With only one mob on you, it drops that one too (an escape).
   else if(a.kind==='feign'){player.cast=null;player.tx=null;let n=0;

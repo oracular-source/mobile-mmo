@@ -113,7 +113,7 @@ Dark caster with an undead pet. Low HP, mana like the Druid, and caster gear (sh
 | 1 | Lifetap | Lifetap | Main attack; heals you for the damage dealt |
 | 1 | Raise Bones | Pet | 3s cast; summons a skeleton (HP 30 + 14 per level) that follows you, attacks your target and holds aggro |
 | 2 | Siphon Plague | DoT | Stronger DoT than the Druid's |
-| 3 | Dread | Fear | The target runs away from you for a few seconds |
+| 3 | Dread | Fear | The target runs away from you for a few seconds, zig-zagging and steering clear of other camps (v0.104) |
 | 6 | Feign Death | Escape | Mobs forget you and stay where they are (no heal, no reset); your pet keeps fighting |
 | 8 | Mend Bones | Pet heal | Heals your skeleton |
 
