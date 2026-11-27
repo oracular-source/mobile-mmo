@@ -30,6 +30,7 @@ Moved out of `docs/board.md` on Nov 24 to keep the board short (every chat reads
 | ~~**Settings cleanup**~~ (built v0.35, owner picked A: one Menu window with Spells and Settings tabs; Settings in four groups: Controls, Combat, Display, Game) | H | S | done |
 
 ## Older changelog
+- **Docs (Nov 24)** New backlog card **Fork pacing past 30** (owner): one fork per ability, slower forks after 30, EverQuest-style AAs past 50; the skill tree lane settles it before the level 16 forks. No game changes.
 - **Docs (Nov 24)** **Lane plan** in How we work (owner): which chat lanes to run now and in what order (bugs, balance reopened toward Malrec, map, skill tree; character, UI and teaser as light lanes), plus a weekly rotation. No game changes.
 - **Docs (Nov 24)** **Board trimmed** (backlog card, owner OK): the board went from about 36,000 words to about 17,000. Changelog entries older than the last 15 and the 20 finished (struck-through) backlog cards moved to `docs/archive.md`. New rule in How we work: keep the board short. No game changes.
 - **Docs (Nov 24)** Owner's brother's suggestions to the backlog: automatic checks on every push, trim the board to save tokens, ship-a-release skill. No game changes.

@@ -1,4 +1,4 @@
-// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, flying things (the Skeleton King's Bone Throw), Greyfang's Howl and wolf bites.
+// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, flying things (the Skeleton King's Bone Throw), Greyfang's roar-howl and wolf bites.
 'use strict';
 // Looks only. Everything here uses fr() (Math.random), never the game's rng(), and never changes a timer, a number or
 // a position the rules use, so fights and the sim roll exactly the same with or without it. While the sim runs
@@ -86,39 +86,26 @@ function drawBone(x,y,ang,len,a){const c=Math.cos(ang),s=Math.sin(ang),px=-s,py=
 function boneGlow(x,y,r,a){lx.globalCompositeOperation='lighter';lx.globalAlpha=a;lx.fillStyle='#6a4a9a';lx.beginPath();lx.arc(Math.round(x),Math.round(y),r,0,7);lx.fill();
   lx.globalAlpha=a*1.4;lx.beginPath();lx.arc(Math.round(x),Math.round(y),r*0.5,0,7);lx.fill();lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}
 
-// ---------- Greyfang's Howl (v0.106, his signature move) ----------
-// Looks only: the howl already calls his pack from 260 away instead of 70 (combat.js); this makes you see it. He rears
-// up and throws his head back, cold breath smokes from his jaws, his ice-blue eyes flare, and rings of sound roll out
-// across the wood. When a ring reaches one of his pack, that wolf's eyes flash and it lifts its head to answer.
-const HOWL={pose:1.4,reach:260,speed:230,rings:[0.15,0.42,0.7],col:'#bfe9ff'};
-function animHowl(m){if(logMute)return;m.howlT=HOWL.pose;m.howlA=0.36;
-  const pack=mobs.filter(o=>o!==m&&!o.dead&&m.sp.group&&o.sp.group===m.sp.group&&dist(o,m)<HOWL.reach).map(o=>({m:o,d:dist(o,m),done:0}));
-  fxo.push({k:'howl',m:m,x:m.x,y:m.y,dir:m.dir,pack:pack,t:0,life:HOWL.rings[2]+HOWL.reach/HOWL.speed+0.1})}
-// How far he's reared back this frame (radians, nose up): up fast, a trembling hold, back down.
-function howlPose(m){const T=HOWL.pose,e=T-m.howlT,full=m.howlA||0.36,up=0.18,down=0.3;
-  const k=e<up?e/up:m.howlT<down?m.howlT/down:1;return -full*k*m.dir+(k===1?Math.sin(e*40)*0.015:0)}
-// Where his jaws are, roughly, with the rear-up taken into account.
+// ---------- Greyfang's Howl (v0.107, toned down v0.108: owner, "way too much", make it a small roar like a Pokemon cry) ----------
+// Looks only: the howl already calls his pack from 260 away instead of 70 (combat.js). He leans back a little with his
+// nose up, and three short sound lines pulse out from his jaws a few times. His pack lift their heads a moment later.
+const HOWL={pose:1.0,lean:0.18,pulse:0.22,col:'#e8f4ff'};
+function animHowl(m){if(logMute)return;m.howlT=HOWL.pose;m.howlA=HOWL.lean;
+  const pack=mobs.filter(o=>o!==m&&!o.dead&&m.sp.group&&o.sp.group===m.sp.group&&dist(o,m)<260).map(o=>({m:o,at:0.3+dist(o,m)/600,done:0}));
+  fxo.push({k:'howl',m:m,pack:pack,t:0,life:HOWL.pose})}
+// How far he's leaning back this frame (radians, nose up): up fast, hold, back down.
+function howlPose(m){const T=HOWL.pose,e=T-m.howlT,full=m.howlA||HOWL.lean,up=0.15,down=0.25;
+  const k=e<up?e/up:m.howlT<down?m.howlT/down:1;return -full*k*m.dir}
+// Where his jaws are, roughly, with the lean taken into account.
 function howlMouth(m){const img=IMG[m.def.img],w=img.w,h=img.h,a=Math.abs(howlPose(m));
-  return{x:m.x+m.dir*(w*0.5-3)*Math.cos(a),y:m.y-h+6-(w*0.85)*Math.sin(a)}}
-function howlTick(f,dt){const m=f.m;
-  if(!m.dead&&m.howlT>0.3&&Math.random()<0.7){const o=howlMouth(m);parts.push({x:o.x+fr(-1,1),y:o.y+fr(-1,1),vx:m.dir*fr(2,8),vy:-fr(8,16),t:0,life:fr(0.5,0.9),col:Math.random()<0.5?'#cfe0ea':'#8fa4b0'})} // cold breath
-  const r=(f.t-HOWL.rings[0])*HOWL.speed;
-  f.pack.forEach(p=>{if(!p.done&&r>=p.d){p.done=1;if(p.m.dead)return;p.m.howlT=0.55;p.m.howlA=0.2;
-    fxo.push({k:'glint',m:p.m,t:0,life:0.6})}})}
-// A ring of sound: a flattened circle (the ground is seen at a slant) of dashes, thinning and fading as it spreads.
-function howlRing(x,y,r,a){if(r<=2||a<=0.01)return;lx.fillStyle=HOWL.col;const ry=r*0.55,n=Math.max(16,Math.round(r*0.9));
-  for(let i=0;i<n;i++){if(i%4===3)continue;const an=i/n*6.283;lx.globalAlpha=a*(0.75+0.25*Math.sin(an*3));lx.fillRect(Math.round(x+Math.cos(an)*r),Math.round(y+Math.sin(an)*ry),2,1)}
+  return{x:m.x+m.dir*(w*0.5-2)*Math.cos(a),y:m.y-h+7-(w*0.9)*Math.sin(a)}}
+function howlTick(f,dt){f.pack.forEach(p=>{if(!p.done&&f.t>=p.at){p.done=1;if(!p.m.dead){p.m.howlT=0.5;p.m.howlA=0.12}}})}
+// Three short lines fanning out from his mouth (up-forward, forward, down-forward), each pulse moving out and fading.
+function howlDraw(f){const m=f.m;if(m.dead||!(m.howlT>0.2))return;const o=howlMouth(m),e=HOWL.pose-m.howlT;if(e<0.12)return;
+  const q=((e-0.12)%HOWL.pulse)/HOWL.pulse;lx.fillStyle=HOWL.col;
+  [-0.7,-0.2,0.3].forEach(an=>{const a=an*m.dir+(m.dir<0?Math.PI:0),c=Math.cos(a),s=Math.sin(a),r0=3+q*4;lx.globalAlpha=1-q;
+    for(let i=0;i<3;i++)lx.fillRect(Math.round(o.x+c*(r0+i)),Math.round(o.y+s*(r0+i)),1,1)});
   lx.globalAlpha=1}
-function howlDraw(f){const m=f.m,o=m.dead?{x:f.x,y:f.y-20}:howlMouth(m);
-  HOWL.rings.forEach((d,i)=>{const r=(f.t-d)*HOWL.speed;if(r<0||r>HOWL.reach)return;const a=Math.min(1,(1-r/HOWL.reach)*1.3)*(i?0.7:1);
-    howlRing(o.x,o.y+8,r,a);if(r<40)howlRing(o.x,o.y+8,r*0.8,a*0.5)}); // a faint inner ring while it's still close
-  if(!m.dead&&m.howlT>0.3){const img=IMG[m.def.img],ex=m.x+m.dir*(img.w*0.5-7),ey=howlMouth(m).y-1,pr=0.6+0.4*Math.sin(f.t*18);
-    lx.globalCompositeOperation='lighter';lx.globalAlpha=0.3*pr;lx.fillStyle='#9fe8ff';lx.beginPath();lx.arc(Math.round(ex),Math.round(ey),2,0,7);lx.fill();lx.globalAlpha=0.9;lx.fillRect(Math.round(ex),Math.round(ey),1,1);
-    lx.globalAlpha=0.18;lx.beginPath();lx.arc(Math.round(o.x),Math.round(o.y),3+pr,0,7);lx.fill();lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}}
-// A pack wolf hears him: its red eyes flash bright for a moment.
-function glintDraw(f){const m=f.m;if(m.dead)return;const img=IMG[m.def.img],p=f.t/f.life,x=m.x+m.dir*(img.w*0.5-6),y=m.y-img.h+5;
-  lx.globalCompositeOperation='lighter';lx.globalAlpha=(1-p)*0.45;lx.fillStyle='#ff6a50';lx.beginPath();lx.arc(Math.round(x),Math.round(y),1.5+p,0,7);lx.fill();
-  lx.globalAlpha=1-p;lx.fillStyle='#ffd0c0';lx.fillRect(Math.round(x),Math.round(y),1,1);lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}
 
 // Every frame (from update): move the animations along and drop the finished ones.
 function fxTick(dt){
@@ -161,7 +148,7 @@ function fxDrawLit(){
     boneGlow(bx,by,5+p*5,0.12+p*0.18);
     if(Math.random()<0.3+p*0.5){const a=fr(0,6.3),r=fr(8,14);parts.push({x:bx+Math.cos(a)*r,y:by+Math.sin(a)*r,vx:-Math.cos(a)*r*2.5,vy:-Math.sin(a)*r*2.5,t:0,life:0.35,col:'#b48cff'})}
     drawBone(bx,by,(-0.6-p*0.7)*m.dir,12)}
-  fxo.forEach(f=>{if(f.k==='howl')howlDraw(f);else if(f.k==='glint')glintDraw(f)});
+  fxo.forEach(f=>{if(f.k==='howl')howlDraw(f)});
   fxo.forEach(f=>{
     if(f.k==='bone'){const pos=q=>{const p=Math.min(1,q/f.life);return[f.x0+(f.tx-f.x0)*p,f.y0+(f.ty-f.y0)*p-Math.sin(Math.PI*p)*14]};
       const p=Math.min(1,f.t/f.life),[bx,by]=pos(f.t);
