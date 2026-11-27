@@ -264,3 +264,10 @@ No style takes: same setting as the chapel grounds and the crypt (Nov 20). **Nav
 
 - **Locked-in rooms (v0.71, owner Nov 21):** the door you came through shuts with an **iron portcullis**, not a slab: you can see back through the bars into the lit room behind (the way out is right there, just shut). How it's drawn: a dark slot in the arch across the doorway, vertical bars 3 px apart (black outline, one grey `#5c5c66` highlight line each), two crossbars with rivet dots, spiked feet into the floor; it drops in 0.16 s with a small bounce and rises slowly (1.2 s) when it opens. Rising water spreads **from the middle outward** (nearest tiles first), never row by row, so it reads as water welling up; brazier footings stay dry and stick up out of it.
 - **A named that lives in the dark carries its own light (v0.71):** the Drowned Prior melted into his black water and read as a plain hooded shape, so he now has a small cold light (`glow:38` in `mobs.js`, the lighting's cool tint) as if from his lantern. Use this for any named whose look gets lost in its room's dark.
+
+## Weapon looks (owner, Nov 27)
+- **Looks follow power, never rarity colour.** A stronger weapon never looks plainer than a weaker one. Zone 1 uses looks 1–4; each new zone adds the next looks, so higher zones keep growing.
+- **How it's drawn** (`tools/weapon_looks.py`, held in the right hand at 15×18): each step up makes the weapon longer, wider or fancier, never just busier. Look 1 plain dull iron and wood; 2 steel, a little longer; 3 bright steel with brass, a 2-wide blade or bigger head; 4 polished with gold and **one** gem pixel, widest shape. Power reads from proportion at this size: widen the blade and lengthen the guard rather than adding detail (references: pixel weapon tier packs, Nov 27).
+- **Named weapons** keep their tier's shape and swap colours to their maker: Skeleton King bone grip and trim with a violet gem; Malrec soot-dark iron with an ember edge and gold-orange trim.
+- **No weapon = empty hand**, so taking a weapon off is easy to see.
+
