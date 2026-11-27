@@ -9,12 +9,13 @@ const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skelet
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).
 const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel',d1:'dungeon1',d2:'dungeon1_f2'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel',dungeon1:'d1',dungeon1_f2:'d2'};
-// Each map's light: how bright the dark is (amb) and the colour of the night over it. Shared by render.js and the minimap.
-const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee'},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a'},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'},
+// Each map's light: how bright the dark is (amb) and the colour of the night over it. Indoors, spill (how strong) and reach
+// (times a light's radius) give every light a long faint tail that fills its room (v0.95, bakeLight); outdoors has none. Shared by render.js and the minimap.
+const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee',spill:0.35,reach:2.6},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a',spill:0.35,reach:2.6},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'},
   // Ruined Chapel (v0.62, Vesper embers): cold blue-grey dusk; the warmth comes from its candles, censers and embers.
   chapel:{amb:0.4,col:'8,10,20',text:'#f0c890'},
   // Dungeon 1 (v0.63): the crypt's cold blue-black, a touch brighter so the flood water, pews and cultists read on a phone.
-  vault:{amb:0.3,col:'4,6,16',text:'#f0c890'}};
+  vault:{amb:0.3,col:'4,6,16',text:'#f0c890',spill:0.35,reach:2.6}};
 function curArea(){const k=AREA_OF[zoneId];return k?buildArea(k):null}
 // Small integer hash so every tile gets the same "random" details each time (no effect on the game's seeded rolls).
 function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>>13))*1274126177|0;return((n^(n>>>16))>>>0)/4294967296}
@@ -146,7 +147,79 @@ function buildArea(id){
   // A flame behind a tree crown (v0.64, owner: a lantern flickering through a tree at the crossroads): flames draw after the
   // lighting, over everything, so one under a crown in front showed through the leaves. Those stay unlit-looking now.
   A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&!t.tree.shrub&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
+  bakeLight(A);
   AREAS[id]=A;return A;
+}
+
+// Light that follows the room (v0.95, owner picked B Nov 25, look of A Nov 27). Every fixed light in the area is worked out
+// once, when the area is built, into two pictures: how much darkness it lifts (lmCut) and the firelight colour it adds
+// (lmGlow). Light travels across open floor tile by tile, so it fills its room, creeps a little way down a hall and fades,
+// but never shines through rock (tiles tagged 'wall'). Indoors (AREA_TINT spill) each light also gets a long, faint
+// tail past its bright core, like real light. Outdoors spill is 0, so the open-air look stays exactly as it was.
+// Drawing it each frame is two picture draws, the same cost as before; the live flicker is a small glow near each flame.
+const LM=2; // one light-map cell = 2 x 2 game pixels, drawn smoothed (light is soft anyway)
+function bakeLight(A){
+  const w=A.w,h=A.h,AT=AREA_TINT[A.tint]||{amb:0.38},amb=AT.amb,S=AT.spill||0,RE=AT.reach||1,K=1.15; // K: the 3/4 view squashes light up and down, as the old pools did
+  const wall=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)wall[y*w+x]=AREA_TILES[A.rows[y][x]].tags.indexOf('wall')>=0?1:0;
+  const isW=(x,y)=>x<0||y<0||x>=w||y>=h||wall[y*w+x]===1;
+  const CW=Math.ceil(w*T/LM),CH=Math.ceil(h*T/LM),keep=new Float32Array(CW*CH).fill(1),warm=new Float32Array(CW*CH),cool=new Float32Array(CW*CH);
+  const RIM=10; // a wall tile only catches light on the face within 10 px of the open floor it borders
+  A.lights.forEach(L=>{
+    const R=L.r*Math.max(1,S>0?RE:1),tr=Math.ceil(R/T)+2,ltx=Math.floor(L.x/T),lty=Math.floor(L.y/T);
+    const x0=Math.max(0,ltx-tr),y0=Math.max(0,lty-tr),x1=Math.min(w-1,ltx+tr),y1=Math.min(h-1,lty+tr),bw=x1-x0+1,bh=y1-y0+1;
+    const geo=new Float32Array(bw*bh).fill(1e9),dir=(tx,ty)=>Math.hypot(tx*T+8-L.x,(ty*T+8-L.y)*K);
+    // Where the light starts: its own tile, or (a lamp hung on a wall) the open tile just in front of it, else any open neighbour.
+    const seeds=[];if(!isW(ltx,lty))seeds.push([ltx,lty]);else if(!isW(ltx,lty+1))seeds.push([ltx,lty+1]);
+    else for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++)if(!isW(ltx+dx,lty+dy))seeds.push([ltx+dx,lty+dy]);
+    const q=[];seeds.forEach(([sx,sy])=>{if(sx<x0||sx>x1||sy<y0||sy>y1)return;geo[(sy-y0)*bw+sx-x0]=dir(sx,sy);q.push(sx,sy)});
+    // Spread across open tiles (a few passes of a simple queue; boxes are small). Diagonal steps can't squeeze between two walls.
+    const st=[[1,0,T],[-1,0,T],[0,1,T*K],[0,-1,T*K],[1,1,Math.hypot(T,T*K)],[-1,1,Math.hypot(T,T*K)],[1,-1,Math.hypot(T,T*K)],[-1,-1,Math.hypot(T,T*K)]];
+    for(let i=0;i<q.length;i+=2){const x=q[i],y=q[i+1],g=geo[(y-y0)*bw+x-x0];if(g>R+T*2)continue;
+      for(const [dx,dy,c] of st){const nx=x+dx,ny=y+dy;if(nx<x0||nx>x1||ny<y0||ny>y1||isW(nx,ny))continue;if(dx&&dy&&isW(x+dx,y)&&isW(x,y+dy))continue;
+        const j=(ny-y0)*bw+nx-x0;if(g+c<geo[j]-0.01){geo[j]=g+c;q.push(nx,ny)}}}
+    // In plain sight (the tile's walked distance is about its straight-line distance), use the straight line for a round pool.
+    const seen=(tx,ty)=>{const g=geo[(ty-y0)*bw+tx-x0];return g<1e9&&g<=dir(tx,ty)*1.09+6};
+    const c0x=Math.max(0,Math.floor((L.x-R)/LM)),c1x=Math.min(CW-1,Math.ceil((L.x+R)/LM)),c0y=Math.max(0,Math.floor((L.y-R/K)/LM)),c1y=Math.min(CH-1,Math.ceil((L.y+R/K)/LM));
+    for(let cy=c0y;cy<=c1y;cy++)for(let cxl=c0x;cxl<=c1x;cxl++){
+      const px=cxl*LM+LM/2,py=cy*LM+LM/2,tx=Math.floor(px/T),ty=Math.floor(py/T);if(tx<x0||tx>x1||ty<y0||ty>y1)continue;
+      const direct=Math.hypot(px-L.x,(py-L.y)*K);let d=1e9;
+      const own=!isW(tx,ty);
+      if(own&&seen(tx,ty))d=direct;
+      else for(let dy=-1;dy<=1;dy++)for(let dx=-1;dx<=1;dx++){const nx=tx+dx,ny=ty+dy;if(nx<x0||nx>x1||ny<y0||ny>y1||isW(nx,ny))continue;
+        if(own){if(dx&&dy&&isW(tx+dx,ty)&&isW(tx,ty+dy))continue}
+        else{if(dx&&dy)continue; // a wall face lights from the floor straight in front of it, and only near that edge
+          const edge=dx>0?(tx+1)*T-px:dx<0?px-tx*T:dy>0?(ty+1)*T-py:py-ty*T;if(edge>RIM)continue}
+        const g=geo[(ny-y0)*bw+nx-x0];if(g>=1e9)continue;
+        const v=seen(nx,ny)?direct:g+Math.hypot(px-(nx*T+8),(py-(ny*T+8))*K);if(v<d)d=v}
+      if(d>=R)continue;
+      const v=Math.max(0,1-d/L.r),core=v*v,tail=S>0?S*Math.pow(1-d/R,1.6):0;
+      const o=cy*CW+cxl;keep[o]*=1-Math.min(1,(core*0.9+tail)/(1-amb));
+      if(L.w>0)warm[o]+=(core+tail*0.8)*L.w/255;if(L.c>0)cool[o]+=(core+tail*0.8)*L.c/255;
+    }
+  });
+  // Soften by a few pixels so the light's edge follows curved cave walls instead of showing the square tiles it was worked out on.
+  const cut=new Float32Array(CW*CH);for(let o=0;o<CW*CH;o++)cut[o]=1-keep[o];
+  [cut,warm,cool].forEach(a=>blurCells(a,CW,CH,3));
+  for(let o=0;o<CW*CH;o++)keep[o]=1-cut[o];
+  const mk=()=>{const c=document.createElement('canvas');c.width=CW;c.height=CH;return c};
+  const cutC=mk(),gloC=mk(),ci=cutC.getContext('2d').createImageData(CW,CH),gi=gloC.getContext('2d').createImageData(CW,CH);
+  for(let o=0;o<CW*CH;o++){const p=o*4;ci.data[p+3]=Math.round((1-keep[o])*255);
+    const aw=warm[o],ac=cool[o],a=Math.min(1,aw+ac);if(a<=0)continue;const s=aw+ac;
+    gi.data[p]=(255*aw+170*ac)/s;gi.data[p+1]=(150*aw+200*ac)/s;gi.data[p+2]=(60*aw+215*ac)/s;gi.data[p+3]=Math.round(a*255)}
+  cutC.getContext('2d').putImageData(ci,0,0);gloC.getContext('2d').putImageData(gi,0,0);
+  A.lmCut=cutC;A.lmGlow=gloC;
+}
+// Box blur in place, r cells each way, across then down.
+function blurCells(a,W,H,r){const tmp=new Float32Array(Math.max(W,H)),n=2*r+1;
+  for(let y=0;y<H;y++){let s=0;for(let x=-r;x<=r;x++)s+=a[y*W+Math.min(W-1,Math.max(0,x))];
+    for(let x=0;x<W;x++){tmp[x]=s/n;s+=a[y*W+Math.min(W-1,x+r+1)]-a[y*W+Math.max(0,x-r)]}for(let x=0;x<W;x++)a[y*W+x]=tmp[x]}
+  for(let x=0;x<W;x++){let s=0;for(let y=-r;y<=r;y++)s+=a[Math.min(H-1,Math.max(0,y))*W+x];
+    for(let y=0;y<H;y++){tmp[y]=s/n;s+=a[Math.min(H-1,y+r+1)*W+x]-a[Math.max(0,y-r)*W+x]}for(let y=0;y<H;y++)a[y*W+x]=tmp[y]}}
+// Draw the part of a light map under a world rectangle (wx, wy, ww x wh game pixels) at dx, dy on ctx, clipped to the map.
+function drawLightMap(ctx,img,wx,wy,ww,wh,dx,dy){
+  const sx=Math.max(0,wx),sy=Math.max(0,wy),ex=Math.min(img.width*LM,wx+ww),ey=Math.min(img.height*LM,wy+wh);if(ex<=sx||ey<=sy)return;
+  const sm=ctx.imageSmoothingEnabled;ctx.imageSmoothingEnabled=true;
+  ctx.drawImage(img,sx/LM,sy/LM,(ex-sx)/LM,(ey-sy)/LM,dx+sx-wx,dy+sy-wy,ex-sx,ey-sy);ctx.imageSmoothingEnabled=sm;
 }
 // The woods carry on past the map edges (v0.64 top and bottom; v0.76 all four sides and the corners, for "Character always
 // centred": the camera now shows past every edge). The edge's own trees carry on (so roads and clearings that run off the

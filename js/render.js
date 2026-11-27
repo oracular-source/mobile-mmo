@@ -363,7 +363,10 @@ function render(){
   // Lighting: a dark overlay with dithered light pools cut out of it. The pools are pre-drawn "stamps",
   // so each frame is just a few image draws instead of reading and rewriting every pixel (the old way stuttered on phones).
   const AT=curArea()&&AREA_TINT[curArea().tint],amb=AT?AT.amb:zoneId==='dun'?0.22:0.38,fl=1+0.04*Math.sin(time*9)+0.02*Math.sin(time*23);
-  const zl=curArea()?curArea().lights.concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))).concat(mobs.filter(m=>m.def.glow&&!m.dead).map(m=>({x:m.x,y:m.y-12,r:m.def.glow,w:0,c:46}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  // v0.95: an area's own fixed lights are baked into its light map (area.js bakeLight); only lights that move (floaters,
+  // hazards, rares, the Prior's lantern) are still stamped live here.
+  const AR=curArea(),baked=!!(AR&&AR.lmCut);
+  const zl=AR?(baked?[]:AR.lights).concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))).concat(mobs.filter(m=>m.def.glow&&!m.dead).map(m=>({x:m.x,y:m.y-12,r:m.def.glow,w:0,c:46}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
   // pools stay put on the ground while the camera glides.
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
@@ -374,11 +377,16 @@ function render(){
   if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
   dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);
   dg.globalCompositeOperation='destination-out';
+  if(baked)drawLightMap(dg,AR.lmCut,ox,oy,DW,DH,0,0);
   lights.forEach(l=>dg.drawImage(lightStamp(l.r,amb,'cut'),l.x-ox-l.r-1,l.y-oy-l.r-1));
   dg.globalCompositeOperation='source-over';
   lx.save();lx.translate(-camX,-camY);
   lx.drawImage(dark,ox,oy);
   lx.globalCompositeOperation='lighter';
+  if(baked){drawLightMap(lx,AR.lmGlow,ox,oy,DW,DH,ox,oy);
+    // Fire flickers: a small warm glow near each flame breathes with the flicker (kept small so it never reaches past a wall).
+    AR.lights.forEach(l=>{if(!(l.w>0)||l.x<camX-l.r||l.x>camX+VW+l.r||l.y<camY-l.r||l.y>camY+VH+l.r)return;const a=(fl-0.95)*3;if(a<=0)return;
+      const r=Math.max(6,Math.round(l.r*0.45));lx.globalAlpha=a*l.w/255;lx.drawImage(lightStamp(r,amb,'warm'),Math.round(l.x)-r-1,Math.round(l.y)-r-1)})}
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.restore();
   drawGlows();
