@@ -84,7 +84,12 @@ obj table 23 26
 obj banner 21 17
 obj banner 24 17
 obj torn_banner 20 27
-obj censer 29 23
+# v0.96 lighting pass: wall torches either side of the banners and a censer pair either side of the middle table, all
+# mirrored on the doors (was one censer on the east wall)
+obj sconce 19 17
+obj sconce 26 17
+obj censer 17 24
+obj censer 28 24
 spawn cult_zealot 14 26 20
 spawn cult_ashcaller 14 28 19
 spawn cult_mender 14 27 21

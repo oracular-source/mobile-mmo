@@ -42,7 +42,7 @@ const MM_PIN_COL={exit:'#7dffa6',dun:'#c8a0ff',camp:'#ffd27a',boss:'#ff6b6b'};
 function mmZone(id){
   if(MM.z[id])return MM.z[id];
   let src;
-  if(id==='over')src={w:40,h:30,world:overWorld,map:overMap,name:'Gate Road'};
+  if(id==='over')src={w:40,h:30,world:overWorld,map:overMap,name:'Old Zone'};
   else if(id==='dun')src={w:DUN.w,h:DUN.h,world:DUN.world,map:DUN.map,name:'Dungeon 1'};
   else if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);src={w:A.w,h:A.h,world:A.world,map:A.map,name:A.name,rows:A.rows}}
   else return null;

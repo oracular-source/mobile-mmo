@@ -109,6 +109,8 @@ function buildArea(id){
   for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
   A.objs.forEach(o=>{const cx=o.x*T+o.w*T/2;
+    // Wall torch (v0.96): hangs on the face of a north wall; its light starts on the floor just in front (never inside the wall).
+    if(o.kind==='sconce'){A.lights.push({x:cx,y:(o.y+1)*T+3,r:50,w:32});A.flames.push({x:cx,y:o.y*T+3,big:0})}
     if(o.kind==='torch'){A.lights.push({x:cx,y:o.y*T-6,r:58,w:34});A.flames.push({x:cx,y:o.y*T-4,big:0})}
     if(o.kind==='town_gate'){const m=o.x*T+o.w*T/2;[m-22,m+23].forEach(x=>{A.lights.push({x:x,y:o.y*T+16-26,r:48,w:30});A.flames.push({x:x-6,y:o.y*T+16-22,big:0,lamp:1})})}
     if(o.kind==='lantern'){A.lights.push({x:cx,y:o.y*T-4,r:44,w:26});A.flames.push({x:cx,y:o.y*T-1,big:0,lamp:1})}
@@ -1800,6 +1802,10 @@ function drawObj(g,R,o){
     // An old cut stump with its rings showing.
     shadow(X+2,Y+12,13,3);R(X+3,Y+4,11,10,AP.out);R(X+4,Y+5,9,8,AP.trunk);R(X+4,Y+5,9,3,'#a88a64');R(X+6,Y+6,5,1,'#7a5a42');R(X+2,Y+12,3,2,AP.out);R(X+12,Y+12,3,2,AP.out);return}
   if(k==='brazier'){R(X+3,Y+4,10,5,AP.out);R(X+4,Y+5,8,3,AP.iron);R(X+4,Y+5,8,1,AP.ironHi);R(X+7,Y+8,2,6,AP.out);R(X+4,Y+13,8,2,AP.out);shadow(X+3,Y+14,10,2);return}
+  // Wall torch (v0.96, lighting pass; refs: pixel wall torch, video game wall sconce): an iron plate pinned to the wall face, a
+  // bracket arm, a short wooden torch leaning a touch out with an iron cup on top. Flame drawn live (flames list).
+  if(k==='sconce'){R(X+5,Y+9,6,6,AP.out);R(X+6,Y+10,4,4,AP.iron);R(X+6,Y+10,4,1,AP.ironHi);R(X+7,Y+11,2,2,AP.ironTip);
+    R(X+6,Y+3,4,8,AP.out);R(X+7,Y+4,2,7,AP.woodDk);R(X+7,Y+4,1,7,AP.wood);R(X+5,Y+2,6,3,AP.out);R(X+6,Y+3,4,1,AP.ironHi);R(X+5,Y+8,6,1,AP.out);return}
   if(k==='torch'){R(X+6,Y-6,4,22,AP.out);R(X+7,Y-5,2,20,AP.woodDk);R(X+7,Y-5,1,20,AP.wood);R(X+5,Y-6,6,3,AP.out);R(X+6,Y-5,4,1,AP.ironHi);shadow(X+5,Y+14,7,2);return}
   if(k==='lantern'){R(X+7,Y-8,2,24,AP.out);R(X+7,Y-8,1,23,AP.woodHi);R(X+8,Y-8,5,2,AP.out);R(X+11,Y-6,4,6,AP.out);R(X+12,Y-5,2,4,'#ffb860');return}
   if(k==='candle'){[[4,10,3],[9,12,4],[12,9,2]].forEach(([x,y,h])=>{R(X+x-1,Y+y-1,3,h+2,AP.out);R(X+x,Y+y,1,h,'#e8e0c8')});R(X+3,Y+14,11,1,'#cfc8b2');return}

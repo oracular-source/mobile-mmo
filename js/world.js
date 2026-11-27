@@ -179,7 +179,7 @@ function enterZone(id,from,at){
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;if(sp.gone){sp.timer=Infinity;return}sp.timer=0;spawn(sp)}); // gone = killed earlier this dungeon run
   if(A&&A.rare){A.rare.sp.mob=null;if(A.rare.sp.up)spawn(A.rare.sp)} // a rare still out there waits for you (no reroll by walking in and out)
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
-  if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('You enter Dungeon 1. The air is cold and still.','#c8a0ff');floatText(player.x,player.y-30,'Dungeon 1','#c8a0ff',true)}
+  if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('Old Zone: the first crypt (frozen, kept to compare).','#c8a0ff');floatText(player.x,player.y-30,'Old crypt','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
   else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex,player.lastMove):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.exitGuard=ex||null;player.exitGuardT=time;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
@@ -253,7 +253,7 @@ function checkPortals(){
     return}
   const t=tileAt(player.x,player.y);
   if(t!==player.onTile){player.onTile=t;
-    if(t===10)prompt('Dungeon 1','A crypt for levels 4 to 7, sized for one player. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
+    if(t===10)prompt('Old crypt','Old Zone: the first crypt, kept to compare. Boss 1 waits at the end. Anything you pull will chase you until one of you dies.','Enter',()=>enterZone('dun'));
     if(t===8&&zoneId==='arena'){prompt('Leave the testing grounds?','Back to the crossroads.','Leave',()=>enterZone('cross'));}
     else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('gy'));}
   }

@@ -62,6 +62,9 @@ obj light_shaft 39 3
 # LANDING (5): grey daylight falls down the stairs. Story 1, grave robbers got in first: a coffin smashed open with
 # the crowbar still in it, a sack dropped in a hurry spilling candlesticks. Their trail goes west (a candlestick on the floor).
 obj light_shaft 21 42
+# the corridor to the ossuary and the embalming room: one wall torch each way, mirrored on the stairs (lighting pass, v0.96)
+obj sconce 10 37
+obj sconce 33 37
 obj smashed_coffin 24 37
 obj loot_sack 23 38
 obj candle 26 41
@@ -74,7 +77,6 @@ spawn crypt_rat 5 18 39
 obj skull_pile 3 23
 obj skull_pile 8 33
 obj mourner_shrine 2 28
-obj candle 3 29
 obj cobweb 2 22
 obj candlestick 8 38
 spawn skeleton 5-6 5 24
@@ -83,14 +85,15 @@ spawn skeleton 6 4 31
 spawn skeleton 6 6 32
 spawn crypt_rat 6 5 30
 
-# EMBALMING ROOM (east, 5-6): stone slabs, one still with a shrouded body, urns along the wall, a brazier the dead
-# never let go out. The hidden chest sits behind the slabs.
+# EMBALMING ROOM (east, 5-6): stone slabs, one still with a shrouded body, urns along the wall, two wall torches the
+# dead never let go out (v0.96: a pair centred on the north wall, was one brazier jammed in the corner). The hidden chest sits behind the slabs.
 obj slab 36 24
 obj slab 36 28
 obj urn 41 22
 obj urn 41 25
 obj urn 41 31
-obj brazier 34 22
+obj sconce 35 21
+obj sconce 40 21
 obj cobweb 40 33
 chest 40 28
 spawn skeleton 6 38 26
@@ -104,6 +107,9 @@ obj robber_remains 14 28
 obj candle 17 28
 obj brazier 20 22
 obj brazier 23 22
+# v0.96: a wall torch over each wing, mirrored on the north door (the hall's ends were black)
+obj sconce 14 21
+obj sconce 29 21
 spawn skeleton 6 14 25
 spawn crypt_rat 6 15 26
 spawn skeleton 6 28 28
@@ -145,7 +151,7 @@ critter bat 38 33 1
 critter bat 22 26 2
 critter bat 22 9 2
 critter bat 38 3 1
-critter moth 34.5 22.5 2
+critter moth 35.5 22.5 2
 critter moth 20.5 14.5 1
 critter moth 13.5 3.5 2
 critter moth 30.5 11.5 1

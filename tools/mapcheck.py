@@ -223,6 +223,19 @@ def check(m, tiles, objs):
             if mk['k'] == 'exit' and (mk['type'] == m['start'] or 'lit' in mk.get('extra', [])):
                 if not any(abs(o['x'] - mk['x']) + abs(o['y'] - mk['y']) <= o['light'] + 3 for o in lights):
                     W.append(f"exit {mk['type']} has no light near it (torches mark the way in)")
+    # one light per spot (lighting pass v0.96, owner Nov 27): two light sources within 2 tiles of each other usually means
+    # a spare candle beside a shrine. A pair flanking something sits on one row (gate torches, door braziers), so same-row
+    # pairs pass; anything else gets a warning to look at.
+    # Also passes: a light flanked by a mirrored pair (candles either side of a shrine), and daylight shafts (a wide hole
+    # lets in more than one).
+    lit = [o for o in placed if o['light'] and o['kind'] != 'light_shaft']
+    mid = lambda o: o['x'] + o['w'] / 2
+    flanked = lambda a, b: any(c is not b and c['kind'] == b['kind'] and c['y'] == b['y'] and abs((mid(b) + mid(c)) / 2 - mid(a)) <= 0.5 for c in lit)
+    for i, a in enumerate(lit):
+        for b in lit[i + 1:]:
+            if flanked(a, b) or flanked(b, a): continue
+            if a['y'] != b['y'] and max(abs(a['x'] - b['x']), abs(a['y'] - b['y'])) <= 2:
+                W.append(f"{a['kind']} at {a['x']},{a['y']} and {b['kind']} at {b['x']},{b['y']} are two lights in one spot (one light per spot)")
     m.update(placed=placed, markers=markers, fogs=fogs, foot=foot, solid=solid, dist=dist)
     return E, W, m
 

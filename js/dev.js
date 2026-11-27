@@ -17,6 +17,7 @@ function devAct(a){
   else if(a==='gate'){if(zoneId!=='over')enterZone('over');player.x=3.5*T;player.y=15*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='door'){if(zoneId!=='over')enterZone('over');player.x=DOOR.x;player.y=DOOR.y+26;player.onTile=tileAt(player.x,player.y);if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='dun'){enterZone('dun')}
+  else if(a==='crypt'){enterZone('crypt');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='gy'){enterZone('gy');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='cross'){enterZone('cross');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
@@ -52,7 +53,10 @@ function renderDev(){
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
     sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Boss 1 item'),b('copper','+500 copper')))+
-    sec('tp','Teleport',g(b('gate','Gate'),b('door','Crypt door'),b('dun','Dungeon start'),b('bossroom','Boss room'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
+    sec('tp','Teleport',g(b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
+    // Old Zone (owner, Nov 27): the first build (Gate Road, guards, the first crypt), kept only to compare then and now.
+    // Frozen: not part of the game, nobody works on it.
+    sec('old','Old Zone (first build, frozen)',g(b('gate','Old gate'),b('door','Old crypt door'),b('dun','Old crypt'),b('bossroom','Old boss room')))+
     sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'),b('pace','Zone 1 pace'))+
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
       '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.lastPace&&simState.lastPace.cls===CLS&&(!simState.last||simState.lastPaceAt>simState.lastAt)?paceSummary(simState.lastPace):simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+

@@ -65,6 +65,7 @@ mausoleum    3 2 1      ground 1     S    0
 dead_oak     2 2 1      ground 1     -    0
 statue       1 1 1      ground 1     -    0
 torch        1 1 1      ground 0     -    4
+sconce       1 1 0      wall   0     -    3
 lantern      1 1 1      ground 0     -    3
 candle       1 1 0      ground 0     -    2
 cart         2 1 1      ground 0     -    0
