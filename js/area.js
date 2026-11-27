@@ -20,32 +20,47 @@ function curArea(){const k=AREA_OF[zoneId];return k?buildArea(k):null}
 // Small integer hash so every tile gets the same "random" details each time (no effect on the game's seeded rolls).
 function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>>13))*1274126177|0;return((n^(n>>>16))>>>0)/4294967296}
 
-// Build ahead (v0.92, optimization lane): the first visit to an area used to paint its whole map on the spot (about half a
-// second for Wolfwood on a laptop, more on a phone), so the screen froze at the doorway. Now, after you arrive, the areas
-// your exits lead to are built one at a time when the browser has a spare moment AND nothing is fighting you (a build is
-// one chunk of work, so it waits rather than land in the middle of a pull). Building uses no random rolls, so an area
-// built early is exactly the one you'd have got. A dungeon floor you've already walked is rebuilt fresh in the
-// background too (only while you're outside the dungeon), so every run still starts clean.
-const prebuildQ=[];let prebuildOn=false;
+// Build ahead (v0.92, optimization lane): the first visit to an area used to paint its whole map on the spot, so the screen
+// froze at the doorway. Since v0.92 the areas your exits lead to are built ahead of time, one at a time. Building uses no
+// random rolls, so an area built early is exactly the one you'd have got. A dungeon floor you've already walked is rebuilt
+// fresh in the background too (only while you're outside the dungeon), so every run still starts clean.
+//
+// Build in slices (Nov 27): a build used to be one chunk (0.1 to 0.3 s on a laptop, several times that on a phone), so even
+// built ahead it was a hitch, and it had to wait for a quiet moment. Now every build step is a generator (function*) that
+// pauses after each row of tiles, row of pixels or light, and buildTick (called once a frame by the main loop) runs it for
+// BUILD_SLICE ms and stops. So the work spreads over a second or two of frames, never more than a few ms in any one, and it
+// can carry on in the middle of a fight. Walking into an area before it's done finishes the rest at once (buildArea).
+// The pauses don't change the picture: the same steps run in the same order (checked pixel for pixel when this was built).
+const BUILD_SLICE=4;     // ms of building per frame: small next to a phone's ~16 ms frame
+const prebuildQ=[];      // areas waiting to be built ahead
+let buildJob=null;       // the build in progress: {id, it (the paused build)}
+function finishGen(it){let r;do{r=it.next()}while(!r.done);return r.value}
+// Build an area now, in one go (or finish the one already part-built). Everything outside the builder calls this.
+function buildArea(id){
+  if(AREAS[id])return AREAS[id];
+  let A;if(buildJob&&buildJob.id===id){A=finishGen(buildJob.it);buildJob=null}else A=finishGen(buildAreaGen(id));
+  AREAS[id]=A;return A}
+function paintArea(A){return finishGen(paintAreaGen(A))} // a repaint in one go (drainFlood: the flood goes, the floor is painted again)
 function prebuildNext(){
   const A=curArea();if(!A)return;prebuildQ.length=0;
   A.exits.forEach(e=>{const k=e.to;if(!MAPS[k]||k===A.id||prebuildQ.indexOf(k)>=0)return;
     if(!AREAS[k]||(AREAS[k].used&&MAPS[k].instance&&!A.instance))prebuildQ.push(k)});
-  if(!prebuildOn&&prebuildQ.length){prebuildOn=true;idle(prebuildStep)}
 }
-const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:2000}):setTimeout(f,300);
-function prebuildStep(){
-  if(inCombat()||player.cast||player.dead>0){idle(prebuildStep);return} // wait for a quiet moment
-  const k=prebuildQ.shift();
-  if(k&&!simState.busy){const cur=curArea();
-    if(AREAS[k]&&AREAS[k].used&&MAPS[k].instance&&!(cur&&cur.instance))Object.keys(MAPS).forEach(j=>{if(MAPS[j].instance&&AREAS[j]&&AREAS[j].used)delete AREAS[j]});
-    if(!AREAS[k]){crashGuard(()=>{const B=buildArea(k);
+function buildTick(){
+  if(simState.busy)return; // the sim runs its own fixed steps; leave the browser to it
+  const end=performance.now()+BUILD_SLICE;
+  while(performance.now()<end){
+    if(!buildJob){const k=prebuildQ.shift();if(!k)return;const cur=curArea();
+      if(AREAS[k]&&AREAS[k].used&&MAPS[k].instance&&!(cur&&cur.instance))Object.keys(MAPS).forEach(j=>{if(MAPS[j].instance&&AREAS[j]&&AREAS[j].used)delete AREAS[j]});
+      if(AREAS[k])continue;
+      buildJob={id:k,it:buildAreaGen(k)}}
+    let r;try{r=buildJob.it.next()}catch(e){crashReport(e,'build ahead '+buildJob.id);buildJob=null;continue} // a broken build is dropped; entering builds it again
+    if(r.done){const B=AREAS[buildJob.id]=r.value;buildJob=null;
       // A dungeon's lower floors come along once its first floor is ready, so the stairs down don't freeze either.
-      if(B.instance)B.exits.forEach(e=>{const j=e.to;if(MAPS[j]&&MAPS[j].instance&&!AREAS[j]&&prebuildQ.indexOf(j)<0)prebuildQ.push(j)})},'prebuild')}}
-  if(prebuildQ.length)idle(prebuildStep);else prebuildOn=false;
+      if(B.instance)B.exits.forEach(e=>{const j=e.to;if(MAPS[j]&&MAPS[j].instance&&!AREAS[j]&&prebuildQ.indexOf(j)<0)prebuildQ.push(j)})}
+  }
 }
-function buildArea(id){
-  if(AREAS[id])return AREAS[id];
+function* buildAreaGen(id){
   const M=MAPS[id],rows=M.tiles,w=rows[0].length,h=rows.length;
   const A={id:id,name:M.name,w:w,h:h,rows:rows.slice(),map:[],objs:[],spawns:[],exits:[],fogs:[],lights:[],flames:[],chests:[],holes:[],named:[],start:null,tint:M.tint,enter:M.enter||'',wake:M.wake||'',instance:!!M.instance,seals:[]};
   M.things.split('\n').forEach(line=>{const p=line.split('#')[0].trim().split(/\s+/);if(!p[0])return;
@@ -145,12 +160,13 @@ function buildArea(id){
   A.start=edge?{x:st.tx*T+8+(st.tx>=w-1?-48:st.tx<=0?48:0),y:st.ty*T+8+(st.ty>=h-1?-48:st.ty<=0?48:0)}:areaSpot(A,st); // a few steps inside, clear of the exit
   if(!A.start)A.start={x:st.tx*T+8,y:st.ty*T+8};
   if(M.startAt)A.start={x:M.startAt[0]*T+8,y:M.startAt[1]*T+8}; // v0.64: where you start and wake when the way in is a closed gate
-  A.trees=[];A.world=paintArea(A);edgeWoods(A);
+  yield; // after reading the map file
+  A.trees=[];A.world=yield* paintAreaGen(A);yield* edgeWoodsGen(A);
   // A flame behind a tree crown (v0.64, owner: a lantern flickering through a tree at the crossroads): flames draw after the
   // lighting, over everything, so one under a crown in front showed through the leaves. Those stay unlit-looking now.
   A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&!t.tree.shrub&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
-  bakeLight(A);
-  AREAS[id]=A;return A;
+  yield* bakeLightGen(A);
+  return A;
 }
 
 // Light that follows the room (v0.95, owner picked B Nov 25, look of A Nov 27). Every fixed light in the area is worked out
@@ -160,13 +176,13 @@ function buildArea(id){
 // tail past its bright core, like real light. Outdoors spill is 0, so the open-air look stays exactly as it was.
 // Drawing it each frame is two picture draws, the same cost as before; the live flicker is a small glow near each flame.
 const LM=2; // one light-map cell = 2 x 2 game pixels, drawn smoothed (light is soft anyway)
-function bakeLight(A){
+function* bakeLightGen(A){ // pauses after each light
   const w=A.w,h=A.h,AT=AREA_TINT[A.tint]||{amb:0.38},amb=AT.amb,S=AT.spill||0,RE=AT.reach||1,K=1.15; // K: the 3/4 view squashes light up and down, as the old pools did
   const wall=new Uint8Array(w*h);for(let y=0;y<h;y++)for(let x=0;x<w;x++)wall[y*w+x]=AREA_TILES[A.rows[y][x]].tags.indexOf('wall')>=0?1:0;
   const isW=(x,y)=>x<0||y<0||x>=w||y>=h||wall[y*w+x]===1;
   const CW=Math.ceil(w*T/LM),CH=Math.ceil(h*T/LM),keep=new Float32Array(CW*CH).fill(1),warm=new Float32Array(CW*CH),cool=new Float32Array(CW*CH);
   const RIM=10; // a wall tile only catches light on the face within 10 px of the open floor it borders
-  A.lights.forEach(L=>{
+  for(const L of A.lights){
     const R=L.r*Math.max(1,S>0?RE:1),tr=Math.ceil(R/T)+2,ltx=Math.floor(L.x/T),lty=Math.floor(L.y/T);
     const x0=Math.max(0,ltx-tr),y0=Math.max(0,lty-tr),x1=Math.min(w-1,ltx+tr),y1=Math.min(h-1,lty+tr),bw=x1-x0+1,bh=y1-y0+1;
     const geo=new Float32Array(bw*bh).fill(1e9),dir=(tx,ty)=>Math.hypot(tx*T+8-L.x,(ty*T+8-L.y)*K);
@@ -198,16 +214,17 @@ function bakeLight(A){
       const o=cy*CW+cxl;keep[o]*=1-Math.min(1,(core*0.9+tail)/(1-amb));
       if(L.w>0)warm[o]+=(core+tail*0.8)*L.w/255;if(L.c>0)cool[o]+=(core+tail*0.8)*L.c/255;
     }
-  });
+    yield}
   // Soften by a few pixels so the light's edge follows curved cave walls instead of showing the square tiles it was worked out on.
   const cut=new Float32Array(CW*CH);for(let o=0;o<CW*CH;o++)cut[o]=1-keep[o];
-  [cut,warm,cool].forEach(a=>blurCells(a,CW,CH,3));
+  for(const a of [cut,warm,cool]){blurCells(a,CW,CH,3);yield}
   for(let o=0;o<CW*CH;o++)keep[o]=1-cut[o];
   const mk=()=>{const c=document.createElement('canvas');c.width=CW;c.height=CH;return c};
   const cutC=mk(),gloC=mk(),ci=cutC.getContext('2d').createImageData(CW,CH),gi=gloC.getContext('2d').createImageData(CW,CH);
-  for(let o=0;o<CW*CH;o++){const p=o*4;ci.data[p+3]=Math.round((1-keep[o])*255);
+  for(let cy=0;cy<CH;cy++){for(let o=cy*CW;o<(cy+1)*CW;o++){const p=o*4;ci.data[p+3]=Math.round((1-keep[o])*255);
     const aw=warm[o],ac=cool[o],a=Math.min(1,aw+ac);if(a<=0)continue;const s=aw+ac;
     gi.data[p]=(255*aw+170*ac)/s;gi.data[p+1]=(150*aw+200*ac)/s;gi.data[p+2]=(60*aw+215*ac)/s;gi.data[p+3]=Math.round(a*255)}
+    if(cy%32===31)yield}
   cutC.getContext('2d').putImageData(ci,0,0);gloC.getContext('2d').putImageData(gi,0,0);
   A.lmCut=cutC;A.lmGlow=gloC;
 }
@@ -228,7 +245,7 @@ function drawLightMap(ctx,img,wx,wy,ww,wh,dx,dy){
 // map stay open), and further out the gaps close up into deeper forest, with the odd dead snag. Outdoors only; you can
 // never walk there. Shadows go into the mirrored ground strips.
 const EDGE_DEPTH=14; // tiles of woods past each edge (the camera shows at most about half a screen, ~13 tiles, past an edge)
-function edgeWoods(A){
+function* edgeWoodsGen(A){ // pauses after each row of edge trees
   if(A.instance||A.tint==='earth'||A.tint==='crypt'||A.tint==='vault')return;
   const W=A.w,H=A.h,wd=A.world,treeN={tree:1,fir:1,dead_tree:1};
   const nm=(x,y)=>{x=Math.max(0,Math.min(W-1,x));y=Math.max(0,Math.min(H-1,y));return AREA_TILES[A.rows[y][x]].name};
@@ -242,18 +259,18 @@ function edgeWoods(A){
     {n:W,lo:0,hi:W,src:(i,k)=>nm(i,H-k),at:(i,k)=>[i,H-1+k],cv:wd.edgeBot,shp:(x,y)=>[x,wd.edgeBot.height-(y-H*T)]},
     {n:H,lo:-EDGE_DEPTH,hi:H+EDGE_DEPTH,src:(i,k)=>nm(k-1,i),at:(i,k)=>[-k,i],cv:wd.edgeLeft,shp:(x,y)=>[-x,y]},
     {n:H,lo:-EDGE_DEPTH,hi:H+EDGE_DEPTH,src:(i,k)=>nm(W-k,i),at:(i,k)=>[W-1+k,i],cv:wd.edgeRight,shp:(x,y)=>[wd.edgeRight.width-(x-W*T),y]}];
-  SIDES.forEach((S,si)=>{
+  for(let si=0;si<SIDES.length;si++){const S=SIDES[si];
     // The kind of wood an edge has: whatever tree is most common in its first few rows.
     const kindNear=i=>{const c={};for(let j=1;j<=4;j++)for(let d=-4;d<=4;d++){const n=S.src(i+d,j);if(treeN[n])c[n]=(c[n]||0)+1}
       return Object.keys(c).sort((a,b)=>c[b]-c[a])[0]||fallback};
-    for(let k=1;k<=EDGE_DEPTH;k++)for(let i=S.lo;i<S.hi;i++){
+    for(let k=1;k<=EDGE_DEPTH;k++){for(let i=S.lo;i<S.hi;i++){
       const src=S.src(i,k);let n=null;
       if(treeN[src])n=ah(i,k,160+si*7)<0.9?src:null; // the edge's own trees carry on (one in ten left out, so it isn't a mirror)
       else if(k>=2&&open(src)&&[-1,0,1].every(d=>open(S.src(i+d,k))&&open(S.src(i+d,1)))&&ah(i,k,162+si*7)<Math.min(0.85,0.12+0.1*k))n=kindNear(i); // gaps close up further out, a few clearings stay
       if(!n)continue;if(n==='tree'&&ah(i,k,164+si*7)<0.05)n='dead_tree'; // now and then a dead snag
       const [tx,ty]=S.at(i,k),bx=tx*T,by=ty*T,im=pickTree(A,n,tx,ty);
       if(ty>=0&&ty<H||si<2){const [sx,sy]=S.shp(bx+8+im.shx,by+14);sh(S.cv,sx,sy,im.sh)} // corner shadows fall outside the strips
-      A.trees.push(treeAt(im,bx,by,by+13))}});
+      A.trees.push(treeAt(im,bx,by,by+13));yield}}}
 }
 // Shut every seal again (a fresh instance visit) and block its tiles.
 function sealArea(A){A.seals.forEach(sl=>{sl.open=false;for(let y=sl.y0;y<=sl.y1;y++)for(let x=sl.x0;x<=sl.x1;x++)A.map[y][x]=5})}
@@ -321,22 +338,25 @@ function waterField(A,groundOf){
     // Averaging a small square of blended samples turns a staircase of tiles into a slope.
     let f=0;for(let sy=-6;sy<=6;sy+=6)for(let sx=-6;sx<=6;sx+=6)f+=bl(px+sx,py+sy);f/=9;
     return f-0.5+(N1(px,py)-0.5)*0.5+(N2(px,py)-0.5)*0.22}}
-function paintWater(A,g,groundOf){
+function* paintWaterGen(A,g,groundOf){ // pauses after each water-edge tile
   const V=waterField(A,groundOf);A.wetV=V;
   const near=[];for(let y=0;y<A.h;y++)for(let x=0;x<A.w;x++){let n=0;for(let j=-1;j<=1;j++)for(let i=-1;i<=1;i++){const a=x+i,b=y+j;if(a>=0&&b>=0&&a<A.w&&b<A.h&&groundOf(a,b)==='water')n=1}if(n)near.push([x,y])}
   if(!near.length)return;
   const W=A.w*T,H=A.h*T,img=g.getImageData(0,0,W,H),d=img.data;
-  const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const C={};const col=h=>C[h]||(C[h]=rgb(h));
-  const put=(x,y,h)=>{const c=col(h),k=(y*W+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255};
+  // Colours written as whole pixels (one 32-bit number each, in the byte order of this device) rather than four bytes apiece.
+  const d32=new Uint32Array(d.buffer),le=new Uint8Array(new Uint32Array([1]).buffer)[0]===1,C={};
+  const col=h=>{let c=C[h];if(c===undefined){const r=parseInt(h.slice(1,3),16),gg=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+    c=C[h]=le?((255<<24)|(b<<16)|(gg<<8)|r)>>>0:((r<<24)|(gg<<16)|(b<<8)|255)>>>0}return c};
+  const put=(x,y,h)=>{d32[y*W+x]=col(h)};
   const cave=A.tint==='earth',NB=noiseGrid(W+16,H+16,24,204),N9=noiseGrid(W+16,H+16,9,205),N11=noiseGrid(W+16,H+16,11,206);
   // The land a water tile's dry bits belong to: the neighbour on that side, else any land next to it.
   const bankOf=(tx,ty,ox,oy)=>{const sx=ox<8?-1:1,sy=oy<8?-1:1;for(const [dx,dy] of [[sx,0],[0,sy],[sx,sy],[-sx,0],[0,-sy],[-sx,-sy],[sx,-sy],[-sx,sy]]){const n=groundOf(tx+dx,ty+dy);if(n!=='water')return n}return cave?'cave_dirt':'mud'};
-  near.forEach(([tx,ty])=>{const isW=groundOf(tx,ty)==='water';
+  for(const [tx,ty] of near){const isW=groundOf(tx,ty)==='water';
     for(let oy=0;oy<T;oy++)for(let ox=0;ox<T;ox++){const px=tx*T+ox,py=ty*T+oy,v=V(px,py);
       const bankW=0.07+0.13*NB(px,py); // the wet strip changes width along the bank
       if(v<0){
         if(v>-bankW)put(px,py,cave?(ah(px,py,5)<0.5?'#2a231b':'#241e17'):(ah(px,py,5)<0.6?AP.mud:(ah(px,py,6)<0.5?'#2c2820':AP.mudDk))); // wet mud
-        else if(isW)put(px,py,groundPatch(bankOf(tx,ty,ox,oy),px,py)); // land biting into a water tile
+        else if(isW)put(px,py,groundPatch(bankOf(tx,ty,ox,oy),px,py,A.patch)); // land biting into a water tile
         continue}
       let c;
       if(v<0.03)c='#0d1a22';                                               // dark wet rim right at the edge
@@ -344,7 +364,7 @@ function paintWater(A,g,groundOf){
       else if(v<0.11)c=ah(px,py,7)<0.55?'#1d3842':'#1a333e';               // shallows, a touch lighter and greener
       else if(v<0.2)c=ah(px,py,8)<0.5?'#16293a':AP.water;                  // stepping down
       else c=v>0.42&&N9(px,py)<0.5?'#0f202b':(N11(px,py)<0.45?'#16293a':AP.water); // deep, in soft patches
-      put(px,py,c)}});
+      put(px,py,c)}yield}
   g.putImageData(img,0,0);
   // Bank details on top: pebbles in the wet strip, reeds in clumps, lily pads in still water, light catching the deep.
   const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};const dead=A.tint==='moonlit';
@@ -364,9 +384,9 @@ function paintWater(A,g,groundOf){
 const BUILT_GROUND=new Set(['road','floor','stairs','flagstone','dirt_slope','bridge']);
 // One ground's colour at a pixel: the 8 x 8 colour patches are wobbled a little so they never line up in a checker grid
 // (built floors keep their tidy patches).
-let PATCH_NX=null,PATCH_NY=null; // set per area by paintGround (noise grids sized to the area)
-function groundPatch(n,px,py){if(BUILT_GROUND.has(n)||!PATCH_NX)return groundCol(n,ah(px>>3,py>>3,1));
-  const qx=px+Math.round((PATCH_NX(px,py)-0.5)*7),qy=py+Math.round((PATCH_NY(px,py)-0.5)*7);return groundCol(n,ah(qx>>3,qy>>3,1))}
+// P: the area's patch noise from paintGround (A.patch), passed in rather than shared, so two areas can be mid-build at once.
+function groundPatch(n,px,py,P){if(BUILT_GROUND.has(n)||!P)return groundCol(n,ah(px>>3,py>>3,1));
+  const qx=px+Math.round((P[0](px,py)-0.5)*7),qy=py+Math.round((P[1](px,py)-0.5)*7);return groundCol(n,ah(qx>>3,qy>>3,1))}
 // A ground's small detail (tuft, pebble, reed...) for the bits of ground that spill over a tile line.
 function groundDetail(R,n,x,y,r){
   if(n==='grass')R(x,y,1,2,r<0.5?AP.ggTuft:AP.ggTuft2);else if(n==='dead_grass')R(x,y,1,2,AP.dgTuft);
@@ -374,7 +394,7 @@ function groundDetail(R,n,x,y,r){
   else if(n==='mud')R(x,y,3,1,AP.mudDk);else if(n==='marsh'){R(x,y-2,1,3,AP.reed);R(x,y-2,1,1,AP.reedHi)}
   else if(n==='needles')R(x,y,2,1,AP.needleHi);else if(n==='moss')R(x,y,3,2,AP.mossHi);else if(n==='blight')R(x,y,1,1,AP.ash);
   else if(n==='cave_dirt')R(x,y,1,1,AP.caveHi);else if(n==='ash')R(x,y,1,1,AP.ashHi);else if(n==='gravel')R(x,y,2,1,AP.gravHi)}
-function paintGround(A,g,groundOf){
+function* paintGroundGen(A,g,groundOf){ // pauses after each row of tiles (see Build in slices)
   const W=A.w*T,H=A.h*T,types=[],tid={},id=n=>tid[n]!==undefined?tid[n]:(tid[n]=types.push(n)-1);
   const tt=[];for(let y=0;y<A.h;y++){tt[y]=[];for(let x=0;x<A.w;x++)tt[y][x]=id(groundOf(x,y))}
   const WATER=id('water'),tm=(x,y)=>tt[y<0?0:y>=A.h?A.h-1:y][x<0?0:x>=A.w?A.w-1:x];
@@ -386,11 +406,11 @@ function paintGround(A,g,groundOf){
   const thin=types.map(n=>n==='dirt_path'||n==='gate'||n==='broken_fence'||n==='road'||n==='bridge'?0.16:0);
   const at=new Uint8Array(W*H),img=g.createImageData(W,H),d32=new Uint32Array(img.data.buffer);
   const NX=noiseGrid(W,H,18,401),NY=noiseGrid(W,H,18,402),NT=types.map((n,c)=>noiseGrid(W+16,H+16,12,500+c));
-  const PX=noiseGrid(W+16,H+16,10,403),PY=noiseGrid(W+16,H+16,10,404);PATCH_NX=PX;PATCH_NY=PY;
+  const PX=noiseGrid(W+16,H+16,10,403),PY=noiseGrid(W+16,H+16,10,404);A.patch=[PX,PY];
   const wsum=new Float32Array(types.length),seen=new Int32Array(4);
   const CW=(W>>3)+4,CH=(H>>3)+4,cell=new Uint8Array(CW*CH);for(let j=0;j<CH;j++)for(let i=0;i<CW;i++)cell[j*CW+i]=Math.floor(ah(i-1,j-1,1)*20); // patch rolls, one per 8 x 8 cell
-  const OFF=new Int8Array(((W>>1)+1)*((H>>1)+1)*2),OW=(W>>1)+1;for(let j=0;j*2<H;j++)for(let i=0;i*2<W;i++){const k=(j*OW+i)*2;OFF[k]=Math.round((PX(i*2,j*2)-0.5)*7);OFF[k+1]=Math.round((PY(i*2,j*2)-0.5)*7)} // patch wobble every 2 px
-  for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const t0=tt[ty][tx];
+  const OFF=new Int8Array(((W>>1)+1)*((H>>1)+1)*2),OW=(W>>1)+1;for(let j=0;j*2<H;j++){for(let i=0;i*2<W;i++){const k=(j*OW+i)*2;OFF[k]=Math.round((PX(i*2,j*2)-0.5)*7);OFF[k+1]=Math.round((PY(i*2,j*2)-0.5)*7)}if(j%32===31)yield} // patch wobble every 2 px
+  for(let ty=0;ty<A.h;ty++){for(let tx=0;tx<A.w;tx++){const t0=tt[ty][tx];
     // Only tiles with a different ground next to them need the blend (water is left to the water pass).
     let edge=false;if(t0!==WATER)for(let j=-1;j<=1&&!edge;j++)for(let i=-1;i<=1;i++){const n=tm(tx+i,ty+j);if(n!==t0&&n!==WATER){edge=true;break}}
     const anyB=built[t0]||built[tm(tx-1,ty)]||built[tm(tx+1,ty)]||built[tm(tx,ty-1)]||built[tm(tx,ty+1)],aw=anyB?2:4;
@@ -405,11 +425,11 @@ function paintGround(A,g,groundOf){
       at[py*W+px]=t;
       // The colour patch: 8 x 8 blocks, wobbled for natural ground so they don't form a checker grid.
       let cx=px,cy=py;if(!built[t]){const k=((py>>1)*OW+(px>>1))*2;cx+=OFF[k];cy+=OFF[k+1]}
-      d32[py*W+px]=pal[t][cell[((cy>>3)+1)*CW+(cx>>3)+1]]}}
+      d32[py*W+px]=pal[t][cell[((cy>>3)+1)*CW+(cx>>3)+1]]}}yield}
   g.putImageData(img,0,0);
   return {types:types,at:at}}
 const EDGE_STRIP=256; // game pixels of edge ground kept for the mirror past each map edge (more than the camera ever shows: about half a screen)
-function paintArea(A){
+function* paintAreaGen(A){ // pauses between rows (see Build in slices)
   const W=A.w*T,H=A.h*T,c=document.createElement('canvas');c.width=W;c.height=H;const g=c.getContext('2d');
   const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)};
   const tile=(x,y)=>(x<0||y<0||x>=A.w||y>=A.h)?null:A.rows[y][x];
@@ -429,8 +449,8 @@ function paintArea(A){
 
   // 1) Ground (v0.54): every pixel picks its ground from a smooth blend of the tiles around it, so grounds meet in natural
   // curves instead of tile squares; colour patches are wobbled so they don't line up in a checker grid. Then tufts and pebbles.
-  const eg=paintGround(A,g,groundOf);const egAt=(x,y)=>eg.types[eg.at[Math.max(0,Math.min(A.h*T-1,y))*A.w*T+Math.max(0,Math.min(A.w*T-1,x))]];
-  for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){
+  const eg=yield* paintGroundGen(A,g,groundOf);const egAt=(x,y)=>eg.types[eg.at[Math.max(0,Math.min(A.h*T-1,y))*A.w*T+Math.max(0,Math.min(A.w*T-1,x))]];
+  for(let ty=0;ty<A.h;ty++){for(let tx=0;tx<A.w;tx++){
     const gname=groundOf(tx,ty),bx=tx*T,by=ty*T;
     const R0=R;{const R=(x,y,w,h,col)=>{if(w>2||h>4||egAt(x,y)===gname)R0(x,y,w,h,col)}; // a tuft only where its own ground shows
     for(let i=0;i<6;i++){const r1=ah(tx,ty,10+i),r2=ah(tx,ty,30+i),x=bx+Math.floor(r1*15),y=by+Math.floor(r2*15);
@@ -490,10 +510,10 @@ function paintArea(A){
        else if(here==='moss'&&r<0.3){R(x,y,1,3,AP.ggTuft);R(x+1,y+1,1,2,AP.ggTuft2);R(x-1,y+1,1,2,AP.ggTuft2)}}} // grass tuft
     // Heart pass (v0.49): leaves drift under the dead trees.
     if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
-  }
+  }yield}
 
   // 1b) Water with natural edges (v0.52): drawn over the square tiles as one smooth shape, then the bank details.
-  paintWater(A,g,groundOf);
+  yield* paintWaterGen(A,g,groundOf);
   for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const gname=groundOf(tx,ty),bx=tx*T,by=ty*T;
     // The Sunken Graveyard lives up to its name: old headstones lean up out of the flooded water, each with its waterline.
     // Only in water with no living grass nearby, so none turn up in the creek outside the fence.
@@ -506,7 +526,7 @@ function paintArea(A){
   }
 
   // 1c) Rat tunnel earth walls with natural edges (v0.74), before the edge copies so the earth carries on past the map edge.
-  paintEarthWalls(A,g,name);
+  yield* paintEarthWallsGen(A,g,name);
   // Ground-only copies of the top and bottom edges, taken before any scenery: render mirrors these past the map edge so the
   // strip under the top bars (or the spell grid) shows ground carrying on, never black and never a doubled building (v0.55).
   {const E=Math.min(H,EDGE_STRIP),cut=y=>{const e=document.createElement('canvas');e.width=W;e.height=E;e.getContext('2d').drawImage(c,0,y,W,E,0,0,W,E);return e};
@@ -534,7 +554,7 @@ function paintArea(A){
         if(shrub===2)continue; // a gap in the treeline filled by the bush
         const im=pickTree(A,n,tx,ty); // v0.50: kinds, sizes and shades per area (tree variety)
         g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+8+im.shx,by+14,im.sh,Math.max(2,Math.round(im.sh/3)),0,0,7);g.fill();
-        A.trees.push(treeAt(im,bx,by,by+13))}
+        A.trees.push(treeAt(im,bx,by,by+13));yield} // a pause per tree: the first of each kind and size draws its picture (pickTree)
       else if(n==='boulder')drawBoulder(R,bx,by,name(tx,ty-1)!=='boulder',ah(tx,ty,16));
       else if(n==='bush'||n==='dead_bush')drawBush(R,bx,by,n==='dead_bush',ah(tx,ty,5));
       else if(n==='grave')drawGrave(R,bx,by,ah(tx,ty,6),tx,ty);
@@ -576,7 +596,7 @@ function paintArea(A){
       if(o.kind==='chapel'){const im=chapelImg(o),X=o.x*T,Y=o.y*T;im.box=[0,0,im.c.width-1,im.c.height-1];
         A.trees.push({tree:im,x:X-im.ox,y:Y+o.h*T-1,px:X-im.ox,py:Y-im.oy,b:[X-im.ox,Y-im.oy+20,X-im.ox+im.c.width,Y+o.h*T],a:1});return} // sorted with characters, like a tree
       drawObj(g,R,o)});
-  }
+  yield}
   // Chests are drawn each frame in render.js (drawChests), since they open and fill again.
   return c;
 }
@@ -910,28 +930,46 @@ function drawCoffin(R,bx,by,r){ // two tiles tall (map: a C with another C under
 // the foot and pale mushrooms growing there. Walking stays on tiles: the drawn edge only moves a few pixels off the tile line,
 // and the middle of an open tile is never drawn over.
 const EARTH_FACE=10;
-function paintEarthWalls(A,g,name){
-  const solidT=(x,y)=>{if(x<0||y<0||x>=A.w||y>=A.h)return 1;const m=name(x,y);return m==='earth_wall'||m==='rat_hole'?1:0};
+function* paintEarthWallsGen(A,g,name){ // pauses after each row of pixels
   let any=0;for(let y=0;y<A.h&&!any;y++)for(let x=0;x<A.w;x++)if(name(x,y)==='earth_wall'){any=1;break}
   if(!any)return;
+  // Speed (optimization lane): which tiles are earth, looked up once in a table (a 2-tile border counts as earth, as before)
+  // instead of comparing tile names for every pixel. And a tile whose 3x3 neighbours are all the same (deep in the rock or
+  // out on open floor) needs no edge maths: the noise below moves the blend by at most 0.26, never across the 0.5 line,
+  // so its pixels come out exactly as before. Only tiles beside a wall edge do the full work. Same picture, ~5x faster.
+  const SW=A.w+4,sol=new Uint8Array(SW*(A.h+4)).fill(1);
+  for(let y=0;y<A.h;y++)for(let x=0;x<A.w;x++){const m=name(x,y);sol[(y+2)*SW+x+2]=m==='earth_wall'||m==='rat_hole'?1:0}
+  const solidT=(x,y)=>x<-2||y<-2||x>=A.w+2||y>=A.h+2?1:sol[(y+2)*SW+x+2];
+  const same=new Uint8Array(A.w*A.h);for(let y=0;y<A.h;y++)for(let x=0;x<A.w;x++){const c=solidT(x,y);let u=1;
+    for(let dy=-1;dy<=1&&u;dy++)for(let dx=-1;dx<=1;dx++)if(solidT(x+dx,y+dy)!==c){u=0;break}same[y*A.w+x]=u}
   const W=A.w*T,H=A.h*T,N1=noiseGrid(W+32,H+32,13,231),N2=noiseGrid(W+32,H+32,5,232);
   // Wall-ness between tile centres (1 = wall), sampled in a small square so a staircase becomes a slope.
-  const bl=(px,py)=>{const u=px/T-0.5,v=py/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
+  const bl0=(px,py)=>{const u=px/T-0.5,v=py/T-0.5,i=Math.floor(u),j=Math.floor(v),fx=u-i,fy=v-j;
     return solidT(i,j)*(1-fx)*(1-fy)+solidT(i+1,j)*fx*(1-fy)+solidT(i,j+1)*(1-fx)*fy+solidT(i+1,j+1)*fx*fy};
+  // Each pixel's blend averages 9 samples that its neighbours share, so each sample is worked out once and kept
+  // (NaN = not yet; full-precision numbers so the sums match exactly). A 5-pixel border covers the samples past the edge.
+  const BW=W+10,BC=new Float64Array(BW*(H+10)).fill(NaN);
+  const bl=(px,py)=>{const i=(py+5)*BW+px+5;let v=BC[i];if(v!==v)v=BC[i]=bl0(px,py);return v};
   const M=new Uint8Array(W*H);
-  for(let py=0;py<H;py++)for(let px=0;px<W;px++){const tx=(px/T)|0,ty=(py/T)|0,ox=px-tx*T,oy=py-ty*T,st=solidT(tx,ty);
+  for(let py=0;py<H;py++){for(let px=0;px<W;px++){const tx=(px/T)|0,ty=(py/T)|0,ox=px-tx*T,oy=py-ty*T,st=solidT(tx,ty);
     // the middle of an open tile always stays floor (you stand there), the middle of a wall tile always stays wall
-    if(ox>=4&&ox<12&&oy>=4&&oy<12){M[py*W+px]=st;continue}
+    if(same[ty*A.w+tx]||(ox>=4&&ox<12&&oy>=4&&oy<12)){M[py*W+px]=st;continue}
     let f=0;for(let sy=-5;sy<=5;sy+=5)for(let sx=-5;sx<=5;sx+=5)f+=bl(px+sx,py+sy);f/=9;
     f+=(N1(px+16,py+16)-0.5)*0.36+(N2(px+16,py+16)-0.5)*0.16;
-    M[py*W+px]=f>0.5?1:0}
+    M[py*W+px]=f>0.5?1:0}yield}
   const wall=(x,y)=>x<0||y<0||x>=W||y>=H?1:M[y*W+x];
   const img=g.getImageData(0,0,W,H),d=img.data;
-  const rgb=h=>[parseInt(h.slice(1,3),16),parseInt(h.slice(3,5),16),parseInt(h.slice(5,7),16)];const C={};const col=h=>C[h]||(C[h]=rgb(h));
-  const put=(x,y,h)=>{const c=col(h),k=(y*W+x)*4;d[k]=c[0];d[k+1]=c[1];d[k+2]=c[2];d[k+3]=255};
-  for(let py=0;py<H;py++)for(let px=0;px<W;px++){
+  // Colours written as whole pixels (one 32-bit number each, in the byte order of this device) rather than four bytes apiece.
+  const d32=new Uint32Array(d.buffer),le=new Uint8Array(new Uint32Array([1]).buffer)[0]===1,C={};
+  const col=h=>{let c=C[h];if(c===undefined){const r=parseInt(h.slice(1,3),16),gg=parseInt(h.slice(3,5),16),b=parseInt(h.slice(5,7),16);
+    c=C[h]=le?((255<<24)|(b<<16)|(gg<<8)|r)>>>0:((r<<24)|(gg<<16)|(b<<8)|255)>>>0}return c};
+  const put=(x,y,h)=>{d32[y*W+x]=col(h)};
+  // How far down to the floor from each wall pixel (0 = no floor within the face height), worked out once per column
+  // from the bottom up, instead of searching down from every wall pixel.
+  const down=new Uint8Array(W*H);for(let px=0;px<W;px++){let n=255;for(let py=H-1;py>=0;py--){const i=py*W+px;if(!M[i]){n=0;continue}n=n>=EARTH_FACE?255:n+1;down[i]=n<=EARTH_FACE?n:0}}
+  for(let py=0;py<H;py++){for(let px=0;px<W;px++){
     if(!wall(px,py)){if(wall(px,py-1)&&py>0&&ah(px,py,41)<0.8)put(px,py,'#241e17');else if(wall(px,py-2)&&py>1&&ah(px,py,42)<0.4)put(px,py,'#2a231b');continue} // damp shadow at the foot
-    let k=0;for(let s=1;s<=EARTH_FACE;s++)if(py+s<H&&!wall(px,py+s)){k=s;break}
+    const k=down[py*W+px];
     if(k){ // the soil face
       if(k===1)put(px,py,AP.out);
       else if(k===EARTH_FACE)put(px,py,'#46382a');
@@ -941,7 +979,7 @@ function paintEarthWalls(A,g,name){
     if(py>0&&!wall(px,py-1))put(px,py,AP.earthHi);          // the lit far rim
     else if(py>1&&!wall(px,py-2))put(px,py,AP.out);
     else if(!wall(px-1,py)||!wall(px+1,py))put(px,py,'#1f1913'); // a thin rim on the sides
-    else put(px,py,ah(px,py,44)<0.02?'#211b15':AP.earth)}
+    else put(px,py,ah(px,py,44)<0.02?'#211b15':AP.earth)}yield}
   g.putImageData(img,0,0);
   const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};
   // Where a face column ends: the last wall pixel above the floor, searched down from y0. -1 if there's no full face there.

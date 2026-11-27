@@ -7,6 +7,7 @@ function loop(ts){
   // Each part runs inside crashGuard (js/crash.js): an error is reported and the next frame still comes (it used to freeze the game).
   requestAnimationFrame(loop);
   if(running&&!document.hidden&&!simState.busy){time+=dt;crashGuard(()=>{botTick();update(dt)},'update')} // the sim runs its own fixed steps
+  if(running&&!document.hidden)crashGuard(buildTick,'build'); // areas next door, a few ms a frame (js/area.js, Build in slices)
   crashGuard(render,'render');uiT+=dt;if(uiT>0.1){crashGuard(()=>{ui();pauseWatch()},'ui');uiT=0}
 }
 resize();buildControls();
