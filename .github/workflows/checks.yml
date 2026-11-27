@@ -1,0 +1,33 @@
+# Automatic checks on every push (board card, owner's brother, Nov 24).
+# GitHub runs tools/check.py after each push to main: a green check on the commit means it passed, a red X means
+# something broke (a JavaScript error, a spell that throws, a map error, or sim numbers that moved). Details: tools/check.py.
+name: checks
+on:
+  # Only when game code or the checks themselves change: a docs-only push (board, notes) skips the run.
+  push:
+    branches: [main]
+    paths: ['index.html', 'css/**', 'js/**', 'tools/check.py', 'tools/check-baseline.json', 'tools/mapcheck.py', '.github/workflows/**']
+  pull_request:
+    paths: ['index.html', 'css/**', 'js/**', 'tools/check.py', 'tools/check-baseline.json', 'tools/mapcheck.py', '.github/workflows/**']
+  workflow_dispatch:   # a "Run workflow" button on the Actions tab
+concurrency:
+  group: checks-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          lfs: false
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install the headless browser
+        # Pinned so the browser (and so the sim's numbers) only change when we choose to.
+        run: |
+          pip install playwright==1.63.0 pillow
+          python -m playwright install --with-deps chromium
+      - name: Run the checks
+        run: python tools/check.py

@@ -1,0 +1,5742 @@
+{
+"druid": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.1,
+"dmg": 10
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.3,
+"dmg": 30
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 39
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 60
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.1,
+"dmg": 14
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.9,
+"dmg": 39
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 51
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 80
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 34.3,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.8,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 94.3,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.8,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 117
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 69.7,
+"dmg": 6
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.7,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 124
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 57.3,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.3,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 8,
+"deaths": 2,
+"kill": 52.1,
+"dmg": 99
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 48.6,
+"dmg": 2
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.4,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 45.9,
+"dmg": 89
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 37.6,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.0,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 50.3,
+"dmg": 99
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 36.0,
+"dmg": 0
+}
+],
+"warrior": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 10.8,
+"dmg": 7
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.7,
+"dmg": 20
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 25
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.1,
+"dmg": 67
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.8,
+"dmg": 8
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 21.6,
+"dmg": 24
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.0,
+"dmg": 28
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 34.4,
+"dmg": 84
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 14
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 22.8,
+"dmg": 31
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.4,
+"dmg": 36
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 38.2,
+"dmg": 109
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 17
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 22.5,
+"dmg": 36
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.3,
+"dmg": 40
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 38.7,
+"dmg": 125
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 19
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.0,
+"dmg": 41
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.3,
+"dmg": 46
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 38.7,
+"dmg": 142
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 168
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.9,
+"dmg": 21
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.7,
+"dmg": 47
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.8,
+"dmg": 54
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 40.5,
+"dmg": 154
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 198
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 9,
+"deaths": 1,
+"kill": 71.8,
+"dmg": 174
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 14.1,
+"dmg": 24
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.6,
+"dmg": 53
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.8,
+"dmg": 59
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 40.5,
+"dmg": 165
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 223
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 61.7,
+"dmg": 151
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 14.1,
+"dmg": 27
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.9,
+"dmg": 60
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.0,
+"dmg": 66
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 38.7,
+"dmg": 181
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 7,
+"deaths": 3,
+"kill": 58.6,
+"dmg": 214
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 43.5,
+"dmg": 110
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 14.2,
+"dmg": 26
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.0,
+"dmg": 59
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.4,
+"dmg": 67
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 39.4,
+"dmg": 186
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 55.8,
+"dmg": 180
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 39.1,
+"dmg": 83
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 14.2,
+"dmg": 28
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.0,
+"dmg": 64
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.4,
+"dmg": 73
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 39.3,
+"dmg": 201
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 49.5,
+"dmg": 151
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 37.9,
+"dmg": 71
+}
+],
+"rogue": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 5.8,
+"dmg": 2
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.4,
+"dmg": 15
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 10.6,
+"dmg": 15
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 6,
+"deaths": 4,
+"kill": 25.6,
+"dmg": 58
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 6.4,
+"dmg": 3
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 13
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.1,
+"dmg": 13
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 24.5,
+"dmg": 63
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.6,
+"dmg": 4
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 13
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.5,
+"dmg": 16
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 23.9,
+"dmg": 71
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.2,
+"dmg": 4
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 15
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.2,
+"dmg": 18
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 23.7,
+"dmg": 83
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.8,
+"dmg": 6
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 18
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 23
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 25.4,
+"dmg": 83
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 125
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.8,
+"dmg": 6
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.2,
+"dmg": 18
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.4,
+"dmg": 22
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 24.9,
+"dmg": 98
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 140
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 1,
+"deaths": 9,
+"kill": 35.8,
+"dmg": 136
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.2,
+"dmg": 8
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.2,
+"dmg": 20
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 23
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 24.6,
+"dmg": 103
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 155
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 155
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.1,
+"dmg": 7
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.9,
+"dmg": 18
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 24
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 23.7,
+"dmg": 87
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 6,
+"deaths": 4,
+"kill": 38.5,
+"dmg": 159
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 33.3,
+"dmg": 81
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.8,
+"dmg": 7
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.9,
+"dmg": 19
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 26
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 23.9,
+"dmg": 104
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 35.4,
+"dmg": 122
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.3,
+"dmg": 39
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.3,
+"dmg": 7
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 21
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.0,
+"dmg": 27
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 23.9,
+"dmg": 116
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 31.6,
+"dmg": 86
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.6,
+"dmg": 36
+}
+],
+"necro": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.5,
+"dmg": 11
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 24
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 36
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 86
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.3,
+"dmg": 14
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 31
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 46
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 125
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 6
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 13
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.4,
+"dmg": 24
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 1,
+"deaths": 9,
+"kill": 30.3,
+"dmg": 140
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 14.0,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.1,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.3,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 34.1,
+"dmg": 22
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.1,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.2,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 33.7,
+"dmg": 19
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 3,
+"deaths": 7,
+"kill": 85.3,
+"dmg": 235
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.0,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.2,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 33.4,
+"dmg": 19
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 4,
+"deaths": 6,
+"kill": 73.5,
+"dmg": 233
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 56.1,
+"dmg": 149
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.2,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.6,
+"dmg": 9
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 9,
+"deaths": 1,
+"kill": 64.4,
+"dmg": 249
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 42.4,
+"dmg": 98
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.2,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.2,
+"dmg": 10
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 9,
+"deaths": 1,
+"kill": 50.9,
+"dmg": 237
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 42.8,
+"dmg": 80
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.2,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.4,
+"dmg": 11
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 44.3,
+"dmg": 208
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 38.5,
+"dmg": 76
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.7,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.4,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.1,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.0,
+"dmg": 15
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 37.8,
+"dmg": 186
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 27.2,
+"dmg": 54
+}
+],
+"cleric": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.1,
+"dmg": 14
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.8,
+"dmg": 40
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.2,
+"dmg": 42
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 1,
+"deaths": 9,
+"kill": 30.5,
+"dmg": 88
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 22
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.5,
+"dmg": 57
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.4,
+"dmg": 48
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 8,
+"deaths": 2,
+"kill": 27.3,
+"dmg": 136
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 25
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.5,
+"dmg": 61
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.3,
+"dmg": 52
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.3,
+"dmg": 161
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.2,
+"dmg": 26
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.6,
+"dmg": 69
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 52
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 25.0,
+"dmg": 166
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 31
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.6,
+"dmg": 81
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.2,
+"dmg": 65
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.0,
+"dmg": 173
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 231
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 36
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.0,
+"dmg": 84
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.2,
+"dmg": 72
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.0,
+"dmg": 193
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 350
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 294
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 41
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.6,
+"dmg": 97
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 80
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 29.8,
+"dmg": 173
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 52.4,
+"dmg": 391
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 1,
+"deaths": 9,
+"kill": 77.2,
+"dmg": 218
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 45
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.7,
+"dmg": 98
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.3,
+"dmg": 88
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.4,
+"dmg": 211
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 53.3,
+"dmg": 332
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 9,
+"deaths": 1,
+"kill": 64.8,
+"dmg": 419
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 50
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.3,
+"dmg": 112
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 43
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.2,
+"dmg": 192
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 41.1,
+"dmg": 222
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 9,
+"deaths": 1,
+"kill": 59.8,
+"dmg": 358
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 53
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.1,
+"dmg": 118
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.9,
+"dmg": 84
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.4,
+"dmg": 254
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 46.2,
+"dmg": 149
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 51.6,
+"dmg": 292
+}
+],
+"enchanter": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 10.8,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.1,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.6,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 11.2,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.4,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.7,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.2,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.4,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.7,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.5,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.0,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.8,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.5,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.4,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 93.0,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.8,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.4,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.7,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 2,
+"deaths": 8,
+"kill": 73.7,
+"dmg": 87
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 87.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.4,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.1,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 82.3,
+"dmg": 44
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 93.1,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.4,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.4,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 90.6,
+"dmg": 42
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 95.4,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.8,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 94.4,
+"dmg": 23
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 96.9,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.1,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.5,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.4,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 92.9,
+"dmg": 19
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 85.8,
+"dmg": 0
+}
+],
+"paladin": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.6,
+"dmg": 11
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.9,
+"dmg": 30
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.1,
+"dmg": 35
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 69
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 13
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 21.7,
+"dmg": 32
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.6,
+"dmg": 38
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 88
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 17
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 21.4,
+"dmg": 40
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.6,
+"dmg": 42
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 104
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 20
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 22.0,
+"dmg": 47
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 37
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 32.0,
+"dmg": 144
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.8,
+"dmg": 24
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 22.5,
+"dmg": 59
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 42
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.8,
+"dmg": 168
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 250
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 29
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.4,
+"dmg": 70
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 49
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.7,
+"dmg": 174
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 300
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 306
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 32
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.6,
+"dmg": 77
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 51
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 25.1,
+"dmg": 190
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 310
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 8,
+"deaths": 2,
+"kill": 66.8,
+"dmg": 412
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 12.8,
+"dmg": 32
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.6,
+"dmg": 85
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.4,
+"dmg": 50
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 20.0,
+"dmg": 152
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 34.5,
+"dmg": 310
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 42.8,
+"dmg": 246
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 31
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.2,
+"dmg": 81
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.4,
+"dmg": 54
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 19.4,
+"dmg": 159
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 32.5,
+"dmg": 267
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 43.6,
+"dmg": 191
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 32
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 25.8,
+"dmg": 92
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.2,
+"dmg": 54
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 19.0,
+"dmg": 165
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 26.5,
+"dmg": 161
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 38.2,
+"dmg": 174
+}
+],
+"shadowknight": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.6,
+"dmg": 11
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 20.8,
+"dmg": 31
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.4,
+"dmg": 36
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 75
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.9,
+"dmg": 13
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.6,
+"dmg": 25
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 36
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 1,
+"deaths": 9,
+"kill": 26.2,
+"dmg": 97
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.9,
+"dmg": 15
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.7,
+"dmg": 31
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 43
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 1,
+"deaths": 9,
+"kill": 26.2,
+"dmg": 114
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.3,
+"dmg": 12
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.4,
+"dmg": 20
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 134
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.5,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.1,
+"dmg": 14
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.4,
+"dmg": 23
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 2,
+"deaths": 8,
+"kill": 31.0,
+"dmg": 163
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 163
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.6,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 23.7,
+"dmg": 16
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.6,
+"dmg": 25
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 34.2,
+"dmg": 189
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 210
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 5,
+"deaths": 5,
+"kill": 66.2,
+"dmg": 251
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.5,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.3,
+"dmg": 20
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 18.6,
+"dmg": 27
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.4,
+"dmg": 214
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 264
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 56.7,
+"dmg": 205
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.5,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 24.6,
+"dmg": 21
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 33
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.9,
+"dmg": 226
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 9,
+"deaths": 1,
+"kill": 57.2,
+"dmg": 286
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 44.4,
+"dmg": 133
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.5,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 21.8,
+"dmg": 5
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.4,
+"dmg": 33
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 34.1,
+"dmg": 256
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 50.7,
+"dmg": 291
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 39.3,
+"dmg": 99
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 19.3,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 22.3,
+"dmg": 6
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 17.9,
+"dmg": 34
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 34.3,
+"dmg": 275
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 48.3,
+"dmg": 268
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 36.4,
+"dmg": 90
+}
+],
+"wizard": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.1,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 43.3,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.8,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.5,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.8,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.4,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.5,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.7,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.9,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.7,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.7,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.4,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 91.8,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.7,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.4,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 92
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 59.3,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.7,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.4,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 2,
+"deaths": 8,
+"kill": 62.4,
+"dmg": 98
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 53.7,
+"dmg": 1
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.5,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.4,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 6,
+"deaths": 4,
+"kill": 60.9,
+"dmg": 92
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 45.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.4,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 8,
+"deaths": 0,
+"kill": 53.4,
+"dmg": 75
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 43.4,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.7,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.2,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 26.2,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 45.5,
+"dmg": 62
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 38.8,
+"dmg": 0
+}
+],
+"magician": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 10.8,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.1,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 36.7,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.5,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.7,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.1,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.5,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.7,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 35.6,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 11.2,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 33.1,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 10.2,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.5,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 84
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.1,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 10.2,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 8,
+"deaths": 2,
+"kill": 73.0,
+"dmg": 71
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 2,
+"deaths": 8,
+"kill": 48.0,
+"dmg": 90
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 10.0,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.2,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 61.1,
+"dmg": 44
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 7,
+"deaths": 3,
+"kill": 45.1,
+"dmg": 66
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 10.2,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 29.5,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 53.4,
+"dmg": 44
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 40.8,
+"dmg": 25
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 9.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 29.0,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 47.7,
+"dmg": 45
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 37.0,
+"dmg": 12
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 7.4,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 12.3,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 9.9,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 28.8,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 44.8,
+"dmg": 44
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 27.9,
+"dmg": 10
+}
+],
+"ranger": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.9,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 0
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 27.5,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.8,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.1,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.1,
+"dmg": 0
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 53.1,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.8,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 47.1,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.5,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 44.9,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.7,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.7,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 39.3,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 100.1,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.2,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 38.9,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 2,
+"deaths": 8,
+"kill": 82.9,
+"dmg": 186
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 90.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 19.2,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 41.1,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 1,
+"deaths": 9,
+"kill": 71.6,
+"dmg": 196
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 83.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.7,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 40.9,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 9,
+"deaths": 1,
+"kill": 69.2,
+"dmg": 122
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 80.9,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 40.8,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 62.0,
+"dmg": 90
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 57.2,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.5,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.7,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 39.8,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 49.4,
+"dmg": 79
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 66.6,
+"dmg": 0
+}
+],
+"monk": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 10.1,
+"dmg": 12
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.8,
+"dmg": 30
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.5,
+"dmg": 38
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 89
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.2,
+"dmg": 16
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.9,
+"dmg": 39
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 50
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 109
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.0,
+"dmg": 21
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.0,
+"dmg": 49
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.3,
+"dmg": 62
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 4,
+"deaths": 2,
+"kill": 32.0,
+"dmg": 126
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.8,
+"dmg": 18
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.1,
+"dmg": 50
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.0,
+"dmg": 55
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 2,
+"deaths": 1,
+"kill": 38.4,
+"dmg": 144
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 21
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.5,
+"dmg": 54
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.0,
+"dmg": 64
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 8,
+"deaths": 1,
+"kill": 34.2,
+"dmg": 162
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 174
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.4,
+"dmg": 24
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.5,
+"dmg": 61
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.3,
+"dmg": 73
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 0,
+"kill": 35.4,
+"dmg": 174
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 7,
+"kill": 0,
+"dmg": 190
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 205
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 8.3,
+"dmg": 28
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.0,
+"dmg": 64
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.0,
+"dmg": 65
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 0,
+"kill": 35.8,
+"dmg": 194
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 215
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 52.7,
+"dmg": 184
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 6.9,
+"dmg": 12
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.6,
+"dmg": 62
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 70
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.1,
+"dmg": 176
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 51.7,
+"dmg": 207
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 43.5,
+"dmg": 121
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 6.9,
+"dmg": 13
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.5,
+"dmg": 68
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.5,
+"dmg": 77
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.1,
+"dmg": 191
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 45.7,
+"dmg": 160
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 38.6,
+"dmg": 98
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 6.9,
+"dmg": 14
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.6,
+"dmg": 64
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.6,
+"dmg": 66
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 32.9,
+"dmg": 198
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 44.3,
+"dmg": 160
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 37.3,
+"dmg": 80
+}
+],
+"shaman": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 10.1,
+"dmg": 14
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 13.8,
+"dmg": 24
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 36
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 70
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.3,
+"dmg": 14
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 14.7,
+"dmg": 25
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.4,
+"dmg": 36
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 90
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.6,
+"dmg": 18
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.3,
+"dmg": 33
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 15.2,
+"dmg": 47
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 104
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 16.7,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.9,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 22.0,
+"dmg": 0
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 31.3,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 16.1,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 20.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.6,
+"dmg": 0
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 75.3,
+"dmg": 3
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 20.5,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.4,
+"dmg": 0
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 4,
+"deaths": 6,
+"kill": 82.8,
+"dmg": 177
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 59.6,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 20.8,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 30.8,
+"dmg": 0
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 7,
+"deaths": 3,
+"kill": 65.5,
+"dmg": 156
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 57.3,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 20.2,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 28.8,
+"dmg": 0
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 54.6,
+"dmg": 104
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 44.0,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.1,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 28.6,
+"dmg": 0
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 55.4,
+"dmg": 127
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 43.1,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 15.8,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 15.7,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 19.1,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 28.4,
+"dmg": 0
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 47.3,
+"dmg": 91
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 42.0,
+"dmg": 0
+}
+],
+"bard": [
+{
+"lvl": 1,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 11.1,
+"dmg": 11
+},
+{
+"lvl": 1,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 20.0,
+"dmg": 33
+},
+{
+"lvl": 1,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 16.3,
+"dmg": 41
+},
+{
+"lvl": 1,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 70
+},
+{
+"lvl": 2,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.8,
+"dmg": 15
+},
+{
+"lvl": 2,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 18.0,
+"dmg": 39
+},
+{
+"lvl": 2,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.0,
+"dmg": 44
+},
+{
+"lvl": 2,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 87
+},
+{
+"lvl": 3,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.8,
+"dmg": 19
+},
+{
+"lvl": 3,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.4,
+"dmg": 43
+},
+{
+"lvl": 3,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 14.2,
+"dmg": 56
+},
+{
+"lvl": 3,
+"fight": "Two skeletons",
+"wins": 0,
+"deaths": 10,
+"kill": 0,
+"dmg": 102
+},
+{
+"lvl": 4,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.5,
+"dmg": 24
+},
+{
+"lvl": 4,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.3,
+"dmg": 54
+},
+{
+"lvl": 4,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 58
+},
+{
+"lvl": 4,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 27.8,
+"dmg": 129
+},
+{
+"lvl": 5,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.8,
+"dmg": 27
+},
+{
+"lvl": 5,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 17.0,
+"dmg": 58
+},
+{
+"lvl": 5,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 12.9,
+"dmg": 63
+},
+{
+"lvl": 5,
+"fight": "Two skeletons",
+"wins": 8,
+"deaths": 2,
+"kill": 28.5,
+"dmg": 153
+},
+{
+"lvl": 5,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 117.3,
+"dmg": 7
+},
+{
+"lvl": 6,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 25
+},
+{
+"lvl": 6,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.6,
+"dmg": 54
+},
+{
+"lvl": 6,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.7,
+"dmg": 61
+},
+{
+"lvl": 6,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 36.5,
+"dmg": 170
+},
+{
+"lvl": 6,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 338.4,
+"dmg": 39
+},
+{
+"lvl": 6,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 101.7,
+"dmg": 18
+},
+{
+"lvl": 7,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.5,
+"dmg": 28
+},
+{
+"lvl": 7,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.6,
+"dmg": 62
+},
+{
+"lvl": 7,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 67
+},
+{
+"lvl": 7,
+"fight": "Two skeletons",
+"wins": 9,
+"deaths": 1,
+"kill": 37.0,
+"dmg": 182
+},
+{
+"lvl": 7,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 283.6,
+"dmg": 40
+},
+{
+"lvl": 7,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 80.6,
+"dmg": 4
+},
+{
+"lvl": 8,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 32
+},
+{
+"lvl": 8,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.5,
+"dmg": 65
+},
+{
+"lvl": 8,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 81
+},
+{
+"lvl": 8,
+"fight": "Two skeletons",
+"wins": 8,
+"deaths": 2,
+"kill": 39.6,
+"dmg": 233
+},
+{
+"lvl": 8,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 252.7,
+"dmg": 43
+},
+{
+"lvl": 8,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 79.0,
+"dmg": 12
+},
+{
+"lvl": 9,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.6,
+"dmg": 35
+},
+{
+"lvl": 9,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.3,
+"dmg": 70
+},
+{
+"lvl": 9,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.4,
+"dmg": 84
+},
+{
+"lvl": 9,
+"fight": "Two skeletons",
+"wins": 8,
+"deaths": 2,
+"kill": 35.5,
+"dmg": 253
+},
+{
+"lvl": 9,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 225.9,
+"dmg": 40
+},
+{
+"lvl": 9,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 66.6,
+"dmg": 7
+},
+{
+"lvl": 10,
+"fight": "Rat",
+"wins": 10,
+"deaths": 0,
+"kill": 9.5,
+"dmg": 38
+},
+{
+"lvl": 10,
+"fight": "Beetle (armored)",
+"wins": 10,
+"deaths": 0,
+"kill": 16.9,
+"dmg": 85
+},
+{
+"lvl": 10,
+"fight": "Skeleton",
+"wins": 10,
+"deaths": 0,
+"kill": 13.6,
+"dmg": 88
+},
+{
+"lvl": 10,
+"fight": "Two skeletons",
+"wins": 10,
+"deaths": 0,
+"kill": 39.6,
+"dmg": 274
+},
+{
+"lvl": 10,
+"fight": "Boss 1 (lvl 7)",
+"wins": 10,
+"deaths": 0,
+"kill": 201.8,
+"dmg": 38
+},
+{
+"lvl": 10,
+"fight": "Old Gnawbone (lvl 6)",
+"wins": 10,
+"deaths": 0,
+"kill": 59.6,
+"dmg": 4
+}
+]
+}
