@@ -20,8 +20,18 @@ const inv=(function(){
     if(v&&v.v===1){v.bags.forEach((b,i)=>{if(i<BAG_SIZE&&b&&ITEMS[b.id])d.bags[i]=b});Object.keys(v.equip||{}).forEach(k=>{if(ITEMS[v.equip[k]])d.equip[k]=v.equip[k]});d.copper=v.copper|0}}catch(e){}
   return d;
 })();
-const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper});
-const stat=k=>Object.values(inv.equip).reduce((t,id)=>t+(ITEMS[id][k]||0),0);
+// Gear wear (v0.97): inv.wear[slot] = how worn the item in that slot is, 0 (fine) to 100 (broken: no stats). A bag item carries its
+// own wear as b.w, so taking something off and putting it back on can't reset it. Older saves have none: everything starts fine.
+inv.wear=(function(){try{const v=store.get(KEY('inv'),null);return v&&v.wear?v.wear:{}}catch(e){return {}}})();
+const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper,wear:inv.wear});
+const broken=sl=>(inv.wear[sl]||0)>=100;
+const stat=k=>Object.keys(inv.equip).reduce((t,sl)=>t+(broken(sl)?0:ITEMS[inv.equip[sl]][k]||0),0);
+// Repair price: the share of an item's value that's worn off, for every worn item. At least 1 copper if anything is worn.
+const repairCost=()=>{let c=0,any=false;Object.keys(inv.equip).forEach(sl=>{const w=inv.wear[sl]||0;if(w>0){any=true;c+=ITEMS[inv.equip[sl]].value*w/100}});return any?Math.max(1,Math.ceil(c)):0};
+// Loot memory (v0.97): which named you've killed at least once (first kill pays blue or better) and how many kills of each
+// have gone by without its pink (bad-luck protection). Saved per character.
+const lootMem=(function(){const d={first:{},dry:{}};try{const v=store.get(KEY('loot'),null);if(v){d.first=v.first||{};d.dry=v.dry||{}}}catch(e){}return d})();
+const saveLoot=()=>store.set(KEY('loot'),lootMem);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
 const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
 // STA: +3 HP per point. WIS: +3 mana per point.

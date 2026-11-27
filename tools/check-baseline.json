@@ -165,7 +165,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 94.3,
+"kill": 95.7,
 "dmg": 0
 },
 {
@@ -213,8 +213,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 69.7,
-"dmg": 6
+"kill": 70.4,
+"dmg": 10
 },
 {
 "lvl": 7,
@@ -245,7 +245,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 31.7,
+"kill": 31.4,
 "dmg": 0
 },
 {
@@ -261,7 +261,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 57.3,
+"kill": 57.0,
 "dmg": 0
 },
 {
@@ -293,24 +293,24 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.3,
+"kill": 32.0,
 "dmg": 0
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
-"wins": 8,
-"deaths": 2,
-"kill": 52.1,
-"dmg": 99
+"wins": 9,
+"deaths": 1,
+"kill": 52.6,
+"dmg": 97
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 48.6,
-"dmg": 2
+"kill": 49.0,
+"dmg": 0
 },
 {
 "lvl": 9,
@@ -357,7 +357,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.6,
+"kill": 37.8,
 "dmg": 0
 },
 {
@@ -439,7 +439,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 31.1,
+"kill": 31.3,
 "dmg": 67
 },
 {
@@ -503,8 +503,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 38.2,
-"dmg": 109
+"kill": 38.4,
+"dmg": 110
 },
 {
 "lvl": 4,
@@ -576,7 +576,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 168
+"dmg": 173
 },
 {
 "lvl": 6,
@@ -607,8 +607,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 40.5,
-"dmg": 154
+"kill": 40.6,
+"dmg": 156
 },
 {
 "lvl": 6,
@@ -623,7 +623,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 9,
 "deaths": 1,
-"kill": 71.8,
+"kill": 72.1,
 "dmg": 174
 },
 {
@@ -655,7 +655,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 40.5,
+"kill": 40.6,
 "dmg": 165
 },
 {
@@ -671,7 +671,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 61.7,
+"kill": 61.9,
 "dmg": 151
 },
 {
@@ -704,23 +704,23 @@
 "wins": 10,
 "deaths": 0,
 "kill": 38.7,
-"dmg": 181
+"dmg": 182
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
-"wins": 7,
-"deaths": 3,
-"kill": 58.6,
-"dmg": 214
+"wins": 9,
+"deaths": 1,
+"kill": 59.6,
+"dmg": 218
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.5,
-"dmg": 110
+"kill": 43.7,
+"dmg": 109
 },
 {
 "lvl": 9,
@@ -751,15 +751,15 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 39.4,
-"dmg": 186
+"kill": 39.2,
+"dmg": 189
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 55.8,
+"kill": 55.5,
 "dmg": 180
 },
 {
@@ -799,15 +799,15 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 39.3,
-"dmg": 201
+"kill": 39.1,
+"dmg": 204
 },
 {
 "lvl": 10,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 49.5,
+"kill": 51.6,
 "dmg": 151
 },
 {
@@ -815,8 +815,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.9,
-"dmg": 71
+"kill": 38.0,
+"dmg": 73
 }
 ],
 "rogue": [
@@ -847,10 +847,10 @@
 {
 "lvl": 1,
 "fight": "Two skeletons",
-"wins": 6,
-"deaths": 4,
+"wins": 7,
+"deaths": 3,
 "kill": 25.6,
-"dmg": 58
+"dmg": 57
 },
 {
 "lvl": 2,
@@ -881,8 +881,8 @@
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 1,
-"kill": 24.5,
-"dmg": 63
+"kill": 24.7,
+"dmg": 64
 },
 {
 "lvl": 3,
@@ -946,7 +946,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 23.7,
-"dmg": 83
+"dmg": 84
 },
 {
 "lvl": 5,
@@ -1033,7 +1033,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 1,
 "deaths": 9,
-"kill": 35.8,
+"kill": 34.3,
 "dmg": 136
 },
 {
@@ -1065,8 +1065,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 24.6,
-"dmg": 103
+"kill": 24.5,
+"dmg": 100
 },
 {
 "lvl": 7,
@@ -1113,16 +1113,16 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 23.7,
-"dmg": 87
+"kill": 23.9,
+"dmg": 84
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
-"wins": 6,
-"deaths": 4,
-"kill": 38.5,
-"dmg": 159
+"wins": 5,
+"deaths": 5,
+"kill": 37.6,
+"dmg": 162
 },
 {
 "lvl": 8,
@@ -1130,7 +1130,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 33.3,
-"dmg": 81
+"dmg": 84
 },
 {
 "lvl": 9,
@@ -1162,15 +1162,15 @@
 "wins": 10,
 "deaths": 0,
 "kill": 23.9,
-"dmg": 104
+"dmg": 106
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 35.4,
-"dmg": 122
+"kill": 36.3,
+"dmg": 119
 },
 {
 "lvl": 9,
@@ -1178,7 +1178,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 25.3,
-"dmg": 39
+"dmg": 40
 },
 {
 "lvl": 10,
@@ -1210,7 +1210,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 23.9,
-"dmg": 116
+"dmg": 118
 },
 {
 "lvl": 10,
@@ -1218,15 +1218,15 @@
 "wins": 10,
 "deaths": 0,
 "kill": 31.6,
-"dmg": 86
+"dmg": 89
 },
 {
 "lvl": 10,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 24.6,
-"dmg": 36
+"kill": 24.4,
+"dmg": 37
 }
 ],
 "necro": [
@@ -1260,7 +1260,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 86
+"dmg": 85
 },
 {
 "lvl": 2,
@@ -1292,7 +1292,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 125
+"dmg": 124
 },
 {
 "lvl": 3,
@@ -1323,7 +1323,7 @@
 "fight": "Two skeletons",
 "wins": 1,
 "deaths": 9,
-"kill": 30.3,
+"kill": 27.9,
 "dmg": 140
 },
 {
@@ -1393,10 +1393,10 @@
 {
 "lvl": 5,
 "fight": "Old Gnawbone (lvl 6)",
-"wins": 3,
-"deaths": 7,
-"kill": 85.3,
-"dmg": 235
+"wins": 4,
+"deaths": 6,
+"kill": 77.3,
+"dmg": 217
 },
 {
 "lvl": 6,
@@ -1433,17 +1433,17 @@
 {
 "lvl": 6,
 "fight": "Boss 1 (lvl 7)",
-"wins": 4,
-"deaths": 6,
-"kill": 73.5,
-"dmg": 233
+"wins": 3,
+"deaths": 7,
+"kill": 74.4,
+"dmg": 241
 },
 {
 "lvl": 6,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 56.1,
+"kill": 56.0,
 "dmg": 149
 },
 {
@@ -1451,7 +1451,7 @@
 "fight": "Rat",
 "wins": 10,
 "deaths": 0,
-"kill": 13.2,
+"kill": 13.1,
 "dmg": 0
 },
 {
@@ -1475,7 +1475,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.6,
+"kill": 32.7,
 "dmg": 9
 },
 {
@@ -1483,7 +1483,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 9,
 "deaths": 1,
-"kill": 64.4,
+"kill": 64.6,
 "dmg": 249
 },
 {
@@ -1491,8 +1491,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 42.4,
-"dmg": 98
+"kill": 42.1,
+"dmg": 94
 },
 {
 "lvl": 8,
@@ -1531,8 +1531,8 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 9,
 "deaths": 1,
-"kill": 50.9,
-"dmg": 237
+"kill": 51.1,
+"dmg": 238
 },
 {
 "lvl": 8,
@@ -1540,7 +1540,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 42.8,
-"dmg": 80
+"dmg": 81
 },
 {
 "lvl": 9,
@@ -1579,16 +1579,16 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 44.3,
-"dmg": 208
+"kill": 44.1,
+"dmg": 209
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 38.5,
-"dmg": 76
+"kill": 38.6,
+"dmg": 77
 },
 {
 "lvl": 10,
@@ -1619,7 +1619,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.0,
+"kill": 31.9,
 "dmg": 15
 },
 {
@@ -1635,8 +1635,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 27.2,
-"dmg": 54
+"kill": 28.2,
+"dmg": 55
 }
 ],
 "cleric": [
@@ -1733,7 +1733,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 26.3,
+"kill": 26.2,
 "dmg": 161
 },
 {
@@ -1765,7 +1765,7 @@
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 1,
-"kill": 25.0,
+"kill": 24.9,
 "dmg": 166
 },
 {
@@ -1885,15 +1885,15 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 29.8,
-"dmg": 173
+"kill": 29.5,
+"dmg": 170
 },
 {
 "lvl": 7,
 "fight": "Boss 1 (lvl 7)",
-"wins": 10,
-"deaths": 0,
-"kill": 52.4,
+"wins": 9,
+"deaths": 1,
+"kill": 51.9,
 "dmg": 391
 },
 {
@@ -1901,8 +1901,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 1,
 "deaths": 9,
-"kill": 77.2,
-"dmg": 218
+"kill": 75.7,
+"dmg": 215
 },
 {
 "lvl": 8,
@@ -1941,7 +1941,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 53.3,
+"kill": 53.2,
 "dmg": 332
 },
 {
@@ -1949,8 +1949,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 9,
 "deaths": 1,
-"kill": 64.8,
-"dmg": 419
+"kill": 65.3,
+"dmg": 423
 },
 {
 "lvl": 9,
@@ -1989,16 +1989,16 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 41.1,
-"dmg": 222
+"kill": 41.2,
+"dmg": 226
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
-"wins": 9,
-"deaths": 1,
-"kill": 59.8,
-"dmg": 358
+"wins": 10,
+"deaths": 0,
+"kill": 61.8,
+"dmg": 376
 },
 {
 "lvl": 10,
@@ -2037,16 +2037,16 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 46.2,
-"dmg": 149
+"kill": 49.4,
+"dmg": 160
 },
 {
 "lvl": 10,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 51.6,
-"dmg": 292
+"kill": 51.2,
+"dmg": 294
 }
 ],
 "enchanter": [
@@ -2079,7 +2079,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 36.1,
+"kill": 35.9,
 "dmg": 0
 },
 {
@@ -2111,7 +2111,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 30.7,
+"kill": 30.5,
 "dmg": 0
 },
 {
@@ -2175,7 +2175,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 35.0,
+"kill": 34.6,
 "dmg": 0
 },
 {
@@ -2207,7 +2207,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 36.4,
+"kill": 36.1,
 "dmg": 0
 },
 {
@@ -2215,7 +2215,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 93.0,
+"kill": 91.6,
 "dmg": 0
 },
 {
@@ -2247,7 +2247,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 36.7,
+"kill": 36.5,
 "dmg": 0
 },
 {
@@ -2255,7 +2255,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 2,
 "deaths": 8,
-"kill": 73.7,
+"kill": 74.2,
 "dmg": 87
 },
 {
@@ -2263,7 +2263,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 87.9,
+"kill": 82.8,
 "dmg": 0
 },
 {
@@ -2303,7 +2303,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 82.3,
+"kill": 84.2,
 "dmg": 44
 },
 {
@@ -2311,7 +2311,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 93.1,
+"kill": 93.6,
 "dmg": 0
 },
 {
@@ -2351,7 +2351,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 90.6,
+"kill": 90.3,
 "dmg": 42
 },
 {
@@ -2359,7 +2359,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 95.4,
+"kill": 93.5,
 "dmg": 0
 },
 {
@@ -2399,7 +2399,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 94.4,
+"kill": 95.3,
 "dmg": 23
 },
 {
@@ -2407,7 +2407,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 96.9,
+"kill": 95.4,
 "dmg": 0
 },
 {
@@ -2439,7 +2439,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 36.4,
+"kill": 36.1,
 "dmg": 0
 },
 {
@@ -2447,7 +2447,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 92.9,
+"kill": 90.6,
 "dmg": 19
 },
 {
@@ -2583,10 +2583,10 @@
 {
 "lvl": 4,
 "fight": "Two skeletons",
-"wins": 9,
-"deaths": 1,
-"kill": 32.0,
-"dmg": 144
+"wins": 7,
+"deaths": 3,
+"kill": 32.5,
+"dmg": 142
 },
 {
 "lvl": 5,
@@ -2617,8 +2617,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 30.8,
-"dmg": 168
+"kill": 30.6,
+"dmg": 169
 },
 {
 "lvl": 5,
@@ -2657,8 +2657,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 26.7,
-"dmg": 174
+"kill": 27.0,
+"dmg": 176
 },
 {
 "lvl": 6,
@@ -2674,7 +2674,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 306
+"dmg": 301
 },
 {
 "lvl": 7,
@@ -2705,8 +2705,8 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 25.1,
-"dmg": 190
+"kill": 25.4,
+"dmg": 191
 },
 {
 "lvl": 7,
@@ -2721,8 +2721,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 8,
 "deaths": 2,
-"kill": 66.8,
-"dmg": 412
+"kill": 68.0,
+"dmg": 413
 },
 {
 "lvl": 8,
@@ -2753,24 +2753,24 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 20.0,
-"dmg": 152
+"kill": 20.2,
+"dmg": 153
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 34.5,
-"dmg": 310
+"kill": 34.7,
+"dmg": 312
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 42.8,
-"dmg": 246
+"kill": 42.5,
+"dmg": 243
 },
 {
 "lvl": 9,
@@ -2802,23 +2802,23 @@
 "wins": 10,
 "deaths": 0,
 "kill": 19.4,
-"dmg": 159
+"dmg": 157
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 32.5,
-"dmg": 267
+"kill": 32.0,
+"dmg": 262
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.6,
-"dmg": 191
+"kill": 43.8,
+"dmg": 194
 },
 {
 "lvl": 10,
@@ -2849,23 +2849,23 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 19.0,
-"dmg": 165
+"kill": 18.8,
+"dmg": 162
 },
 {
 "lvl": 10,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 26.5,
-"dmg": 161
+"kill": 26.8,
+"dmg": 164
 },
 {
 "lvl": 10,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 38.2,
+"kill": 37.9,
 "dmg": 174
 }
 ],
@@ -2932,7 +2932,7 @@
 "wins": 1,
 "deaths": 9,
 "kill": 26.2,
-"dmg": 97
+"dmg": 99
 },
 {
 "lvl": 3,
@@ -2964,7 +2964,7 @@
 "wins": 1,
 "deaths": 9,
 "kill": 26.2,
-"dmg": 114
+"dmg": 116
 },
 {
 "lvl": 4,
@@ -2993,10 +2993,10 @@
 {
 "lvl": 4,
 "fight": "Two skeletons",
-"wins": 0,
-"deaths": 10,
-"kill": 0,
-"dmg": 134
+"wins": 1,
+"deaths": 9,
+"kill": 31.2,
+"dmg": 133
 },
 {
 "lvl": 5,
@@ -3036,7 +3036,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 163
+"dmg": 162
 },
 {
 "lvl": 6,
@@ -3083,8 +3083,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 5,
 "deaths": 5,
-"kill": 66.2,
-"dmg": 251
+"kill": 66.5,
+"dmg": 252
 },
 {
 "lvl": 7,
@@ -3132,7 +3132,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 56.7,
-"dmg": 205
+"dmg": 204
 },
 {
 "lvl": 8,
@@ -3163,23 +3163,23 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.9,
-"dmg": 226
+"kill": 32.5,
+"dmg": 225
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
 "wins": 9,
 "deaths": 1,
-"kill": 57.2,
-"dmg": 286
+"kill": 57.4,
+"dmg": 288
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 44.4,
+"kill": 44.7,
 "dmg": 133
 },
 {
@@ -3212,23 +3212,23 @@
 "wins": 10,
 "deaths": 0,
 "kill": 34.1,
-"dmg": 256
+"dmg": 255
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 50.7,
-"dmg": 291
+"kill": 51.3,
+"dmg": 289
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 39.3,
-"dmg": 99
+"kill": 38.4,
+"dmg": 94
 },
 {
 "lvl": 10,
@@ -3260,14 +3260,14 @@
 "wins": 10,
 "deaths": 0,
 "kill": 34.3,
-"dmg": 275
+"dmg": 274
 },
 {
 "lvl": 10,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 48.3,
+"kill": 49.5,
 "dmg": 268
 },
 {
@@ -3275,8 +3275,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 36.4,
-"dmg": 90
+"kill": 35.1,
+"dmg": 85
 }
 ],
 "wizard": [
@@ -3341,7 +3341,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 35.5,
+"kill": 35.4,
 "dmg": 0
 },
 {
@@ -3373,7 +3373,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 35.4,
+"kill": 35.1,
 "dmg": 0
 },
 {
@@ -3405,7 +3405,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 31.9,
+"kill": 31.7,
 "dmg": 0
 },
 {
@@ -3445,7 +3445,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 91.8,
+"kill": 92.6,
 "dmg": 0
 },
 {
@@ -3493,7 +3493,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 59.3,
+"kill": 59.7,
 "dmg": 0
 },
 {
@@ -3541,7 +3541,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 53.7,
+"kill": 55.5,
 "dmg": 1
 },
 {
@@ -3581,7 +3581,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 6,
 "deaths": 4,
-"kill": 60.9,
+"kill": 60.6,
 "dmg": 92
 },
 {
@@ -3629,7 +3629,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 8,
 "deaths": 0,
-"kill": 53.4,
+"kill": 53.7,
 "dmg": 75
 },
 {
@@ -3637,7 +3637,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.4,
+"kill": 43.2,
 "dmg": 0
 },
 {
@@ -3669,7 +3669,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 26.2,
+"kill": 26.4,
 "dmg": 0
 },
 {
@@ -3677,7 +3677,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 45.5,
+"kill": 45.3,
 "dmg": 62
 },
 {
@@ -3685,7 +3685,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 38.8,
+"kill": 39.0,
 "dmg": 0
 }
 ],
@@ -3719,7 +3719,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 36.7,
+"kill": 36.3,
 "dmg": 0
 },
 {
@@ -3887,24 +3887,24 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 30.9,
+"kill": 30.7,
 "dmg": 0
 },
 {
 "lvl": 6,
 "fight": "Boss 1 (lvl 7)",
-"wins": 8,
-"deaths": 2,
-"kill": 73.0,
-"dmg": 71
+"wins": 9,
+"deaths": 1,
+"kill": 72.8,
+"dmg": 68
 },
 {
 "lvl": 6,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 2,
 "deaths": 8,
-"kill": 48.0,
-"dmg": 90
+"kill": 47.3,
+"dmg": 88
 },
 {
 "lvl": 7,
@@ -3935,7 +3935,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 30.2,
+"kill": 30.0,
 "dmg": 0
 },
 {
@@ -3943,16 +3943,16 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 61.1,
+"kill": 61.2,
 "dmg": 44
 },
 {
 "lvl": 7,
 "fight": "Old Gnawbone (lvl 6)",
-"wins": 7,
-"deaths": 3,
-"kill": 45.1,
-"dmg": 66
+"wins": 8,
+"deaths": 2,
+"kill": 44.8,
+"dmg": 61
 },
 {
 "lvl": 8,
@@ -3983,7 +3983,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 29.5,
+"kill": 29.6,
 "dmg": 0
 },
 {
@@ -3991,16 +3991,16 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 53.4,
-"dmg": 44
+"kill": 53.2,
+"dmg": 45
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 40.8,
-"dmg": 25
+"kill": 40.7,
+"dmg": 24
 },
 {
 "lvl": 9,
@@ -4039,7 +4039,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 47.7,
+"kill": 47.5,
 "dmg": 45
 },
 {
@@ -4047,8 +4047,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.0,
-"dmg": 12
+"kill": 37.1,
+"dmg": 14
 },
 {
 "lvl": 10,
@@ -4087,7 +4087,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 44.8,
+"kill": 44.6,
 "dmg": 44
 },
 {
@@ -4095,8 +4095,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 27.9,
-"dmg": 10
+"kill": 27.6,
+"dmg": 8
 }
 ],
 "ranger": [
@@ -4129,7 +4129,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 27.5,
+"kill": 28.4,
 "dmg": 0
 },
 {
@@ -4193,7 +4193,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 47.1,
+"kill": 47.0,
 "dmg": 0
 },
 {
@@ -4257,7 +4257,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 39.3,
+"kill": 38.9,
 "dmg": 0
 },
 {
@@ -4265,7 +4265,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 100.1,
+"kill": 100.5,
 "dmg": 0
 },
 {
@@ -4306,14 +4306,14 @@
 "wins": 2,
 "deaths": 8,
 "kill": 82.9,
-"dmg": 186
+"dmg": 187
 },
 {
 "lvl": 6,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 90.9,
+"kill": 91.5,
 "dmg": 0
 },
 {
@@ -4353,7 +4353,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 1,
 "deaths": 9,
-"kill": 71.6,
+"kill": 72.3,
 "dmg": 196
 },
 {
@@ -4361,7 +4361,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 83.9,
+"kill": 84.4,
 "dmg": 0
 },
 {
@@ -4401,7 +4401,7 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 9,
 "deaths": 1,
-"kill": 69.2,
+"kill": 69.0,
 "dmg": 122
 },
 {
@@ -4409,7 +4409,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 80.9,
+"kill": 80.5,
 "dmg": 0
 },
 {
@@ -4457,7 +4457,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 57.2,
+"kill": 56.2,
 "dmg": 0
 },
 {
@@ -4489,7 +4489,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 39.8,
+"kill": 39.6,
 "dmg": 0
 },
 {
@@ -4505,7 +4505,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 66.6,
+"kill": 66.3,
 "dmg": 0
 }
 ],
@@ -4601,10 +4601,10 @@
 {
 "lvl": 3,
 "fight": "Two skeletons",
-"wins": 4,
-"deaths": 2,
-"kill": 32.0,
-"dmg": 126
+"wins": 5,
+"deaths": 1,
+"kill": 32.1,
+"dmg": 125
 },
 {
 "lvl": 4,
@@ -4666,9 +4666,9 @@
 "lvl": 5,
 "fight": "Two skeletons",
 "wins": 8,
-"deaths": 1,
-"kill": 34.2,
-"dmg": 162
+"deaths": 2,
+"kill": 33.5,
+"dmg": 156
 },
 {
 "lvl": 5,
@@ -4705,10 +4705,10 @@
 {
 "lvl": 6,
 "fight": "Two skeletons",
-"wins": 9,
-"deaths": 0,
-"kill": 35.4,
-"dmg": 174
+"wins": 8,
+"deaths": 1,
+"kill": 35.2,
+"dmg": 172
 },
 {
 "lvl": 6,
@@ -4755,8 +4755,8 @@
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 0,
-"kill": 35.8,
-"dmg": 194
+"kill": 35.3,
+"dmg": 192
 },
 {
 "lvl": 7,
@@ -4771,8 +4771,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 52.7,
-"dmg": 184
+"kill": 52.3,
+"dmg": 185
 },
 {
 "lvl": 8,
@@ -4803,23 +4803,23 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.1,
-"dmg": 176
+"kill": 32.3,
+"dmg": 178
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 51.7,
-"dmg": 207
+"kill": 52.5,
+"dmg": 209
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.5,
+"kill": 43.3,
 "dmg": 121
 },
 {
@@ -4851,24 +4851,24 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.1,
-"dmg": 191
+"kill": 32.2,
+"dmg": 193
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 45.7,
-"dmg": 160
+"kill": 45.9,
+"dmg": 161
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 38.6,
-"dmg": 98
+"kill": 40.1,
+"dmg": 103
 },
 {
 "lvl": 10,
@@ -4899,24 +4899,24 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 32.9,
-"dmg": 198
+"kill": 33.0,
+"dmg": 197
 },
 {
 "lvl": 10,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 44.3,
-"dmg": 160
+"kill": 43.3,
+"dmg": 163
 },
 {
 "lvl": 10,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.3,
-"dmg": 80
+"kill": 37.9,
+"dmg": 79
 }
 ],
 "shaman": [
@@ -5085,7 +5085,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 75.3,
+"kill": 76.2,
 "dmg": 3
 },
 {
@@ -5117,7 +5117,7 @@
 "fight": "Two skeletons",
 "wins": 10,
 "deaths": 0,
-"kill": 30.4,
+"kill": 30.9,
 "dmg": 0
 },
 {
@@ -5133,7 +5133,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 59.6,
+"kill": 59.9,
 "dmg": 0
 },
 {
@@ -5181,7 +5181,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 57.3,
+"kill": 56.6,
 "dmg": 0
 },
 {
@@ -5221,15 +5221,15 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 54.6,
-"dmg": 104
+"kill": 55.1,
+"dmg": 105
 },
 {
 "lvl": 8,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 44.0,
+"kill": 44.4,
 "dmg": 0
 },
 {
@@ -5269,8 +5269,8 @@
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 55.4,
-"dmg": 127
+"kill": 55.6,
+"dmg": 126
 },
 {
 "lvl": 9,
@@ -5325,7 +5325,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 42.0,
+"kill": 41.8,
 "dmg": 0
 }
 ],
@@ -5455,8 +5455,8 @@
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 1,
-"kill": 27.8,
-"dmg": 129
+"kill": 28.0,
+"dmg": 127
 },
 {
 "lvl": 5,
@@ -5471,7 +5471,7 @@
 "fight": "Beetle (armored)",
 "wins": 10,
 "deaths": 0,
-"kill": 17.0,
+"kill": 16.9,
 "dmg": 58
 },
 {
@@ -5488,15 +5488,15 @@
 "wins": 8,
 "deaths": 2,
 "kill": 28.5,
-"dmg": 153
+"dmg": 152
 },
 {
 "lvl": 5,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 117.3,
-"dmg": 7
+"kill": 113.4,
+"dmg": 5
 },
 {
 "lvl": 6,
@@ -5527,24 +5527,24 @@
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 1,
-"kill": 36.5,
-"dmg": 170
+"kill": 36.4,
+"dmg": 168
 },
 {
 "lvl": 6,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 338.4,
-"dmg": 39
+"kill": 337.5,
+"dmg": 36
 },
 {
 "lvl": 6,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 101.7,
-"dmg": 18
+"kill": 101.4,
+"dmg": 16
 },
 {
 "lvl": 7,
@@ -5552,14 +5552,14 @@
 "wins": 10,
 "deaths": 0,
 "kill": 9.5,
-"dmg": 28
+"dmg": 29
 },
 {
 "lvl": 7,
 "fight": "Beetle (armored)",
 "wins": 10,
 "deaths": 0,
-"kill": 16.6,
+"kill": 16.5,
 "dmg": 62
 },
 {
@@ -5567,31 +5567,31 @@
 "fight": "Skeleton",
 "wins": 10,
 "deaths": 0,
-"kill": 13.6,
-"dmg": 67
+"kill": 13.4,
+"dmg": 69
 },
 {
 "lvl": 7,
 "fight": "Two skeletons",
 "wins": 9,
 "deaths": 1,
-"kill": 37.0,
-"dmg": 182
+"kill": 37.4,
+"dmg": 185
 },
 {
 "lvl": 7,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 283.6,
-"dmg": 40
+"kill": 280.1,
+"dmg": 36
 },
 {
 "lvl": 7,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 80.6,
+"kill": 80.9,
 "dmg": 4
 },
 {
@@ -5623,15 +5623,15 @@
 "fight": "Two skeletons",
 "wins": 8,
 "deaths": 2,
-"kill": 39.6,
-"dmg": 233
+"kill": 39.4,
+"dmg": 237
 },
 {
 "lvl": 8,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 252.7,
+"kill": 253.4,
 "dmg": 43
 },
 {
@@ -5640,7 +5640,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 79.0,
-"dmg": 12
+"dmg": 10
 },
 {
 "lvl": 9,
@@ -5669,42 +5669,42 @@
 {
 "lvl": 9,
 "fight": "Two skeletons",
-"wins": 8,
-"deaths": 2,
+"wins": 9,
+"deaths": 1,
 "kill": 35.5,
-"dmg": 253
+"dmg": 249
 },
 {
 "lvl": 9,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 225.9,
-"dmg": 40
+"kill": 226.3,
+"dmg": 42
 },
 {
 "lvl": 9,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 66.6,
-"dmg": 7
+"kill": 66.1,
+"dmg": 10
 },
 {
 "lvl": 10,
 "fight": "Rat",
 "wins": 10,
 "deaths": 0,
-"kill": 9.5,
-"dmg": 38
+"kill": 9.6,
+"dmg": 39
 },
 {
 "lvl": 10,
 "fight": "Beetle (armored)",
 "wins": 10,
 "deaths": 0,
-"kill": 16.9,
-"dmg": 85
+"kill": 16.5,
+"dmg": 82
 },
 {
 "lvl": 10,
@@ -5712,31 +5712,31 @@
 "wins": 10,
 "deaths": 0,
 "kill": 13.6,
-"dmg": 88
+"dmg": 92
 },
 {
 "lvl": 10,
 "fight": "Two skeletons",
-"wins": 10,
-"deaths": 0,
+"wins": 9,
+"deaths": 1,
 "kill": 39.6,
-"dmg": 274
+"dmg": 273
 },
 {
 "lvl": 10,
 "fight": "Boss 1 (lvl 7)",
 "wins": 10,
 "deaths": 0,
-"kill": 201.8,
-"dmg": 38
+"kill": 200.7,
+"dmg": 41
 },
 {
 "lvl": 10,
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 59.6,
-"dmg": 4
+"kill": 59.1,
+"dmg": 5
 }
 ]
 }

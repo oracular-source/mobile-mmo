@@ -170,6 +170,7 @@ function update(dt){
   for(let i=hands.length-1;i>=0;i--){hands[i].t+=dt;if(hands[i].t>hands[i].life)hands.splice(i,1)}
   for(let i=rings.length-1;i>=0;i--){rings[i].t+=dt;if(rings[i].t>rings[i].life)rings.splice(i,1)}
   for(let i=floats.length-1;i>=0;i--){floats[i].t+=dt;if(floats[i].t>(floats[i].life||1.1))floats.splice(i,1)}
+  for(let i=pillars.length-1;i>=0;i--){pillars[i].t+=dt;if(pillars[i].t>pillars[i].life)pillars.splice(i,1)}
   for(let i=parts.length-1;i>=0;i--){const p=parts[i];p.t+=dt;p.x+=p.vx*dt;p.y+=p.vy*dt;if(p.t>p.life)parts.splice(i,1)}
   for(let i=beams.length-1;i>=0;i--){beams[i].t+=dt;if(beams[i].t>0.15)beams.splice(i,1)}
 }

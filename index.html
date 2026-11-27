@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.96">
+<link rel="stylesheet" href="css/game.css?v=0.97">
 </head>
 <body>
 <div id="app">
@@ -43,8 +43,10 @@
     <div id="bcast"><div id="bcastname"></div><div class="bar"><i id="bcastfill"></i></div></div>
     <!-- Moments (v0.37, owner picked B): one small banner for level ups, good drops, first named kills, bags full and dungeon clears. Never blocks a tap. -->
     <div id="banner"><div id="bantitle"></div><div id="bansub"></div></div>
-    <!-- Death (v0.37): who killed you, the XP it cost, and you choose when to get up. The game keeps running behind it. -->
+    <!-- Death (v0.37): who killed you, what it cost (gear wear since v0.97), and you choose when to get up. The game keeps running behind it. -->
     <div id="deathUI"><div id="dtitle">You have died</div><div id="dkiller"></div><div id="dxp"></div><button id="drespawn">Respawn</button></div>
+    <!-- Pick one (v0.97, owner Nov 27): Brother Malrec's chest offers three items and you take one. See-through, never pauses; shows while you stand by the chest. -->
+    <div id="pickUI"><div id="pktitle">Brother Malrec's chest</div><div id="pksub">Take one</div><div id="plist"></div></div>
     <div id="log"></div>
     <div id="logpanel"><div id="logtabs"><button data-f="all">All</button><button data-f="fight">Fight</button><button data-f="loot">Loot</button><button id="logclose" aria-label="Close log">✕</button></div><div id="loglist"></div></div>
     <div id="controls"></div>
@@ -54,7 +56,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <div class="mhead"><h1>Ashfen Hollow</h1><button class="mx" id="introx" aria-label="Close" style="display:none">✕</button></div>
-        <p class="hint" style="margin:0 0 6px">Prototype v0.96 · pick a class</p>
+        <p class="hint" style="margin:0 0 6px">Prototype v0.97 · pick a class</p>
         <div id="clspick"></div>
         <div id="clsinfo"><div class="dfig"><canvas id="clscv" width="20" height="24"></canvas></div><div><b id="clsname"></b> <span id="clstag" class="hint"></span><div id="clsdesc" class="hint"></div></div></div>
         <button id="start" class="go">Play</button>
@@ -134,39 +136,39 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.96"></script>
-<script src="js/data/sprites.js?v=0.96"></script>
-<script src="js/rng.js?v=0.96"></script>
-<script src="js/save.js?v=0.96"></script>
-<script src="js/crash.js?v=0.96"></script>
-<script src="js/map.js?v=0.96"></script>
-<script src="js/data/classes.js?v=0.96"></script>
-<script src="js/data/icons.js?v=0.96"></script>
-<script src="js/data/mobs.js?v=0.96"></script>
-<script src="js/data/items.js?v=0.96"></script>
-<script src="js/data/tiles.js?v=0.96"></script>
-<script src="js/data/maps/graveyard.js?v=0.96"></script>
-<script src="js/data/maps/crypt.js?v=0.96"></script>
-<script src="js/data/maps/crossroads.js?v=0.96"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.96"></script>
-<script src="js/data/maps/wolfwood.js?v=0.96"></script>
-<script src="js/data/maps/chapel.js?v=0.96"></script>
-<script src="js/data/maps/dungeon1.js?v=0.96"></script>
-<script src="js/data/maps/dungeon1_f2.js?v=0.96"></script>
-<script src="js/state.js?v=0.96"></script>
-<script src="js/spawns.js?v=0.96"></script>
-<script src="js/fx.js?v=0.96"></script>
-<script src="js/path.js?v=0.96"></script>
-<script src="js/combat.js?v=0.96"></script>
-<script src="js/input.js?v=0.96"></script>
-<script src="js/ui.js?v=0.96"></script>
-<script src="js/world.js?v=0.96"></script>
-<script src="js/area.js?v=0.96"></script>
-<script src="js/update.js?v=0.96"></script>
-<script src="js/render.js?v=0.96"></script>
-<script src="js/sim.js?v=0.96"></script>
-<script src="js/dev.js?v=0.96"></script>
-<script src="js/minimap.js?v=0.96"></script>
-<script src="js/main.js?v=0.96"></script>
+<script src="js/core.js?v=0.97"></script>
+<script src="js/data/sprites.js?v=0.97"></script>
+<script src="js/rng.js?v=0.97"></script>
+<script src="js/save.js?v=0.97"></script>
+<script src="js/crash.js?v=0.97"></script>
+<script src="js/map.js?v=0.97"></script>
+<script src="js/data/classes.js?v=0.97"></script>
+<script src="js/data/icons.js?v=0.97"></script>
+<script src="js/data/mobs.js?v=0.97"></script>
+<script src="js/data/items.js?v=0.97"></script>
+<script src="js/data/tiles.js?v=0.97"></script>
+<script src="js/data/maps/graveyard.js?v=0.97"></script>
+<script src="js/data/maps/crypt.js?v=0.97"></script>
+<script src="js/data/maps/crossroads.js?v=0.97"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.97"></script>
+<script src="js/data/maps/wolfwood.js?v=0.97"></script>
+<script src="js/data/maps/chapel.js?v=0.97"></script>
+<script src="js/data/maps/dungeon1.js?v=0.97"></script>
+<script src="js/data/maps/dungeon1_f2.js?v=0.97"></script>
+<script src="js/state.js?v=0.97"></script>
+<script src="js/spawns.js?v=0.97"></script>
+<script src="js/fx.js?v=0.97"></script>
+<script src="js/path.js?v=0.97"></script>
+<script src="js/combat.js?v=0.97"></script>
+<script src="js/input.js?v=0.97"></script>
+<script src="js/ui.js?v=0.97"></script>
+<script src="js/world.js?v=0.97"></script>
+<script src="js/area.js?v=0.97"></script>
+<script src="js/update.js?v=0.97"></script>
+<script src="js/render.js?v=0.97"></script>
+<script src="js/sim.js?v=0.97"></script>
+<script src="js/dev.js?v=0.97"></script>
+<script src="js/minimap.js?v=0.97"></script>
+<script src="js/main.js?v=0.97"></script>
 </body>
 </html>

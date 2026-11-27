@@ -18,7 +18,7 @@ Take EverQuest's social danger and Dreadmyst's small, tight scope. Leave out the
 | --- | --- | --- |
 | Camps and pulls | EverQuest | Named camps with spawn timers; pull mobs back to a safe spot |
 | Classes need each other | EverQuest | Buffs, heals and crowd control make groups clearly faster |
-| Death has weight | EverQuest | Death costs XP and time, never your gear |
+| Death has weight | EverQuest | Death costs time and wears your gear (repair at a campfire for copper); no XP loss (owner, Nov 27: too hardcore for a phone game) |
 | Small, finished scope | Dreadmyst | Six launch classes and a few zones, polished before adding more |
 | Build customization | Dreadmyst | Ability forks, majors and loadouts as you level |
 | Short repeatable runs | Dreadmyst | Camps and dungeons that fit 15–30 minutes |
@@ -350,7 +350,7 @@ The level cap is 30 at launch and gets raised with each expansion; the game is p
 - **Power comes from level, not picks:** both sides of a fork are a little stronger than the base ability and about equal to each other; they differ by situation. Mobs are tuned assuming every player has their forks. Abilities still grow a little every level on their own. No "+5%" options. The sim checks each option; if one wins everywhere, it gets redesigned.
 - **Abilities:** EverQuest-style spellbook. **Every class has the same number of abilities at the same levels** (decided Nov 25): 8 by level 8, then new ones at 11, 17, 21 and 27 (12 by 30) and 31, 41 and 47 (15 by 50); one per class has no fork. Long cast-once buffs become always-on class traits (Clarity, Spirit Ward). Each class learns these, with similar abilities merged into fork options, but can only have 6–8 of them loaded at a time (6 slots at level 1, a 7th at 15, an 8th at 25). The loadout is the build: two players of the same class can play very differently.
 - **Swapping:** forks, majors and loadouts can be changed free in town, so experimenting costs nothing.
-- **Gear:** 8 slots (head, chest, legs, feet, hands, weapon, off-hand, ring), with drops from camps, named mobs and dungeon bosses, in rarity tiers (junk, common, uncommon, rare, named). Loot is personal and goes straight to your bags. Stats: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens incoming hits. No gear score gates.
+- **Gear:** 8 slots (head, chest, legs, feet, hands, weapon, off-hand, ring), with drops from camps, named mobs and dungeon bosses, in rarity tiers (junk, common/white, uncommon/green, rare/blue, named/pink). Loot is personal and goes straight to your bags. **Drops are sparse (v0.97, owner Nov 27):** normal mobs drop gear about 1 kill in 30, blues are a highlight, **pinks only from named and bosses** (about 1 kill in 4–5 on average, with bad-luck protection), the first kill of each named is always blue or better, and **Brother Malrec's chest offers three items: pick one**. **Wear:** each death wears every worn item 10%; at 100% it gives no stats until repaired at any campfire (until Town 1). Numbers in `LOOT` (`js/data/items.js`). Stats: STA +3 HP, WIS +3 mana, INT +2% spell damage and healing, AC softens incoming hits. No gear score gates.
 - **Alts:** an account-wide bank and cosmetic unlocks make leveling a second class feel good.
 
 **Spellbook rules**

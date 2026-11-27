@@ -356,6 +356,9 @@ function render(){
     lx.translate(-ox,-oy);lx.globalAlpha=1});
   if(A0)drawAreaCritters(A0,1); // perched crows, owl, bats, chimney smoke (v0.49)
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
+  // Loot pillars (v0.97): a soft column of light rising from a good drop, bright core, wider faint edge, fading out.
+  pillars.forEach(p=>{const f=Math.min(1,p.t*4)*Math.max(0,1-p.t/p.life),x=Math.round(p.x),y=Math.round(p.y),h=44+Math.round(6*Math.sin(p.t*3));
+    lx.globalAlpha=0.35*f;lx.fillStyle=p.col;lx.fillRect(x-3,y-h,7,h);lx.globalAlpha=0.9*f;lx.fillRect(x-1,y-h-4,3,h+4);lx.globalAlpha=1});
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
   lx.restore();
   // v0.71: def.glow = a named that carries its own cold light (the Drowned Prior's lantern; without it he melted into his
@@ -477,6 +480,7 @@ function ui(){
     const lh='Lv '+t.lv+(tr.length?' '+tr.join(' '):'');if($('tlv').dataset.h!==lh){$('tlv').dataset.h=lh;$('tlv').innerHTML=lh}}
   else tf.style.visibility='hidden';
   // Boss and named casts at you: big bar in the middle of the screen, whoever you're targeting (never in the target frame).
+  {const p=$('pickUI'),c=run.chest,on=c&&c.offer&&!c.taken&&c.open&&!player.dead&&dist(player,c)<40?'block':'none';if(p.style.display!==on)p.style.display=on}
   {const d=$('deathUI'),on=player.dead>0&&!simState.busy?'block':'none';if(d.style.display!==on)d.style.display=on} // the sim's arena deaths never show it
   const bc=$('bcast'),cm=mobs.find(m=>!m.dead&&m.casting&&(m.def.boss||m.def.named||m.def.rare));
   if(cm){bc.style.display='block';$('bcastname').textContent=cap(cm.def.name)+': '+cm.casting.name;$('bcastfill').style.width=Math.min(100,100*cm.casting.t/cm.casting.dur)+'%'}else bc.style.display='none';

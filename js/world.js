@@ -235,7 +235,8 @@ function tapSummon(wx,wy){const A=curArea();if(!A)return false;
 function checkPortals(){
   const inst=zoneId==='dun'||(curArea()&&curArea().instance);
   if(inst&&run.chest&&!run.chest.open&&dist(player,run.chest)<12){run.chest.open=true;burst(run.chest.x,run.chest.y-4,'#ffd27a',16,true);
-    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
+    const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));
+    if(run.chest.offer){renderChestPick();log('Three things lie in the chest. Take one.','#ffd27a')}else lootPillar(run.chest.x,run.chest.y,run.chest.items||[]);saveInv();}
   if(inst&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
   if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);checkLocks(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>exitTrigger(A,e,tx,ty)); // v0.94: doorways fire under your feet, not a tile early

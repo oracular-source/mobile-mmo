@@ -588,19 +588,19 @@ const simState={busy:false,last:null};
 // Keep the real character safe while a sim runs: no saving, no gear, no god mode, chat muted; simEnd puts it all back.
 function simBegin(){
   simState.busy=true; // the main loop skips its own updates while simState.busy
-  const keep={lvl:player.lvl,xp:player.xp,inv:JSON.stringify(inv),kills:JSON.stringify(kills),auto:settings.autoCast,god:dev.god,set:store.set};
+  const keep={lvl:player.lvl,xp:player.xp,inv:JSON.stringify(inv),loot:JSON.stringify(lootMem),kills:JSON.stringify(kills),auto:settings.autoCast,god:dev.god,set:store.set};
   store.set=function(){};logMute=true;settings.autoCast=false;dev.god=false;inv.equip={};
   return keep;
 }
 function simEnd(keep){
   finaleReset();
   seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;pet2=null;
-  const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;
+  const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;inv.wear=iv.wear||{};{const l=JSON.parse(keep.loot);lootMem.first=l.first;lootMem.dry=l.dry}
   Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));
   if(keep.forks){forkPick=keep.forks}
   enterZone('arena');player.lvl=keep.lvl;applyForks();player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);
   player.buffs={};player.cds={};player.dead=0;player.target=null;
-  floats.length=0;parts.length=0;beams.length=0;
+  floats.length=0;parts.length=0;beams.length=0;pillars.length=0;
   simState.busy=false;
 }
 // Runs every scenario for your class, one fight per tick so the phone stays responsive. Resolves with the results.

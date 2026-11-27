@@ -1,7 +1,7 @@
 // Floating numbers, sparks, the chat log, and small helpers (distance, con colours, movement).
 'use strict';
 /* ---------- Effects, text, log ---------- */
-const floats=[],parts=[],beams=[];
+const floats=[],parts=[],beams=[],pillars=[]; // pillars: loot light columns (v0.97)
 let rangeShow=0,rangeR=80;
 // Floating text, option A (owner, Nov 18; v0.33): spread out and hold. kind: 'hit' = your own hits (big, white);
 // 'small' = DoT ticks, pet and NPC hits; numbers otherwise medium. Words (Zz, MARKED, RESIST...) sit still over the head.

@@ -125,3 +125,15 @@ const KEY_CHANCE=0.1;
 // Deeper areas pay better. An opened chest fills again after CHEST_REFILL seconds.
 const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20},chapel:{unc:0.65,rare:0.15,cu:26},dungeon1:{unc:0.75,rare:0.25,cu:34}};
 const CHEST_REFILL=600;
+// Loot feel (v0.97, Items lane, owner Nov 27): fewer drops so each one counts. Normal mobs drop gear rarely (about 1 kill in 30),
+// blues are a highlight, pinks (named items) only come from named and bosses, about 1 in 10 kills, and creep up each kill without one.
+const LOOT={
+  mobCommon:0.022,mobCommonLv:0.0005, // white: ~2.5% a kill (a little more from higher mobs)
+  mobUnc:0.007,                       // green: ~0.7% a kill
+  mobRare:0.0015,mobRareLv:4,         // blue: ~1 in 700 kills, from level 4 mobs up
+  caveX:1.5,                          // rat tunnel and crypt pay a little better (they used to double)
+  rareMobBlue:0.3,                    // a rare mob drops one item: green, or blue this often
+  namedPink:0.10,pinkStep:0.05,       // a named's own pink: 10%, +5% for every kill of it without one (resets when one drops)
+  namedBlue:0.33,                     // when the pink doesn't drop: blue this often, else green. First kill of each named: blue or better
+  wearDeath:10                        // each death wears every worn item 10% (repair at any campfire); replaces the XP loss
+};

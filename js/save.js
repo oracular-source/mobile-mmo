@@ -18,11 +18,14 @@ const store={
    The whole save carries one number. When a future release changes how something is saved,
    bump SAVE_VERSION and add a step below that turns the old shape into the new one, so
    players keep their characters instead of losing them. Steps run in order, oldest first. */
-const SAVE_VERSION=1;
+const SAVE_VERSION=2;
 const SAVE_STEPS={
   // 0 → 1 (v0.14.1): saves from before version numbers. Shapes are unchanged; just clear out
   // any value that can't be read (half-written or corrupted) so it can't cause trouble later.
-  1(){store.keys().forEach(k=>{if(k==='ashfen-backup')return;const r=store.raw(k);if(r==null)return;try{JSON.parse(r)}catch(e){store.del(k)}})}
+  1(){store.keys().forEach(k=>{if(k==='ashfen-backup')return;const r=store.raw(k);if(r==null)return;try{JSON.parse(r)}catch(e){store.del(k)}})},
+  // 1 → 2 (v0.97): bags and gear gain optional wear (inv.wear, b.w) and a new per-character loot memory (first kills, pink dry
+  // counts). Both default to nothing, so old saves need no change: every item starts in perfect condition.
+  2(){}
 };
 (function upgradeSave(){
   const keys=store.keys();

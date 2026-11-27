@@ -193,9 +193,12 @@ function playerDie(m){
   finaleAbort(); // v0.79: die in the finale and it waits for you in the sanctum
   log('You have been slain by '+m.def.name+'!','#ff4d4d');
   resetLocks(); // v0.71: a locked, flooded room (the Drowned Prior's) drains back and opens for the next try
-  const loss=Math.min(player.xp,Math.floor(need(player.lvl)*0.1));player.xp-=loss;save();
+  // v0.97 (owner, Nov 27): no more XP loss on death (too hardcore for a phone game). Instead every worn item wears a little;
+  // repair at any campfire for copper. A broken item (100%) gives no stats until it's repaired.
+  const worn=Object.keys(inv.equip);worn.forEach(sl=>{inv.wear[sl]=Math.min(100,(inv.wear[sl]||0)+LOOT.wearDeath)});saveInv();save();
+  const brk=worn.filter(broken).length;
   // The death panel (v0.37) shows these; you stay down until you tap Respawn.
-  $('dkiller').textContent='Slain by '+m.def.name;$('dxp').textContent=loss>0?'−'+loss+' XP':'';
+  $('dkiller').textContent='Slain by '+m.def.name;$('dxp').textContent=worn.length?(brk?brk+' item'+(brk>1?'s':'')+' broken · repair at a campfire':'Your gear is worn (−'+LOOT.wearDeath+'%)'):'';
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
   mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
   player.buffs={};player.bval={};player.lsUsed=false;player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
@@ -311,30 +314,42 @@ function petBackOff(){
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
 /* ---------- Loot ---------- */
-// Drop chances grow a little with mob level. Gear: ~11-15% common, ~3-5% uncommon, 1% rare from level 4+ mobs.
+// v0.97 (Items lane, owner Nov 27): gear should feel sparse. Normal mobs drop gear rarely; rares one item; named and bosses one item,
+// with their own pink only now and then (bad-luck protection), first kill of each named always blue or better. Numbers in LOOT.
+const blueOrGreen=()=>RARES.length?pick(RARES):pick(UNCOMMONS); // some classes have no blue yet: a green stands in
+// A named's offer: n items for its pinks list. Rolls the pink chance once per item; the first item of a first kill is blue or better.
+// Any pink offered resets the dry count, otherwise it grows. n = 3 for Malrec's chest (pick one), 1 for everyone else.
+function namedOffer(type,pinks,n){
+  const first=!lootMem.first[type],p=LOOT.namedPink+LOOT.pinkStep*(lootMem.dry[type]||0),out=[];let pink=false;
+  for(let i=0;i<n;i++){let id=null;
+    for(let tries=0;tries<6&&(!id||out.indexOf(id)>=0);tries++){
+      if(pinks.length&&rng()<p){id=pick(pinks)}
+      else id=(first&&i===0)||rng()<LOOT.namedBlue?blueOrGreen():pick(UNCOMMONS.length?UNCOMMONS:COMMONS)}
+    if(ITEMS[id].rar==='named')pink=true;out.push(id)}
+  lootMem.first[type]=1;lootMem.dry[type]=pink?0:(lootMem.dry[type]||0)+1;saveLoot();return out}
+const NAMED_PINKS={gnaw:()=>['gnawring'],greyfang:()=>['fangring'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
 function rollLoot(m){
   const got=[];
   if(rng()<0.6)got.push(JUNK[m.type]);
   if(m.type==='dead'&&rng()<0.3)got.push('rag');
-  const lb=m.lv*0.01,r=rng(),dun=zoneId==='dun'||zoneId==='crypt'||zoneId==='tunnel';
-  if(r<0.10+lb)got.push(pick(COMMONS));
-  else if(r<0.10+lb+(0.025+lb*0.5)*(dun?2:1))got.push(pick(UNCOMMONS));
-  if(m.lv>=4&&rng()<(dun?0.03:0.01))got.push(pick(RARES));
-  // Boss 1's loot waits in its chest: one named item and one uncommon, every time, plus a small rare chance.
-  if(m.type==='boss1'){const c=[pick(BOSS1),pick(UNCOMMONS)];if(rng()<0.15)c.push(pick(RARES));if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
+  const cave=zoneId==='crypt'||zoneId==='tunnel'?LOOT.caveX:1,boss=m.def.named||m.type==='boss1'||NAMED_PINKS[m.type]||m.type==='malrec';
+  if(!boss&&!m.def.rare){const r=rng(),pc=LOOT.mobCommon+LOOT.mobCommonLv*m.lv,pu=LOOT.mobUnc*cave;
+    if(r<pc)got.push(pick(COMMONS));else if(r<pc+pu)got.push(pick(UNCOMMONS));
+    if(m.lv>=LOOT.mobRareLv&&rng()<LOOT.mobRare*cave&&RARES.length)got.push(pick(RARES))}
   // Summon keys: only from that area's mobs, in that area (the zone check comes first, so the arena sim rolls nothing extra).
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
-  if(m.def.rare){got.push(pick(UNCOMMONS));if(rng()<0.25&&RARES.length)got.push(pick(RARES));} // a rare always pays: an uncommon for your class, sometimes a rare
-  if(m.type==='gnaw'){got.push('gnawring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
-  // Dungeon 1 (v0.63): the Prior and the Bellringer drop their own item (any class) and maybe an uncommon; Malrec's loot
-  // waits in his chest: one named item for your gear group and one uncommon every time, plus a small rare chance.
-  if(m.type==='prior'){got.push('priorcowl');if(rng()<0.6)got.push(pick(UNCOMMONS));}
-  if(m.type==='bellringer'){got.push('bellband');if(rng()<0.6)got.push(pick(UNCOMMONS));}
-  if(m.type==='malrec'){const c=[pick(MALREC.length?MALREC:BOSS1),pick(UNCOMMONS)];if(rng()<0.2&&RARES.length)c.push(pick(RARES));
-    if(run.chest){run.chest.items=c.concat(got.filter(id=>ITEMS[id].rar!=='junk'));got.splice(0,got.length,...got.filter(id=>ITEMS[id].rar==='junk'))}else got.push.apply(got,c);}
-  if(m.type==='greyfang'){got.push('fangring');if(rng()<0.5)got.push(pick(UNCOMMONS));}
+  if(m.def.rare)got.push(rng()<LOOT.rareMobBlue?blueOrGreen():pick(UNCOMMONS)); // a rare always pays one item: green, sometimes blue
+  if(NAMED_PINKS[m.type])got.push(namedOffer(m.type,NAMED_PINKS[m.type](),1)[0]);
+  // The Skeleton King's item waits in his chest; Brother Malrec's chest offers three and you pick one (owner, Nov 27).
+  const toChest=items=>{if(run.chest){run.chest.items=items;return}got.push.apply(got,items)};
+  if(m.type==='boss1')toChest(namedOffer('boss1',BOSS1,1));
+  if(m.type==='malrec'){const o=namedOffer('malrec',MALREC.length?MALREC:BOSS1,3);if(run.chest){run.chest.offer=o;run.chest.items=[]}else got.push(o[0])}
   got.forEach((id,i)=>giveItem(id,1,i));
+  lootPillar(m.x,m.y,got); // a column of light for a blue or a pink
 }
+// Looks only: a column of light in the drop's colour where it fell (blue or pink), so a good drop reads as a moment.
+function lootPillar(x,y,ids){const best=ids.map(id=>ITEMS[id]).filter(it=>it&&(it.rar==='named'||it.rar==='rare')).sort((p,q)=>p.rar==='named'?-1:1)[0];
+  if(best&&!logMute){pillars.push({x:x,y:y,col:RAR[best.rar],t:0,life:best.rar==='named'?4:3});burst(x,y-6,RAR[best.rar],14,true)}}
 function giveItem(id,n,k){
   const it=ITEMS[id];n=n||1;
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;

@@ -112,6 +112,11 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Grasp's spots**: each spot gets its own ripple rings and dark pool; hands rise on every spot, so where the safe water is reads at a glance.
 - **Finale flood**: water pours in at the sanctum door first and the dry floor shrinks to a ring round the middle, never to nothing (repainted in steps, like the Prior's room).
 
+## Loot moments: how they're drawn (v0.97, Items lane)
+- **Loot pillar:** a blue or pink drop raises a soft column of light in the item's rarity colour where it fell: a 7 px wide faint band (35% at its brightest) round a 3 px bright core (90%), about 44 px tall with a slow 6 px breathe, fading in over a quarter second and out over 3 s (blue) or 4 s (pink), plus a small upward burst of sparks in the same colour. Whites and greens get nothing, so the pillar stays rare. Drawing only (`pillars` in `js/fx.js`, drawn in `js/render.js`).
+- **Pick one panel (Malrec's chest):** the grey see-through window style (UI look), centred over the upper middle, three full-width buttons: item name in its rarity colour, then slot · rarity · stats, then "vs what you wear" in green and red. Shows only while you stand by the opened chest; never pauses.
+- **Worn gear:** the paper-doll slot shows a small condition line under the item name: amber "70%", red "broken".
+
 ## Characters and monsters: size (owner, Nov 21)
 - **Player characters are 15 × 18 on screen (final).** How it's drawn: each class is authored at 20 × 24 in `RAGS` (`js/data/sprites.js`) and the renderer drops every 4th row and column (`js/render.js`) to show it at 15 × 18. New class looks are drawn the same way.
 - Humanoid monsters and NPCs are sized against that 15 × 18; undead (skeletons, the Skeleton King, zombies) get redrawn bigger than today in the character design pass. The rats, Old Gnawbone and the chapel placeholders are the bar to match.

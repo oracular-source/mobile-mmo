@@ -376,7 +376,7 @@ const fitPx=w=>w.length<=5?9.5:w.length<=7?8.5:7.5;
 $('ctabs').addEventListener('click',e=>{const b=e.target.closest('button[data-tab]');if(!b)return;charTab=b.dataset.tab;charSel=null;renderChar()});
 function slotCell(sl){const id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x[0]===sl)[1],sel=charSel&&charSel.slot===sl;
   return '<div class="dslot'+(sel?' sel':'')+'" data-act="pickslot" data-slot="'+sl+'"'+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+
-    (it?'<span style="color:'+RAR[it.rar]+'">'+shortName(it.name)+'</span>':'<span class="q">'+nm+'</span>')+'</div>'}
+    (it?'<span style="color:'+RAR[it.rar]+'">'+shortName(it.name)+'</span>'+(inv.wear[sl]?'<small style="color:'+(broken(sl)?'#ff6b6b':'#e0b060')+'">'+(broken(sl)?'broken':(100-inv.wear[sl])+'%')+'</small>':''):'<span class="q">'+nm+'</span>')+'</div>'}
 function renderChar(){
   document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
   const L=player.lvl;$('ctitle').textContent=C.name+' · Lv '+L;let h='';
@@ -385,6 +385,8 @@ function renderChar(){
     h+='<div class="doll"><div class="dcol">'+DOLL_L.map(slotCell).join('')+'</div><div class="dfig"><canvas id="dollcv" width="15" height="18"></canvas></div><div class="dcol">'+DOLL_R.map(slotCell).join('')+'</div>';
     h+='<div class="dstats"><div>HP <b>'+maxHP(L)+'</b></div>'+(C.mana?'<div>Mana <b>'+maxMP(L)+'</b></div>':'')+
       STAT_KEYS.map(k=>'<div>'+k[1]+' <b>'+stat(k[0])+'</b></div>').join('')+'<div class="cop">'+inv.copper+' copper</div></div></div>';
+    // Repairs (v0.97): death wears your gear instead of costing XP; fix it all at any campfire.
+    const rc=repairCost();if(rc)h+=nearFire()?'<button data-act="repair" class="sellall">Repair all · '+rc+' copper</button>':'<div class="bhead"><span class="q">Gear worn · repair at any campfire ('+rc+'c)</span></div>';
     const used=inv.bags.filter(Boolean).length;
     h+='<div class="bhead"><span>Bags '+used+'/'+inv.bags.length+'</span>'+(near?'<span class="q">Marrow is buying</span>':'')+'</div>'; // v0.60: no sell note where there's no merchant
     if(near)h+='<button data-act="selljunk" class="sellall">Sell all junk</button>';
@@ -412,7 +414,8 @@ function detailStrip(near){
   if(!charSel)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
   if(charSel.slot){const sl=charSel.slot,id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x[0]===sl)[1];
     if(!it)return '<b>'+nm+'</b> <span class="q">· empty. Equip something from your bags.</span>';
-    return '<b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span><br>'+(itemStats(it)||'No stats')+
+    const w=inv.wear[sl]||0;
+    return '<b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span>'+(w?' · <span style="color:'+(w>=100?'#ff6b6b':'#e0b060')+'">'+(w>=100?'broken: no stats until repaired':'condition '+(100-w)+'%')+'</span>':'')+'<br>'+(itemStats(it)||'No stats')+
       '<div class="acts"><button data-act="unequip">Take off</button></div>'}
   const b=inv.bags[charSel.bag];if(!b)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
   const it=ITEMS[b.id];let h='<b style="color:'+RAR[it.rar]+'">'+it.name+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
@@ -426,12 +429,14 @@ $('cbox').addEventListener('click',e=>{
   if(act==='pick'){const i=+el.dataset.i;charSel=inv.bags[i]&&!(charSel&&charSel.bag===i)?{bag:i}:null}
   else if(act==='pickslot'){const sl=el.dataset.slot;charSel=charSel&&charSel.slot===sl?null:{slot:sl}}
   else if(act==='unequip'&&charSel&&charSel.slot){const sl=charSel.slot,id=inv.equip[sl];if(!id)return;const i=inv.bags.indexOf(null);if(i<0){log('Your bags are full.','#ff8a80');return}
-    inv.bags[i]={id:id,n:1};delete inv.equip[sl];log('You remove the '+ITEMS[id].name+'.','#9aa');charSel={bag:i}}
+    inv.bags[i]=inv.wear[sl]?{id:id,n:1,w:inv.wear[sl]}:{id:id,n:1};delete inv.equip[sl];delete inv.wear[sl];log('You remove the '+ITEMS[id].name+'.','#9aa');charSel={bag:i}}
   else if(act==='equip'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],old=inv.equip[it.slot];
-    inv.equip[it.slot]=b.id;inv.bags[bi]=old?{id:old,n:1}:null;log('You equip the '+it.name+'.',RAR[it.rar]);charSel=old?{bag:bi}:{slot:it.slot}}
+    const ow=inv.wear[it.slot]||0;inv.equip[it.slot]=b.id;if(b.w)inv.wear[it.slot]=b.w;else delete inv.wear[it.slot];inv.bags[bi]=old?(ow?{id:old,n:1,w:ow}:{id:old,n:1}):null;/* wear travels with the item */log('You equip the '+it.name+'.',RAR[it.rar]);charSel=old?{bag:bi}:{slot:it.slot}}
   else if(act==='sell'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bi]=null;charSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
   else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}});charSel=null;
     log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227','loot');inv.copper+=c}
+  else if(act==='repair'){const rc=repairCost();if(!rc){}else if(!nearFire())log('Repair at any campfire.','#9aa');else if(inv.copper<rc)log('Repairs cost '+rc+' copper; you have '+inv.copper+'.','#ff8a80');
+    else{inv.copper-=rc;inv.wear={};log('You mend your gear by the fire for '+rc+' copper.','#c9a227','loot');banner('Gear repaired',rc+' copper','#c9a227')}}
   else if(act==='destroy'&&bi!==null){log('You destroy the '+ITEMS[inv.bags[bi].id].name+'.','#9aa');inv.bags[bi]=null;charSel=null}
   player.hp=Math.min(player.hp,maxHP(player.lvl));player.mp=Math.min(player.mp,maxMP(player.lvl));
   saveInv();renderChar();
@@ -482,4 +487,12 @@ $('logtabs').addEventListener('pointerdown',e=>{const b=e.target.closest('button
 $('logclose').addEventListener('pointerdown',e=>{e.preventDefault();toggleLogPanel(false)});
 
 // Death panel (v0.37): Respawn gets you up at the area's start (half health and mana, as before).
+// Malrec's chest (v0.97): three items, take one. Each shows its slot, stats and how it compares to what you wear.
+function renderChestPick(){const c=run.chest;if(!c||!c.offer)return;
+  $('plist').innerHTML=c.offer.map((id,i)=>{const it=ITEMS[id],cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
+    const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
+    return '<button data-i="'+i+'"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar+'</span> · '+(itemStats(it)||'No stats')+
+      '<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>')+'</button>'}).join('')}
+$('plist').addEventListener('click',e=>{const b=e.target.closest('button[data-i]'),c=run.chest;if(!b||!c||!c.offer||c.taken)return;
+  const id=c.offer[+b.dataset.i];if(!giveItem(id,1,0))return;c.taken=true;lootPillar(c.x,c.y,[id]);saveInv();$('pickUI').style.display='none'});
 $('drespawn').addEventListener('click',()=>{if(player.dead>0)respawnPlayer()});

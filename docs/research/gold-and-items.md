@@ -119,7 +119,9 @@ Deep dive for the "Items and gold rethink" card on the board. Must be settled be
 4. **Enchanting (+1 to +5, already decided).** Small sure steps, no fail or break. **+3 adds a faint glow, +5 a strong one** (ties to gear showing on the character). Orbs are rare drops, one tier per zone; merge 3 into 1; a lower orb on better gear gives less. **Moving an enchant to new gear costs gold**, so a new drop never feels like losing your +4. Unwanted gear breaks into orb dust; an auto setting does it for whites.
 5. **What gold is for (one loop).** Main: forge fees (enchanting, moving enchants). Backstop: orbs at a very high price. Small: teleport orbs, dyes, maybe repairs after death (older card). Never bank space (that's sold for real money).
 
-**Open questions for the owner:**
+**Owner answers (Nov 27):** pinks from **named and bosses only**; Malrec's chest: **pick 1 of 3**; normal mobs **still drop gear, but rarely**; **repairs after death replace the XP loss** ("too hardcore for a phone game"). **Built in v0.97.**
+
+**Questions as asked:**
 1. Pinks from named and bosses only, or can rares drop them too?
 2. Malrec's chest: pick 1 of 3, or a straight random roll?
 3. Should normal mobs drop gear at all, or only copper and junk (gear from chests, rares and named)?
