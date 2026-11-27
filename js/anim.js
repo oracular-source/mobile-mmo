@@ -53,11 +53,10 @@ function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=
 
 // Where to draw a mob this frame: its swing lunge, with a tiny lean back just before. (Hit reactions wait for weapon
 // animations, owner Nov 27.)
-function mobAnim(m){let dx=0,dy=0,rot=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
+function mobAnim(m){let dx=0,dy=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
   if(m.near>0&&m.atk>0&&m.atk<0.3&&m.aimX!==undefined){const k=(0.3-m.atk)/0.3,ax=m.aimX-m.x,ay=m.aimY-m.y,d=Math.hypot(ax,ay)||1;dx-=ax/d*k;dy-=ay/d*k} // the wind-up: leans back a pixel
   if(m.swT>0){const p=1-m.swT/SWING,o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
-  if(m.howlT>0)rot=howlPose(m); // Greyfang throws his head back (and his pack lifts theirs to answer)
-  return{dx:Math.round(dx),dy:Math.round(dy),rot:rot}}
+  return{dx:Math.round(dx),dy:Math.round(dy)}}
 
 // ---------- The Skeleton King's Bone Throw (v0.102, owner picked it over a wailing skull and a crown bolt) ----------
 // Same rules as the old Shadow Bolt: a 2 s cast, stun or fear breaks it, out of range it falls short. During the cast he
@@ -86,30 +85,28 @@ function drawBone(x,y,ang,len,a){const c=Math.cos(ang),s=Math.sin(ang),px=-s,py=
 function boneGlow(x,y,r,a){lx.globalCompositeOperation='lighter';lx.globalAlpha=a;lx.fillStyle='#6a4a9a';lx.beginPath();lx.arc(Math.round(x),Math.round(y),r,0,7);lx.fill();
   lx.globalAlpha=a*1.4;lx.beginPath();lx.arc(Math.round(x),Math.round(y),r*0.5,0,7);lx.fill();lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}
 
-// ---------- Greyfang's Howl (v0.107, toned down v0.108: owner, "way too much", make it a small roar like a Pokemon cry) ----------
-// Looks only: the howl already calls his pack from 260 away instead of 70 (combat.js). He leans back a little with his
-// nose up, and three short sound lines pulse out from his jaws a few times. His pack lift their heads a moment later.
-const HOWL={pose:1.0,lean:0.18,pulse:0.22,col:'#e8f4ff'};
-function animHowl(m){if(logMute)return;m.howlT=HOWL.pose;m.howlA=HOWL.lean;
-  const pack=mobs.filter(o=>o!==m&&!o.dead&&m.sp.group&&o.sp.group===m.sp.group&&dist(o,m)<260).map(o=>({m:o,at:0.3+dist(o,m)/600,done:0}));
-  fxo.push({k:'howl',m:m,pack:pack,t:0,life:HOWL.pose})}
-// How far he's leaning back this frame (radians, nose up): up fast, hold, back down.
-function howlPose(m){const T=HOWL.pose,e=T-m.howlT,full=m.howlA||HOWL.lean,up=0.15,down=0.25;
-  const k=e<up?e/up:m.howlT<down?m.howlT/down:1;return -full*k*m.dir}
-// Where his jaws are, roughly, with the lean taken into account.
-function howlMouth(m){const img=IMG[m.def.img],w=img.w,h=img.h,a=Math.abs(howlPose(m));
-  return{x:m.x+m.dir*(w*0.5-2)*Math.cos(a),y:m.y-h+7-(w*0.9)*Math.sin(a)}}
-function howlTick(f,dt){f.pack.forEach(p=>{if(!p.done&&f.t>=p.at){p.done=1;if(!p.m.dead){p.m.howlT=0.5;p.m.howlA=0.12}}})}
-// Three short lines fanning out from his mouth (up-forward, forward, down-forward), each pulse moving out and fading.
-function howlDraw(f){const m=f.m;if(m.dead||!(m.howlT>0.2))return;const o=howlMouth(m),e=HOWL.pose-m.howlT;if(e<0.12)return;
-  const q=((e-0.12)%HOWL.pulse)/HOWL.pulse;lx.fillStyle=HOWL.col;
-  [-0.7,-0.2,0.3].forEach(an=>{const a=an*m.dir+(m.dir<0?Math.PI:0),c=Math.cos(a),s=Math.sin(a),r0=3+q*4;lx.globalAlpha=1-q;
-    for(let i=0;i<3;i++)lx.fillRect(Math.round(o.x+c*(r0+i)),Math.round(o.y+s*(r0+i)),1,1)});
+// ---------- Greyfang's Howl (v0.109; owner: stop to howl, then charge to catch up; a real lean-back pose, not a turn) ----------
+// The rules (combat.js, update.js) stop him for def.howlStop seconds and then rush him in at 1.9x speed. Here: a beat
+// in his normal pose, then his howl frame (head thrown back, muzzle up, mouth open) while three short sound lines pulse
+// from his jaws like a Pokemon cry, a one-pixel crouch just before he goes, and dust kicked up while he rushes.
+const HOWL={pulse:0.22,col:'#e8f4ff',mouth:[35,1]}; // mouth = his nose tip in the howl frame's grid
+function animHowl(m){if(logMute)return;fxo.push({k:'howl',m:m,t:0,life:(m.def.howlStop||1)+0.1})}
+// Which picture to draw for him right now (null = his normal one).
+function howlFrame(m){if(!(m.howlHold>0))return null;const T=m.def.howlStop||1,e=T-m.howlHold;
+  if(e<0.08||m.howlHold<0.1)return{im:IMG[m.def.img],dy:m.howlHold<0.1?1:0}; // a beat before he throws his head back; a crouch before the rush
+  return IMG[m.def.img+'howl']?{im:IMG[m.def.img+'howl'],dy:0}:null}
+function howlTick(f,dt){}
+// Three short lines fanning out from his raised jaws, each pulse sliding out and fading.
+function howlDraw(f){const m=f.m;if(m.dead||!(m.howlHold>0.12))return;const im=IMG[m.def.img+'howl'];if(!im)return;
+  const e=(m.def.howlStop||1)-m.howlHold;if(e<0.12)return;
+  const ox=m.x+m.dir*(HOWL.mouth[0]+0.5-(im.w>>1)),oy=m.y+1-im.h+HOWL.mouth[1],q=((e-0.12)%HOWL.pulse)/HOWL.pulse;lx.fillStyle=HOWL.col;
+  [-1.35,-0.85,-0.35].forEach(an=>{const a=m.dir>0?an:Math.PI-an,c=Math.cos(a),s=Math.sin(a),r0=3+q*4;lx.globalAlpha=1-q;
+    for(let i=0;i<3;i++)lx.fillRect(Math.round(ox+c*(r0+i)),Math.round(oy+s*(r0+i)),1,1)});
   lx.globalAlpha=1}
 
 // Every frame (from update): move the animations along and drop the finished ones.
 function fxTick(dt){
-  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.near>0)m.near-=dt;if(m.howlT>0)m.howlT-=dt}
+  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.near>0)m.near-=dt;if(m.howlDash>0&&m.state==='chase'&&!m.dead&&Math.random()<0.5)parts.push({x:m.x-m.dir*fr(4,14),y:m.y+fr(-1,1),vx:-m.dir*fr(6,16),vy:-fr(2,8),t:0,life:fr(0.3,0.5),col:Math.random()<0.5?'#6e6458':'#8a7f70'})} // dust kicked up as Greyfang rushes in
   for(let i=fxo.length-1;i>=0;i--){const f=fxo[i];f.t+=dt;
     if(f.k==='bone'){if(f.home){f.tx=player.x;f.ty=player.y-8}const p=Math.min(1,f.t/f.life),bx=f.x0+(f.tx-f.x0)*p,by=f.y0+(f.ty-f.y0)*p-Math.sin(Math.PI*p)*14;
       if(Math.random()<0.8)parts.push({x:bx+fr(-1,1),y:by+fr(-1,1),vx:fr(-4,4),vy:fr(-6,2),t:0,life:fr(0.25,0.5),col:Math.random()<0.35?'#9a7cc8':'#cfc6ae'}); // bone dust and a thread of grave-light

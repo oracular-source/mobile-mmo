@@ -157,14 +157,17 @@ function update(dt){
       if(m.def.toll&&tollThink(m,dt))return;if(m.dead||player.dead)return;
       if(m.def.cast&&mobCast(m,dt))return;if(m.dead||player.dead)return; // chapel casters (v0.62): stand still while the bar fills
       if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.burn)burnThink(m,dt);if(m.def.blink)wispBlink(m,dt);
+      // Greyfang (v0.109): stands still while he howls, then rushes in to catch up.
+      if(m.howlHold>0){m.howlHold-=dt;m.dir=v.x>m.x?1:-1;if(m.howlHold<=0)m.howlDash=m.def.howlRush||0;return}
+      if(m.howlDash>0){m.howlDash-=dt;if(d<=11)m.howlDash=0}
       if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
       if(m.def.charge&&boarCharge(m,v,d,dt,spd))return; // the boar lowering its head or rushing in
-      if(d>11){if(spd>0)pathTo(m,v.x,v.y,spd,dt)} // around trees and walls, not into them (js/path.js)
+      if(d>11){if(spd>0)pathTo(m,v.x,v.y,spd*(m.howlDash>0?1.9:1),dt)} // around trees and walls, not into them (js/path.js)
       else{m.dir=v.x>m.x?1:-1;m.aimX=v.x;m.aimY=v.y;m.near=0.2;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         animSwing(m,v); // looks only (js/anim.js): the lunge and slash
         if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.riseCd=undefined;m.riseN=0;m.wakes=0}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.howlHold=0;m.howlDash=0;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.riseCd=undefined;m.riseN=0;m.wakes=0}
     }
   });
   updateHazards(dt);finaleTick(dt);if(shakeT>0)shakeT=Math.max(0,shakeT-dt);

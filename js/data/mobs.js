@@ -27,9 +27,9 @@ const TYPES={
   // charge = when you're a little way off it lowers its head (seen coming), then rushes you and hits at once.
   wolf:{name:'a blight wolf',img:'wolf',lv:[8,11],hp:47,hpl:19,dmg:3.3,dmgl:1.5,spd:34,bite:1,aggro:52,armor:0,pack:1,flee:0.2},
   boar:{name:'a thornback boar',img:'boar',lv:[8,11],hp:56,hpl:23,dmg:3.5,dmgl:1.65,spd:27,aggro:44,armor:0.15,charge:1},
-  // Greyfang (named, 11): walks a loop round the middle of the wood with two pack wolves (route on the map). howl = when it's pulled,
+  // Greyfang (named, 11): howlStop = seconds he stands and howls when pulled, howlRush = seconds he then runs 1.9x to catch up (v0.109). Walks a loop round the middle of the wood with two pack wolves (route on the map). howl = when it's pulled,
   // its whole pack comes from much farther off. Never flees. No summon key: it comes back on its own timer.
-  greyfang:{name:'Greyfang',img:'greyfang',lv:[11,11],hp:138,hpl:34,dmg:4.9,dmgl:1.95,spd:34,bite:1,aggro:60,armor:0.1,named:1,howl:1,zone:'Wolfwood'},
+  greyfang:{name:'Greyfang',img:'greyfang',lv:[11,11],hp:138,hpl:34,dmg:4.9,dmgl:1.95,spd:34,bite:1,aggro:60,armor:0.1,named:1,howl:1,howlStop:0.9,howlRush:1.5,zone:'Wolfwood'},
   // Old Scar (rare, 11): an old one-eyed wolf, alone, hits hard.
   oldscar:{name:'Old Scar',img:'oldscar',lv:[11,11],hp:112,hpl:32,dmg:5.6,dmgl:2.1,spd:36,bite:1,aggro:56,armor:0.05,rare:1,zone:'Wolfwood'},
   // Ruined Chapel grounds (v0.62, levels 10-14). camp = fen cultists standing within 3 tiles of one another fight as one camp, and

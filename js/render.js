@@ -25,6 +25,7 @@ const IMG={druid:mk(SPR.druid,PAL),dead:mk(SPR.dead,PAL),rat:mkWalk(SPR.rat,SPR.
   boss1:mk(SPR.dead,Object.assign({},PAL,{z:'#b9b3a0',Z:'#7a7468',r:'#3d2a63',e:'#b48cff'}),3)}; // bosses draw at 3x so they loom (placeholder until the art pass)
 // Wolfwood (v0.40): blight wolf, Greyfang, Old Scar and the thornback boar, each with a step frame.
 ['wolf','greyfang','oldscar','boar'].forEach(k=>{IMG[k]=mkWalk(WOLF_SPR[k],WOLF_SPR[k+'step'],Object.assign({},PAL,WOLF_PAL[k]))});
+IMG.greyfanghowl=mk(WOLF_SPR.greyfanghowl,Object.assign({},PAL,WOLF_PAL.greyfang)); // his howl pose (v0.109)
 
 // Ruined Chapel (v0.62): hooded cultists and the Ashen Acolyte from one robed shape (ROBED in sprites.js), and the ash wisp.
 // The hood is a rounded cowl with the face lost in shadow and two eyes glowing in it; the robe flares to the hem; a rope belt;
@@ -332,9 +333,8 @@ function render(){
     const mmv=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)&&!(m.root>0)&&!(m.near>0);
     // v0.102 (js/anim.js): the swing lunge moves the sprite only, never the mob itself.
     const an=mobAnim(m),fim=img.steps?walkFrame(img,m.walk,mmv).im:img,fb=img.steps?0:(mmv?(Math.floor(m.walk*6)%2):0);
-    if(an.rot){const px=Math.round(m.x)-m.dir*(img.w>>1),py=Math.round(m.y)+1; // rear up round the back feet (Greyfang's Howl)
-      lx.save();lx.translate(px,py);lx.rotate(an.rot);drawSprite(fim,m.x+an.dx-px,m.y+1+an.dy-py,m.dir,fb,false);lx.restore()}
-    else drawSprite(fim,m.x+an.dx,m.y+1+an.dy,m.dir,fb,false);
+    const hp=howlFrame(m); // Greyfang's howl: his howl pose, a crouch just before he rushes (js/anim.js)
+    if(hp)drawSprite(hp.im,m.x,m.y+1+hp.dy,m.dir,0,false);else drawSprite(fim,m.x+an.dx,m.y+1+an.dy,m.dir,fb,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark
