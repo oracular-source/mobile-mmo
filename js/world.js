@@ -165,8 +165,9 @@ function enterZone(id,from,at){
   // A fresh dungeon run (v0.66): walking into an instance from outside it rebuilds every floor (flood back, seals shut,
   // chests full, every mob up). Going between its floors (down the Prior's stairs, back up) keeps the same run.
   const tgt=AREA_OF[id],fresh=!!(tgt&&MAPS[tgt].instance&&!(from&&MAPS[from]&&MAPS[from].instance));
-  if(fresh)Object.keys(MAPS).forEach(k=>{if(MAPS[k].instance)delete AREAS[k]});
-  zoneId=id;const A=curArea();
+  // v0.92: only floors you've already walked are thrown away; one built ahead of time (prebuildNext) is still untouched.
+  if(fresh)Object.keys(MAPS).forEach(k=>{if(MAPS[k].instance&&AREAS[k]&&AREAS[k].used)delete AREAS[k]});
+  zoneId=id;const A=curArea();if(A)A.used=1;
   if(id==='dun'){map=DUN.map;MW=DUN.w;MH=DUN.h;world=DUN.world;spawns=dunSpawns();}
   else if(id==='arena'){map=ARENA.map;MW=ARENA.w;MH=ARENA.h;world=ARENA.world;spawns=[];}
   else if(A){map=A.map;MW=A.w;MH=A.h;world=A.world;spawns=A.spawns;}
@@ -196,6 +197,7 @@ function enterZone(id,from,at){
   decoy=null;grounds.length=0;traps.length=0;hazards.length=0;
   player.onTile=tileAt(player.x,player.y);
   arriveSafe(); // v0.77: nothing jumps you on arrival
+  prebuildNext(); // v0.92: build the areas next door in spare moments so the next doorway doesn't freeze
 }
 /* ---------- Summoning a named (v0.31) ---------- */
 // At a named's spot (the crypt throne, Gnawbone's bone pile) you can call it back if it isn't up, so a trip is never wasted.

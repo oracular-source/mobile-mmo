@@ -168,6 +168,24 @@ function drawSprite(img,x,y,dir,bob,sit){
 function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
   const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let err=dx+dy;lx.fillStyle=col;
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
+// Trees on screen (v0.92, optimization lane): areas hold thousands of trees (Wolfwood ~3,000 counting the woods past the
+// edges) and checking every one each frame made most of the frame's garbage. The trees are sorted once into 128-pixel
+// squares; each frame only the squares in view are checked. The grid rebuilds itself if the area's tree list changes
+// (repaintArea). Visible trees keep the area's list order, so the depth sort draws exactly as before.
+const TG=128,tgOut=[],entsBuf=[],byY=(a,b)=>a.y-b.y;
+let tgStamp=0;
+function treesInView(A){
+  const L=A.trees;
+  if(A.tg_arr!==L||A.tg_n!==L.length){const g=new Map();
+    L.forEach((tr,i)=>{tr.ti=i;for(let cy=Math.floor(tr.b[1]/TG);cy<=Math.floor(tr.b[3]/TG);cy++)for(let cx=Math.floor(tr.b[0]/TG);cx<=Math.floor(tr.b[2]/TG);cx++){
+      const k=cx*65536+cy;let c=g.get(k);if(!c)g.set(k,c=[]);c.push(tr)}});
+    A.tg=g;A.tg_arr=L;A.tg_n=L.length}
+  tgOut.length=0;tgStamp++;
+  const x0=Math.floor(camX/TG),x1=Math.floor((camX+VW)/TG),y0=Math.floor(camY/TG),y1=Math.floor((camY+VH)/TG);
+  for(let cy=y0;cy<=y1;cy++)for(let cx=x0;cx<=x1;cx++){const c=A.tg.get(cx*65536+cy);if(!c)continue;
+    for(let i=0;i<c.length;i++){const tr=c[i];if(tr.ts===tgStamp)continue;tr.ts=tgStamp;
+      if(tr.b[2]>=camX&&tr.b[0]<=camX+VW&&tr.b[3]>=camY&&tr.b[1]<=camY+VH)tgOut.push(tr)}}
+  return tgOut.sort((a,b)=>a.ti-b.ti)}
 let time=0;
 function render(){
   // Smooth camera (v0.45, optimization lane): the camera and every moving sprite snap to a SCREEN pixel (1/S of a game pixel),
@@ -268,8 +286,14 @@ function render(){
   grounds.forEach(g=>{if(!g.totem)return;const x=Math.round(g.x),y=Math.round(g.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-2,y-9,4,10);lx.fillStyle='#6e4a2a';lx.fillRect(x-1,y-8,2,8);lx.fillStyle=Math.floor(time*3)%2?'#7a9a3a':'#9be37a';lx.fillRect(x-1,y-9,2,2)});
   traps.forEach(tr=>{const x=Math.round(tr.x),y=Math.round(tr.y);lx.fillStyle='#8d8692';for(let i=-3;i<=3;i+=2)lx.fillRect(x+i,y-1-((i+3)%4?0:1),1,2);lx.fillStyle='#4a3b33';lx.fillRect(x-4,y+1,9,1)});
   // Trees in view join the depth sort (v0.30): whoever stands north of a trunk is drawn first, so the crown covers them.
-  const A0=curArea(),trees=A0?A0.trees.filter(tr=>tr.b[2]>=camX&&tr.b[0]<=camX+VW&&tr.b[3]>=camY&&tr.b[1]<=camY+VH):[];
-  const ents=mobs.concat(zoneId==='over'?npcs:[],pet?[pet]:[],pet2?[pet2]:[],decoy?[decoy]:[],[player],trees).sort((a,b)=>a.y-b.y);
+  // Everyone and every tree in view, in one reused list (no new arrays each frame), then sorted north to south.
+  // Same order as before (mobs, NPCs, pets, decoy, you, trees) going in, and the sort keeps ties in that order.
+  const A0=curArea(),ents=entsBuf;ents.length=0;
+  for(let i=0;i<mobs.length;i++)ents.push(mobs[i]);
+  if(zoneId==='over')for(let i=0;i<npcs.length;i++)ents.push(npcs[i]);
+  if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);
+  if(A0){const tv=treesInView(A0);for(let i=0;i<tv.length;i++)ents.push(tv[i])}
+  ents.sort(byY);
   // A tree you (or your target) are behind fades so you never lose sight of the fight.
   const behind=(o,tr)=>o&&!o.dead&&o.y<tr.y&&o.x+6>tr.b[0]&&o.x-6<tr.b[2]&&o.y>tr.b[1]+4&&o.y-14<tr.b[3];
   const drawEnt=e=>{
@@ -321,14 +345,15 @@ function render(){
   ents.forEach(e=>{
     if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
       lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
-    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.save();lx.translate(ox,oy);drawEnt(e);
+    // Nudge there and back instead of save()/restore() per sprite (restore was ~8% of the frame); the alpha is reset after.
+    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.translate(ox,oy);drawEnt(e);
     // Wading (v0.64): in slow water (Dungeon 1's flood, the crossroads creek) the water covers your feet and shins, with a
     // ripple ring that moves, so you can see why you're slow. Floating things (wisps, the sword) skim over.
     if(slowArea&&!e.dead&&!(e.def&&e.def.float)&&e.img!=='blade'&&e!==decoy&&!(e===player&&player.dead>0)){const SA=slowArea,tx=Math.floor(e.x/T),ty=Math.floor(e.y/T);
       if(tx>=0&&ty>=0&&tx<SA.w&&ty<SA.h&&SA.slow[ty*SA.w+tx]){const x=Math.round(e.x),y=Math.round(e.y),fl=SA.rows[ty][tx]==='z',w=e===player?16:Math.min(26,Math.max(12,Math.round(((IMG[e.img]||{}).w||14)*0.9))),ph=Math.floor(time*5+x)%4;
         lx.fillStyle=fl?AP.flood[1]:AP.water;lx.fillRect(x-w/2,y-3,w,5);lx.fillStyle=fl?AP.floodHi:AP.waterHi;lx.fillRect(x-w/2-1+ph%2,y-3,w+2,1);
         lx.fillStyle=AP.glint;lx.globalAlpha=0.5;lx.fillRect(x-w/2-2-ph,y-1,2,1);lx.fillRect(x+w/2+ph,y-1,2,1);lx.globalAlpha=1}}
-    lx.restore()});
+    lx.translate(-ox,-oy);lx.globalAlpha=1});
   if(A0)drawAreaCritters(A0,1); // perched crows, owl, bats, chimney smoke (v0.49)
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});

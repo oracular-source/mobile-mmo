@@ -19,6 +19,30 @@ function curArea(){const k=AREA_OF[zoneId];return k?buildArea(k):null}
 // Small integer hash so every tile gets the same "random" details each time (no effect on the game's seeded rolls).
 function ah(x,y,s){let n=(x*374761393+y*668265263+(s||0)*1442695041)|0;n=(n^(n>>>13))*1274126177|0;return((n^(n>>>16))>>>0)/4294967296}
 
+// Build ahead (v0.92, optimization lane): the first visit to an area used to paint its whole map on the spot (about half a
+// second for Wolfwood on a laptop, more on a phone), so the screen froze at the doorway. Now, after you arrive, the areas
+// your exits lead to are built one at a time when the browser has a spare moment AND nothing is fighting you (a build is
+// one chunk of work, so it waits rather than land in the middle of a pull). Building uses no random rolls, so an area
+// built early is exactly the one you'd have got. A dungeon floor you've already walked is rebuilt fresh in the
+// background too (only while you're outside the dungeon), so every run still starts clean.
+const prebuildQ=[];let prebuildOn=false;
+function prebuildNext(){
+  const A=curArea();if(!A)return;prebuildQ.length=0;
+  A.exits.forEach(e=>{const k=e.to;if(!MAPS[k]||k===A.id||prebuildQ.indexOf(k)>=0)return;
+    if(!AREAS[k]||(AREAS[k].used&&MAPS[k].instance&&!A.instance))prebuildQ.push(k)});
+  if(!prebuildOn&&prebuildQ.length){prebuildOn=true;idle(prebuildStep)}
+}
+const idle=f=>window.requestIdleCallback?requestIdleCallback(f,{timeout:2000}):setTimeout(f,300);
+function prebuildStep(){
+  if(inCombat()||player.cast||player.dead>0){idle(prebuildStep);return} // wait for a quiet moment
+  const k=prebuildQ.shift();
+  if(k&&!simState.busy){const cur=curArea();
+    if(AREAS[k]&&AREAS[k].used&&MAPS[k].instance&&!(cur&&cur.instance))Object.keys(MAPS).forEach(j=>{if(MAPS[j].instance&&AREAS[j]&&AREAS[j].used)delete AREAS[j]});
+    if(!AREAS[k]){crashGuard(()=>{const B=buildArea(k);
+      // A dungeon's lower floors come along once its first floor is ready, so the stairs down don't freeze either.
+      if(B.instance)B.exits.forEach(e=>{const j=e.to;if(MAPS[j]&&MAPS[j].instance&&!AREAS[j]&&prebuildQ.indexOf(j)<0)prebuildQ.push(j)})},'prebuild')}}
+  if(prebuildQ.length)idle(prebuildStep);else prebuildOn=false;
+}
 function buildArea(id){
   if(AREAS[id])return AREAS[id];
   const M=MAPS[id],rows=M.tiles,w=rows[0].length,h=rows.length;
