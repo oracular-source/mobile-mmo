@@ -121,7 +121,7 @@ function buildArea(id){
   A.trees=[];A.world=paintArea(A);edgeWoods(A);
   // A flame behind a tree crown (v0.64, owner: a lantern flickering through a tree at the crossroads): flames draw after the
   // lighting, over everything, so one under a crown in front showed through the leaves. Those stay unlit-looking now.
-  A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
+  A.flames.forEach(f=>{f.hid=A.trees.some(t=>t.tree&&!t.tree.chapel&&!t.tree.shrub&&f.x>=t.b[0]+6&&f.x<=t.b[2]-6&&f.y>=t.b[1]+6&&f.y<=t.y-4&&t.y>f.y+6)});
   AREAS[id]=A;return A;
 }
 // The woods carry on past the map edges (v0.64 top and bottom; v0.76 all four sides and the corners, for "Character always
@@ -381,7 +381,14 @@ function paintArea(A){
        if(ah(tx,ty,123)<0.5){R(x,y-3,1,4,AP.out);R(x,y-2,1,3,AP.trunkHi);R(x-2,y-4,2,2,AP.leafHi);R(x+1,y-5,2,2,AP.leafTop);R(x-1,y-6,2,1,AP.leafHi)} // a seedling
        else{R(x-2,y,5,1,AP.fernDk);R(x-3,y-1,2,1,AP.fern);R(x+2,y-1,2,1,AP.fern);R(x-1,y-2,1,2,AP.fernHi);R(x+1,y-2,1,2,AP.fern);R(x,y-3,1,3,AP.fernHi)}} // a little fern
      else if(here==='dead_grass'&&nb('dead_tree')&&ah(tx,ty,124)<0.18){const x=bx+3+Math.floor(ah(tx,ty,125)*8),y=by+5+Math.floor(ah(tx,ty,126)*8),fl=ah(tx,ty,127)<0.5?1:-1;
-       for(let i=0;i<6;i++){R(x+i,y+Math.floor(i*fl/3),1,1,AP.out);R(x+i,y-1+Math.floor(i*fl/3),1,1,i<2?AP.trunkHi:AP.trunk)}R(x+3,y-2+(fl>0?1:-1),1,1,AP.twig)}} // a fallen branch
+       for(let i=0;i<6;i++){R(x+i,y+Math.floor(i*fl/3),1,1,AP.out);R(x+i,y-1+Math.floor(i*fl/3),1,1,i<2?AP.trunkHi:AP.trunk)}R(x+3,y-2+(fl>0?1:-1),1,1,AP.twig)} // a fallen branch
+     // Wolfwood forest floor (v0.90): beside the trees, now and then a cluster of little brown toadstools, a mossy stone,
+     // a fallen fir branch or a tuft of grass in the moss. Flat ground detail: you walk over it.
+     else if(A.tint==='wood'&&(here==='needles'||here==='moss'||here==='fern')){const near=nb('fir')||nb('tree'),r=ah(tx,ty,150),x=bx+3+Math.floor(ah(tx,ty,151)*9),y=by+5+Math.floor(ah(tx,ty,152)*8);
+       if(near&&r<0.08){for(let k=0;k<2+(r<0.04?1:0);k++){const mx=x+k*3-(k>1?5:0),my=y+(k===1?-1:k>1?2:0);R(mx,my,1,2,'#c9c2a8');R(mx-1,my-1,3,1,AP.out);R(mx-1,my-2,3,1,'#7a4a2c');R(mx-1,my-2,1,1,'#a8703e')}} // toadstools
+       else if(near&&r<0.105){R(x,y-3,4,1,AP.out);R(x-1,y-2,6,3,AP.out);R(x,y,4,1,AP.out);R(x,y-2,4,2,AP.bould);R(x,y-2,2,1,AP.bouldHi);R(x+3,y-1,1,1,AP.bouldDk);R(x+1,y-2,2,1,AP.moss)} // small mossy stone, rounded
+       else if(near&&r<0.19){for(let i=0;i<7;i++){R(x+i,y,1,1,AP.out);R(x+i,y-1,1,1,i<2?AP.trunkHi:AP.trunk);if(i%2&&i>1){R(x+i,y-2,1,1,AP.firHi);R(x+i,y+1,1,1,AP.fir)}}} // fallen fir branch, needles still on
+       else if(here==='moss'&&r<0.3){R(x,y,1,3,AP.ggTuft);R(x+1,y+1,1,2,AP.ggTuft2);R(x-1,y+1,1,2,AP.ggTuft2)}}} // grass tuft
     // Heart pass (v0.49): leaves drift under the dead trees.
     if(gname==='dead_grass'&&[[0,1],[0,-1],[1,0],[-1,0],[0,0]].some(([dx,dy])=>name(tx+dx,ty+dy)==='dead_tree'))for(let i=0;i<4;i++){const x=bx+Math.floor(ah(tx,ty,100+i)*15),y=by+Math.floor(ah(tx,ty,110+i)*15);R(x,y,2,1,i%2?'#4a3424':'#5e4026')}
   }
@@ -414,7 +421,19 @@ function paintArea(A){
   for(let ty=0;ty<A.h;ty++){
     for(let tx=0;tx<A.w;tx++){
       const n=name(tx,ty),bx=tx*T,by=ty*T;
-      if(n==='tree'||n==='dead_tree'||n==='fir'){const im=pickTree(A,n,tx,ty); // v0.50: kinds, sizes and shades per area (tree variety)
+      if(n==='tree'||n==='dead_tree'||n==='fir'){
+        // Wolfwood bushes (v0.90): on a tree tile at the edge of the woods (open ground beside it), one in seven is a
+        // bush clump in a gap of the treeline and about one in three has a small bush at its foot. Still solid either way.
+        let shrub=0;
+        if(A.tint==='wood'&&n!=='dead_tree'&&[[0,1],[0,-1],[1,0],[-1,0]].some(([dx,dy])=>{const t=tile(tx+dx,ty+dy);return t&&AREA_TILES[t].walk})){
+          const sr=ah(tx,ty,140);shrub=sr<0.14?2:sr<0.44?1:0}
+        if(shrub){const sk=pickByWeight(SHRUB_MIX,ah(tx,ty,141)),sz=shrub===2?1+(ah(tx,ty,142)<0.5?1:0):(ah(tx,ty,142)<0.6?0:1),
+            si=shrubImg(sk,sz,Math.floor(ah(tx,ty,143)*4),Math.floor(ah(tx,ty,144)*3)),sx=bx+Math.round((ah(tx,ty,145)-0.5)*4),e=treeAt(si,sx,by,by+15);
+          // never on top of a prop (natural placement: nothing overlaps something it shouldn't); then the tree stays
+          if(A.objs.some(o=>e.b[0]<o.x*T+o.w*T+2&&e.b[2]>o.x*T-2&&e.b[1]<o.y*T+o.h*T+2&&e.b[3]>o.y*T-2))shrub=0;
+          else{g.fillStyle='rgba(0,0,0,0.3)';g.beginPath();g.ellipse(sx+8,by+15,5+sz*2,2,0,0,7);g.fill();A.trees.push(e)}}
+        if(shrub===2)continue; // a gap in the treeline filled by the bush
+        const im=pickTree(A,n,tx,ty); // v0.50: kinds, sizes and shades per area (tree variety)
         g.fillStyle='rgba(0,0,0,0.35)';g.beginPath();g.ellipse(bx+8+im.shx,by+14,im.sh,Math.max(2,Math.round(im.sh/3)),0,0,7);g.fill();
         A.trees.push(treeAt(im,bx,by,by+13))}
       else if(n==='boulder')drawBoulder(R,bx,by,name(tx,ty-1)!=='boulder',ah(tx,ty,16));
@@ -486,7 +505,16 @@ function pickTree(A,n,tx,ty){
   const cx=Math.floor((tx+ah(ty,0,71)*3)/5),cy=Math.floor((ty+ah(tx,0,72)*3)/5),stand=ah(tx,ty,73)<0.75?ah(cx,cy,70):ah(tx,ty,74);
   const sz=ah(tx,ty,31),size=sz<0.14?0:sz>0.88?2:1,hr=ah(tx,ty,32),shade=hr<0.58?0:hr<0.77?1:hr<0.9?2:3,v=Math.floor(ah(tx,ty,33)*4);
   if(n==='tree')return treeImg('live',pickByWeight(TREE_MIX[A.tint]||TREE_MIX_DEF,stand),size,shade,v);
-  if(n==='fir')return treeImg('fir','fir',size,shade,v);
+  if(n==='fir'){
+    // Wolfwood forest pass (v0.90, owner: "the trees are all the same"; the Sunken Graveyard's mix is the model):
+    // firs, narrow spruces and tall pines grow in stands, now and then a dead fir, and toward the lighter south end
+    // more and more leafy oaks and birches mix in. Other areas keep the plain fir until the owner says otherwise.
+    if(A.tint==='wood'){
+      const south=(ty-28)/18;if(south>0&&ah(tx,ty,75)<Math.min(1,south)*0.45)return treeImg('live',pickByWeight(TREE_MIX.wood,stand),size,shade,v);
+      if(ah(tx,ty,76)<0.04)return treeImg('fir','deadfir',size,0,v);
+      const ws=ah(tx,ty,77),wsize=ws<0.2?0:ws>0.86?2:1; // a few more young trees and old giants than elsewhere
+      return treeImg('fir',pickByWeight(CONIFER_MIX,stand),wsize,shade,v)}
+    return treeImg('fir','fir',size,shade,v)}
   // Dead: mostly crooked, some leaning or forked, a few snapped-off snags and stumps.
   const d=ah(tx,ty,34);return treeImg('dead',d<0.38?'crooked':d<0.6?'lean':d<0.78?'forked':d<0.92?'snag':'stump',size,0,v);
 }
@@ -497,8 +525,10 @@ function treeImg(kind,sp,size,shade,v){
   const R=(x,y,ww,hh,col)=>{g.fillStyle=col;g.fillRect(x,y,ww,hh)},r=(v+0.5)/4;
   let sh=10,shx=1;
   if(kind==='live'){const L=LEAVES[sp].map(col=>shiftCol(col,SHADE[shade]));sh=drawLiving(R,ox,oy,sp,size,L,v)}
-  else if(kind==='fir'){const sc=[0.55,0.95,1.22][size]+r*0.08,P={firDk:shiftCol(AP.firDk,SHADE[shade]),fir:shiftCol(AP.fir,SHADE[shade]),firHi:shiftCol(AP.firHi,SHADE[shade]),firTop:shiftCol(AP.firTop,SHADE[shade])};
-    drawFir(R,ox,oy,r,v,sc,P);sh=Math.round(5+4*sc);shx=0}
+  else if(kind==='fir'){const sc=[0.55,0.95,1.22][size]+r*0.08,C=CONIFER_COL[sp]||CONIFER_COL.fir,
+    P={firDk:shiftCol(C[0],SHADE[shade]),fir:shiftCol(C[1],SHADE[shade]),firHi:shiftCol(C[2],SHADE[shade]),firTop:shiftCol(C[3],SHADE[shade])};
+    if(sp==='spruce')drawSpruce(R,ox,oy,r,v,sc,P);else if(sp==='pine')drawPine(R,ox,oy,r,v,sc,P);else if(sp==='deadfir')drawDeadFir(R,ox,oy,r,v,sc);else drawFir(R,ox,oy,r,v,sc,P);
+    sh=Math.round((sp==='spruce'||sp==='deadfir'?4:5)+4*sc);shx=0}
   else if(kind==='dead')sh=drawDeadTree(R,ox,oy,r,sp,size,v);
   else if(kind==='giant')drawGiant(R,ox,oy);else drawDeadOak(R,ox,oy);
   // Find the drawn part (for the "are you behind it?" check).
@@ -608,6 +638,81 @@ function drawFir(R,bx,by,r,v,sc,P){
   const tw=sc>1.1?2:1;for(let y=bot+1;y<=base;y++)for(let x=-tw;x<=tw;x++)cells.set((cx+x)+','+y,x<0?AP.trunkHi:AP.trunk);
   outlined(R,cells);
 }
+// ---- Wolfwood forest pass (v0.90): more kinds of conifer, so the wood isn't one cone repeated (references first:
+// "pixel forest", "video game forest", real conifer woods; recipes in area-rules.md, Wolfwood). Each kind has its own
+// silhouette, which is what reads at phone zoom: the fir's drooping tiers, the spruce's narrow spiky spire, the pine's
+// bare trunk under a ragged flat-topped crown, the dead fir's grey pole of snapped twigs.
+const CONIFER_MIX=[['fir',0.45],['spruce',0.32],['pine',0.23]];
+const CONIFER_COL={fir:[AP.firDk,AP.fir,AP.firHi,AP.firTop],spruce:['#0c1819','#132625','#1d3833','#2c4c44'],pine:['#141f14','#1d2c1b','#2f4528','#4a6238']};
+function drawSpruce(R,bx,by,r,v,sc,P){
+  // Spruce: taller and much narrower than the fir, six short tiers with jagged tips that point down, darker and bluer.
+  const cx=bx+8,base=by+14,top=base-Math.round((62+Math.floor(r*8))*sc),bot=base-Math.max(2,Math.round(4*sc)),H=bot-top,cells=new Map(),tiers=sc<0.7?4:6;
+  for(let y=top;y<=bot;y++){const f=(y-top)/H,tp=(f*tiers)%1;
+    const hw=Math.max(1,Math.round((1+f*7.5*Math.min(1.15,0.45+sc*0.6))*(0.45+0.55*tp)));
+    for(let x=-hw;x<=hw;x++){if(Math.abs(x)===hw&&tp<0.7&&ah(x+v*13,y,24)<0.5)continue; // ragged edges
+      const lit=(-x/hw)*0.9+(tp<0.25?0.2:0)-(tp>0.8?1:0)+(ah(x+v*29,y,25)-0.5)*0.6;
+      cells.set((cx+x)+','+y,lit>0.8?P.firTop:lit>0.15?P.firHi:lit<-0.55?P.firDk:P.fir)}
+    // the drooping tip at each side at the bottom of a tier
+    if(tp>0.86&&hw>2){cells.set((cx-hw-1)+','+(y+1),P.fir);cells.set((cx+hw+1)+','+(y+1),P.firDk)}}
+  cells.set(cx+','+(top-1),P.firHi); // a thin leader at the very top
+  for(let y=bot+1;y<=base;y++)for(let x=-1;x<=0;x++)cells.set((cx+x)+','+y,x<0?AP.trunkHi:AP.trunk);
+  outlined(R,cells)}
+function drawPine(R,bx,by,r,v,sc,P){
+  // Pine: a tall bare trunk, warm orange-brown up high, a few stubs of old branches, and a ragged crown of flat clumps
+  // only at the top (one low side clump on a branch), so its outline breaks the row of cones.
+  const cells=new Map(),cx=bx+8,base=by+14,H=Math.round((60+Math.floor(r*8))*sc),top=base-H,j=i=>ah(v,i,90+Math.round(sc*10));
+  const tw=sc>1.1?3:2,cb=top+Math.round(H*0.55); // where the crown starts
+  for(let y=cb-4;y<=base;y++){const up=y<base-H*0.45;for(let k=0;k<tw;k++)cells.set((cx-1+k)+','+y,k===0?(up?'#8a5a3a':AP.trunkHi):(up?'#5e3c28':AP.trunk))}
+  for(let i=0;i<3;i++){const y=base-Math.round(H*(0.25+i*0.1)),s=i%2?1:-1;cells.set((cx+(s>0?tw-1:-1)+s)+','+y,AP.trunk)} // old branch stubs
+  // Flat pads of needles held out on branches, in steps up the trunk, with dark gaps between them (the Scots pine look).
+  const blobs=[],m=sc<0.7?3:5,wd=14*Math.min(1.2,0.5+sc*0.6);
+  for(let i=0;i<m;i++){const f=i/(m-1),py=Math.round(cb-2-f*(cb-top-4)),side=i===m-1?0:(i+Math.floor(j(1)*2))%2?1:-1,
+      px=Math.round(cx+side*wd*(0.35+j(10+i)*0.3)*(1-f*0.5)),rx=wd*(0.55+j(20+i)*0.2)*(1-f*0.35),ry=Math.max(2.5,wd*(0.2+j(30+i)*0.06));
+    for(let k=0;k<=Math.abs(px-cx);k++)cells.set((cx+Math.sign(px-cx)*k)+','+(py+3-Math.floor(k/2)),'#5e3c28'); // the branch out to the pad
+    blobs.push([px,py,rx,ry])}
+  for(let y=top+3;y<cb-4;y++){cells.set((cx-1)+','+y,'#8a5a3a');cells.set(cx+','+y,'#5e3c28')} // trunk on up through the crown
+  blobs.sort((p,q)=>p[1]-q[1]);crown(cells,blobs,[P.firDk,P.fir,P.firHi,P.firTop],v,cx-3,top+4,wd);
+  outlined(R,cells)}
+function drawDeadFir(R,bx,by,r,v,sc){
+  // A dead fir still standing: a grey pole with short snapped twigs hanging down both sides, shorter toward the top,
+  // and a few rusty clumps of needles that haven't fallen yet. Rare (1 in 25), so it reads as a dead one among the living.
+  const cells=new Map(),cx=bx+8,base=by+14,H=Math.round((50+Math.floor(r*10))*sc),top=base-H;
+  for(let y=top;y<=base;y++){cells.set((cx-1)+','+y,'#7a7266');cells.set(cx+','+y,'#4f4a42')}
+  for(let y=top+3;y<base-6;y+=3){const f=(y-top)/H,len=Math.round(1+f*7*Math.min(1.2,sc)),s=((y>>1)+v)%2?1:-1;
+    for(let k=1;k<=len;k++)cells.set((cx+(s>0?k:-1-k))+','+(y+Math.floor(k/2)),'#5a5248');
+    if(ah(y,v,26)<0.25)for(let k=0;k<2;k++)cells.set((cx+(s>0?len-k:-1-len+k))+','+(y+Math.floor(len/2)-1),'#6a4a2a')}
+  outlined(R,cells)}
+// Bushes (v0.90): the undergrowth a forest needs (top-down pixel forest packs all lean on many bush variants).
+// Drawn on their own small pictures and sorted with characters like trees. They only go on tree tiles at the edge of the
+// woods (in front of a trunk, or in a gap of the treeline), so they're as solid as the trees and nobody stands in one.
+const SHRUB_IMGS={};
+const SHRUB_MIX=[['leafy',0.36],['berry',0.16],['bilberry',0.18],['juniper',0.3]];
+function shrubImg(kind,size,v,shade){
+  const key=[kind,size,v,shade].join('|');if(SHRUB_IMGS[key])return SHRUB_IMGS[key];
+  const W=40,Hh=28,ox=12,oy=10,c=document.createElement('canvas');c.width=W;c.height=Hh;const g=c.getContext('2d');
+  const R=(x,y,w,h,col)=>{g.fillStyle=col;g.fillRect(x,y,w,h)},cells=new Map(),j=i=>ah(v,i,130+size*7);
+  const cx=ox+8+Math.round((j(0)-0.5)*4),base=oy+15;
+  if(kind==='juniper'){
+    // Juniper: a low dark spiky mound of needles, a few pale blue berries on the big ones.
+    const hw=[5,7,9][size],h=[5,7,9][size],P=CONIFER_COL.spruce.map(col=>shiftCol(col,SHADE[shade]));
+    for(let y=-h;y<=0;y++)for(let x=-hw;x<=hw;x++){const d=x*x/(hw*hw)+(y+1)*(y+1)/(h*h);if(d>1)continue;
+      if(d>0.7&&ah(x+v*7,y,27)<0.45)continue; // spiky edge
+      const lit=(-x/hw-(y+h*0.5)/h)*0.7+(ah(x+v*11,y,28)-0.5)*0.7;cells.set((cx+x)+','+(base+y),lit>0.75?P[3]:lit>0.15?P[2]:lit<-0.5?P[0]:P[1])}
+    if(size>0)cells.forEach((col,k)=>{const [x,y]=k.split(',').map(Number);if(ah(x,y,29+v)<0.04&&cells.has((x-1)+','+y)&&cells.has((x+1)+','+y))cells.set(k,'#7a8aa8')})}
+  else{
+    // Leafy bush: three or four round clumps side by side and one on top, lit from the upper left. Berry bushes carry
+    // red berries; bilberry is lower and wider with dark blue berries.
+    const low=kind==='bilberry',hw=[6,8,10][size]+(low?2:0),h=[5,7,9][size]-(low?2:0),n=size===0?2:3;
+    const L=(kind==='bilberry'?['#18241a','#203020','#33472c','#4c6440']:LEAVES.oak).map(col=>shiftCol(col,SHADE[shade]));
+    const blobs=[];for(let i=0;i<n;i++)blobs.push([cx+(i-(n-1)/2)*hw*0.75,base-h*0.45+(j(1+i)-0.5)*2,hw*0.5+j(5+i)*1.5,h*0.55]);
+    blobs.push([cx+(j(9)-0.5)*3,base-h*0.8,hw*0.55,h*0.5]);blobs.sort((p,q)=>p[1]-q[1]);
+    crown(cells,blobs,L,v,cx-2,base-h,hw);
+    if(kind==='berry'||kind==='bilberry'){const B=kind==='berry'?['#8e2f2a','#c8583c']:['#2c3460','#5a6aa8'];
+      cells.forEach((col,k)=>{const [x,y]=k.split(',').map(Number);if(ah(x,y,31+v)<0.09&&cells.has(x+','+(y+1))&&cells.has((x+1)+','+y)&&cells.has(x+','+(y-1))){cells.set(k,B[0]);if(ah(x,y,32)<0.6)cells.set((x+1)+','+y,B[1])}})}}
+  outlined(R,cells);
+  const d=g.getImageData(0,0,W,Hh).data;let x0=W,x1=0,y0=Hh,y1=0;
+  for(let y=0;y<Hh;y++)for(let x=0;x<W;x++)if(d[(y*W+x)*4+3]){if(x<x0)x0=x;if(x>x1)x1=x;if(y<y0)y0=y;if(y>y1)y1=y}
+  return SHRUB_IMGS[key]={c:c,ox:ox,oy:oy,box:[x0,y0,x1,y1],sh:0,shx:0,shrub:1}}
 function drawGiant(R,bx,by){
   // The dead giant tree: a huge pale bare trunk on a 4x4 footprint, branches spread far above the firs, a dark hollow at its foot.
   // (bx,by) = the footprint's bottom-left tile; base = the ground line.
