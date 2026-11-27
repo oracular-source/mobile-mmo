@@ -32,7 +32,7 @@ Before v0.43, every mob walked in a straight line toward its target, sliding sid
 Hurt wolves fled at angles all round the circle with zero time stuck. All 32 Wolfwood mobs chasing at once: about 0.2 ms per game tick (a frame has about 16 ms).
 
 ## Later
-- **Fear** can use a safety map (backlog card).
+- ~~**Fear** can use a safety map~~ **built v0.101** (`fleeField` / `fleeFrom` in `js/path.js`): stuck time while feared went from 1.5–2.8 s of 5 s to 0 s in seven of eight areas.
 - **Tap-to-move** for the player can use `pathTo` (optimization card).
 - **Phase 3 (server):** the same maps work on a server; one map per player target per area, cached the same way.
 

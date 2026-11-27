@@ -118,3 +118,40 @@ function walkGoal(e,tx,ty){
   for(let i=0;i<f.length;i++){const s=f[i];if(s===PATH_FAR)continue;
     const d=Math.hypot((i%MW)*T+8-tx,((i/MW)|0)*T+8-ty);if(d<bd-0.01||(d<bd+0.01&&s<bs)){bd=d;bs=s;best=i}}
   return best<0?{x:tx,y:ty,W:Wg}:{x:(best%MW)*T+8,y:((best/MW)|0)*T+8,W:Wg}}
+
+// Running in fear (optimization lane, Nov 27; Brogue's "safety map", docs/research/pathing.md). A feared mob used to run in a
+// straight line directly away from you, so it slammed into the nearest wall, tree or corner and ground there. Now it walks
+// downhill on a safety map: start from the distance map to you (steps from every tile), flip it so far is low (times
+// FLEE_K), then let the values settle so no tile is more than one step worse than its best neighbour. A dead end or a corner
+// then stops looking like a way out, because the open ground round it is lower, so a mob runs along the open routes away
+// from you, round things and even past you to the far side of a room, instead of into the wall. Cached per tile you stand on.
+const FLEE_K=1.2;        // how much "far from you" outweighs "a long way round": Brogue's value
+const fleeMaps=new Map();let fleeRef=null;
+function fleeField(gx,gy){pathSync();if(fleeRef!==pathFree){fleeMaps.clear();fleeRef=pathFree}
+  const k=gx+','+gy;let s=fleeMaps.get(k);if(s){fleeMaps.delete(k);fleeMaps.set(k,s);return s}
+  const d=pathField(gx,gy),N=MW*MH;s=new Float32Array(N);
+  for(let i=0;i<N;i++)s[i]=d[i]===PATH_FAR?Infinity:-FLEE_K*d[i];
+  // Settle: sweep forwards and backwards until nothing changes (a few passes on our small grids).
+  for(let pass=0;pass<64;pass++){let ch=false;
+    for(let b=0;b<2;b++)for(let n=0;n<N;n++){const i=b?N-1-n:n;if(s[i]===Infinity)continue;const x=i%MW,y=(i/MW)|0;
+      for(let q=0;q<8;q++){const dx=PATH_DIRS[q][0],dy=PATH_DIRS[q][1];if(!pathStep(x,y,dx,dy))continue;const v=s[i+dy*MW+dx]+1;if(v<s[i]){s[i]=v;ch=true}}}
+    if(!ch)break}
+  fleeMaps.set(k,s);if(fleeMaps.size>8)fleeMaps.delete(fleeMaps.keys().next().value);
+  return s}
+// Move e one tick away from `from` (you) in fear. Like pathTo: walk downhill a few tiles, aim for the farthest in plain sight.
+// Cornered (no tile leads anywhere safer) it cowers in the middle of its tile instead of pushing into the wall.
+function fleeFrom(e,from,spd,dt){
+  const away=()=>{const dx=e.x-from.x,dy=e.y-from.y,dd=Math.hypot(dx,dy)||1;moveToward(e,e.x+dx/dd*20,e.y+dy/dd*20,spd,dt)};
+  pathSync();
+  let x=Math.floor(e.x/T),y=Math.floor(e.y/T);const gx=Math.floor(from.x/T),gy=Math.floor(from.y/T);
+  if(!pathOk(x,y)||!pathOk(gx,gy))return away(); // standing somewhere odd (or you are): the old straight run
+  const s=fleeField(gx,gy);if(s[y*MW+x]===Infinity)return away();
+  let aim=null;
+  for(let st=0;st<PATH_LOOK;st++){const cur=s[y*MW+x];let bx=-1,by=-1,bv=cur,bd=-1;
+    for(let q=0;q<8;q++){const dx=PATH_DIRS[q][0],dy=PATH_DIRS[q][1];if(!pathStep(x,y,dx,dy))continue;
+      const v=s[(y+dy)*MW+x+dx],dd=Math.hypot((x+dx)*T+8-from.x,(y+dy)*T+8-from.y); // ties: the step farther from you
+      if(v<bv-1e-6||(Math.abs(v-bv)<=1e-6&&v<cur&&dd>bd)){bv=v;bd=dd;bx=x+dx;by=y+dy}}
+    if(bx<0)break;x=bx;y=by;const cx=x*T+8,cy=y*T+8;
+    if(!aim||clearLine(e.x,e.y,cx,cy))aim={x:cx,y:cy};else break}
+  if(!aim){moveToward(e,x*T+8,y*T+8,spd,dt);return}
+  moveToward(e,aim.x,aim.y,spd,dt)}
