@@ -11,7 +11,7 @@ SETUP={
 'king':'''const m=G.mobs.find(m=>m.def.boss);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x-30;P.y=m.y+10;m.state='idle';W.focus=m;W.at=6;W.act=()=>killMob(m);W.n=70;''',
 'throw':'''const m=G.mobs.find(m=>m.def.boss);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+30;P.y=m.y+60;m.state='chase';m.threat={p:999,pet:0};m.bolt=0.01;W.focus={x:(m.x+P.x)/2,y:(m.y+P.y)/2};W.n=84;W.god=1;''',
 'howl':'''const m=G.mobs.find(m=>m.type==='greyfang'&&!m.dead);const pk=G.mobs.filter(o=>o!==m&&!o.dead&&o.sp.group&&o.sp.group===m.sp.group);
-  G.mobs.forEach(o=>{if(o!==m&&pk.indexOf(o)<0)o.dead=true});P.x=m.x+46;P.y=m.y+14;m.state='idle';m.dir=1;
+  G.mobs.forEach(o=>{if(o!==m&&pk.indexOf(o)<0)o.dead=true});P.x=m.x+110;P.y=m.y+14;m.state='idle';m.dir=1;
   pk.forEach((o,i)=>{o.x=m.x-40-i*26;o.y=m.y-30+i*44;o.state='idle';o.dir=1});W.at=6;W.act=()=>engage(m);W.n=120;W.god=1;''',
 'crowd':'''const sk=G.mobs.filter(m=>m.type==='cskel'&&!m.dead).slice(0,3);G.mobs.forEach(o=>{if(sk.indexOf(o)<0)o.dead=true});const K=G.mobs.find(m=>m.def.boss);
   sk.forEach((m,i)=>{m.x=P.x-12+i*12;m.y=P.y-9+(i%2)*3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.2+i*0.55});W.focus=P;W.n=96;W.god=1;''',
