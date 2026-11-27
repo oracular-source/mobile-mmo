@@ -147,15 +147,18 @@ function closePrompt(){$('promptUI').classList.remove('show');promptAction=null;
 function promptWatch(){if(promptAt&&(promptAt.z!==zoneId||Math.hypot(player.x-promptAt.x,player.y-promptAt.y)>2*T))closePrompt()}
 $('pyes').addEventListener('click',()=>{const a=promptAction;closePrompt();if(a)a()});
 $('pno').addEventListener('click',closePrompt);
-// A free spot a couple of tiles from an exit (not on it, so you don't trigger it again on arrival).
+// A free spot beside an exit (not on it, so you don't trigger it again on arrival).
 // dir (v0.41): the way you were walking. You come out on that side of the exit so you keep walking away from it, not back in.
+// v0.94 (owner Nov 27: "you're landing further away from the door"): through a doorway or stairs you come out on the
+// tile right beside it, never on a tile that would take you straight back. Map-edge exits still put you 2 tiles in.
 function areaSpot(A,ex,dir){
   let offs=[[0,2],[0,-2],[2,0],[-2,0],[0,3],[0,-3],[3,0],[-3,0],[2,2],[-2,2],[2,-2],[-2,-2]];
+  if(!exitEdge(A,ex))offs=[[0,1],[0,-1],[1,0],[-1,0]].concat(offs);
   if(dir&&(dir.x||dir.y)){const d=Math.hypot(dir.x,dir.y);offs=offs.map((o,i)=>[o,i]).sort((a,b)=>{const s=o=>(o[0]*dir.x+o[1]*dir.y)/(d*Math.hypot(o[0],o[1]));return (s(b[0])-s(a[0]))||(a[1]-b[1])}).map(o=>o[0])}
   // Open ground only (v0.64, owner: coming up out of the rat tunnel dropped you in a pocket behind the lamppost that was
   // hard to get out of): a spot needs most of the ground around it open, so you never arrive boxed in by a tree, a post
   // or a wall. If nothing round the exit is that open, the first free spot still does.
-  const ok=(x,y)=>x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0,roomy=(x,y)=>{let n=0;for(let j=-2;j<=2;j++)for(let i=-2;i<=2;i++)if(ok(x+i,y+j))n++;return n>=15};
+  const ok=(x,y)=>x>=0&&y>=0&&x<A.w&&y<A.h&&A.map[y][x]===0&&!A.exits.some(e=>exitTrigger(A,e,x,y)),roomy=(x,y)=>{let n=0;for(let j=-2;j<=2;j++)for(let i=-2;i<=2;i++)if(ok(x+i,y+j))n++;return n>=15};
   for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;if(ok(x,y)&&roomy(x,y))return{x:x*T+8,y:y*T+8}}
   for(const [dx,dy] of offs){const x=ex.tx+dx,y=ex.ty+dy;if(ok(x,y))return{x:x*T+8,y:y*T+8}}
   return A.start||null}
@@ -235,7 +238,7 @@ function checkPortals(){
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));saveInv();}
   if(inst&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
   const A=curArea();
-  if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);checkLocks(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>Math.abs(e.tx-tx)<=1&&Math.abs(e.ty-ty)<=1&&(e.tx===tx||e.ty===ty));
+  if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);checkLocks(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>exitTrigger(A,e,tx,ty)); // v0.94: doorways fire under your feet, not a tile early
     // The exit you just came out of wakes up 1 second after you arrive (owner, Nov 20; was "after walking 3 tiles away"):
     // you can run straight back in (to help a friend), but you can't flicker in and out. If you're already back on it when the
     // second is up, it takes you through then (you always arrive 2+ tiles off it, so arriving never counts as standing on it).

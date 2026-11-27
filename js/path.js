@@ -77,20 +77,36 @@ function randomRunSpot(e,from){pathSync();
 
 // Tap to walk (optimization lane). Your walks get their own walk grid: the mobs' grid minus every way-out tile (an exit and
 // the tiles beside it that take you through, as in checkPortals), so a route round a tree never carries you out of the area
-// by accident. Tap the exit itself (or beside it) and that one exit stays open, so you walk out as you meant to.
-function exitTrigger(e,x,y){return Math.abs(e.tx-x)<=1&&Math.abs(e.ty-y)<=1&&(e.tx===x||e.ty===y)}
+// by accident. Tap the exit itself (or beside it, e.g. the door in the building) and that one exit stays open, so you walk out as you meant to.
+// Which tiles take you through an exit (v0.94, owner Nov 27: "you're going in much further away than the door is").
+// A doorway or stairs only fires when your feet are on it: the exit tile, or another tile of the same stairs / steps /
+// slope beside it (the crypt's stairs are two wide). It used to fire from the plain ground in front too, a tile early.
+// An exit on the map's edge (walking off the side) keeps the old rule: the edge tile or one beside it.
+const EXIT_WIDE=new Set(['stairs','steps','dirt_slope']);
+function exitEdge(A,e){return e.tx<=0||e.ty<=0||e.tx>=A.w-1||e.ty>=A.h-1}
+function exitTrigger(A,e,x,y){
+  if(x===e.tx&&y===e.ty)return true;
+  if(Math.abs(e.tx-x)+Math.abs(e.ty-y)!==1)return false;
+  if(exitEdge(A,e))return true;
+  const c=A.rows[y]&&A.rows[y][x];return c===A.rows[e.ty][e.tx]&&!!AREA_TILES[c]&&EXIT_WIDE.has(AREA_TILES[c].name)}
+// A tap counts as tapping an exit if it's on it or right beside it, as before, or (v0.94) anywhere on the building or rock
+// within 2 tiles of a doorway: tapping the top of the crypt's dark doorway used to walk you round behind the crypt.
+const exitNear=(A,e,x,y)=>(Math.abs(e.tx-x)<=1&&Math.abs(e.ty-y)<=1&&(e.tx===x||e.ty===y))||
+  (!exitEdge(A,e)&&!okIn(pathFree,x,y)&&Math.max(Math.abs(e.tx-x),Math.abs(e.ty-y))<=2);
 function walkGrid(gx,gy){pathSync();
-  const A=curArea(),ex=A&&A.exits||[],open=ex.find(e=>exitTrigger(e,gx,gy)),k=open?ex.indexOf(open):-1;
+  const A=curArea(),ex=A&&A.exits||[],open=ex.find(e=>exitNear(A,e,gx,gy)),k=open?ex.indexOf(open):-1;
   let W=walkGrids.get(k);if(W)return W;
   const G=pathFree.slice();
   for(const e of ex){if(e===open)continue;
-    for(let y=e.ty-1;y<=e.ty+1;y++)for(let x=e.tx-1;x<=e.tx+1;x++)if(x>=0&&y>=0&&x<MW&&y<MH&&exitTrigger(e,x,y))G[y*MW+x]=0}
-  W={G,C:new Map()};walkGrids.set(k,W);return W}
+    for(let y=e.ty-1;y<=e.ty+1;y++)for(let x=e.tx-1;x<=e.tx+1;x++)if(x>=0&&y>=0&&x<MW&&y<MH&&exitTrigger(A,e,x,y))G[y*MW+x]=0}
+  W={G,C:new Map(),ex:open||null};walkGrids.set(k,W);return W}
 // Where should a tap actually take you? The tapped spot if you can walk there; if it's a tree, wall or water, or cut off
 // (across a pond), the reachable tile nearest to it, so a tap never leaves you pushing into a trunk or a shoreline.
 // Returns {x,y,W}: the goal and the walk grid to use for it.
 function walkGoal(e,tx,ty){
-  const gx=Math.floor(tx/T),gy=Math.floor(ty/T),W=walkGrid(gx,gy),G=W.G;
+  let gx=Math.floor(tx/T),gy=Math.floor(ty/T);const W=walkGrid(gx,gy),G=W.G;
+  // Tapped a building or rock next to a doorway (v0.94): walk to the doorway itself, not the nearest bit of ground.
+  if(W.ex&&!okIn(pathFree,gx,gy)){tx=W.ex.tx*T+8;ty=W.ex.ty*T+8;gx=W.ex.tx;gy=W.ex.ty}
   const ex=Math.floor(e.x/T),ey=Math.floor(e.y/T);
   if(!okIn(pathFree,ex,ey))return{x:tx,y:ty,W:null}; // standing somewhere odd: the old straight walk
   // Standing on a way-out tile (just arrived, or stepped back on one): that one's open too, so you can walk off it.
