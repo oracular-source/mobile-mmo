@@ -138,7 +138,7 @@ D['monk']=dict(pal=pal('monk'),lab='punch',idle=[
 "....ssssss......",
 ".....ssss.......",
 "...sHnnnnNsssWW.",
-"..ssHnnnnNssWW..",
+"..ssHnnnnN...WW.",  # punch: arm one pixel thick, 2x2 wrapped fist
 "..s.HnnnnN......",
 "..WTTTTTTTT.....",
 "....HnnnnNT.....",
