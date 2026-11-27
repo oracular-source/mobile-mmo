@@ -55,7 +55,7 @@ function engage(m,byPet){
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
-  const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;floatText(m.x,m.y-26,'HOWL!','#ffb37a',true);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
+  const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;animHowl(m);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
   if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&!(o.calm>0)&&dist(o,m)<reach){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
   if(m.def.camp)campCall(m); // a chapel camp shouts for the nearest other camp (v0.62)
 }

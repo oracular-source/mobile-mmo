@@ -1,4 +1,4 @@
-// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, and flying things (the Skeleton King's Bone Throw).
+// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, flying things (the Skeleton King's Bone Throw), Greyfang's Howl and wolf bites.
 'use strict';
 // Looks only. Everything here uses fr() (Math.random), never the game's rng(), and never changes a timer, a number or
 // a position the rules use, so fights and the sim roll exactly the same with or without it. While the sim runs
@@ -14,6 +14,7 @@ function fxBits(x,y,cols,n,sp,up,life){for(let i=0;i<n;i++)parts.push({x:x+fr(-2
 // swing, so a stack of three ripples instead of blurring into one shape.
 function animSwing(m,v){if(logMute)return;
   const dx=v.x-m.x,dy=v.y-m.y,d=Math.hypot(dx,dy)||1;m.swT=SWING;m.swx=dx/d;m.swy=dy/d;
+  if(m.def.bite){fxo.push({k:'bite',x:v.x,y:v.y-8,t:0,life:0.22});return} // wolves: jaws snap shut on you (v0.106)
   fxo.push({k:'slash',x:v.x,y:v.y-8,ax:-dx/d,ay:-dy/d,t:0,life:0.16,col:m.def.slash||'#f2eee0'})}
 // A mob dies. Its family's death if it has one (def.death in js/data/mobs.js), otherwise it sinks into the ground and
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
@@ -52,10 +53,11 @@ function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=
 
 // Where to draw a mob this frame: its swing lunge, with a tiny lean back just before. (Hit reactions wait for weapon
 // animations, owner Nov 27.)
-function mobAnim(m){let dx=0,dy=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
+function mobAnim(m){let dx=0,dy=0,rot=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
   if(m.near>0&&m.atk>0&&m.atk<0.3&&m.aimX!==undefined){const k=(0.3-m.atk)/0.3,ax=m.aimX-m.x,ay=m.aimY-m.y,d=Math.hypot(ax,ay)||1;dx-=ax/d*k;dy-=ay/d*k} // the wind-up: leans back a pixel
   if(m.swT>0){const p=1-m.swT/SWING,o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
-  return{dx:Math.round(dx),dy:Math.round(dy)}}
+  if(m.howlT>0)rot=howlPose(m); // Greyfang throws his head back (and his pack lifts theirs to answer)
+  return{dx:Math.round(dx),dy:Math.round(dy),rot:rot}}
 
 // ---------- The Skeleton King's Bone Throw (v0.102, owner picked it over a wailing skull and a crown bolt) ----------
 // Same rules as the old Shadow Bolt: a 2 s cast, stun or fear breaks it, out of range it falls short. During the cast he
@@ -84,14 +86,49 @@ function drawBone(x,y,ang,len,a){const c=Math.cos(ang),s=Math.sin(ang),px=-s,py=
 function boneGlow(x,y,r,a){lx.globalCompositeOperation='lighter';lx.globalAlpha=a;lx.fillStyle='#6a4a9a';lx.beginPath();lx.arc(Math.round(x),Math.round(y),r,0,7);lx.fill();
   lx.globalAlpha=a*1.4;lx.beginPath();lx.arc(Math.round(x),Math.round(y),r*0.5,0,7);lx.fill();lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}
 
+// ---------- Greyfang's Howl (v0.106, his signature move) ----------
+// Looks only: the howl already calls his pack from 260 away instead of 70 (combat.js); this makes you see it. He rears
+// up and throws his head back, cold breath smokes from his jaws, his ice-blue eyes flare, and rings of sound roll out
+// across the wood. When a ring reaches one of his pack, that wolf's eyes flash and it lifts its head to answer.
+const HOWL={pose:1.4,reach:260,speed:230,rings:[0.15,0.42,0.7],col:'#bfe9ff'};
+function animHowl(m){if(logMute)return;m.howlT=HOWL.pose;m.howlA=0.36;
+  const pack=mobs.filter(o=>o!==m&&!o.dead&&m.sp.group&&o.sp.group===m.sp.group&&dist(o,m)<HOWL.reach).map(o=>({m:o,d:dist(o,m),done:0}));
+  fxo.push({k:'howl',m:m,x:m.x,y:m.y,dir:m.dir,pack:pack,t:0,life:HOWL.rings[2]+HOWL.reach/HOWL.speed+0.1})}
+// How far he's reared back this frame (radians, nose up): up fast, a trembling hold, back down.
+function howlPose(m){const T=HOWL.pose,e=T-m.howlT,full=m.howlA||0.36,up=0.18,down=0.3;
+  const k=e<up?e/up:m.howlT<down?m.howlT/down:1;return -full*k*m.dir+(k===1?Math.sin(e*40)*0.015:0)}
+// Where his jaws are, roughly, with the rear-up taken into account.
+function howlMouth(m){const img=IMG[m.def.img],w=img.w,h=img.h,a=Math.abs(howlPose(m));
+  return{x:m.x+m.dir*(w*0.5-3)*Math.cos(a),y:m.y-h+6-(w*0.85)*Math.sin(a)}}
+function howlTick(f,dt){const m=f.m;
+  if(!m.dead&&m.howlT>0.3&&Math.random()<0.7){const o=howlMouth(m);parts.push({x:o.x+fr(-1,1),y:o.y+fr(-1,1),vx:m.dir*fr(2,8),vy:-fr(8,16),t:0,life:fr(0.5,0.9),col:Math.random()<0.5?'#cfe0ea':'#8fa4b0'})} // cold breath
+  const r=(f.t-HOWL.rings[0])*HOWL.speed;
+  f.pack.forEach(p=>{if(!p.done&&r>=p.d){p.done=1;if(p.m.dead)return;p.m.howlT=0.55;p.m.howlA=0.2;
+    fxo.push({k:'glint',m:p.m,t:0,life:0.6})}})}
+// A ring of sound: a flattened circle (the ground is seen at a slant) of dashes, thinning and fading as it spreads.
+function howlRing(x,y,r,a){if(r<=2||a<=0.01)return;lx.fillStyle=HOWL.col;const ry=r*0.55,n=Math.max(16,Math.round(r*0.9));
+  for(let i=0;i<n;i++){if(i%4===3)continue;const an=i/n*6.283;lx.globalAlpha=a*(0.75+0.25*Math.sin(an*3));lx.fillRect(Math.round(x+Math.cos(an)*r),Math.round(y+Math.sin(an)*ry),2,1)}
+  lx.globalAlpha=1}
+function howlDraw(f){const m=f.m,o=m.dead?{x:f.x,y:f.y-20}:howlMouth(m);
+  HOWL.rings.forEach((d,i)=>{const r=(f.t-d)*HOWL.speed;if(r<0||r>HOWL.reach)return;const a=Math.min(1,(1-r/HOWL.reach)*1.3)*(i?0.7:1);
+    howlRing(o.x,o.y+8,r,a);if(r<40)howlRing(o.x,o.y+8,r*0.8,a*0.5)}); // a faint inner ring while it's still close
+  if(!m.dead&&m.howlT>0.3){const img=IMG[m.def.img],ex=m.x+m.dir*(img.w*0.5-7),ey=howlMouth(m).y-1,pr=0.6+0.4*Math.sin(f.t*18);
+    lx.globalCompositeOperation='lighter';lx.globalAlpha=0.3*pr;lx.fillStyle='#9fe8ff';lx.beginPath();lx.arc(Math.round(ex),Math.round(ey),2,0,7);lx.fill();lx.globalAlpha=0.9;lx.fillRect(Math.round(ex),Math.round(ey),1,1);
+    lx.globalAlpha=0.18;lx.beginPath();lx.arc(Math.round(o.x),Math.round(o.y),3+pr,0,7);lx.fill();lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}}
+// A pack wolf hears him: its red eyes flash bright for a moment.
+function glintDraw(f){const m=f.m;if(m.dead)return;const img=IMG[m.def.img],p=f.t/f.life,x=m.x+m.dir*(img.w*0.5-6),y=m.y-img.h+5;
+  lx.globalCompositeOperation='lighter';lx.globalAlpha=(1-p)*0.45;lx.fillStyle='#ff6a50';lx.beginPath();lx.arc(Math.round(x),Math.round(y),1.5+p,0,7);lx.fill();
+  lx.globalAlpha=1-p;lx.fillStyle='#ffd0c0';lx.fillRect(Math.round(x),Math.round(y),1,1);lx.globalAlpha=1;lx.globalCompositeOperation='source-over'}
+
 // Every frame (from update): move the animations along and drop the finished ones.
 function fxTick(dt){
-  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.near>0)m.near-=dt}
+  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.near>0)m.near-=dt;if(m.howlT>0)m.howlT-=dt}
   for(let i=fxo.length-1;i>=0;i--){const f=fxo[i];f.t+=dt;
     if(f.k==='bone'){if(f.home){f.tx=player.x;f.ty=player.y-8}const p=Math.min(1,f.t/f.life),bx=f.x0+(f.tx-f.x0)*p,by=f.y0+(f.ty-f.y0)*p-Math.sin(Math.PI*p)*14;
       if(Math.random()<0.8)parts.push({x:bx+fr(-1,1),y:by+fr(-1,1),vx:fr(-4,4),vy:fr(-6,2),t:0,life:fr(0.25,0.5),col:Math.random()<0.35?'#9a7cc8':'#cfc6ae'}); // bone dust and a thread of grave-light
       if(f.t>=f.life){fxo.splice(i,1);boneEnd(f,bx,by);continue}}
     else if(f.k==='bones')bonesTick(f,dt);
+    else if(f.k==='howl')howlTick(f,dt);
     else if(f.k==='frag'){if(f.y<f.gy)f.ang+=f.va*dt;f.vy+=160*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;if(f.y>f.gy){f.y=f.gy;f.vy*=-0.35;f.vx*=0.5}}
     if(f.t>=f.life)fxo.splice(i,1)}}
 // Where the bone ends up. Hit: it cracks apart on you. Dodged: it glances off and tumbles away. Short or broken off: it
@@ -109,7 +146,11 @@ function fxDraw(){
       for(let j=0;j<6;j++){const q=j/5;if(q>p*1.6)break;const an=base-1+q*2;lx.globalAlpha=Math.max(0,1-p)*(0.5+0.5*q);lx.fillRect(Math.round(f.x+Math.cos(an)*5),Math.round(f.y+Math.sin(an)*5),1,1)}lx.globalAlpha=1}
     else if(f.k==='fall'){const p=f.t/f.life,im=f.img,h=Math.max(1,Math.round(im.h*(1-p*0.75))),w=im.w,dx=Math.round(f.x)-(w>>1),dy=Math.round(f.y)-h;
       lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}
-    else if(f.k==='bones')bonesDraw(f)})}
+    else if(f.k==='bones')bonesDraw(f)
+    else if(f.k==='bite'){const p=Math.min(1,f.t/0.1),gap=Math.round(5*(1-p)),fade=f.t>0.12?1-(f.t-0.12)/0.1:1;lx.globalAlpha=Math.max(0,fade); // two rows of fangs close on you
+      for(let i=-2;i<=2;i++){const x=Math.round(f.x)+i*2,up=Math.round(f.y)-gap-1,lo=Math.round(f.y)+gap+1,long=i===-2||i===2;
+        lx.fillStyle='#1c1820';lx.fillRect(x-1,up-2,3,long?4:3);lx.fillRect(x-1,lo-(long?1:0),3,long?4:3);
+        lx.fillStyle='#f2eee0';lx.fillRect(x,up-1,1,long?3:2);lx.fillRect(x,lo,1,long?3:2)}lx.globalAlpha=1}})}
 // Every frame, after the lighting (so the dark doesn't swallow it): the bone in the King's hand, in the air and in pieces.
 function fxDrawLit(){
   // The bone raised over his head while the cast bar fills, rising and trembling as it comes to the throw, grave-light
@@ -120,6 +161,7 @@ function fxDrawLit(){
     boneGlow(bx,by,5+p*5,0.12+p*0.18);
     if(Math.random()<0.3+p*0.5){const a=fr(0,6.3),r=fr(8,14);parts.push({x:bx+Math.cos(a)*r,y:by+Math.sin(a)*r,vx:-Math.cos(a)*r*2.5,vy:-Math.sin(a)*r*2.5,t:0,life:0.35,col:'#b48cff'})}
     drawBone(bx,by,(-0.6-p*0.7)*m.dir,12)}
+  fxo.forEach(f=>{if(f.k==='howl')howlDraw(f);else if(f.k==='glint')glintDraw(f)});
   fxo.forEach(f=>{
     if(f.k==='bone'){const pos=q=>{const p=Math.min(1,q/f.life);return[f.x0+(f.tx-f.x0)*p,f.y0+(f.ty-f.y0)*p-Math.sin(Math.PI*p)*14]};
       const p=Math.min(1,f.t/f.life),[bx,by]=pos(f.t);
