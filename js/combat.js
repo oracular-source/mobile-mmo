@@ -64,7 +64,7 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   if(src!=='npc'&&m.crack>0)dmg*=1.2; // Sunder (Warrior fork): cracked armor
-  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;animHit(m,src,kind);
+  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
   else if(src==='pet'){m.petT=pet;m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}

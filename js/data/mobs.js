@@ -1,6 +1,7 @@
 // DATA ONLY. Mob types and the XP knobs.
 'use strict';
 // undead:1 = Cleric and Paladin holy spells hit it harder (and some only work on undead).
+// death:'bones' = falls into a pile of bones, skull on top (js/anim.js); deathHead = [x, y, w, h, grid width] of the skull in its sprite.
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
   rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:30,aggro:40,armor:0},
@@ -13,7 +14,7 @@ const TYPES={
   trat:{name:'a tunnel rat',img:'trat',lv:[2,4],hp:48,hpl:18,dmg:2.4,dmgl:1.35,spd:31,aggro:44,armor:0},
   brat:{name:'a big tunnel rat',img:'brat',lv:[4,5],hp:56,hpl:21,dmg:3,dmgl:1.55,spd:30,aggro:46,armor:0.05},
   crat:{name:'a crypt rat',img:'crat',lv:[4,5],hp:50,hpl:20,dmg:2.8,dmgl:1.45,spd:31,aggro:44,armor:0},
-  cskel:{name:'a crypt skeleton',img:'skel',lv:[4,6],hp:56,hpl:23,dmg:5.2,dmgl:2,spd:29,aggro:52,undead:1,armor:0.15},
+  cskel:{name:'a crypt skeleton',img:'skel',death:'bones',deathHead:[3,0,9,7,16],lv:[4,6],hp:56,hpl:23,dmg:5.2,dmgl:2,spd:29,aggro:52,undead:1,armor:0.15},
   // Named rares (v0.32, map chat): about 1 in 100 spawns in an area brings out that area's rare at its own spot on the map.
   // rare:1 = 3x XP, a sure uncommon for your class (and a rare chance), a faint glow. shell = direct hits mostly glance off (DoTs work best).
   // callAt = at that share of health it runs to the nearest idle mob and brings it (and its neighbours) back. Adds from:'ground' = they rise beside it.
@@ -67,7 +68,7 @@ const TYPES={
   summoner:{name:'a cult summoner',img:'summoner',lv:[14,15],hp:46,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
     cast:{name:'Cinder Lash',first:2,every:5,dur:1.2,range:90,x:1.5,col:'#ffb060'}},
   cwisp:{name:'a candle wisp',img:'cwisp',lv:[15,15],hp:30,hpl:6,dmg:0,dmgl:0,spd:11,aggro:0,armor:0,float:1,drift:1,noxp:1},
-  boss1:{name:'the Skeleton King',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
+  boss1:{name:'the Skeleton King',img:'boss1',death:'bones',deathHead:[5,0,13,10,24],lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:
 // 1) KILLS_PER_LEVEL: how many even-level, standard-toughness kills each level takes (index = level). The XP needed for

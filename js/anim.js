@@ -5,7 +5,7 @@
 // (logMute) nothing is spawned, so it stays fast.
 const fr=(a,b)=>a+Math.random()*(b-a);
 const fxo=[]; // short animations and flying things: {k:kind, t, life, ...}
-const SWING=0.26,HITT=0.2,BONE_FLIGHT=0.32; // seconds: a lunge out and back, a hit nudge, the bone in the air
+const SWING=0.26,BONE_FLIGHT=0.32; // seconds: a lunge out and back, a hit nudge, the bone in the air
 
 // Dust, shards, sparks: little 1-pixel bits that fly out and fade (the same parts list as the old bursts).
 function fxBits(x,y,cols,n,sp,up,life){for(let i=0;i<n;i++)parts.push({x:x+fr(-2,2),y:y+fr(-2,2),vx:fr(-1,1)*sp,vy:fr(-1,1)*sp-(up||0),t:0,life:fr(0.35,0.75)*(life||1),col:cols[i%cols.length]})}
@@ -15,25 +15,47 @@ function fxBits(x,y,cols,n,sp,up,life){for(let i=0;i<n;i++)parts.push({x:x+fr(-2
 function animSwing(m,v){if(logMute)return;
   const dx=v.x-m.x,dy=v.y-m.y,d=Math.hypot(dx,dy)||1;m.swT=SWING;m.swx=dx/d;m.swy=dy/d;
   fxo.push({k:'slash',x:v.x,y:v.y-8,ax:-dx/d,ay:-dy/d,t:0,life:0.16,col:m.def.slash||'#f2eee0'})}
-// A mob is hit: a white flash and a small push away from what hit it. DoT and song ticks stay quiet (too often).
-function animHit(m,src,kind){if(logMute||kind==='dot'||kind==='song')return;
-  const a=src==='pet'&&pet?pet:src==='npc'?null:player;let dx=a?m.x-a.x:fr(-1,1),dy=a?m.y-a.y:fr(-1,1);const d=Math.hypot(dx,dy)||1;
-  m.hitT=HITT;m.hx_=dx/d;m.hy_=dy/d}
-// A mob dies: it flashes, then sinks into the ground and fades while dust puffs out at its feet.
+// A mob dies. Its family's death if it has one (def.death in js/data/mobs.js), otherwise it sinks into the ground and
+// fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
 function animDeath(m){if(logMute)return;const img=IMG[m.def.img];if(!img||m.def.float)return;
+  if(m.def.death==='bones'){boneCollapse(m,img);return}
   fxo.push({k:'fall',img:img,x:m.x,y:m.y+1,dir:m.dir,t:0,life:0.55});fxBits(m.x,m.y-1,['#6e6458','#8a7f70','#5a5248'],8,16,4,0.9)}
 
-// Where to draw a mob this frame: its swing lunge (with a tiny lean back just before), its hit nudge, and the flash.
+// ---------- Skeleton death: falls into a pile of bones, the skull drops on top (v0.105, first unique death) ----------
+// The body caves in (squashes toward its feet in about 0.12 s) while its bones spill out and land in a little mound;
+// the skull hangs in the air a beat, then drops onto the pile, bounces once and settles. The pile lies there about
+// 3 s, then fades. def.deathHead = [x, y, w, h, source width]: where the skull is in the sprite's grid.
+function boneCollapse(m,img){const H=m.def.deathHead||[3,0,9,7,16],sc=img.w/H[4],big=sc>1.5;
+  const gy=m.y,pc=[],n=big?11:7;
+  for(let i=0;i<n;i++){const tx=m.x+fr(-6,6)*(big?1.6:1)*(0.4+0.6*Math.abs(Math.sin(i*1.7))),y0=m.y-fr(img.h*0.2,img.h*0.65),t0=fr(0.03,0.12);
+    pc.push({x:m.x+fr(-3,3)*(big?2:1),y:y0,tx:tx,gy:gy-Math.max(0,(big?5:3.5)-Math.abs(tx-m.x)*0.6)-fr(0,1),lie:fr(-0.45,0.45)+(Math.random()<0.5?0:Math.PI),vx:0,vy:fr(-20,0),t0:t0,ang:fr(0,6.3),va:fr(-16,16),len:big?fr(4,8):fr(3,6),down:false})}
+  pc.forEach(p=>{p.vx=(p.tx-p.x)/0.24});
+  fxo.push({k:'bones',img:img,x:m.x,y:m.y+1,dir:m.dir,H:H,sc:sc,pc:pc,gy:gy,t:0,life:3.4,
+    sk:{x:m.x+(H[0]+H[2]/2-H[4]/2)*sc*m.dir,y:m.y+1-img.h+H[1]*sc,vy:0,vx:fr(-6,6),rest:gy-3-(big?3:0),bounced:0,ang:0,landed:0},puffed:0})}
+function bonesTick(f,dt){const g=320;
+  f.pc.forEach(p=>{if(f.t<p.t0||p.down)return;p.vy+=g*dt;p.x+=p.vx*dt;p.y+=p.vy*dt;p.ang+=p.va*dt;
+    if(p.y>=p.gy){p.y=p.gy;p.down=true;p.ang=p.lie}}); // lands and lies still, roughly flat (a bone standing upright reads as a stick)
+  if(!f.puffed&&f.t>0.2){f.puffed=1;fxBits(f.x,f.gy-1,['#6e6458','#8a7f70','#5a5248'],8,18,4,0.9)}
+  const s=f.sk;if(f.t<0.24){s.y+=Math.sin(f.t*40)*0.08;return} // the skull hangs a beat while the body caves in under it
+  if(s.landed)return;s.vy+=g*dt;s.y+=s.vy*dt;s.x+=s.vx*dt;s.ang+=s.vx*dt*0.15;
+  if(s.y>=s.rest){s.y=s.rest;if(!s.bounced){s.bounced=1;s.vy*=-0.32;s.vx*=0.5;fxBits(s.x,s.rest+2,['#8a7f70','#cfc6ae'],4,10,3,0.6)}else{s.landed=1;s.vy=0}}}
+function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=f.t>f.life-0.5?(f.life-f.t)/0.5:1;
+  // The body below the skull caving in.
+  if(f.t<0.14){const p=f.t/0.14,top=Math.round((H[1]+H[3])*sc),bh=im.h-top,h=Math.max(1,Math.round(bh*(1-p*0.8)));
+    lx.globalAlpha=1-p*0.6;lx.drawImage(dirIm,0,top,im.w,bh,Math.round(f.x)-(im.w>>1),Math.round(f.y)-h,im.w,h);lx.globalAlpha=1}
+  // The bones, falling and then lying in their pile.
+  f.pc.forEach(p=>{if(f.t>=p.t0)drawBone(p.x,p.y,p.ang,p.len,fade)});
+  // The skull, cut from the sprite itself so it's the same face (and the King keeps his crown).
+  const s=f.sk,sw=Math.round(H[2]*sc),sh=Math.round(H[3]*sc),sx=f.dir<0?im.w-Math.round((H[0]+H[2])*sc):Math.round(H[0]*sc);
+  lx.globalAlpha=fade;lx.save();lx.translate(Math.round(s.x),Math.round(s.y)+(sh>>1));lx.rotate(Math.round(s.ang/0.35)*0.35);
+  lx.drawImage(dirIm,sx,Math.round(H[1]*sc),sw,sh,-(sw>>1),-(sh>>1),sw,sh);lx.restore();lx.globalAlpha=1}
+
+// Where to draw a mob this frame: its swing lunge, with a tiny lean back just before. (Hit reactions wait for weapon
+// animations, owner Nov 27.)
 function mobAnim(m){let dx=0,dy=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
   if(m.near>0&&m.atk>0&&m.atk<0.3&&m.aimX!==undefined){const k=(0.3-m.atk)/0.3,ax=m.aimX-m.x,ay=m.aimY-m.y,d=Math.hypot(ax,ay)||1;dx-=ax/d*k;dy-=ay/d*k} // the wind-up: leans back a pixel
   if(m.swT>0){const p=1-m.swT/SWING,o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
-  if(m.hitT>0){const o=m.hitT/HITT;dx+=m.hx_*2*o;dy+=m.hy_*1.5*o}
-  return{dx:Math.round(dx),dy:Math.round(dy),flash:m.hitT>HITT-0.07}}
-
-// A white copy of a sprite for the hit flash, made once per picture and kept.
-function whiteOf(img,dir){const key=dir<0?'wf':'wc';if(img[key])return img[key];
-  const c=document.createElement('canvas');c.width=img.w;c.height=img.h;const x=c.getContext('2d');x.drawImage(dir<0?img.f:img.c,0,0);
-  x.globalCompositeOperation='source-in';x.fillStyle='#ffffff';x.fillRect(0,0,img.w,img.h);return img[key]=c}
+  return{dx:Math.round(dx),dy:Math.round(dy)}}
 
 // ---------- The Skeleton King's Bone Throw (v0.102, owner picked it over a wailing skull and a crown bolt) ----------
 // Same rules as the old Shadow Bolt: a 2 s cast, stun or fear breaks it, out of range it falls short. During the cast he
@@ -49,7 +71,11 @@ function boneLand(m,out){const b=fxo.find(f=>f.k==='bone'&&f.m===m&&!f.out);if(b
 function drawBone(x,y,ang,len,a){const c=Math.cos(ang),s=Math.sin(ang),px=-s,py=c,hl=len/2;lx.globalAlpha=a==null?1:a;
   const dot=(X,Y,n,col)=>{lx.fillStyle=col;lx.fillRect(Math.round(X)-(n>>1),Math.round(Y)-(n>>1),n,n)};
   const big=len>=8,kn=big?1.6:1;
-  for(let pass=0;pass<2;pass++){const n=big?(pass?2:4):(pass?1:3),col=pass?'#e8e0c8':'#1c1820';
+  if(!big){ // small bone: a cream line with a shadow pixel under it and a knob at each end, so it stays light
+    for(let i=-hl;i<=hl;i+=0.5)dot(x+c*i,y+s*i+1,1,'#1c1820');
+    for(let i=-hl;i<=hl;i+=0.5)dot(x+c*i,y+s*i,1,'#e4dccb');
+    [-1,1].forEach(e=>{dot(x+c*hl*e+px*0.6,y+s*hl*e+py*0.6,1,'#f6f0dc');dot(x+c*hl*e-px*0.6,y+s*hl*e-py*0.6,1,'#bdb39c')});lx.globalAlpha=1;return}
+  for(let pass=0;pass<2;pass++){const n=pass?2:4,col=pass?'#e8e0c8':'#1c1820';
     for(let i=-hl;i<=hl;i+=0.5)dot(x+c*i,y+s*i,n,col);
     if(big)[-1,1].forEach(e=>{const ex=x+c*hl*e,ey=y+s*hl*e;dot(ex+px*kn,ey+py*kn,n,pass?'#f6f0dc':col);dot(ex-px*kn,ey-py*kn,n,pass?'#f6f0dc':col)})}
   if(big){lx.fillStyle='#a89e86';for(let i=-hl+2;i<=hl-2;i+=1)lx.fillRect(Math.round(x+c*i+px*0.7),Math.round(y+s*i+py*0.7),1,1)} // shade on the lower edge
@@ -60,11 +86,12 @@ function boneGlow(x,y,r,a){lx.globalCompositeOperation='lighter';lx.globalAlpha=
 
 // Every frame (from update): move the animations along and drop the finished ones.
 function fxTick(dt){
-  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.hitT>0)m.hitT-=dt;if(m.near>0)m.near-=dt}
+  for(let i=0;i<mobs.length;i++){const m=mobs[i];if(m.swT>0)m.swT-=dt;if(m.near>0)m.near-=dt}
   for(let i=fxo.length-1;i>=0;i--){const f=fxo[i];f.t+=dt;
     if(f.k==='bone'){if(f.home){f.tx=player.x;f.ty=player.y-8}const p=Math.min(1,f.t/f.life),bx=f.x0+(f.tx-f.x0)*p,by=f.y0+(f.ty-f.y0)*p-Math.sin(Math.PI*p)*14;
       if(Math.random()<0.8)parts.push({x:bx+fr(-1,1),y:by+fr(-1,1),vx:fr(-4,4),vy:fr(-6,2),t:0,life:fr(0.25,0.5),col:Math.random()<0.35?'#9a7cc8':'#cfc6ae'}); // bone dust and a thread of grave-light
       if(f.t>=f.life){fxo.splice(i,1);boneEnd(f,bx,by);continue}}
+    else if(f.k==='bones')bonesTick(f,dt);
     else if(f.k==='frag'){if(f.y<f.gy)f.ang+=f.va*dt;f.vy+=160*dt;f.x+=f.vx*dt;f.y+=f.vy*dt;if(f.y>f.gy){f.y=f.gy;f.vy*=-0.35;f.vx*=0.5}}
     if(f.t>=f.life)fxo.splice(i,1)}}
 // Where the bone ends up. Hit: it cracks apart on you. Dodged: it glances off and tumbles away. Short or broken off: it
@@ -81,7 +108,8 @@ function fxDraw(){
     if(f.k==='slash'){const p=f.t/f.life,base=Math.atan2(f.ay,f.ax);lx.fillStyle=f.col;
       for(let j=0;j<6;j++){const q=j/5;if(q>p*1.6)break;const an=base-1+q*2;lx.globalAlpha=Math.max(0,1-p)*(0.5+0.5*q);lx.fillRect(Math.round(f.x+Math.cos(an)*5),Math.round(f.y+Math.sin(an)*5),1,1)}lx.globalAlpha=1}
     else if(f.k==='fall'){const p=f.t/f.life,im=f.img,h=Math.max(1,Math.round(im.h*(1-p*0.75))),w=im.w,dx=Math.round(f.x)-(w>>1),dy=Math.round(f.y)-h;
-      lx.globalAlpha=1-p*p;lx.drawImage(p<0.15?whiteOf(im,f.dir):(f.dir<0?im.f:im.c),0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}})}
+      lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}
+    else if(f.k==='bones')bonesDraw(f)})}
 // Every frame, after the lighting (so the dark doesn't swallow it): the bone in the King's hand, in the air and in pieces.
 function fxDrawLit(){
   // The bone raised over his head while the cast bar fills, rising and trembling as it comes to the throw, grave-light
