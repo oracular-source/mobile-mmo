@@ -33,23 +33,20 @@ MAPS.rat_tunnel = {
     'EEEEEEEEEdd~~~~~dddddddEhEEEEdddddEhEEhEEEEEEE',
     'EEEEEEEEEddddddddddddddddEEEdddpdddddddEEEEEEE',
     'EEEEEEEEEEdddddddddEEdddddEdddddddpdddddddEEEE',
-    'EEEEEEEEEEEdddEEEEEEEEEddddddddddddddddddEEEEE',
-    'EEEEEEEEEEEEEEEEEEEEEEEEdBddddddddddddddBdEEEE',
+    'EEEEEEEEEEEdddEEEEEEEEEdddddddddddddddddBEEEEE',
+    'EEEEEEEEEEEEEEEEEEEEEEEEddddddddddddddddddEEEE',
     'EEEEEEEEEEEEEEEEEEEEEEEEddddddddddddddddddEEEE',
     'EEEEEEEEEEEEEEEEEEEEEEEEEEddddddddddddddddEEEE',
-    'EEEEEEEEEEEEEEEEEEEEEEEEEEBddddddddddddddEEEEE',
-    'EEEEEEEEEEEEEEEEEEEEEEEEEEEdddddddddddBddEEEEE',
-    'EEEEEEEEEEEEEEEEEEEEEEEEEEEEddBddddddddEEEEEEE',
+    'EEEEEEEEEEEEEEEEEEEEEEEEEEdddddddddddddddEEEEE',
+    'EEEEEEEEEEEEEEEEEEEEEEEEEEEddddddddddddddEEEEE',
+    'EEEEEEEEEEEEEEEEEEEEEEEEEEEEdddddddddddEEEEEEE',
     'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEdddddEEEEEEEEEEEE',
     'EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE',
   ],
   things: `
-# daylight through the sinkhole and a few cracks; the cart fell in from the road above
+# daylight only under the sinkhole (owner, Nov 27: no light shafts deeper in); the cart fell in from the road above
 obj light_shaft 8 4
 obj light_shaft 6 5
-obj light_shaft 23 8
-obj light_shaft 13 19
-obj light_shaft 33 27
 obj cart 10 6
 obj gnaw_pile 36 27
 # one way in and out: the sinkhole (owner, Nov 20: it's a rat tunnel; the old back hole is gone)
@@ -81,6 +78,30 @@ named old_gnawbone 6 34 29 summon=gnaw_pile key=severed_paw
 # secrets: the side burrow with a dead adventurer, and the Pale Rat
 chest 32 4
 rare pale_rat 29 6
+# pool cavern (love pass, Nov 27): a wet bank, dripstone by the wall, glow caps where it's damp, rat tracks to the water, pale fish
+obj stalagmite 8 22
+obj stalagmite 9 26 small
+obj glow_caps 9 25
+obj glow_caps 17 22
+obj rat_tracks 17 23 w
+obj rat_tracks 12 21 s
+critter cavefish 13.5 23.6 2
+# Gnawbone's den (love pass, Nov 27): bones heaped round his nest and thinning out, a drag trail in from the west,
+# glow caps feeding on the rot by the pile (the den's only light)
+obj gnawed_bones 35 28 heap
+obj gnawed_bones 38 27 heap
+obj gnawed_bones 36 29 heap
+obj gnawed_bones 34 28 few
+obj gnawed_bones 37 29 few
+obj gnawed_bones 38 29 few
+obj gnawed_bones 35 30 few
+obj gnawed_bones 39 28 few
+obj gnawed_bones 33 29 one
+obj gnawed_bones 31 28 one
+obj gnawed_bones 29 29 one
+obj gnawed_bones 27 28 one
+obj glow_caps 39 29
+obj glow_caps 32 27
 # damp mist over the pool and the den floor (x y w h)
 fog 8 19 14 8
 fog 25 26 16 9

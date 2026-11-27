@@ -107,6 +107,9 @@ function drawGlows(){
       lx.globalAlpha=0.10;lx.fillStyle='#ffc860';lx.beginPath();lx.ellipse(b.x,b.y,18,8,0,0,6.283);lx.fill();
       for(let i=0;i<6;i++){const ph=(time*0.08+i/6+b.ph)%1,y=b.y-88*(1-ph);lx.globalAlpha=0.9*Math.sin(ph*Math.PI)*(0.5+0.5*Math.sin(time*3+i*2));lx.fillStyle='#fff2c8';lx.fillRect(Math.round(b.x-14+i*3-(88*(1-ph))*0.6+Math.sin(time*0.7+i)*1.5),Math.round(y),1,1)}
       lx.globalCompositeOperation='source-over';lx.globalAlpha=1});
+    // Glow caps (rat tunnel love pass, Nov 27): each cap's top glows a cold blue-green, breathing slowly, a spore drifting up now and then.
+    (A.caps||[]).forEach(c=>{c.spots.forEach(([x,y],i)=>{const p=0.5+0.5*Math.sin(time*0.8+c.ph+i*1.3);lx.globalAlpha=0.45+0.55*p;lx.fillStyle='#b8fff0';lx.fillRect(c.x+x,c.y+y-2,1,1);if(p>0.7){lx.globalAlpha=0.5*p;lx.fillRect(c.x+x-1,c.y+y-2,3,1)}});
+      const ph=(time*0.15+c.ph)%1;lx.globalAlpha=0.6*Math.sin(ph*Math.PI);lx.fillStyle='#9af0e0';lx.fillRect(c.x+8+Math.round(Math.sin(time*0.9+c.ph)*3),Math.round(c.y+8-ph*16),1,1);lx.globalAlpha=1});
     // Foxfire: the fungus on rotting wood glows a cold green, pulsing slowly, a mote drifting up off it now and then.
     (A.fox||[]).forEach(f=>{const p=0.55+0.45*Math.sin(time*0.9+f.ph);
       [[5,8],[9,7],[6,11],[10,10],[8,12],[3,12],[12,12]].forEach(([x,y],i)=>{lx.globalAlpha=Math.max(0,p-(i%3)*0.15);lx.fillStyle='#b8ffc8';lx.fillRect(f.x+x,f.y+y,1,1)});
@@ -714,9 +717,13 @@ function updateAreaCritters(A,dt){
       if(c.st==='sit'&&d<84&&player.dead<=0){c.st='slink';c.t=0;c.away=player.x<c.x?1:-1}
       else if(c.st==='slink'){c.x+=c.away*22*dt;c.y-=10*dt;if(c.t>0.9){c.st='gone';c.t=0}}
       else if(c.st==='gone'&&c.t>14&&home>140){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='cavefish'){if(c.a===undefined){c.a=Math.random()*6.28;c.rx=vr(16,30);c.ry=vr(5,9);c.sp=vr(0.25,0.4)*(Math.random()<0.5?1:-1);c.dart=0}
+      if(c.dart>0)c.dart-=dt;else if(d<30&&player.dead<=0&&Math.random()<dt*3)c.dart=0.6;
+      c.a+=c.sp*dt*(c.dart>0?5:1);const nx=c.hx+Math.cos(c.a)*c.rx,ny=c.hy+Math.sin(c.a)*c.ry;
+      if(!A.wetV||A.wetV(nx,ny)>0.12){c.x=nx;c.y=ny}else c.sp=-c.sp} // turn back before the bank
     else if(c.kind==='owl'){c.blink-=dt;if(c.blink<-0.15)c.blink=vr(2,6);const dx=player.x-c.x;c.look=Math.abs(dx)<20?0:dx<0?-1:1}
   });
-  if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:0})}}}
+  if(A.waterSpots.length){A.ripT-=dt;if(A.ripT<=0){A.ripT=vr(0.5,1.4);const v=A.waterSpots.filter(w=>inView(w.x,w.y));if(v.length){const w=v[Math.floor(Math.random()*v.length)];A.rip.push({x:w.x+vr(-6,6),y:w.y+vr(-5,5),t:A.tint==='earth'?-0.4:0,drip:A.tint==='earth'})}if(A.tint==='earth')A.ripT+=vr(0.8,2)}} // in a cave the rings come from drips off the roof: a drop falls first, and less often
   A.rip.forEach(r=>r.t+=dt);A.rip=A.rip.filter(r=>r.t<1.6);
   if(A.chimneys.length){A.smokeT-=dt;if(A.smokeT<=0){A.smokeT=0.4;A.chimneys.forEach(ch=>{if(inView(ch.x,ch.y))A.smoke.push({x:ch.x+vr(-1,1),y:ch.y,t:0})})}}
   A.smoke.forEach(p=>{p.t+=dt;p.y-=7*dt;p.x+=(3+Math.sin(p.t*2))*dt});A.smoke=A.smoke.filter(p=>p.t<3.2);
@@ -726,11 +733,14 @@ function updateAreaCritters(A,dt){
 function drawAreaCritters(A,layer){
   if(!A.crit)return;const f=(x,y,w,h,col)=>{lx.fillStyle=col;lx.fillRect(Math.round(x),Math.round(y),w,h)};
   if(layer===0){
-    A.rip.forEach(r=>{const k=r.t/1.6,rad=1+k*(r.big?8:5);lx.globalAlpha=1-k;for(let a=0;a<14;a++){const an=a/14*6.283;f(r.x+Math.cos(an)*rad,r.y+Math.sin(an)*rad*0.45,1,1,k<0.4?AP.glint:AP.waterHi)}lx.globalAlpha=1});
+    A.rip.forEach(r=>{if(r.t<0){const h=-r.t*70;lx.globalAlpha=0.8;f(r.x,r.y-h-2,1,2,'#9ab8c0');lx.globalAlpha=1;return} // the falling drop
+      const k=r.t/1.6,rad=1+k*(r.big?8:5);lx.globalAlpha=1-k;for(let a=0;a<14;a++){const an=a/14*6.283;f(r.x+Math.cos(an)*rad,r.y+Math.sin(an)*rad*0.45,1,1,k<0.4?AP.glint:AP.waterHi)}lx.globalAlpha=1});
     A.crit.forEach(c=>{if(c.st==='gone')return;
       if(c.kind==='frog')critGrid(c.jump>0?FROG_JUMP:FROG,c.x,c.y-(c.st==='leap'?c.jump:c.jump>0?2:0),c.dir);
       if(c.kind==='crow'&&c.ground&&c.st==='sit')critGrid(c.peck>0?CROW_PECK:CROW,c.x,c.y,c.dir);
       if(c.kind==='rabbit')critGrid(c.jump>0.5?RABBIT_HOP:c.nib>0&&Math.floor(time*8)%2?RABBIT_NIB:RABBIT,c.x,c.y-c.jump,c.dir);
+      if(c.kind==='cavefish'){const dx=Math.cos(c.a),dy=Math.sin(c.a)*0.5,dir=dx>=0?1:-1,wig=Math.floor(time*(c.dart>0?16:5)+c.ph)%2;lx.globalAlpha=0.42;
+        f(c.x-dir*2,c.y,4,1,'#c8d8d4');f(c.x+dir*2,c.y,1,1,'#e8f0ec');f(c.x-dir*3,c.y+(wig?-1:1)*0.6,1,1,'#a8bcb8');lx.globalAlpha=1} // pale cave fish under the water
       if(c.kind==='deer')critGrid(c.st==='run'?(c.jump>2?DEER_RUN:DEER):c.alert||c.up>0?DEER:DEER_GRAZE,c.x,c.y-(c.jump||0),c.dir)});
     return}
   A.crit.forEach(c=>{

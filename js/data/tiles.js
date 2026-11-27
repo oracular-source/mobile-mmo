@@ -136,6 +136,10 @@ coffin       1 2 1      floor  0     -    0
 sarcophagus  2 2 1      floor  0     -    0
 bone_wall    1 1 1      floor  0     -    0
 carpet       2 6 0      floor  0     -    0
+gnawed_bones 1 1 0      floor  0     -    0
+glow_caps    1 1 0      floor  0     -    1
+rat_tracks   1 1 0      floor  0     -    0
+stalagmite   1 1 1      floor  0     -    0
 `;
 // Objects that are only partly solid (v0.86, owner: "invisible walls behind the tree"). One row per footprint row, top to
 // bottom, '#' = solid. Objects not listed are solid on their whole footprint when blocks = 1. The giant tree's trunk and

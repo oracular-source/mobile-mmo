@@ -161,6 +161,8 @@ function* buildAreaGen(id){
       const lit=C.filter(c=>c.lit);if(lit.length)A.lights.push({x:lit.reduce((a,c)=>a+c.x,0)/lit.length,y:o.y*T+2,r:34,w:22})}
     // A robber's candle stuck on a coffin lid (love pass v0.103: candles off the floor).
     if(o.kind==='coffin'&&o.opt==='candle'){A.lights.push({x:o.x*T+5,y:o.y*T+18,r:28,w:20});A.flames.push({x:o.x*T+5,y:o.y*T+14,big:0,tiny:1})}
+    // Rat tunnel love pass (Nov 27): pale glow caps on damp ground give the pool cavern and Gnawbone's den a faint cold light with a reason.
+    if(o.kind==='glow_caps'){A.lights.push({x:cx,y:o.y*T+10,r:26,w:0,c:24});(A.caps=A.caps||[]).push({x:o.x*T,y:o.y*T,spots:glowCapSpots(o),ph:ah(o.x,o.y,65)*6.3})}
     if(o.kind==='light_shaft'){A.lights.push({x:cx,y:o.y*T+8,r:54,w:0,c:30});A.motes=(A.motes||[]).concat([{x:cx,y:o.y*T+12}])} // cold daylight from a crack above
   });
   // Ember pits glow from below (every other tile is enough light).
@@ -380,6 +382,8 @@ function* paintWaterGen(A,g,groundOf){ // pauses after each water-edge tile
   const R=(x,y,w,h,c)=>{g.fillStyle=c;g.fillRect(x,y,w,h)};const dead=A.tint==='moonlit';
   near.forEach(([tx,ty])=>{for(let i=0;i<8;i++){const x=tx*T+Math.floor(ah(tx,ty,300+i)*16),y=ty*T+Math.floor(ah(tx,ty,320+i)*16),v=V(x,y),r=ah(tx,ty,340+i);
     if(v<0&&v>-0.12&&r<0.12){R(x,y+1,3,1,AP.out);R(x,y,3,1,AP.stoneDk);R(x,y,1,1,AP.stone)}                                  // a pebble at the waterline
+    else if(cave&&v>-0.1&&v<0.05&&r<0.5){if(r<0.24){R(x-1,y+2,6,1,AP.out);R(x-1,y,6,2,'#4c4032');R(x,y,3,1,'#6a5a46');R(x-1,y+3,6,1,'#0d1a22')} // rat tunnel love pass: a flat stone half in the water, wet dark below it
+      else{R(x,y+1,2,1,AP.out);R(x,y,2,1,'#5a4a38')}}                                                                       // a wet pebble
     else if(!cave&&v>-0.16&&v<0.06&&r>0.12&&r<0.34){const n=2+Math.floor(ah(x,y,9)*3);                                    // a clump of reeds
       for(let k=0;k<n;k++){const rx=x+k*2-n,h=3+Math.floor(ah(x+k,y,10)*3);R(rx,y-h+1,1,h,dead?'#5e5638':AP.reed);R(rx,y-h+1,1,1,dead?'#8a7d52':AP.reedHi)}
       if(dead&&r<0.18)R(x,y-6,1,2,'#3b2a1e')}
@@ -916,6 +920,8 @@ function drawRock(R,bx,by,face,top,r){
   if(face){R(bx,by+6,16,10,AP.stoneDk2);for(let y=0;y<10;y+=4){R(bx,by+6+y,16,1,AP.mortar);const o=(y/4)%2?4:12;R(bx+o,by+6+y,1,4,AP.mortar)}
     R(bx,by+6,16,1,AP.stoneDk);R(bx,by+15,16,1,AP.out);if(r<0.25)R(bx+3+Math.floor(r*30),by+11,2,2,AP.moss)}
 }
+// Glow cap spots in a tile: [x, y (top of stem), stem height], 4-6 caps leaning together.
+function glowCapSpots(o){const n=3+Math.floor(ah(o.x,o.y,66)*2),S=[[7,10,3,1]];for(let i=0;i<n;i++){const l=i%2?-1:1;S.push([7+l*(3+Math.floor(ah(o.x+i,o.y,67)*3)),11+Math.floor(ah(o.x,o.y+i,68)*3),1+(i%2),0])}return S.sort((a,b)=>a[1]-b[1])} // [x, top of stem, stem height, big]
 // A heap of old bones against the wall.
 // Bone heaps (v0.89 redraw; owner: the old ones read as white blobs): real bone shapes, a thin shaft with a knob of
 // two bumps at each end, two or three lying across each other, and a skull with dark eye holes on top.
@@ -1739,6 +1745,43 @@ function drawObj(g,R,o){
     R(cx-12,cy-7,24,13,AP.out);R(cx-11,cy-6,22,11,'#3a2e22');R(cx-8,cy-4,16,8,AP.out);R(cx-7,cy-3,14,7,'#050404');
     R(cx-14,cy-9,28,3,AP.out);R(cx-13,cy-8,26,1,AP.trunk);R(cx-13,cy-9,8,1,AP.trunkHi); // the root arching over it
     R(cx+6,cy+5,7,3,AP.caveHi);R(cx-12,cy+5,5,2,AP.earthFace);return}
+  if(k==='gnawed_bones'){
+    // Rat tunnel love pass (Nov 27, owner: the den's bones were spaced evenly). Rats drag what they eat back to the nest, so
+    // bones heap round Gnawbone's pile and thin out away from it: heap (a dark stain, 7-9 small gnawed bones crossing, a
+    // little rib cage, now and then a skull), few (3-4 bones), one (a single bone on the drag trail). Small bones, not crypt femurs.
+    const n=o.opt==='heap'?8:o.opt==='few'?4:1+(ah(o.x,o.y,40)<0.4?1:0);
+    if(o.opt==='heap')for(let y=-4;y<=4;y++)for(let x=-7;x<=7;x++){if(x*x/49+y*y/16>1||ah(X+x,Y+y,41)<0.3)continue;R(X+8+x,Y+9+y,1,1,'#241d16')}
+    for(let i=0;i<n;i++){const bx=X+2+Math.floor(ah(o.x*7+i,o.y,42)*11),by=Y+4+Math.floor(ah(o.x,o.y*7+i,43)*10),l=3+Math.floor(ah(o.x+i,o.y+i,44)*3),d=Math.floor(ah(i,o.x+o.y,45)*3);
+      for(let j=0;j<l;j++){const px=bx+(d===2?0:j),py=by+(d===0?0:d===1?Math.floor(j/2):j);R(px,py+1,1,1,AP.out);R(px,py,1,1,j===0||j===l-1?'#d8d0c0':ah(px,py,46)<0.3?AP.boneDk:AP.bone)}}
+    if(o.opt==='heap'){const rx=X+4+Math.floor(ah(o.x,o.y,47)*6),ry=Y+7;R(rx-1,ry+3,7,1,AP.out);R(rx,ry+2,5,1,AP.boneDk); // rib cage: a spine with ribs curving off it
+      for(let j=0;j<3;j++){R(rx+j*2,ry,1,2,AP.bone);R(rx+j*2,ry-1,1,1,AP.out)}
+      if(ah(o.x,o.y,48)<0.5)cryptSkull(R,X+9,Y+3,true)}
+    return}
+  if(k==='glow_caps'){
+    // Glow caps (refs: pixel glowing mushrooms): rounded domes on short pale stems, one big cap with smaller ones leaning in,
+    // the dome's top glowing cold blue-green (the glow is drawn live, pulsing slowly).
+    const S=glowCapSpots(o);shadow(X+2,Y+13,12,2);
+    S.forEach(([x,y,h,big])=>{R(X+x,Y+y,big?2:1,h,'#b4bcb0');
+      if(big){R(X+x-2,Y+y-3,6,4,AP.out);R(X+x-1,Y+y-3,4,2,'#4a9a90');R(X+x-1,Y+y-1,4,1,'#2a5a56');R(X+x,Y+y-3,2,1,'#8ae0d0')}
+      else{R(X+x-1,Y+y-2,3,3,AP.out);R(X+x-1,Y+y-2,3,1,'#4a9a90');R(X+x,Y+y-2,1,1,'#8ae0d0');R(X+x-1,Y+y-1,3,1,'#2a5a56')}});return}
+  if(k==='rat_tracks'){
+    // Paw prints pressed into the wet mud, little pairs walking down to the water (opt = the way they go: n s e w):
+    // each print a dark dent with a pale lip of pushed-up mud, a thin tail drag between them.
+    const dir=o.opt||'w',dx=dir==='e'?1:dir==='w'?-1:0,dy=dir==='s'?1:dir==='n'?-1:0;
+    for(let i=0;i<6;i++){const t=i*3-8,side=i%2?2:-1,px=X+8+dx*t+(dy?side:0),py=Y+8+dy*t+(dx?side:0);
+      R(px,py,2,1,'#0e0b08');R(px,py+1,2,1,'#5a4a38');if(i%2===0)R(X+8+dx*(t+1),Y+9+dy*(t+1),1,1,'#1a1510')}
+    return}
+  if(k==='stalagmite'){
+    // Dripstone by the pool (refs: pixel cave stalagmite): what makes it read is a lumpy, bulging column that narrows to a
+    // rounded tip, not a clean triangle; stacked bumps where it grew in rings, a wet pale streak down its lit (left) side,
+    // a flowstone skirt spreading at the foot and a wet ring round it. opt small = a short stub.
+    const sm=o.opt==='small',h=sm?9:16,cx=X+8+(sm?0:0),foot=Y+14;
+    shadow(cx-7,foot-1,14,3);R(cx-7,foot,14,1,'#241e17');
+    const prof=y=>{const t=y/h;let w=(sm?3.2:4.2)*Math.pow(t,0.7)+0.6;w+=Math.sin(y*1.3+o.x)*0.6;return Math.max(1,Math.round(w))}; // half width y px from the tip
+    for(let y=0;y<h;y++){const hw=prof(y),yy=foot-h+y;R(cx-hw-1,yy,2*hw+2,1,AP.out);R(cx-hw,yy,2*hw,1,AP.earthFace2);R(cx-hw,yy,Math.max(1,hw),1,AP.earthFace);
+      if(y%4===2)R(cx-hw,yy,2*hw,1,'#4a3a29');if(y>1&&y<h-2)R(cx-hw+1,yy,1,1,y%3?'#7a6a54':'#8f7e64')}
+    R(cx-1,foot-h,2,1,'#9a8a70');R(cx-6,foot-2,12,2,AP.out);R(cx-5,foot-2,10,1,AP.earthFace2);R(cx-5,foot-2,4,1,AP.earthFace); // flowstone skirt
+    R(cx+3,foot-3,1,1,'#2e241a');return}
   if(k==='light_shaft'){
     // A crack of daylight from above: paler dirt and a few pale specks (the beam and dust are lit live).
     for(let y=-6;y<=6;y++)for(let x=-9;x<=9;x++){if(x*x/81+y*y/36>1)continue;if(ah(X+x,Y+y,7)<0.35)R(X+8+x,Y+8+y,1,1,'#4a3e30')}

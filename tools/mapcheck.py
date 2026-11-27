@@ -98,7 +98,7 @@ def check(m, tiles, objs):
     # critters (v0.49): known kinds, on the map; frogs on open ground by water, moths near a light
     for c in critters:
         cx, cy = int(c['x']), int(c['y'])
-        if c['kind'] not in ('crow', 'frog', 'moth', 'owl', 'bat', 'firefly', 'rabbit', 'deer', 'eyes'): E.append(f"unknown critter {c['kind']}"); continue
+        if c['kind'] not in ('crow', 'frog', 'moth', 'owl', 'bat', 'firefly', 'rabbit', 'deer', 'eyes', 'cavefish'): E.append(f"unknown critter {c['kind']}"); continue
         if not (0 <= cx < Wd and 0 <= cy < H): E.append(f"critter {c['kind']} at {c['x']},{c['y']} is off the map"); continue
         if c['kind'] == 'frog':
             if not tiles[g[cy][cx]]['walk']: E.append(f"frog at {c['x']},{c['y']} sits in scenery or water")
