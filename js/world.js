@@ -259,7 +259,7 @@ function checkPortals(){
     else if(t===8){if(inCombat())log('You can not leave while something is chasing you.','#ff8a80');else prompt('Leave Dungeon 1?','Leaving from the entrance resets the dungeon. Anything still alive will be back next time.','Leave',()=>enterZone('gy'));}
   }
 }
-// The Skeleton King: casts a shadow bolt (a 2s cast you can see coming) and calls two skeletons at half health.
+// The Skeleton King: Bone Throw (v0.102, was a shadow bolt; same rules: a 2s cast you can see coming) and calls two skeletons at half health.
 // Counters: stun or fear it mid-cast (Evade and Feign Death also break it off), or be out of range,
 // Deflecting or inside Divine Aura when it lands. While casting it stands still. Returns true while casting.
 // An attack slow on it slows the casting too (cast bar fills slower, longer wait between bolts).
@@ -270,16 +270,18 @@ function bossThink(m,dt){
   // The Enchanter's Slow Mind slows its spellcasting too: longer casts, longer gaps. The Shaman's Drowsy only slows attacks (v0.24).
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;
+    if(m.casting.bone&&!m.casting.thrown&&m.casting.t>=m.casting.dur-BONE_FLIGHT)boneLaunch(m); // thrown a moment early so it lands with the hit (looks only)
     if(m.casting.t<m.casting.dur)return true;
     m.casting=null;m.bolt=BOLT.every;
-    if(dist(m,player)>BOLT.range){floatText(player.x,player.y-20,'MISS','#c8a0ff');log('The shadow bolt falls short. You were out of range.','#9fb8e0');return false}
-    beams.push({x1:m.x,y1:m.y-20,x2:player.x,y2:player.y-8,t:0,col:'#b48cff'});burst(player.x,player.y-8,'#b48cff',8);
-    if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the shadow bolt.','#9fb8e0');return false}
-    let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('The Skeleton King hurls a shadow bolt at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m);
+    if(dist(m,player)>BOLT.range){boneLand(m,'miss');floatText(player.x,player.y-20,'MISS','#c8a0ff');log('The bone falls short. You were out of range.','#9fb8e0');return false}
+    burst(player.x,player.y-8,'#e8e0c8',8); // bone shards (the same roll count as the old purple burst, so the sim is unchanged)
+    if(player.buffs.deflect>0){boneLand(m,'dodge');floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You knock the bone aside.','#9fb8e0');return false}
+    boneLand(m,'hit');
+    let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('The Skeleton King hurls a bone at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m);
     return false}
   m.bolt=(m.bolt===undefined?BOLT.first:m.bolt)-dt;
-  if(m.bolt<=0&&dist(m,player)<BOLT.range){m.casting={name:'Shadow Bolt',t:0,dur:BOLT.cast};floatText(m.x,m.y-34,'Shadow Bolt!','#c8a0ff');
-    log('The Skeleton King begins casting Shadow Bolt! Stun or fear it, or get out of range.','#c8a0ff');return true}
+  if(m.bolt<=0&&dist(m,player)<BOLT.range){m.casting={name:'Bone Throw',t:0,dur:BOLT.cast,bone:1};floatText(m.x,m.y-34,'Bone Throw!','#e8e0c8');
+    log('The Skeleton King raises a bone to throw! Stun or fear him, or get out of range.','#c8a0ff');return true}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('The Skeleton King calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
   return false;

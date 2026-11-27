@@ -64,7 +64,7 @@ function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
   if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   if(src!=='npc'&&m.crack>0)dmg*=1.2; // Sunder (Warrior fork): cracked armor
-  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
+  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;animHit(m,src,kind);
   if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
   else if(src==='pet'){m.petT=pet;m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
@@ -97,7 +97,7 @@ function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
-  burst(m.x,m.y-6,'#cfc8b2',10,false);
+  burst(m.x,m.y-6,'#cfc8b2',10,false);if(how!=='vanish')animDeath(m);
   if(how!=='vanish')log('You have slain '+m.def.name+'!','#ffd27a');
   forkOnDeath(m);
   let xp=xpFor(m.lv,m.def,player.lvl);

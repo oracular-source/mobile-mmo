@@ -141,6 +141,15 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - **Walk:** two step frames, one foot lifted a pixel each; robes can hide it until the animation pass.
 - **Colours** are a few swappable slots per class (cloth ramp H/n/N/d, hood A/a/Q, accent R), which is what makes recolours cheap later.
 
+## Animation and effects (animation lane, v0.102)
+- **Looks only.** Animations never change a timer, a number or where a mob really stands; they move the drawing. Visual randomness uses `fr()` in `js/anim.js` (Math.random), never the game's `rng()`, so the sim rolls the same dice. Nothing is spawned while the sim runs.
+- **Readable crowds (owner, Nov 27): animation, not badges.** No "x4" over a stack (breaks immersion). Each mob shows its own swing: it **leans back a pixel** in the last 0.3 s before a swing, then **lunges** toward whoever it hits (3–6 px by size, out fast in about 0.06 s, back over 0.2 s) and a **pale slash** sweeps across the target. Swings stay timed from when each mob reached you (no forced staggering), so a stack ripples. Legs stop stepping while a mob stands and swings.
+- **Hit reaction:** a **white flash** (about 0.07 s, a white copy of the sprite made once and kept) and a **push of 2 px** away from what hit it, easing back over 0.2 s. DoT and song ticks don't flash (too often).
+- **Death:** a white flash, then the body **sinks** (squashes toward its feet) and fades over about 0.55 s while dust puffs out. Vanishing bosses keep their own exit.
+- **Screen shake is for story only (owner, Nov 27):** never on ordinary hits or boss attacks.
+- **Glow over the dark:** effects that must read in a dark room (the Skeleton King's bone) draw **after the lighting** (`fxDrawLit`) with a soft additive glow, like flames do. Bodies and slashes draw before it so they sit in the room's light.
+- **Skeleton King's Bone Throw (owner picked, Nov 27):** same rules as the old bolt (2 s cast, stun or fear breaks it, out of range it falls short). Recipe: during the cast he lifts a **12-px thigh bone** over his head (dark 4-px outline, 2-px cream shaft, two knobs each end, a shaded lower edge; the dog-bone outline is what reads), rising and trembling near the end while purple grave-light motes are pulled into it and a soft purple glow grows. He throws it **0.32 s before the cast ends** so it lands with the hit: it **arcs** (14 px high), spins, leaves two faint copies behind and bone dust, with a shadow on the floor. **Hit:** it cracks apart into cream shards and small spinning bone pieces that bounce. **Dodged:** it glances off and tumbles away. **Out of range or broken off:** it clatters to the floor and lies a moment.
+
 ## UI look (owner, Nov 18–20)
 Minimal EverQuest-style until the theme is decided; every screen part uses one look (UI breakdowns in `docs/research/ui.md`).
 - **One panel, one button (v0.60, breakdown 19 B):** frames, HUD buttons and every window are plain grey `rgba(40,40,40,.97)` with a 1px `#8a8a8a` edge and 4px corners; buttons `#2b2b2b` with the same edge; inner cards (spells, forks, gear) `#2b2b2b` with a `#6c6c6c` edge. No gradients, no shine.

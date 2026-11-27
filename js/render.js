@@ -329,9 +329,10 @@ function render(){
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
     if(m.def.rare){const pr=0.5+0.5*Math.sin(time*3),rw=Math.round(img.w/2)+2;lx.globalAlpha=0.09+0.08*pr;lx.fillStyle='#d8c8ff';lx.beginPath();lx.ellipse(Math.round(m.x),Math.round(m.y),rw,Math.max(2,Math.round(rw/3)),0,0,7);lx.fill();lx.globalAlpha=1;
       if(Math.random()<0.12)parts.push({x:m.x+(Math.random()-0.5)*img.w,y:m.y-Math.random()*img.h,vx:0,vy:-8,t:0,life:0.7,col:'#e6dcff'})} // the faint glow that says "rare" (visual only, no game rolls)
-    const mmv=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)&&!(m.root>0);
-    if(img.steps){const wf=walkFrame(img,m.walk,mmv);drawSprite(wf.im,m.x,m.y+1,m.dir,0,false)} // new monsters animate their legs
-    else drawSprite(img,m.x,m.y+1,m.dir,mmv?(Math.floor(m.walk*6)%2):0,false);
+    const mmv=(m.state!=='idle'||Math.hypot(m.x-m.wx,m.y-m.wy)>1)&&!(m.root>0)&&!(m.near>0);
+    // v0.102 (js/anim.js): the swing lunge, hit nudge and white flash move the sprite only, never the mob itself.
+    const an=mobAnim(m),fim=img.steps?walkFrame(img,m.walk,mmv).im:img,fb=img.steps?0:(mmv?(Math.floor(m.walk*6)%2):0);
+    drawSprite(an.flash?{c:whiteOf(fim,1),f:whiteOf(fim,-1),w:fim.w,h:fim.h}:fim,m.x+an.dx,m.y+1+an.dy,m.dir,fb,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark
@@ -360,6 +361,7 @@ function render(){
   pillars.forEach(p=>{const f=Math.min(1,p.t*4)*Math.max(0,1-p.t/p.life),x=Math.round(p.x),y=Math.round(p.y),h=44+Math.round(6*Math.sin(p.t*3));
     lx.globalAlpha=0.35*f;lx.fillStyle=p.col;lx.fillRect(x-3,y-h,7,h);lx.globalAlpha=0.9*f;lx.fillRect(x-1,y-h-4,3,h+4);lx.globalAlpha=1});
   parts.forEach(p=>{lx.fillStyle=p.col;lx.fillRect(Math.round(p.x),Math.round(p.y),1,1)});
+  fxDraw(); // slashes, sinking bodies, the Skeleton King's bone (js/anim.js)
   lx.restore();
   // v0.71: def.glow = a named that carries its own cold light (the Drowned Prior's lantern; without it he melted into his
   // dark water and read as a plain hooded shape).
@@ -393,6 +395,7 @@ function render(){
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.restore();
   drawGlows();
+  lx.save();lx.translate(-camX,-camY);fxDrawLit();lx.restore(); // the Bone Throw, over the dark (js/anim.js)
   cx.setTransform(1,0,0,1,0,0); // back to screen pixels for the crisp text layer
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
