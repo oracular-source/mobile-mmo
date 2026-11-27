@@ -21,7 +21,7 @@ function mmPins(id){
     {x:Math.floor(CAMPFIRE.x/T),y:Math.floor(CAMPFIRE.y/T),name:'Camp and guards',k:'camp'},
     {x:Math.floor(SIGN.x/T),y:Math.floor(SIGN.y/T),name:'Signpost',k:'camp'},
     {x:Math.floor(DOOR.x/T),y:Math.floor(DOOR.y/T),name:'Dungeon 1',k:'dun'}];
-  if(id==='dun')return[{x:3,y:30,name:'Way out',k:'exit'},{x:6,y:4,name:'Boss 1',k:'boss'}];
+  if(id==='dun')return[{x:3,y:30,name:'Way out',k:'exit'},{x:6,y:4,name:'Skeleton King',k:'boss'}];
   // Areas from map files: every exit gets a pin (named by the exit, or by where it leads), plus the campfire and each named's spot.
   if(AREA_OF[id]){const A=buildArea(AREA_OF[id]);
     const EX={stairs_up:'Stairs up',back_tunnel:'Back tunnel (Wolfwood)',crypt_tunnel:'Crypt tunnel',sinkhole:'Sinkhole (rat tunnel)',burrow:'Back hole (rat tunnel)',mouth:'Climb out (crossroads)',back_hole:'Back hole (crossroads)',down:'Stairs down (floor 2)',up:'Stairs up (floor 1)',out:'Stairs up (chapel)'}; // Dungeon 1's ways (v0.66)

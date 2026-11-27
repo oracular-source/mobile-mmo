@@ -67,7 +67,7 @@ const TYPES={
   summoner:{name:'a cult summoner',img:'summoner',lv:[14,15],hp:46,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
     cast:{name:'Cinder Lash',first:2,every:5,dur:1.2,range:90,x:1.5,col:'#ffb060'}},
   cwisp:{name:'a candle wisp',img:'cwisp',lv:[15,15],hp:30,hpl:6,dmg:0,dmgl:0,spd:11,aggro:0,armor:0,float:1,drift:1,noxp:1},
-  boss1:{name:'Boss 1',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
+  boss1:{name:'the Skeleton King',img:'boss1',lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:
 // 1) KILLS_PER_LEVEL: how many even-level, standard-toughness kills each level takes (index = level). The XP needed for

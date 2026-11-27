@@ -27,7 +27,7 @@ const SPR={
   frog:[".n.n.","nnnnn","n...n"],
   // Magician's elementals: one shape, recoloured per element in render.js (earth, fire).
   elem:["...kkkk...","..kAAAAk..",".kAeAAeAk.",".kAAAAAAk.","..kAaaAk..",".kAAaaAAk.","kAaAAAAaAk","kAaAAAAaAk",".kkAAAAkk.","..kAaaAk..","..kAk.kAk.","..kkk.kkk."],
-  // Named rares (v0.32): Ironshell = a mire beetle with a cracked, mossy shell (drawn at 2x, placeholder like Boss 1);
+  // Named rares (v0.32): Ironshell = a mire beetle with a cracked, mossy shell (drawn at 2x, placeholder like the Skeleton King);
   // the Weeping Bride = a shambling corpse in a torn veil and a long gown (she glides, no legs). The Pale Rat uses the big rat's shape.
   ironshell:["...k..k...","..kkkkkk..",".kmCcmCck.","kccmkCmcck","kcCckccCmk",".kcmcccmk.",".k.k..k.k."],
   bride:["...kvvvvk...","..kvzzzzvk..","..kvzezevk..",".kvvzZZzvvk.",".kv.kzzk.vk.",".kvkrrrrkvk.",".kzkrrrrkzk.",".kzkrrrrkzk.","..vkrrrrkv..","..kkrrrrkk..","..krrrrrrk..","..krrrrrrk..","..krrrrrrk..",".krrrrrrrrk.",".krrrrrrrrk.",".kkkkkkkkkk."],

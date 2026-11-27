@@ -181,7 +181,7 @@ function lastStand(){
   log('You refuse to fall! Last Stand ('+C.lastStand.dur+'s).','#ffd27a');
   return true;
 }
-// Warrior passives, used by melee hits and Boss 1's bolt alike.
+// Warrior passives, used by melee hits and the Skeleton King's bolt alike.
 function tankMods(dmg){
   // Hold the Line: the more mobs on you, the less each one hurts (the Shadow Knight heals per mob; the Warrior shrugs per mob).
   if(C.holdLine)dmg*=1-C.holdLine*Math.min(C.holdMax||4,Math.max(1,fightingMe().length));

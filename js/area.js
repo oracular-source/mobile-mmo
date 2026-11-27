@@ -4,7 +4,7 @@
 const AREA_TILES={},AREA_OBJS={};
 TILESET.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_TILES[p[0]]={name:p[1],walk:p[2]==='1',tags:p.slice(4)}});
 OBJECTS.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AREA_OBJS[p[0]]={w:+p[1],h:+p[2],blocks:p[3]==='1',light:+p[7]}});
-// Map file mob names -> mob types in js/data/mobs.js. The Skeleton King uses Boss 1 until he has his own data.
+// Map file mob names -> mob types in js/data/mobs.js. The Skeleton King's mob id is still boss1 (kept so saves and the sim stay the same).
 const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar',cult_zealot:'zealot',cult_ashcaller:'ashcaller',cult_chanter:'chanter',ash_wisp:'wisp',ashen_acolyte:'acolyte',cult_mender:'mender',cult_deacon:'deacon',drowned_prior:'prior',bellringer:'bellringer',malrec:'malrec',great_wisp:'gwisp',cult_summoner:'summoner'};
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).

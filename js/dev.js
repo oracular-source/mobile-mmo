@@ -52,14 +52,14 @@ function renderDev(){
   const g=(...btns)=>'<div class="dgrid">'+btns.join('')+'</div>';
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
-    sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Boss 1 item'),b('copper','+500 copper')))+
+    sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Skeleton King item'),b('copper','+500 copper')))+
     sec('tp','Teleport',g(b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
     // Old Zone (owner, Nov 27): the first build (Gate Road, guards, the first crypt), kept only to compare then and now.
     // Frozen: not part of the game, nobody works on it.
     sec('old','Old Zone (first build, frozen)',g(b('gate','Old gate'),b('door','Old crypt door'),b('dun','Old crypt'),b('bossroom','Old boss room')))+
     sec('test','Testing grounds',g(b('arena','Go there'),b('clear','Clear mobs'),b('watch','Bot plays me'),b('sim',simState.busy?'Sim running…':'Run sim ('+C.name+')'),b('pace','Zone 1 pace'))+
       '<p class="hint" style="margin:8px 0 4px">Spawn a test fight:</p>'+g(...SIM_FIGHTS.map(f=>b('sp-'+f.id,f.name.replace(' (armored)','').replace(' (lvl 7)',''))))+
-      '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.lastPace&&simState.lastPace.cls===CLS&&(!simState.last||simState.lastPaceAt>simState.lastAt)?paceSummary(simState.lastPace):simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, Boss 1 from level 6 (a few minutes).')+'</div>')+
+      '<div id="simout" class="simout">'+(!BOTS[CLS]?'No playbook bot for '+C.name+' yet.':simState.lastPace&&simState.lastPace.cls===CLS&&(!simState.last||simState.lastPaceAt>simState.lastAt)?paceSummary(simState.lastPace):simState.last&&simState.last.cls===CLS?'<p><b>'+simSummary(simState.last)+'</b></p>'+simTable(simState.last,true):'Mobs spawn at your level. The sim fights each one '+SIM_SEEDS+' times at every level from 1 to 10, the Skeleton King from level 6 (a few minutes).')+'</div>')+
     sec('look','Look and galleries',g(b('old','Old look'),b('skin','Default skin'))+'<p class="hint" style="margin:8px 0 0">Classes</p><div id="skingal" class="skingal"></div><p class="hint" style="margin:8px 0 0">Monsters</p><div id="mobgal" class="skingal"></div>')+
     sec('world','World',g(b('gnaw','Spawn Gnawbone'),b('keys','Summon keys'),b('rarespawn','Rare here'),b('wipe',devAct.armed?'Tap again to wipe':'Wipe all saves')));
   // Every class in rags (gear tier 0) side by side, so colours can be compared on the phone.

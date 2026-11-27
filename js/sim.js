@@ -3,7 +3,7 @@
 'use strict';
 /* ---------- Sim setup ---------- */
 const SIM_DT=1/30;            // fixed step: 30 game ticks per second, the same on any phone
-// Every level up to the cap, so you can see where a class turns the corner (and the first level it beats Boss 1).
+// Every level up to the cap, so you can see where a class turns the corner (and the first level it beats the Skeleton King).
 const SIM_LEVELS=[1,2,3,4,5,6,7,8,9,10];
 const SIM_SEEDS=10;           // fights per scenario; results are averages
 // Every class fights the same mobs, set to its own level (even con) so levels compare fairly.
@@ -12,7 +12,7 @@ const SIM_FIGHTS=[
   {id:'beetle',name:'Beetle (armored)',mobs:['beetle']},
   {id:'skel',name:'Skeleton',mobs:['cskel']},
   {id:'pair',name:'Two skeletons',mobs:['cskel','cskel']},
-  {id:'boss',name:'Boss 1 (lvl 7)',mobs:['boss1'],minL:6,lv:7}, // tried from level 6 up to find the first level that beats it
+  {id:'boss',name:'Skeleton King (lvl 7)',mobs:['boss1'],minL:6,lv:7}, // tried from level 6 up to find the first level that beats it
   {id:'gnaw',name:'Old Gnawbone (lvl 6)',mobs:['gnaw'],minL:5,lv:6} // squeals for two rats at 2/3 and 1/3 health (beside him: the arena has no holes)
 ];
 // Classes with more than one playbook to compare. Empty for now: the Rogue's Evade was settled as damage (A) on Nov 17.
@@ -375,7 +375,7 @@ const BOTS={
   },
   // ---- Batch 2 (v0.18) ----
   magician:{
-    // Pick the pet for the job: Earth for two mobs or Boss 1 (or below level 2), Fire for a quick single. Flame Shield up first.
+    // Pick the pet for the job: Earth for two mobs or the Skeleton King (or below level 2), Fire for a quick single. Flame Shield up first.
     prep(st){if(player.cast)return false;
       if(player.lvl>=6&&!(player.buffs.fshield>0)&&B.can('fshield')){B.use('fshield');return false}
       const want=(player.lvl<2||st.fight==='pair'||st.fight==='boss'||!st.fight)?'earth':'fire';
@@ -517,7 +517,7 @@ const BOTS={
       // Pull: walk in and Slash; Dirge is already hitting.
       if(!fight.length){if(B.near(t,14)&&B.can('slash'))B.use('slash',t);return}
       // Boss: kite it (EverQuest bard style). Song of Travel + Dirge, staying just inside Dirge's reach so it keeps
-      // pulsing while Boss 1 never catches you; when it starts casting, run out of range.
+      // pulsing while the Skeleton King never catches you; when it starts casting, run out of range.
       if(fight.some(m=>m.def.boss||m.def.named)&&player.lvl>=3){ // named count as bosses (v0.76: Dungeon 1)
         for(const id of ['travel','dirge'])if(!songOn(id)){if(B.can(id)){B.use(id);return}}
         const boss=fight.find(m=>m.def.boss||m.def.named);
@@ -677,8 +677,8 @@ function simTable(res,html){
 function simFirst(res,fightName,need){need=need||0.5;
   const r=res.rows.filter(x=>x.fight===fightName&&x.wins/x.runs>=need).sort((a,b)=>a.lvl-b.lvl)[0];return r?r.lvl:null}
 function simSummary(res){
-  const b=simFirst(res,'Boss 1 (lvl 7)'),p=simFirst(res,'Two skeletons',0.8);
-  return 'Boss 1 first beaten (5+ wins in 10): '+(b?'level '+b:'never (by level 10)')+' · Two skeletons (8+ in 10): '+(p?'from level '+p:'never');
+  const b=simFirst(res,'Skeleton King (lvl 7)'),p=simFirst(res,'Two skeletons',0.8);
+  return 'Skeleton King first beaten (5+ wins in 10): '+(b?'level '+b:'never (by level 10)')+' · Two skeletons (8+ in 10): '+(p?'from level '+p:'never');
 }
 
 /* ---------- Zone 1 pace: how a fresh character climbs through the built areas ---------- */
@@ -766,7 +766,7 @@ function paceSummary(res){
   const nm=k=>{const v=R.map(r=>r.named[k]).filter(x=>x);return v.length?'level '+Math.min.apply(null,v)+(v.length<R.length?' ('+v.length+' of '+R.length+' runs)':''):'not by 8'};
   return '<p><b>'+res.name+', '+R.length+' runs.</b> First lap of every built area: '+Math.round(l1.reduce((a,l)=>a+l.min,0)/R.length)+' min, ends at level '+(l1.reduce((a,l)=>a+l.lvl+l.pct/100,0)/R.length).toFixed(1)+
     '. To level '+PACE_GOAL+': '+(avg(r=>r.min)/60).toFixed(1)+' h ('+avg(r=>r.laps.length).toFixed(1)+' laps), '+avg(r=>r.deaths).toFixed(1)+' deaths.</p>'+
-    '<p>Level after each area, first lap: '+R[0].areas.map(a=>a.area+' '+a.to).join(' → ')+'. Old Gnawbone first beaten: '+nm('Old Gnawbone')+'. Skeleton King: '+nm('Boss 1')+'.</p>';
+    '<p>Level after each area, first lap: '+R[0].areas.map(a=>a.area+' '+a.to).join(' → ')+'. Old Gnawbone first beaten: '+nm('Old Gnawbone')+'. Skeleton King: '+nm('Skeleton King')+'.</p>';
 }
 
 /* ---------- Watch the bot: it plays your character live in the arena ---------- */
