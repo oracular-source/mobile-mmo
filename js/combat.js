@@ -344,12 +344,16 @@ function rollLoot(m){
   const toChest=items=>{if(run.chest){run.chest.items=items;return}got.push.apply(got,items)};
   if(m.type==='boss1')toChest(namedOffer('boss1',BOSS1,1));
   if(m.type==='malrec'){const o=namedOffer('malrec',MALREC.length?MALREC:BOSS1,3);if(run.chest){run.chest.offer=o;run.chest.items=[]}else got.push(o[0])}
+  // Enchant orbs (v0.100): rare from normal mobs, likelier from rares, named and bosses, always from Brother Malrec.
+  // Never rolled in the arena, so the sim's random rolls (and its numbers) stay exactly as they were.
+  if(zoneId!=='arena'){const orb=m.type==='malrec'||(boss?rng()<LOOT.orbNamed:m.def.rare?rng()<LOOT.orbRare:m.lv>=LOOT.orbMobLv&&rng()<LOOT.orbMob);if(orb)got.push('orb1')}
   got.forEach((id,i)=>giveItem(id,1,i));
-  lootPillar(m.x,m.y,got); // a column of light for a blue or a pink
+  lootPillar(m.x,m.y,got); // a column of light for a blue, a pink or an orb
 }
 // Looks only: a column of light in the drop's colour where it fell (blue or pink), so a good drop reads as a moment.
-function lootPillar(x,y,ids){const best=ids.map(id=>ITEMS[id]).filter(it=>it&&(it.rar==='named'||it.rar==='rare')).sort((p,q)=>p.rar==='named'?-1:1)[0];
-  if(best&&!logMute){pillars.push({x:x,y:y,col:RAR[best.rar],t:0,life:best.rar==='named'?4:3});burst(x,y-6,RAR[best.rar],14,true)}}
+const PILLAR_RANK={named:3,rare:2,orb:1}; // the best drop sets the colour; an orb gets a shorter column of its own teal
+function lootPillar(x,y,ids){const best=ids.map(id=>ITEMS[id]).filter(it=>it&&PILLAR_RANK[it.rar]).sort((p,q)=>PILLAR_RANK[q.rar]-PILLAR_RANK[p.rar])[0];
+  if(best&&!logMute){pillars.push({x:x,y:y,col:RAR[best.rar],t:0,life:best.rar==='named'?4:best.rar==='rare'?3:2.2});burst(x,y-6,RAR[best.rar],14,true)}}
 function giveItem(id,n,k){
   const it=ITEMS[id];n=n||1;
   let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;

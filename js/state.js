@@ -23,9 +23,15 @@ const inv=(function(){
 // Gear wear (v0.97): inv.wear[slot] = how worn the item in that slot is, 0 (fine) to 100 (broken: no stats). A bag item carries its
 // own wear as b.w, so taking something off and putting it back on can't reset it. Older saves have none: everything starts fine.
 inv.wear=(function(){try{const v=store.get(KEY('inv'),null);return v&&v.wear?v.wear:{}}catch(e){return {}}})();
-const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper,wear:inv.wear});
+// Enchants (v0.100): inv.ench[slot] = the worn item's step (0 to 5); a bag item carries its own as b.e, the same way wear travels.
+inv.ench=(function(){try{const v=store.get(KEY('inv'),null);return v&&v.ench?v.ench:{}}catch(e){return {}}})();
+const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper,wear:inv.wear,ench:inv.ench});
 const broken=sl=>(inv.wear[sl]||0)>=100;
-const stat=k=>Object.keys(inv.equip).reduce((t,sl)=>t+(broken(sl)?0:ITEMS[inv.equip[sl]][k]||0),0);
+const enchMul=e=>1+(e||0)*LOOT.enchStep;           // each step adds a small share of the item's own stats
+const stat=k=>Object.keys(inv.equip).reduce((t,sl)=>t+(broken(sl)?0:(ITEMS[inv.equip[sl]][k]||0)*enchMul(inv.ench[sl])),0);
+const r1=x=>Math.round(x*10)/10;                     // stats can be fractional with enchants: show one decimal at most
+const enchName=(it,e)=>(e?'+'+e+' ':'')+it.name;
+const enchCls=e=>e>=5?' ench5':e>=3?' ench3':'';     // the glow: faint at +3, strong at +5 (css)
 // Repair price: the share of an item's value that's worn off, for every worn item. At least 1 copper if anything is worn.
 const repairCost=()=>{let c=0,any=false;Object.keys(inv.equip).forEach(sl=>{const w=inv.wear[sl]||0;if(w>0){any=true;c+=ITEMS[inv.equip[sl]].value*w/100}});return any?Math.max(1,Math.ceil(c)):0};
 // Loot memory (v0.97): which named you've killed at least once (first kill pays blue or better) and how many kills of each
@@ -33,10 +39,10 @@ const repairCost=()=>{let c=0,any=false;Object.keys(inv.equip).forEach(sl=>{cons
 const lootMem=(function(){const d={first:{},dry:{}};try{const v=store.get(KEY('loot'),null);if(v){d.first=v.first||{};d.dry=v.dry||{}}}catch(e){}return d})();
 const saveLoot=()=>store.set(KEY('loot'),lootMem);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
-const itemStats=it=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+it[s[0]]).join(' · ');
+const itemStats=(it,e)=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+r1(it[s[0]]*enchMul(e))).join(' · ');
 // STA: +3 HP per point. WIS: +3 mana per point.
 // Spirit Ward (Shaman buff): +10% max health.
-const maxHP=L=>Math.round((C.hp[0]+C.hp[1]*L+stat('sta')*3)*(player.buffs&&player.buffs.ward>0?1.1:1)), maxMP=L=>C.mana?C.mana[0]+C.mana[1]*L+stat('wis')*3:0;
+const maxHP=L=>Math.round((C.hp[0]+C.hp[1]*L+stat('sta')*3)*(player.buffs&&player.buffs.ward>0?1.1:1)), maxMP=L=>C.mana?Math.round(C.mana[0]+C.mana[1]*L+stat('wis')*3):0; // rounded: enchants make stats fractional
 const meleeMult=()=>1+stat('str')*0.02; // STR: +2% melee damage and bandage healing per point
 const GCD=1.5, PSPEED=34;
 // Rogue: Hide lets you sneak at 70% speed; Sprint is +50%.

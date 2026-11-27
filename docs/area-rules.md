@@ -152,6 +152,8 @@ Minimal EverQuest-style until the theme is decided; every screen part uses one l
 - Don't show text for things that aren't there (e.g. a sell note with no merchant nearby).
 - **Camera: you're always in the middle (v0.78, owner Nov 24, upright and sideways).** The view keeps your character centred everywhere, map edges included; it never stops at an edge. So every area has to look right past all four edges and the corners. **How it's drawn:** ground-only copies of each edge, 256 game pixels deep (`EDGE_STRIP`, taken before any scenery), are mirrored past the edge; corners mirror the top or bottom strip both ways. Outdoors, `edgeWoods` grows trees 14 tiles deep past every side: the edge's own trees carry on, roads and clearings that run off the map stay open, and further out the gaps close into forest (a few clearings stay). Caves and dungeons just show their mirrored floor going dark. The v0.55 check stays as a safety net: if a very short screen ever puts you under the top frames or the spell grid, the view nudges.
 
+- **Enchant look (v0.100, Items lane):** an enchanted item shows **+N** before its name everywhere (worn slot, bag square, detail strip). Glow is one teal (`RAR.orb`, #7fe0d8) as a text shadow: **+1–2 none, +3 faint** (3 px, 70%), **+5 strong** (two layers, 3 px and 7 px) (`.ench3` / `.ench5` in `css/game.css`). Enchanting throws a teal spark burst from the character (16 sparks, 22 at +3, 30 at +5). Orbs and dust share the teal so they read as one family. When gear shows on the character, the same +3 / +5 steps light the sprite.
+
 ## Layout
 - Main road plus small side paths that reward curiosity.
 - Loops, not dead ends; a shortcut back to the hub where it fits.

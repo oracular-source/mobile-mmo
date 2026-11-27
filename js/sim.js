@@ -595,7 +595,7 @@ function simBegin(){
 function simEnd(keep){
   finaleReset();
   seedRng(null);store.set=keep.set;logMute=false;settings.autoCast=keep.auto;dev.god=keep.god;pet=null;pet2=null;
-  const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;inv.wear=iv.wear||{};{const l=JSON.parse(keep.loot);lootMem.first=l.first;lootMem.dry=l.dry}
+  const iv=JSON.parse(keep.inv);inv.bags=iv.bags;inv.equip=iv.equip;inv.copper=iv.copper;inv.wear=iv.wear||{};inv.ench=iv.ench||{};{const l=JSON.parse(keep.loot);lootMem.first=l.first;lootMem.dry=l.dry}
   Object.keys(kills).forEach(k=>delete kills[k]);Object.assign(kills,JSON.parse(keep.kills));
   if(keep.forks){forkPick=keep.forks}
   enterZone('arena');player.lvl=keep.lvl;applyForks();player.xp=keep.xp;player.hp=maxHP(keep.lvl);player.mp=maxMP(keep.lvl);

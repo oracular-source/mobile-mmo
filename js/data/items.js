@@ -1,7 +1,7 @@
 // DATA ONLY. Item rarity colours and every item.
 'use strict';
 /* ---------- Items, bags and gear (personal loot: every drop is yours) ---------- */
-const RAR={junk:'#9a9a9a',common:'#e8e2cf',uncommon:'#5fdf6f',rare:'#5fa8ff',named:'#ff9de2',key:'#e8c060'};
+const RAR={junk:'#9a9a9a',common:'#e8e2cf',uncommon:'#5fdf6f',rare:'#5fa8ff',named:'#ff9de2',key:'#e8c060',orb:'#7fe0d8'};
 const ITEMS={
   whisker:{name:'Rat Whisker',rar:'junk',value:1,stack:true},
   shell:{name:'Beetle Shell',rar:'junk',value:3,stack:true},
@@ -14,6 +14,10 @@ const ITEMS={
   // Summon keys (v0.31): used up at a named's spot to call it if it isn't up. Not junk, so "Sell all junk" leaves them alone.
   severed_paw:{name:'Severed Paw',rar:'key',value:1,stack:true,desc:"Summon key · lay it on the bone pile at the bottom of the rat tunnel to call Old Gnawbone"},
   crown_shard:{name:'Crown Shard',rar:'key',value:1,stack:true,desc:"Summon key · set it on the empty throne in the crypt to call the Skeleton King"},
+  // Enchanting (v0.100, Items lane): orbs raise a worn item one step (+1 to +5); unwanted gear breaks into dust, enough dust makes an orb.
+  // One orb tier for now (Zone 1); higher tiers and merging 3 into 1 come with Zone 2.
+  orb1:{name:'Enchant Orb',rar:'orb',value:100,stack:true,desc:"Enchant orb · at a campfire, raise a worn item one step (+1 to +5)"},
+  dust:{name:'Orb Dust',rar:'orb',value:1,stack:true,desc:"Orb dust · from gear you break down; at a campfire, enough of it makes an Enchant Orb"},
   cap:{name:'Cloth Cap',slot:'head',rar:'common',ac:1,value:6},
   robe:{name:'Frayed Robe',slot:'chest',rar:'common',ac:2,wis:1,value:10,cls:'caster'},
   legs:{name:'Patched Leggings',slot:'legs',rar:'common',ac:1,value:6},
@@ -135,5 +139,15 @@ const LOOT={
   rareMobBlue:0.3,                    // a rare mob drops one item: green, or blue this often
   namedPink:0.10,pinkStep:0.05,       // a named's own pink: 10%, +5% for every kill of it without one (resets when one drops)
   namedBlue:0.33,                     // when the pink doesn't drop: blue this often, else green. First kill of each named: blue or better
-  wearDeath:10                        // each death wears every worn item 10% (repair at any campfire); replaces the XP loss
+  wearDeath:10,                       // each death wears every worn item 10% (repair at any campfire); replaces the XP loss
+  // Enchanting (v0.100, owner Nov 27): small sure steps, never fails. Owner: about 10% at +5, felt more than it's big
+  // (the +N in the name, a glow at +3 and +5, a flash when it lands). Raise enchStep to make every step stronger.
+  enchStep:0.02,enchMax:5,            // each step: +2% of the item's stats (+5 = +10%)
+  enchFee:[20,40,80,120,200],         // copper for the step to +1, +2, +3, +4, +5 (plus one orb)
+  moveFee:15,                         // copper per step to move an enchant onto a new item of the same slot
+  orbMob:1/150,orbMobLv:3,            // normal mobs: an orb about 1 kill in 150, from level 3 mobs up (outside the arena)
+  orbRare:0.5,orbNamed:0.25,orbChest:0.1, // rare mobs, named and bosses, hidden chests. Brother Malrec always drops one
+  orbPrice:1000,                      // backstop: buy an orb at a campfire for about an hour of copper
+  dustPerOrb:40,                      // dust to make one orb
+  dust:{common:2,uncommon:5,rare:12,named:25} // dust from breaking down an item of each rarity
 };

@@ -14,6 +14,7 @@ function devAct(a){
   else if(a==='rare'){giveItem(pick(RARES));saveInv()}
   else if(a==='boss'){giveItem(pick(BOSS1));saveInv()}
   else if(a==='copper'){inv.copper+=500;saveInv();log('Dev: +500 copper.','#ff8a80')}
+  else if(a==='orbs'){giveItem('orb1',5);saveInv();log('Dev: +5 Enchant Orbs.','#ff8a80')}
   else if(a==='gate'){if(zoneId!=='over')enterZone('over');player.x=3.5*T;player.y=15*T+8;if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='door'){if(zoneId!=='over')enterZone('over');player.x=DOOR.x;player.y=DOOR.y+26;player.onTile=tileAt(player.x,player.y);if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='dun'){enterZone('dun')}
@@ -52,7 +53,7 @@ function renderDev(){
   const g=(...btns)=>'<div class="dgrid">'+btns.join('')+'</div>';
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
-    sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Skeleton King item'),b('copper','+500 copper')))+
+    sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Skeleton King item'),b('copper','+500 copper'),b('orbs','+5 orbs')))+
     sec('tp','Teleport',g(b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
     // Old Zone (owner, Nov 27): the first build (Gate Road, guards, the first crypt), kept only to compare then and now.
     // Frozen: not part of the game, nobody works on it.

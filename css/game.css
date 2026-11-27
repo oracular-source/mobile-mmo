@@ -327,3 +327,8 @@ body.land #log{width:34%}
 body.land #castbar{top:calc(76px + env(safe-area-inset-top))}
 body.land #qchip{top:calc(104px + env(safe-area-inset-top))}
 body.land #banner{top:auto;bottom:10px}
+
+/* Enchant glow (v0.100): faint at +3, strong at +5, so a high enchant reads at a glance on the Character screen */
+.ench3{text-shadow:0 0 3px rgba(127,224,216,.7)}
+.ench5{text-shadow:0 0 3px #7fe0d8,0 0 7px rgba(127,224,216,.9)}
+.orbrow{display:flex;gap:6px}.orbrow .sellall{flex:1}

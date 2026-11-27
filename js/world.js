@@ -640,7 +640,7 @@ function openChest(A,ch){
   let pool=r<o.rare?RARES:r<o.rare+o.unc?UNCOMMONS:COMMONS;if(!pool.length)pool=UNCOMMONS.length?UNCOMMONS:COMMONS;
   ch.open=true;ch.at=time;burst(ch.x,ch.y-4,'#ffd27a',16,true);
   const c=Math.floor(rr(o.cu,o.cu*2));inv.copper+=c;log('You open a hidden chest: '+c+' copper.','#c9a227','loot');
-  if(pool.length)giveItem(pick(pool),1,0);saveInv()}
+  if(pool.length)giveItem(pick(pool),1,0);if(rng()<LOOT.orbChest)giveItem('orb1',1,1);saveInv()}
 
 /* ---------- Area critters (Heart pass, v0.49): the small living things a map file places ---------- */
 // A map's things can hold "critter <kind> x y [n]" (tile units, decimals fine, docs/map-format.md):

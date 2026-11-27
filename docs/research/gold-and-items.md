@@ -127,6 +127,17 @@ Deep dive for the "Items and gold rethink" card on the board. Must be settled be
 3. Should normal mobs drop gear at all, or only copper and junk (gear from chests, rares and named)?
 4. Repairs after death: keep that card or drop it?
 
+## Enchanting as built (v0.100, Nov 27)
+
+**Owner (Nov 27):** about **10% at +5**: "I don't want scaling to become a nightmare... but I want the user to feel it." So the numbers stay small (2% of the item's stats per step) and the feel comes from the look: +N in the name, a glow at +3 and +5, sparks when it lands, a teal light column for an orb drop.
+
+- **Orbs:** ~1 in 150 kills (level 3+ mobs), rares 50%, named and bosses 25%, Malrec always, hidden chests 10%. Never in the arena (sim unchanged).
+- **Steps:** +1 to +5, 1 orb plus 20 / 40 / 80 / 120 / 200 copper, at any campfire. Never fails.
+- **Move:** 15 copper per step, onto a bag item of the same slot as you equip it (the steps swap).
+- **Dust:** break down bag gear (2 / 5 / 12 / 25 by rarity, plus 20 per enchant step); 40 dust = 1 orb.
+- **Shop orb:** 1000 copper at a campfire (about an hour of kill copper at level 10).
+- **Later:** orb tiers and merging with Zone 2, the forge moves to Town 1, teleport orbs. If +10% isn't felt on the phone, raise `LOOT.enchStep` (0.03 = +15%, 0.04 = +20%).
+
 ## Sources
 - Path of Exile dev diary, "Rethinking Gold as a Currency": https://pathofexile.com/forum/view-thread/55102
 - Path of Exile economy (Game Developer): https://gamedeveloper.com/design/path-of-exile-economy-currency-trading
