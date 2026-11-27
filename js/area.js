@@ -473,7 +473,7 @@ function paintArea(A){
       else if(n==='earth_wall'||n==='rat_hole'){} // drawn earlier as one shape (paintEarthWalls, v0.74)
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
-      else if(n==='coffin')drawCoffin(R,bx,by,ah(tx,ty,12));
+      else if(n==='coffin'){if(name(tx,ty-1)!=='coffin')drawCoffin(R,bx,by,ah(tx,ty,12))}
       else if(n==='pew')drawPew(R,g,bx,by,name(tx-1,ty)==='pew',name(tx+1,ty)==='pew',ah(tx,ty,18));
       else if(n==='bone_niche'){const wl=m=>m==='rock'||m==='bone_niche';drawNiche(R,bx,by,!wl(name(tx,ty+1)),ah(tx,ty,19),!wl(name(tx+1,ty))?'e':!wl(name(tx-1,ty))?'w':'',tx,ty)}
       else if(n==='ember_pit'){const K=(x,y)=>name(x,y)==='ember_pit';drawEmberPit(R,bx,by,K(tx,ty-1),K(tx,ty+1),K(tx-1,ty),K(tx+1,ty),tx,ty)}
@@ -812,22 +812,22 @@ function drawBones(R,bx,by,r){
   R(bx+1,by+10,14,5,'rgba(0,0,0,0.3)');R(bx+3,by+11,10,3,AP.boneDk);
   cryptBone(R,bx+1,by+12,13);cryptBone(R,bx+r*4+3|0,by+5,9,true);if(r>0.4)cryptBone(R,bx+2,by+8,10);
   cryptSkull(R,bx+(r<0.5?8:3),by+4+(r*3|0),true)}
-// Closed coffin (v0.91 redraw; owner: the old ones read as little headstones). What makes it a coffin: the tapered outline,
+// Closed coffin (v0.91 redraw; owner: the old ones read as little headstones; v0.92 person-sized, owner: v0.91's were too small). What makes it a coffin: the tapered outline,
 // narrow at the head, widest at the shoulders, narrowing to the feet, and a cross carved down the lid; a thin front face
 // gives it depth. Versions: plain, lid ajar (slid down off the head end, a black gap showing), cracked lid, a candle stub on top.
 function coffinHW(t,L,a,b,c){a=a||3;b=b||5.5;c=c||2.9;const s=L*0.28;return t<s?a+t/s*(b-a):b-(t-s)/(L-s)*(b-c)} // half width t px from the head (head a, shoulders b, feet c)
-function drawCoffin(R,bx,by,r){
-  const cx=bx+8,top=by,L=14,HW=t=>Math.round(coffinHW(t,L,1.6,4.2,1.8)),ajar=r<0.22?2:0,v=r<0.22?0:r<0.45?1:r>0.82?2:3;
-  R(cx-5,by+14,11,2,'rgba(0,0,0,0.4)');
-  if(ajar){for(let t=0;t<3;t++){const h=HW(t);R(cx-h-1,top+t-1,h*2+3,2,AP.out);R(cx-h,top+t,h*2+1,1,'#0b090d')}} // the open head end
+function drawCoffin(R,bx,by,r){ // two tiles tall (map: a C with another C under it), drawn from the top tile; person-sized
+  const cx=bx+8,top=by+3,L=24,HW=t=>Math.round(coffinHW(t,L,2.6,6,2.8)),ajar=r<0.22?3:0,v=r<0.22?0:r<0.45?1:r>0.82?2:3;
+  R(cx-7,top+L+1,15,3,'rgba(0,0,0,0.4)');
+  if(ajar){for(let t=0;t<4;t++){const h=HW(t);R(cx-h-1,top+t-1,h*2+3,2,AP.out);R(cx-h,top+t,h*2+1,1,'#0b090d')}} // the open head end
   for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h-1,y-1,h*2+3,3,AP.out)}
   for(let t=0;t<L;t++){const h=HW(t),y=top+t+ajar;R(cx-h,y,h*2+1,1,AP.stone);R(cx-h,y,1,1,AP.stoneHi);R(cx+h,y,1,1,AP.stoneDk)}
   {const h=HW(L-1),y=top+L+ajar;R(cx-h,y,h*2+1,2,AP.stoneDk2);R(cx-h-1,y+2,h*2+3,1,AP.out)} // front face at the foot
-  R(cx-1,top+ajar,3,1,AP.stoneHi); // lit head edge
-  R(cx,top+2+ajar,1,10,AP.stoneDk2);R(cx-2,top+4+ajar,5,1,AP.stoneDk2); // the carved cross
-  if(v===1){R(cx+2,top+5+ajar,1,2,AP.out);R(cx+3,top+7+ajar,1,2,AP.out);R(cx+2,top+9+ajar,1,1,AP.out)} // a crack across the lid
-  if(v===2){R(cx-3,top+8+ajar,3,4,AP.out);R(cx-2,top+9+ajar,1,2,'#e8e0c8');R(cx-3,top+12+ajar,3,1,'#d8d0b8')} // a candle stub, wax run down
-  if(r>0.6&&r<0.7)R(cx+1,top+10+ajar,2,1,AP.moss)}
+  R(cx-2,top+ajar,5,1,AP.stoneHi); // lit head edge
+  R(cx,top+3+ajar,1,17,AP.stoneDk2);R(cx-3,top+7+ajar,7,1,AP.stoneDk2); // the carved cross
+  if(v===1){R(cx+2,top+10+ajar,1,2,AP.out);R(cx+3,top+12+ajar,1,2,AP.out);R(cx+2,top+14+ajar,1,2,AP.out);R(cx+3,top+16+ajar,1,1,AP.out)} // a crack across the lid
+  if(v===2){R(cx-4,top+13+ajar,3,5,AP.out);R(cx-3,top+14+ajar,1,3,'#e8e0c8');R(cx-4,top+18+ajar,3,1,'#d8d0b8')} // a candle stub, wax run down
+  if(r>0.6&&r<0.7)R(cx+2,top+19+ajar,2,1,AP.moss)}
 // Rat tunnel walls with natural edges (v0.74, Zone 1 pass step 3): the earth walls used to follow the tile steps, so every
 // cave edge was a staircase. Now they're one shape, like water (v0.52): a smoothed wall field plus two layers of wobble picks,
 // pixel by pixel, wall or floor. Then, in the 3/4 view: a soil face 10 px tall wherever floor lies just below the wall (with
