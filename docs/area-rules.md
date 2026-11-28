@@ -242,6 +242,13 @@ Minimal EverQuest-style until the theme is decided; every screen part uses one l
 - **Physical moves stay physical:** the Bellringer's Toll is a man heaving an iron clapper (it rises a step each beat and shakes with the strain: the tell), then slamming it down. **Iron stays straight and upright (owner, Nov 27, twice):** the clapper never tilts or bends on the slam (a tilted bar read as a bent spoon). He drives it **straight down in front of him**: the same clapper drawn head-down (flipped top to bottom, never turned), his fist on top of the handle, the iron head on the floor. Awkward is fine; bent is not.
 - How it's drawn: `tools/cast_poses_draft.py` (draft page with `tools/cast_review_page.py`), `--game` writes `MOB_CASTS` into `js/data/sprites.js`; `castFrame` / `castPlay` in `js/anim.js` pick the frame, the cast code in `js/world.js` calls `castPlay` when a spell goes off.
 
+### Gap animations and Old Gnawbone's screech (v0.155, owner OK'd draft 1, Nov 28)
+- **Every mob fights with what it carries:** the deacon's lantern-staff, the mender's open palm, the summoner's ember, the Acolyte's censer on its chain. Each move has a held tell (pull back or lift), one fast strike, a held hit, recover.
+- **Rigid things stay upright:** the deacon lifts his lantern-staff straight up and drives it straight down (same rule as the Bellringer's clapper).
+- **Big versions copy the family:** the great ash wisp uses the ash wisp's attack and death at its own size; the candle wisp uses the ash wisp's death in candle colours.
+- **Old Gnawbone's squeal has a body (option A, looks only):** he rears up on his back legs (the front half tilted up a step at a time, feet down), jaws wide, and shakes while short sound lines pulse from his jaws. At each wall hole a rat comes from, dark cracks spread from the hole and dirt sprays out (`holeBurst` in `js/anim.js`).
+- How it's drawn: `tools/gap_anims_draft.py` (review page `tools/gap_review_page.py`); `tools/mob_attack_draft.py --game` and `tools/cast_poses_draft.py --game` write it into `js/data/sprites.js`.
+
 ## Area look sheets
 Each area gets a short look sheet here once its style is picked.
 

@@ -367,6 +367,9 @@ def write_game():
             rel = frs if kind in INSTANT else [f for f in frs if not f.get('cast')]
             out[img][kind] = {'pal': frs[0]['pal'], 'h': [to_pose(f, w, h) for f in hold], 'r': [to_pose(f, w, h) for f in rel],
                               'rt': [round(f['ms'] / 1000, 3) for f in rel]}
+    from mob_attack_draft import to_pose as tp
+    from gap_anims_draft import screech_cast
+    out['gnaw'] = {'squeal': screech_cast(tp)}  # Old Gnawbone's screech when he squeals (owner picked A, Nov 28)
     block = ('// MOB_CASTS (from tools/cast_poses_draft.py --game, owner OK Nov 27): cast poses. h = frames held while the cast bar\n'
              '// fills (the glow builds), r = frames played once when it goes off (rt seconds each); instant moves are all r.\n'
              'const MOB_CASTS=' + json.dumps(out, separators=(',', ':')) + ';\n// /MOB_CASTS\n')

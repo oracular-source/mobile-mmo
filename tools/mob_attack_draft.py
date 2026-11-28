@@ -394,6 +394,9 @@ def write_game_data(data, S):
     # Beetles, boar, ash wisp and cultists (tools/family_anims_draft.py, owner OK'd Nov 27).
     from family_anims_draft import game_data
     fp, fd = game_data(to_pose); out.update(fp); deaths.update(fd)
+    # The gaps: great ash wisp, deacon, mender, summoner, Acolyte, candle wisp (tools/gap_anims_draft.py, owner OK'd Nov 28).
+    from gap_anims_draft import game_data as gap_data
+    gp, gd = gap_data(to_pose); out.update(gp); deaths.update(gd)
     out['_deaths'] = deaths
     block = ('// MOB_POSES (from tools/mob_attack_draft.py, owner OK Nov 27): attack frames drawn from each sprite. t = seconds for\n'
              '// wind-up (held before the hit lands), smear, hit (held), recover. Physical attacks: the weapon or the jaws do the work.\n'

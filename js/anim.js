@@ -115,6 +115,10 @@ function boneGlow(x,y,r,a){lx.globalCompositeOperation='lighter';lx.globalAlpha=
 // shows his howl frame (head thrown back, muzzle up, mouth open; his legs keep their walk) while three short sound lines
 // pulse from his jaws like a Pokemon cry.
 const HOWL={time:1.0,pulse:0.22,col:'#e8f4ff',mouth:[35,1]}; // mouth = his nose tip in the howl frame's grid
+// Old Gnawbone's rats clawing out of a wall hole (v0.155, owner picked A): the dirt round the hole cracks and sprays out
+// as the rat scrabbles free. Looks only.
+function holeBurst(x,y){if(logMute)return;const seg=[];for(let i=0;i<6;i++){const a=fr(0,6.28);seg.push([Math.cos(a),Math.sin(a)*0.7,fr(4,8)])}
+  fxo.push({k:'crack',x:x,y:y-3,seg:seg,t:0,life:1.1});fxBits(x,y-3,['#6e5a40','#8a7356','#4b3b2a','#3a3127'],18,30,12,1.2)}
 function animHowl(m){if(logMute)return;m.howlT=HOWL.time;fxo.push({k:'howl',m:m,t:0,life:HOWL.time+0.1})}
 // His howl picture right now, or null for his normal one (a short beat before and after so the head snaps up and down).
 function howlFrame(m){if(!(m.howlT>0.06&&m.howlT<HOWL.time-0.06))return null;return IMG[m.def.img+'howl']||null}
@@ -148,7 +152,9 @@ function boneEnd(f,x,y){const frag=(n,sp,up)=>{for(let k=0;k<n;k++)fxo.push({k:'
 // the room's light like the mobs do.
 function fxDraw(){
   fxo.forEach(f=>{
-    if(f.k==='slash'){const p=f.t/f.life,base=Math.atan2(f.ay,f.ax);lx.fillStyle=f.col;
+    if(f.k==='crack'){const p=f.t/f.life;lx.fillStyle='#0e0b09';lx.globalAlpha=Math.max(0,1-p*p);
+      f.seg.forEach(([cx,cy,len])=>{const n=Math.round(len*Math.min(1,p*4));for(let j=2;j<n;j++)lx.fillRect(Math.round(f.x+cx*j),Math.round(f.y+cy*j),1,1)});lx.globalAlpha=1}
+    else if(f.k==='slash'){const p=f.t/f.life,base=Math.atan2(f.ay,f.ax);lx.fillStyle=f.col;
       for(let j=0;j<6;j++){const q=j/5;if(q>p*1.6)break;const an=base-1+q*2;lx.globalAlpha=Math.max(0,1-p)*(0.5+0.5*q);lx.fillRect(Math.round(f.x+Math.cos(an)*5),Math.round(f.y+Math.sin(an)*5),1,1)}lx.globalAlpha=1}
     else if(f.k==='fall'){const p=f.t/f.life,im=f.img,h=Math.max(1,Math.round(im.h*(1-p*0.75))),w=im.w,dx=Math.round(f.x)-(w>>1),dy=Math.round(f.y)-h;
       lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}

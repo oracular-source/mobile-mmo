@@ -2,12 +2,12 @@
 
 **Read this first.** Updated on every push and copied into the claude.ai Project on every push (the bigger docs at least every 3 pushes), so a chat that can't reach GitHub still knows the current state. The full detail lives in `docs/board.md`.
 
-**Live version: v0.154** (Nov 28, 2026). Game: https://oracular-source.github.io/mobile-mmo/
+**Live version: v0.155** (Nov 28, 2026). Game: https://oracular-source.github.io/mobile-mmo/
 
 ## Lanes: last shipped → next pickup
 | Lane (start phrase) | Last shipped | Next pickup |
 | --- | --- | --- |
-| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.149 the Bellringer's clapper stays upright on the slam; v0.147 enemies cast with their bodies: cast poses for all 11 caster moves; v0.141 cultist deaths; v0.134 beetles, boar, ash wisp and cultists attack and die | **Draft up: "Gap animations draft 1"** (wisps, deacon, mender, summoner, Acolyte, Old Gnawbone's screech + options A/B/C): owner's marks, then build |
+| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.155 the gaps filled (great and candle wisps, deacon, mender, summoner, Acolyte) and Old Gnawbone's screech; v0.149 Bellringer clapper upright; v0.147 cast poses for all casters | Owner looks at v0.155 on the phone. Every Zone 1 mob now has its own attack and death; next ideas to pick: the Prior and Bellringer wail-and-vanish (still placeholder bursts), Malrec's Candle Wake, or Zone 2 when it comes |
 | **Multiplayer** ("… Continue on multiplayer"): two players, phone to phone | v0.150 step 2: shared monsters in normal areas (host's phone runs them), kills count for both (full XP each), group scaling on by itself, tap your partner to heal them; v0.136 step 1: see each other, chat | Owner and wife try step 2 on the phones (one on mobile data). Then **step 3**: playing together everywhere (Dungeon 1 as a group, buffs on your partner, see pets, follow between areas, boss specials aim at both) |
 | **Items** ("… Continue on items"): drops, boss loot, enchanting, gold | v0.146 chests refill hourly (v0.154: now 20 min); v0.144 climb with gear sim (review page "Zone 1 climb with gear"); v0.131 one pink per boss | **Parked (owner: enough items for now).** Reopens with notes from the owner's full Zone 1 playthrough |
 | **Map** ("… Continue on map"): maps, tiles, area art | v0.153 Town 1: stone town wall, the paddock is back (v0.152's hitching rail undone); v0.148 **Town 1 draft 2**: round and cozier, the wizard's stable (DEV → Teleport → Town 1 (draft) only); v0.143 Town 1 buildings drawn, Dungeon 1 censers and pool fixed; v0.140 Dungeon 1 stairs out and love pass | Owner OK'd Town 1 draft 2 (Nov 28). Next: the **Town 1 build**: townsfolk at their stations, services move from campfires to them, open the crossroads gate, start in town |

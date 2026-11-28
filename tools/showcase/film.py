@@ -45,6 +45,10 @@ AREA['ashcast']='chapel'
 SETUP['toll']=("const m=G.mobs.find(m=>m.type==='bellringer'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+34;P.y=m.y-2;m.state='chase';"
   "m.threat={p:999,pet:0};m.root=99;m.atk=99;m.tollCd=0.1;W.focus={x:m.x+17,y:m.y-6};W.n=80;W.god=1;")
 AREA['toll']='dungeon1_f2'
+# Old Gnawbone's screech (v0.155): drop him just under 2/3 health so he squeals and rats claw out of the wall holes.
+SETUP['gnawsqueal']=("const m=G.mobs.find(m=>m.type==='gnaw'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+34;P.y=m.y-2;m.state='chase';"
+  "m.threat={p:999,pet:0};m.root=99;m.atk=99;m.hp=m.maxhp*0.65;W.n=75;W.god=1;")
+AREA['gnawsqueal']='rat_tunnel'
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:

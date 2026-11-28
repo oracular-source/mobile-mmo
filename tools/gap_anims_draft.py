@@ -205,3 +205,41 @@ if __name__ == '__main__':
     json.dump(d, open(out, 'w'), separators=(',', ':'))
     sheet(d, out.replace('.json', '.png'))
     print('wrote', out)
+
+# ---------- into the game (owner OK'd draft 1, Nov 28: "let's go with A") ----------
+# Read by tools/mob_attack_draft.py --game (MOB_POSES: attacks and deaths) and tools/cast_poses_draft.py --game
+# (MOB_CASTS: Old Gnawbone's screech, played when he squeals). The wall hole is drawn live in js/anim.js (holeBurst).
+GAP_ATK = {  # image: (attack key, base rows)
+    'gwisp': ('gwisp_bite', lambda S: S['GWISP_SPR'][0]),
+    'deacon': ('deacon_attack', lambda S: S['REDO_SPR']['deacon']),
+    'mender': ('mender_attack', lambda S: S['REDO_SPR']['mender']),
+    'summoner': ('summoner_attack', lambda S: S['REDO_SPR']['summoner']),
+    'acolyte': ('acolyte_attack', lambda S: S['REDO_SPR']['acolyte']),
+}
+GAP_DEATH = {  # image: (death key, base rows); _2 and _3 are extra deaths picked at random
+    'gwisp': ('gwisp_death', lambda S: S['GWISP_SPR'][0]),
+    'cwisp': ('cwisp_death', lambda S: S['WISP_SPR'][0]),
+    'summoner': ('summoner_death', lambda S: S['REDO_SPR']['summoner']),
+    'acolyte': ('acolyte_death', lambda S: S['REDO_SPR']['acolyte']),
+}
+
+def game_data(to_pose):
+    from family_anims_draft import load as fload
+    d, S = build(); S = dict(S); F = fload(); S.setdefault('WISP_SPR', F['WISP_SPR'])
+    poses, deaths = {}, {}
+    for name, (key, base) in GAP_ATK.items():
+        rows = base(S); w, h = len(rows[0]), len(rows); frs = d[key][1:]
+        poses[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal']}
+        for slot, f in zip(['wind', 'smear', 'hit', 'rec'], frs): poses[name][slot] = to_pose(f, w, h)
+    for name, (key, base) in GAP_DEATH.items():
+        rows = base(S); w, h = len(rows[0]), len(rows)
+        for suf in ('', '_2', '_3'):
+            if key + suf not in d: continue
+            frs = d[key + suf][1:]
+            deaths[name + suf] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, w, h) for f in frs]}
+    return poses, deaths
+
+def screech_cast(to_pose):
+    """Old Gnawbone's screech as an instant cast pose (MOB_CASTS.gnaw.squeal)."""
+    S2 = load_sprites(); frs = gnaw_screech(S2)[1:-1]; rows = S2['SPR']['gnaw']
+    return {'pal': frs[0]['pal'], 'h': [], 'r': [to_pose(f, len(rows[0]), len(rows)) for f in frs], 'rt': [round(f['ms'] / 1000, 3) for f in frs]}

@@ -44,7 +44,7 @@ const TYPES={
   wisp:{name:'an ash wisp',img:'wisp',death:'flip',lv:[10,14],hp:36,hpl:15,dmg:2.8,dmgl:1.3,spd:30,aggro:46,armor:0,drain:1,blink:1,float:1},
   // The Ashen Acolyte (rare, 14, herb garden): a telegraphed shadow bolt like the King's, and Ember Brand: a ring of embers
   // flares under you (1.5 s to step out, then a big burn). No flee-to-heal (owner, Nov 20: unfair to classes without a snare).
-  acolyte:{name:'the Ashen Acolyte',img:'acolyte',lv:[14,14],hp:120,hpl:32,dmg:4.6,dmgl:1.9,spd:28,aggro:56,armor:0.05,rare:1,brand:1,zone:'Ruined Chapel',
+  acolyte:{name:'the Ashen Acolyte',img:'acolyte',death:'flip',lv:[14,14],hp:120,hpl:32,dmg:4.6,dmgl:1.9,spd:28,aggro:56,armor:0.05,rare:1,brand:1,zone:'Ruined Chapel',
     cast:{name:'Shadow Bolt',first:3,every:6,dur:2,range:110,boss:1,col:'#b48cff'}},
   // Dungeon 1, Brother Malrec's chapel (v0.63, levels 14-15, instanced). heal = a cast with a bar over its head that heals the
   // most hurt of its group (not itself) by x of their health; stun, fear or sleep it to stop it. grasp = Grasp of the Deep:
@@ -64,10 +64,10 @@ const TYPES={
   // Dungeon 1 rebuild (v0.66). gwisp = a great ash wisp: hovers with its pack (camp) and joins the pull; burn = every so often
   // it flares and a ring of fire spreads round where it hangs (1.6 s to get out of the ring). It doesn't die with whoever
   // summoned it (owner, Nov 21). summoner = the cultist who lit it: a caster like the ashcaller.
-  gwisp:{name:'a great ash wisp',img:'gwisp',lv:[14,15],hp:70,hpl:26,dmg:3.2,dmgl:1.4,spd:24,aggro:52,armor:0,float:1,camp:1,burn:1},
-  summoner:{name:'a cult summoner',img:'summoner',lv:[14,15],hp:46,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
+  gwisp:{name:'a great ash wisp',img:'gwisp',death:'flip',lv:[14,15],hp:70,hpl:26,dmg:3.2,dmgl:1.4,spd:24,aggro:52,armor:0,float:1,camp:1,burn:1},
+  summoner:{name:'a cult summoner',img:'summoner',death:'flip',lv:[14,15],hp:46,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
     cast:{name:'Cinder Lash',first:2,every:5,dur:1.2,range:90,x:1.5,col:'#ffb060'}},
-  cwisp:{name:'a candle wisp',img:'cwisp',lv:[15,15],hp:30,hpl:6,dmg:0,dmgl:0,spd:11,aggro:0,armor:0,float:1,drift:1,noxp:1},
+  cwisp:{name:'a candle wisp',img:'cwisp',death:'flip',lv:[15,15],hp:30,hpl:6,dmg:0,dmgl:0,spd:11,aggro:0,armor:0,float:1,drift:1,noxp:1},
   boss1:{name:'the Skeleton King',img:'boss1',death:'bones',deathHead:[5,0,13,10,24],lv:[7,7],hp:247,hpl:44,dmg:6.5,dmgl:2.4,spd:27,aggro:70,undead:1,armor:0.1,named:1,boss:1,zone:'Dungeon 1'}
 };
 // XP has three knobs (v0.34.1, owner Nov 19); tune these, never single mobs' XP or the XP-needed numbers:
