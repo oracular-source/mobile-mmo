@@ -306,7 +306,8 @@ function namedAdds(m){
     castPlay(m,'squeal');floatText(m.x,m.y-26,a.shout||'SQUEAL!','#ffb37a',true);log(cap(m.def.name)+' '+(a.say||'squeals, and rats pour out of the walls!'),'#ffb37a');
     if(a.from==='ground')holes.length=0; // rising from the earth beside it, not out of wall holes
     for(let i=0;i<a.n;i++){const h=holes[i%Math.max(1,holes.length)],sp={type:a.type,x:h?h.x:m.x+(i?16:-16),y:h?h.y:m.y+6,timer:0,mob:null,group:null,lv:[a.lv,a.lv],noRespawn:true};
-      if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const r=spawn(sp);r.state='chase';burst(r.x,r.y-4,a.col||'#5a4836',10,true);if(h)holeBurst(h.x,h.y)}
+      if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const r=spawn(sp);r.state='chase';// The dirt puff comes out of the hole's mouth, not in front of the wall where the rat stands (same rolls as before).
+      const hx=h&&h.mx!==undefined?h.mx+h.mw/2:r.x,hy=h&&h.f!==undefined?h.f-2:r.y-4;burst(hx,hy,a.col||'#5a4836',10,true);if(h){holeBurst(hx,hy+1);animEmerge(r,h)}}
   }
 }
 

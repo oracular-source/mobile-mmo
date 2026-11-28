@@ -131,7 +131,7 @@ function* buildAreaGen(id){
   // Bone walls (love pass, v0.103): a run of them is drawn as one stack, so each knows whether its neighbours are bone walls too.
   A.objs.forEach(o=>{if(o.kind!=='bone_wall')return;o.nl=A.objs.some(q=>q.kind==='bone_wall'&&q.y===o.y&&q.x===o.x-1);o.nr=A.objs.some(q=>q.kind==='bone_wall'&&q.y===o.y&&q.x===o.x+1)});
   // Holes in the tunnel walls: where Old Gnawbone's rats burrow out (the open floor just below each hole).
-  for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10});
+  for(let y=0;y<h-1;y++)for(let x=0;x<w;x++)if(rows[y][x]==='h'&&A.map[y+1][x]===0)A.holes.push({x:x*T+8,y:(y+1)*T+10,tx:x,ty:y});
   // Lights: torches and lanterns are warm, the crypt mouth is cold.
   A.objs.forEach(o=>{const cx=o.x*T+(o.ox||0)+o.w*T/2;
     // Wall torch (v0.96): hangs on the face of a north wall; its light starts on the floor just in front (never inside the wall).
@@ -1043,6 +1043,8 @@ function* paintEarthWallsGen(A,g,name){ // pauses after each row of pixels
   for(let ty=0;ty<A.h;ty++)for(let tx=0;tx<A.w;tx++){const n=name(tx,ty);if(n!=='earth_wall'&&n!=='rat_hole')continue;
     const bx=tx*T,by=ty*T;
     if(n==='rat_hole'){const f=footAt(bx+8,by+4,by+22);if(f<0)continue;const hy=f-15; // the hole sits on the foot of the face
+      // Remember where the dark mouth was drawn, so Old Gnawbone's rats can climb out of it (v0.157, js/anim.js emergeClip).
+      A.holes.forEach(o=>{if(o.tx===tx&&o.ty===ty){o.mx=bx+4;o.my=hy+8;o.mw=8;o.f=f}});
       R(bx+3,hy+7,10,8,AP.out);R(bx+4,hy+8,8,7,'#050404');R(bx+5,hy+7,6,1,AP.out);R(bx+4,hy+8,8,1,'#2a2018');
       R(bx+2,hy+14,12,2,AP.caveHi);R(bx+1,hy+15,3,1,AP.earthFace);R(bx+12,hy+15,3,1,AP.earthFace);R(bx+6,hy+12,2,1,AP.boneDk);
       R(bx+3,f+1,9,1,AP.caveHi);R(bx+5,f+2,5,1,AP.cave[1]);continue} // gnawed bone in the mouth, loose dirt spilled out on the floor

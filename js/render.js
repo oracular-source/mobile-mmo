@@ -461,7 +461,8 @@ function render(){
     if(e.tree){const goal=(player.dead>0?false:behind(player,e))||behind(player.target,e)?0.4:1;e.a+=(goal-e.a)*0.2;if(Math.abs(goal-e.a)<0.02)e.a=goal;
       lx.globalAlpha=e.a;lx.drawImage(e.tree.c,e.px,e.py);lx.globalAlpha=1;return}
     // Nudge there and back instead of save()/restore() per sprite (restore was ~8% of the frame); the alpha is reset after.
-    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.translate(ox,oy);drawEnt(e);
+    const ox=sn(e.x)-Math.round(e.x),oy=sn(e.y)-Math.round(e.y);lx.translate(ox,oy);
+    if(e.emerge&&emergeClip(e)){drawEnt(e);lx.restore()}else drawEnt(e); // a rat climbing out of its hole (js/anim.js)
     // Wading (v0.64): in slow water (Dungeon 1's flood, the crossroads creek) the water covers your feet and shins, with a
     // ripple ring that moves, so you can see why you're slow. Floating things (wisps, the sword) skim over.
     if(slowArea&&!e.dead&&!(e.def&&e.def.float)&&e.img!=='blade'&&e!==decoy&&!(e===player&&player.dead>0)){const SA=slowArea,tx=Math.floor(e.x/T),ty=Math.floor(e.y/T);

@@ -119,6 +119,22 @@ const HOWL={time:1.0,pulse:0.22,col:'#e8f4ff',mouth:[35,1]}; // mouth = his nose
 // as the rat scrabbles free. Looks only.
 function holeBurst(x,y){if(logMute)return;const seg=[];for(let i=0;i<6;i++){const a=fr(0,6.28);seg.push([Math.cos(a),Math.sin(a)*0.7,fr(4,8)])}
   fxo.push({k:'crack',x:x,y:y-3,seg:seg,t:0,life:1.1});fxBits(x,y-3,['#6e5a40','#8a7356','#4b3b2a','#3a3127'],18,30,12,1.2)}
+// v0.157 (owner: the rats looked like they came out of the wall itself, not the hole as drafted): the rat starts inside the
+// hole's dark mouth, seen only through it, pokes its snout out and scrabbles down onto the floor, sliding to where it
+// really is over EMERGE seconds. Looks only: the rat's real spot, timing and chase never change (sims stay the same).
+const EMERGE={poke:0.3,out:0.45}; // seconds: snout poking out of the dark, then scrabbling down onto the floor
+function animEmerge(r,h){if(logMute||h.mx===undefined)return;const im=IMG[r.def.img];
+  // start: feet on the hole's floor line, body tucked in so only the snout end shows in the mouth; it runs toward you,
+  // so its snout leads that way
+  const fd=player.x>=r.x?1:-1;r.emerge={t:time,sx:h.mx+h.mw/2-fd*Math.round(im.w*0.4),sy:h.f,fd:fd,h:h}}
+// Before drawing an emerging rat: clip to the hole's mouth plus the floor below the wall face, and draw it back at the
+// hole, catching up with its real spot as it climbs out. Returns true if it set up a clip (the caller restores).
+function emergeClip(m){const e=m.emerge;if(!e)return false;const t=time-e.t;if(t>=EMERGE.poke+EMERGE.out||m.dead){m.emerge=null;return false}
+  let x,y;
+  if(t<EMERGE.poke){const k=t/EMERGE.poke;x=e.sx-e.fd*Math.round(5*(1-k));y=e.sy} // the snout creeps out of the dark
+  else{const k=(t-EMERGE.poke)/EMERGE.out,q=k*k*(3-2*k);x=e.sx+(m.x-e.sx)*q;y=e.sy+(m.y-e.sy)*q} // out and down to the floor
+  const h=e.h;lx.save();lx.beginPath();lx.rect(h.mx,h.my,h.mw,h.f+1-h.my);lx.rect(h.mx-60,h.f+1,h.mw+120,60);lx.clip();
+  lx.translate(Math.round(x-m.x),Math.round(y-m.y));return true}
 function animHowl(m){if(logMute)return;m.howlT=HOWL.time;fxo.push({k:'howl',m:m,t:0,life:HOWL.time+0.1})}
 // His howl picture right now, or null for his normal one (a short beat before and after so the head snaps up and down).
 function howlFrame(m){if(!(m.howlT>0.06&&m.howlT<HOWL.time-0.06))return null;return IMG[m.def.img+'howl']||null}
