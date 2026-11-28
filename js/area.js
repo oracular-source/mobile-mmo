@@ -599,7 +599,7 @@ function* paintAreaGen(A){ // pauses between rows (see Build in slices)
       else if(n==='stone_wall'){const isW=(x,y)=>{const m=name(x,y);return m==='stone_wall'||m==='gate'};drawStoneWall(R,g,bx,by,isW(tx,ty-1),isW(tx,ty+1),isW(tx+1,ty),isW(tx-1,ty),tx,ty)}
       else if(n==='pillar')drawColumn(R,g,bx,by,ah(tx,ty,17));
       else if(n==='palisade'){const isP=(x,y)=>name(x,y)==='palisade';drawPalisade(R,bx,by,isP(tx-1,ty),isP(tx+1,ty),tx,ty)}
-      else if(n==='rail_fence'){const isJ=(x,y)=>{const m=name(x,y);return m==='rail_fence'||m==='palisade'},isR=(x,y)=>name(x,y)==='rail_fence';drawRailFence(R,g,bx,by,isJ(tx-1,ty),isJ(tx+1,ty),isR(tx,ty-1),isR(tx,ty+1),tx,ty)}
+      else if(n==='rail_fence'){const isJ=(x,y)=>{const m=name(x,y);return m==='rail_fence'||m==='palisade'||m==='stone_wall'},isR=(x,y)=>name(x,y)==='rail_fence';drawRailFence(R,g,bx,by,isJ(tx-1,ty),isJ(tx+1,ty),isR(tx,ty-1),isR(tx,ty+1),tx,ty)}
       else if(n==='earth_wall'||n==='rat_hole'){} // drawn earlier as one shape (paintEarthWalls, v0.74)
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');

@@ -14,30 +14,30 @@ MAPS.town1 = {
     'TTTTT,TTTTTTT,TTTTTT==,TTTTTTTT,T,,TT,,TTT',
     'TTTT,,TTTT,,T,TT,,T,==,TTTTTTTTTT,,,TTTTTT',
     'T,,TT,TTTTTTT,T,,,,,==,,,,TTTTTTTTTTTTTTTT',
-    'TTTT,T,TT,TTT,,,LLLL==LLLL,,TTTTTTTTT,,TTT',
-    'TTTTT,,TT,TT,,LLL,,,==,,,LLL,,TTTTTTTTTTTT',
-    'TTT,TT,TTTT,,LL,,,,,==,,,,,LL,,,TTT,,,T,TT',
-    'TTTTT,TTTT,,LL,,,,,,==,,,,,,LL,,TTTTTTTTTT',
-    'T,TTTTTTTT,LL,,,,,,,==,,,,,,,LL,TTTTTTTTTT',
-    'TTTT,T,,T,LL,,,,,,,,==,,,,,,,,LL,,TTT,TTTT',
-    ',T,T,TT,T,L,,,,,,,,,==,,,,,,,,,L,TTTTTT,TT',
-    ',T,T,TTT,LL,,,,:::,,ss,,:::,,,,LL,TTTTT,T,',
-    'TTTTT,,,,L,,,,,,,,ssssss,,,,,,,,L,,TTTTTTT',
-    'TT,TTTTT,L,,,,,,,ssssssss,,,,,,,L,TTTTTTT,',
-    'TT,,TTT,,L,,,,,,,ssssssss,,,,,,,L,,TT,TTTT',
-    'TTTT,TT,,L,,,,,:ssssssssss,,,,,,L,,TTT,,,T',
-    'TT,TTTT,,L,,,,:,ssssssssss,,,,,,L,,TTTTT,T',
-    'TTTTT,T,,L,,,,,,,ssssssss,,,,,,,L,,TTTTTTT',
-    'TTTTTT,T,L,,,,,,,ssssssss,,,,,,,L,TT,TTTTT',
-    'TTT,TTTT,L,,,,,,,:ssssss,,,,,,,,L,,TTT,T,T',
-    'TTT,TTTT,LL,,,,,,:,:ss:,,,,,,,,LL,TTT,TTTT',
-    ',,T,,TT,T,L,,,,,,::,,,:,,,,,,,,L,TTTTTTT,T',
-    ',TT,,TTTT,LL,,,,,:,,,,:,,,,,,,LL,T,TT,TTTT',
-    ',TT,TT,TTT,LL,,,,,,,,,::::,,,LL,TT,T,TTT,,',
-    'TTTT,T,T,T,,LL,,,,,,,,,,,,,,LL,,,TTTTTTTT,',
-    ',,TTTTTTTTT,,LL,,,,,,,,,,,,LL,,T,TTTTTTTT,',
-    'TTT,TT,T,TT,,,LLL,,,,,,,,LLL,,TT,T,T,TTT,T',
-    'TTTTTTTTTTTTTT,,LLLLLLLLLL,,TTTTTTTTTTT,TT',
+    'TTTT,T,TT,TTT,,,WWWW==WWWW,,TTTTTTTTT,,TTT',
+    'TTTTT,,TT,TT,,WWW,,,==,,,WWW,,TTTTTTTTTTTT',
+    'TTT,TT,TTTT,,WW,,,,,==,,,,,WW,,,TTT,,,T,TT',
+    'TTTTT,TTTT,,WW,,,,,,==,,,,,,WW,,TTTTTTTTTT',
+    'T,TTTTTTTT,WW,,,,,,,==,,,,,,,WW,TTTTTTTTTT',
+    'TTTT,T,,T,WW,,,,,,,,==,,,,,,,,WW,,TTT,TTTT',
+    ',T,T,TT,T,W,,,,,,,,,==,,,,,,,,,W,TTTTTT,TT',
+    ',T,T,TTT,WW,,,,:::,,ss,,:::,,,,WW,TTTTT,T,',
+    'TTTTT,,,,W,,,,,,,,ssssss,,,,,,,,W,,TTTTTTT',
+    'TT,TTTTT,W,,,,,,,ssssssss,,jjjjjW,TTTTTTT,',
+    'TT,,TTT,,W,,,,,,,ssssssss,,j,,,,W,,TT,TTTT',
+    'TTTT,TT,,W,,,,,:ssssssssss,j,,,,W,,TTT,,,T',
+    'TT,TTTT,,W,,,,:,ssssssssss,j,,,,W,,TTTTT,T',
+    'TTTTT,T,,W,,,,,,,ssssssss,,j,,,,W,,TTTTTTT',
+    'TTTTTT,T,W,,,,,,,ssssssss,,jjjjjW,TT,TTTTT',
+    'TTT,TTTT,W,,,,,,,:ssssss,,,,,,,,W,,TTT,T,T',
+    'TTT,TTTT,WW,,,,,,:,:ss:,,,,,,,,WW,TTT,TTTT',
+    ',,T,,TT,T,W,,,,,,::,,,:,,,,,,,,W,TTTTTTT,T',
+    ',TT,,TTTT,WW,,,,,:,,,,:,,,,,,,WW,T,TT,TTTT',
+    ',TT,TT,TTT,WW,,,,,,,,,::::,,,WW,TT,T,TTT,,',
+    'TTTT,T,T,T,,WW,,,,,,,,,,,,,,WW,,,TTTTTTTT,',
+    ',,TTTTTTTTT,,WW,,,,,,,,,,,,WW,,T,TTTTTTTT,',
+    'TTT,TT,T,TT,,,WWW,,,,,,,,WWW,,TT,T,T,TTT,T',
+    'TTTTTTTTTTTTTT,,WWWWWWWWWW,,TTTTTTTTTTT,TT',
     'TT,,TTTTT,T,T,TT,,,,,,,,,,T,TT,,TT,,TT,T,T',
     ',T,TT,,TTTTTTTT,TTT,,,,TTTTTTTTTTTTTTTTTTT',
     'TTTTTTTTTTTTTT,T,,T,T,T,,T,,TTTT,T,TT,TTTT',
@@ -49,9 +49,9 @@ MAPS.town1 = {
     ',TTTT,TTT,TTT,T,TTTTTTT,T,TTTT,T,TTT,TT,TT',
   ],
   things: `
-# Town 1 DRAFT 2 (owner, Nov 27): round and cozier. The palisade is a circle, everyone stands round a round flagstone
-# square a few steps from the hearth, worn paths to each door. The wizard keeps a stable beside his tower, his horses tied
-# at a rail (why does a wizard sell horses? nobody knows). Wrapped in forest so the mirrored edge is woods.
+# Town 1 DRAFT 2 (owner, Nov 27): round and cozier. The town wall is a circle of stone (v0.153, owner: stone walls, not a log palisade), everyone stands round a round flagstone
+# square a few steps from the hearth, worn paths to each door. The wizard keeps a stable and a paddock of horses beside
+# his tower (why does a wizard sell horses? nobody knows). Wrapped in forest so the mirrored edge is woods.
 exit north 20 0 to=crossroads at=south lit
 obj lantern 22 4
 obj torch 18 10
@@ -76,14 +76,13 @@ obj well 15 27
 # south, facing the gate across the square: the wizard's tower, his scrying orb on the square's edge (main quest)
 obj wizard_tower 19 28 half
 obj orb_stand 20 24 half
-# south-east: the wizard's stable; two of his horses tied at a hitching rail beside it, a trough and hay (your first
-# mount comes from here). Owner (Nov 27): no paddock fence, a town doesn't have a fence in the middle.
+# south-east: the wizard's stable, and his paddock against the town wall (your first mount comes from here)
 obj stable 23 25
-obj hitching_post 28 21
-obj hay_bale 31 21
-obj trough 28 23
-critter horse 28.9 22.8 1 tied
-critter horse 30.7 22.8 1 tied
+obj hay_bale 31 19
+obj trough 29 22
+critter horse 29.6 21.0
+critter horse 30.8 21.7
+critter horse 28.8 20.0
 # life
 critter crow 25.2 24.6 1 high
 critter crow 15.3 22.4 1 high
