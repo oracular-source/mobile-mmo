@@ -228,11 +228,11 @@ def rat_frames(rows, step, pal, head_x, open_rows, snap_rows, eye):
     dead = belly(rows); kick = belly(step)
     death = [frame(ready, pal, 300, 'Hit (alive)'),
              frame(shift(grid_to_px(step), 0, -2), pal, 90, 'Death: a yelp hop'),
-             frame(dead, pal, 260, 'Belly-up, legs in the air'),
+             frame(dead, pal, 160, 'Flips belly-up, legs in the air'),
              frame(kick, pal, 90, 'Kick'),
              frame(dead, pal, 90, ''),
              frame(kick, pal, 90, 'Kick'),
-             frame(dead, pal, 1400, 'Lies still, then fades')]
+             frame(dead, pal, 150, 'Gone: fades at once, no lying there (owner, Nov 27)')]
     return bite, death
 
 def rats(S):
@@ -248,7 +248,71 @@ def rats(S):
     bsnap = {7: "aaaayyyk", 8: "aaaakyk."}
     big = rat_frames(B['brat'], B['bratstep'], bpal, 21, bopen, bsnap, (26, 5))
     pale = rat_frames(B['palerat'], B['paleratstep'], dict(S['REDO_PAL']['palerat'], w='#ffffff'), 21, bopen, bsnap, (26, 5))
-    return {'rat_bite': small[0], 'rat_death': small[1], 'brat_bite': big[0], 'brat_death': big[1], 'palerat_bite': pale[0], 'palerat_death': pale[1]}
+    out = {'rat_bite': small[0], 'rat_death': small[1], 'brat_bite': big[0], 'brat_death': big[1], 'palerat_bite': pale[0], 'palerat_death': pale[1]}
+    out.update(big_rats(S))  # the Pale Rat's rear-back bite replaces his plain one; Old Gnawbone's own (owner, Nov 27)
+    return out
+
+# ---------- the Pale Rat and Old Gnawbone: rear back, jaws wide on the big teeth, then bite down (owner, Nov 27) ----------
+def rear_bite(rows, step, pal, head_x, rear_head, rear_top, snap_edits, lunge=3):
+    """Ready -> rears back: head thrown up and back, mouth wide on the big incisors (held, the tell) -> lunges in, still
+    open -> bites down: head drops, teeth clamped (held) -> back. rear_head is drawn by hand from head_x, its first row
+    at rear_top (can be above the sprite). Drawn poses, never a turned sprite."""
+    ready = grid_to_px(rows)
+    body_r = {p: c for p, c in ready.items() if p[0] < head_x}
+    body_s = {p: c for p, c in grid_to_px(step).items() if p[0] < head_x}
+    head = grid_to_px(rear_head, head_x, rear_top)
+    snap_rows = [r for r in rows]
+    for i, t in snap_edits.items(): snap_rows[i] = snap_rows[i][:head_x] + t + snap_rows[i][head_x + len(t):]
+    snap_head = {(x, y + 1): c for (x, y), c in grid_to_px(snap_rows).items() if x >= head_x}  # head dropped into the bite
+    return [frame(ready, pal, 500, 'Ready (as today)'),
+            frame(shift(over(body_r, head), -1, 0), pal, 320, 'Rears back: head up, jaws wide on the big teeth (held, the tell)'),
+            frame(shift(over(body_s, head), lunge - 1, 0), pal, 60, 'Lunges in, still open'),
+            frame(shift(over(body_s, snap_head), lunge, 0), pal, 150, 'Bites down: head drops, teeth clamped (held)'),
+            frame(shift(ready, 1, 0), pal, 120, 'Back')]
+
+PALE_REAR = [  # columns 19 on, first row = row -4: snout thrown high, mouth wide
+    "........kk.",
+    ".......kApk",
+    "......kAaak",
+    "..kk.kAaak.",
+    "kkppkAaeak.",
+    "akppkaaaayk",
+    "aakkAaaakyk",
+    "AAAaaaakkPk",
+    "aaAAaakPPk.",
+    "aaaaaakPPk.",
+    "aaaaaaakyk.",
+    "aaaaaaaayk.",
+    "aaaaaaakk..",
+    "dddkkk.....",
+]
+GNAW_REAR = [  # columns 30 on, first row = row 1
+    "...........kk.....",
+    "..........kAAk....",
+    ".........kAaApk...",
+    "....k..k.kAaaApk..",
+    "...kpkkpkAaaaaak..",
+    "...kppkpkAaeaaYk..",
+    "k.kkpkkkAaaaaYYk..",
+    "AkAAAAAAaaaakkk...",
+    "aAAAAASAaakPPPk...",
+    "aaaaAAAaakPpPPk...",
+    "aaaaaAAaakPPPk....",
+    "aaaaaAAaaakYYk....",
+    "aaaaaadaaaakYk....",
+    "aaaaawdkaaakk.k...",
+    "aaaaawwwwwwwwk....",
+    "aaaaaWdkWkkkWk....",
+    "aaadddk.k...k.....",
+]
+
+def big_rats(S):
+    B = S['REDO_SPR']
+    pale = rear_bite(B['palerat'], B['paleratstep'], S['REDO_PAL']['palerat'], 19, PALE_REAR, -4,
+                     {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+    R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw'])
+    gnaw = rear_bite(R['gnaw'], R['gnawstep'], gpal, 30, GNAW_REAR, 1, {14: "aaaaawdkYYYkwk"}, lunge=4)
+    return {'palerat_bite': pale, 'gnaw_bite': gnaw}
 
 def player(S):
     r = S['RAG15']['warrior']; pal = dict(S['RAG15_COMMON']); pal.update(r['c'])
