@@ -163,6 +163,8 @@ function lightStamp(r,amb,kind){
   g.putImageData(id,0,0);stampCache[key]=c;return c;
 }
 function shadow(x,y,r){lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2,2);lx.fillRect(x-r+1,y+1,r*2-2,1)}
+// Mob attack frames (MOB_POSES, from tools/mob_attack_draft.py) turned into pictures once: each with its ax and by.
+const MOB_POSE_IMG={};Object.keys(MOB_POSES).forEach(k=>{const P=MOB_POSES[k],o={t:P.t};['wind','smear','hit','rec'].forEach(s=>{o[s]={im:mk(P[s].rows,P.pal),ax:P[s].ax,by:P[s].by}});MOB_POSE_IMG[k]=o});
 function drawSprite(img,x,y,dir,bob,sit){
   const im=dir<0?img.f:img.c,w=img.w,h=img.h;
   // Round the position first, then offset by whole pixels: with an odd width (15) Math.round(x-w/2) flipped a pixel out of step with the camera, so sprites shook while walking sideways (v0.27.4).
@@ -171,7 +173,7 @@ function drawSprite(img,x,y,dir,bob,sit){
 }
 // A pose frame can be wider than the standing body (a sword thrust out front): ax is the column that lines up with the
 // body's middle, so the body stays put and only the weapon reaches out. Facing left, the frame is mirrored, and so is ax.
-function drawPose(p,x,y,dir){const im=p.im,dx=Math.round(x)-(dir<0?im.w-1-p.ax:p.ax),dy=Math.round(y)-im.h;lx.drawImage(dir<0?im.f:im.c,dx,dy)}
+function drawPose(p,x,y,dir){const im=p.im,dx=Math.round(x)-(dir<0?im.w-1-p.ax:p.ax),dy=Math.round(y)-im.h+(p.by||0);lx.drawImage(dir<0?im.f:im.c,dx,dy)}
 function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
   const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let err=dx+dy;lx.fillStyle=col;
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
@@ -341,7 +343,8 @@ function render(){
     // v0.102 (js/anim.js): the swing lunge moves the sprite only, never the mob itself.
     const an=mobAnim(m),fim=img.steps?walkFrame(img,m.walk,mmv).im:img,fb=img.steps?0:(mmv?(Math.floor(m.walk*6)%2):0);
     const hp=howlFrame(m); // Greyfang's howl pose while he howls, running legs and all (js/anim.js)
-    if(hp)drawSprite(walkFrame(hp,m.walk,mmv).im,m.x+an.dx,m.y+1+an.dy,m.dir,0,false);else drawSprite(fim,m.x+an.dx,m.y+1+an.dy,m.dir,fb,false);
+    const pf=hp?null:poseFrame(m); // an attack frame: the skeleton's swing, the wolf's bite (js/anim.js)
+    if(hp)drawSprite(walkFrame(hp,m.walk,mmv).im,m.x+an.dx,m.y+1+an.dy,m.dir,0,false);else if(pf)drawPose(pf,m.x,m.y+1,m.dir);else drawSprite(fim,m.x+an.dx,m.y+1+an.dy,m.dir,fb,false);
     if(m.root>0){lx.fillStyle='#5e3e24';for(let i=-5;i<=5;i+=2)lx.fillRect(Math.round(m.x)+i,Math.round(m.y)-((i+Math.floor(time*3))%3===0?2:1),1,2);lx.fillStyle='#3f6b3a';lx.fillRect(Math.round(m.x)-4,Math.round(m.y)-3,1,1);lx.fillRect(Math.round(m.x)+4,Math.round(m.y)-2,1,1)}
     if(m.snare>0&&Math.floor(time*3)%2===0){lx.fillStyle='#5f9ea0';lx.fillRect(Math.round(m.x)-3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x)+3,Math.round(m.y),1,1);lx.fillRect(Math.round(m.x),Math.round(m.y)+1,1,1)}
     if(m.mark>0&&Math.floor(time*2)%2===0){lx.fillStyle='#ffb37a';const my=Math.round(m.y-img.h-4);lx.fillRect(Math.round(m.x),my,1,2);lx.fillRect(Math.round(m.x)-1,my+1,3,1)} // Hunter's Mark

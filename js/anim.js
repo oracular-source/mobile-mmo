@@ -13,8 +13,12 @@ function fxBits(x,y,cols,n,sp,up,life){for(let i=0;i<n;i++)parts.push({x:x+fr(-2
 // A mob swings: a quick lunge toward whoever it hits, and a slash that sweeps across them. Each mob lunges on its own
 // swing, so a stack of three ripples instead of blurring into one shape.
 function animSwing(m,v){if(logMute)return;
-  const dx=v.x-m.x,dy=v.y-m.y,d=Math.hypot(dx,dy)||1;m.swT=SWING;m.swx=dx/d;m.swy=dy/d;
-  if(m.def.bite){fxo.push({k:'bite',x:v.x,y:v.y-8,t:0,life:0.22});return} // wolves: jaws snap shut on you (v0.106)
+  const dx=v.x-m.x,dy=v.y-m.y,d=Math.hypot(dx,dy)||1,P=MOB_POSES[m.def.img];m.swx=dx/d;m.swy=dy/d;
+  // Physical attacks (owner, Nov 27): a mob with drawn attack frames shows the swing or the bite with its own body,
+  // no slash or floating fangs over you. The frames carry the lunge.
+  if(P){m.swDur=P.t[1]+P.t[2]+P.t[3];m.swT=m.swDur;return}
+  m.swDur=SWING;m.swT=SWING;
+  if(m.def.bite)return; // other wolves (Greyfang, Old Scar): the lunge only until their own bite frames are drawn
   fxo.push({k:'slash',x:v.x,y:v.y-8,ax:-dx/d,ay:-dy/d,t:0,life:0.16,col:m.def.slash||'#f2eee0'})}
 // A mob dies. Its family's death if it has one (def.death in js/data/mobs.js), otherwise it sinks into the ground and
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
@@ -53,9 +57,15 @@ function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=
 
 // Where to draw a mob this frame: its swing lunge, with a tiny lean back just before. (Hit reactions wait for weapon
 // animations, owner Nov 27.)
-function mobAnim(m){let dx=0,dy=0;const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
+// Which attack frame to draw (MOB_POSES in sprites.js), or null for the normal sprite: the wind-up in the moment
+// before the hit lands (m.atk counts down to it), then smear, hit (held) and recover after it.
+function poseFrame(m){const P=MOB_POSE_IMG[m.def.img];if(!P||m.casting)return null;const t=P.t;
+  if(m.swT>0){const e=(m.swDur||0)-m.swT;return e<t[1]?P.smear:e<t[1]+t[2]?P.hit:P.rec}
+  if(m.near>0&&m.atk>0&&m.atk<t[0]&&m.aimX!==undefined)return P.wind;
+  return null}
+function mobAnim(m){let dx=0,dy=0;if(MOB_POSES[m.def.img])return{dx:0,dy:0}; // drawn frames move the body themselvesconst img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
   if(m.near>0&&m.atk>0&&m.atk<0.3&&m.aimX!==undefined){const k=(0.3-m.atk)/0.3,ax=m.aimX-m.x,ay=m.aimY-m.y,d=Math.hypot(ax,ay)||1;dx-=ax/d*k;dy-=ay/d*k} // the wind-up: leans back a pixel
-  if(m.swT>0){const p=1-m.swT/SWING,o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
+  if(m.swT>0){const p=1-m.swT/(m.swDur||SWING),o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
   return{dx:Math.round(dx),dy:Math.round(dy)}}
 
 // ---------- The Skeleton King's Bone Throw (v0.102, owner picked it over a wailing skull and a crown bolt) ----------
@@ -129,10 +139,7 @@ function fxDraw(){
       lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}
     else if(f.k==='bones')bonesDraw(f)
     else if(f.k==='parc'||f.k==='pthrust')playerFxDraw(f)
-    else if(f.k==='bite'){const p=Math.min(1,f.t/0.1),gap=Math.round(5*(1-p)),fade=f.t>0.12?1-(f.t-0.12)/0.1:1;lx.globalAlpha=Math.max(0,fade); // two rows of fangs close on you
-      for(let i=-2;i<=2;i++){const x=Math.round(f.x)+i*2,up=Math.round(f.y)-gap-1,lo=Math.round(f.y)+gap+1,long=i===-2||i===2;
-        lx.fillStyle='#1c1820';lx.fillRect(x-1,up-2,3,long?4:3);lx.fillRect(x-1,lo-(long?1:0),3,long?4:3);
-        lx.fillStyle='#f2eee0';lx.fillRect(x,up-1,1,long?3:2);lx.fillRect(x,lo,1,long?3:2)}lx.globalAlpha=1}})}
+})}
 // Every frame, after the lighting (so the dark doesn't swallow it): the bone in the King's hand, in the air and in pieces.
 function fxDrawLit(){
   // The bone raised over his head while the cast bar fills, rising and trembling as it comes to the throw, grave-light

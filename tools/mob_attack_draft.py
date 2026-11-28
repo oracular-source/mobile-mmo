@@ -167,7 +167,9 @@ def wolf(S):
     lunge = over(lunge, grid_to_px(open_head, 17, -1))
     # Snap: jaws shut (the closed head), fangs locked over the lip, body as far forward as it goes.
     snap_head = [r[17:] for r in rows]
-    snap_head[5] = "baawkwkwk"
+    # Owner (Nov 27): on the snap the jaws are fully shut: teeth clenched in one row, no red mouth showing.
+    snap_head[5] = "baaaawwwwk"
+    snap_head[6] = "aaaaakkkk."
     snap = over({p: c for p, c in grid_to_px(step).items() if p[0] < 17}, grid_to_px(snap_head, 17, 0))
     f = []
     f.append(frame(ready, pal, 500, 'Ready (as today)'))
@@ -212,3 +214,36 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# ---------- into the game: write the pose frames into js/data/sprites.js (between the MOB_POSES markers) ----------
+# Each pose: rows (text grid), ax (the column that lines up with the body's middle, as drawPose wants) and by (rows the
+# frame reaches below the standing sprite's feet, so a crouch or a blade in the dirt sits right).
+def to_pose(f, base_w, base_h):
+    px = {(x, y): c for x, y, c in f['px']}
+    x0 = min(x for x, _ in px); x1 = max(x for x, _ in px)
+    y0 = min(y for _, y in px); y1 = max(max(y for _, y in px), base_h - 1)
+    rows = [''.join(px.get((x, y), '.') for x in range(x0, x1 + 1)) for y in range(y0, y1 + 1)]
+    return {'rows': rows, 'ax': (base_w >> 1) - x0, 'by': y1 - (base_h - 1)}
+
+def write_game_data(data, S):
+    names = {'skeleton': ('skel', S['UNDEAD_SPR']['skel'], ['wind', 'smear', 'hit', 'rec']),
+             'king': ('boss1', S['UNDEAD_SPR']['king'], ['wind', 'smear', 'hit', 'rec']),
+             'wolf': ('wolf', S['REDO_SPR']['wolf'], ['wind', 'smear', 'hit', 'rec'])}
+    out = {}
+    for key, (name, base, slots) in names.items():
+        frs = data[key][1:]  # frame 0 is the ready pose (the normal sprite)
+        out[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal']}
+        for slot, f in zip(slots, frs): out[name][slot] = to_pose(f, len(base[0]), len(base))
+    block = ('// MOB_POSES (from tools/mob_attack_draft.py, owner OK Nov 27): attack frames drawn from each sprite. t = seconds for\n'
+             '// wind-up (held before the hit lands), smear, hit (held), recover. Physical attacks: the weapon or the jaws do the work.\n'
+             'const MOB_POSES=' + json.dumps(out, separators=(',', ':')) + ';\n// /MOB_POSES\n')
+    p = os.path.join(ROOT, 'js/data/sprites.js'); s = open(p).read()
+    a = s.find('// MOB_POSES'); b = s.find('// /MOB_POSES\n')
+    s = (s[:a] + block + s[b + len('// /MOB_POSES\n'):]) if a >= 0 and b > a else s.rstrip('\n') + '\n' + block
+    open(p, 'w').write(s)
+    print('wrote MOB_POSES into js/data/sprites.js')
+
+if __name__ == '__main__' and '--game' in sys.argv:
+    S = load_sprites()
+    write_game_data({'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S)}, S)

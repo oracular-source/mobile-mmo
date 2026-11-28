@@ -15,8 +15,11 @@ SETUP={
   pk.forEach((o,i)=>{o.x=m.x-40-i*26;o.y=m.y-30+i*44;o.state='idle';o.dir=1});W.at=6;W.act=()=>engage(m);W.n=120;W.god=1;''',
 'crowd':'''const sk=G.mobs.filter(m=>m.type==='cskel'&&!m.dead).slice(0,3);G.mobs.forEach(o=>{if(sk.indexOf(o)<0)o.dead=true});const K=G.mobs.find(m=>m.def.boss);
   sk.forEach((m,i)=>{m.x=P.x-12+i*12;m.y=P.y-9+(i%2)*3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.2+i*0.55});W.focus=P;W.n=96;W.god=1;''',
+'swing':'''const m=G.mobs.find(m=>m.type==='cskel'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
+'kingswing':'''const m=G.mobs.find(m=>m.def.boss);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.6;m.bolt=99;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
+'bite':'''const m=G.mobs.find(m=>m.type==='wolf'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.4;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
 }
-AREA={'howl':'wolfwood'}  # scenes outside the crypt
+AREA={'howl':'wolfwood','bite':'wolfwood'}  # scenes outside the crypt
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:
