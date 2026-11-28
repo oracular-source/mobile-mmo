@@ -629,7 +629,7 @@ def render(m, tiles, outdir, phone=None):
     out = [path]
     # one phone screen at game scale: 16 px tiles, about 12 x 22 tiles, drawn 2x
     if phone:
-        cx, cy = phone; vw, vh = 12, 22
+        cx, cy = phone; vw, vh = min(12, m['W']), min(22, m['H'])  # a small area (Ironshell's hollow) is smaller than one phone screen
         x0 = max(0, min(m['W'] - vw, cx - vw // 2)); y0 = max(0, min(m['H'] - vh, cy - vh // 2))
         s2 = 32
         im2 = Image.new('RGBA', (vw * s2, vh * s2), (0, 0, 0, 255)); d2 = ImageDraw.Draw(im2)

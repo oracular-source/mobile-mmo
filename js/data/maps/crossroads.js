@@ -13,13 +13,13 @@ MAPS.crossroads = {
     ',TTTTTTTTTTTTTFTTTTTTTT,,==,,,,FT,,T,T,,,,,,,,~~',
     'TTTT,TTTTTTTTT,,TTT,TTT,,==,,,,,,,T,,,T,,,~~~~~~',
     'TTTTTTTTTT,TTTTTTT,TTTT,,==,,,,,,,,,,,,~~~~~~~,,',
-    'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~TTTWWW',
-    'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,T,,,Wnn',
-    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,T,,,Wnn',
-    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,T,,,Wnn',
-    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTT,,,Wnn',
-    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,,WWW',
-    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,,TTTT',
+    'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~,,,,,,',
+    'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,,,,,,,,',
+    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT::',
+    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,T:,T',
+    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTT:,TT',
+    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,:TTT',
+    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,:TTTT',
     'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,:TTTT',
     '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,:,,TTT',
     '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,:,,,TT',
@@ -61,6 +61,7 @@ exit south 25 40 to=town1 lit   # v0.64: at the closed gate (Town 1 isn't built 
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
+exit hollow 47 10 to=nook at=south   # v0.129 (owner): the old steep path up to the chapel now leads into Ironshell's hollow (js/data/maps/nook.js)
 # by the town road: the easiest rats
 spawn rat 1 21 37
 spawn rat 1 28 33
@@ -125,14 +126,6 @@ critter rabbit 14 36.5
 critter rabbit 41.5 16.5
 # secret: a chest at the end of a deer trail in the south-west woods
 chest 5 38
-# Ironshell's nook (v0.126, owner, Nov 27; replaces the steep east path up to the chapel, where level 1-3 players met level
-# 10-14 cultists): the path trails off into a grass gap in the trees and a hidden pocket under the chapel's wall. Ironshell
-# is always home, guarding a chest. Up behind the wall a few cultists walk about: you can see and tap them, but no one can
-# reach anyone (aloof = they never join a fight; the wall blocks spells both ways, line of sight v0.126).
-named ironshell 3 43 11
-chest 43 9
-spawn cult_zealot 12 46 10 aloof
-spawn cult_chanter 12 47 11 aloof
 label 24 24 Crossroads
 label 40 19 Sinkhole
 label 25 9 Old bridge

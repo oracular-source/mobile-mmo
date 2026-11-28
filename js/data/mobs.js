@@ -18,7 +18,7 @@ const TYPES={
   // Named rares (v0.32, map chat): about 1 in 100 spawns in an area brings out that area's rare at its own spot on the map.
   // rare:1 = 3x XP, a sure uncommon for your class (and a rare chance), a faint glow. shell = direct hits mostly glance off (DoTs work best).
   // callAt = at that share of health it runs to the nearest idle mob and brings it (and its neighbours) back. Adds from:'ground' = they rise beside it.
-  ironshell:{name:'Ironshell',img:'ironshell',lv:[3,3],hp:80,hpl:24,dmg:3.8,dmgl:1.6,spd:22,aggro:34,armor:0.6,rare:1,shell:1,zone:'Crossroads'},
+  ironshell:{name:'Ironshell',img:'ironshell',lv:[3,3],hp:80,hpl:24,dmg:3.8,dmgl:1.6,spd:22,aggro:34,armor:0.6,named:1,shell:1,zone:'Crossroads'},
   palerat:{name:'the Pale Rat',img:'palerat',death:'flip',lv:[5,5],hp:90,hpl:28,dmg:3.4,dmgl:1.6,spd:37,aggro:52,armor:0.05,rare:1,callAt:0.3,zone:'Rat tunnel'},
   bride:{name:'the Weeping Bride',img:'bride',lv:[8,8],hp:110,hpl:34,dmg:5.2,dmgl:2,spd:25,aggro:50,undead:1,armor:0,rare:1,zone:'Sunken Graveyard',
     adds:[{at:0.5,type:'dead',n:2,lv:6,from:'ground',shout:'WAIL!',say:'lets out a long wail, and the dead claw their way out of the ground!',col:'#3a3727'}]},

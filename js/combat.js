@@ -332,7 +332,7 @@ function namedOffer(type,pinks,n){
       else id=(first&&i===0)||rng()<LOOT.namedBlue?blueOrGreen():pick(UNCOMMONS.length?UNCOMMONS:COMMONS)}
     if(ITEMS[id].rar==='named')pink=true;out.push(id)}
   lootMem.first[type]=1;lootMem.dry[type]=pink?0:(lootMem.dry[type]||0)+1;saveLoot();return out}
-const NAMED_PINKS={gnaw:()=>['gnawring'],greyfang:()=>['fangring','fangruff'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
+const NAMED_PINKS={gnaw:()=>['gnawring'],ironshell:()=>['ironbracers'],greyfang:()=>['fangring','fangruff'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
 // A rare mob's own item (src in items.js): it's the blue a rare drops, unless you already have it (then any blue for your class).
 const OWN_ITEM={};Object.keys(ITEMS).forEach(id=>{if(ITEMS[id].src)OWN_ITEM[ITEMS[id].src]=id});
 function rollLoot(m){
