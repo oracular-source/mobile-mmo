@@ -24,8 +24,9 @@ SETUP={
 'bratbite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.at=44;W.act=()=>killMob(m);W.n=84;W.god=1;''',
 'palebite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);m.type='palerat';m.def=TYPES.palerat;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.at=44;W.act=()=>killMob(m);W.n=84;W.god=1;''',
 'gnawbite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);m.type='gnaw';m.def=TYPES.gnaw;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+16;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.n=84;W.god=1;''',
+'stairs':'''const m=G.mobs.find(m=>m.type==='malrec')||G.mobs[0];const hx=m.hx,hy=m.hy;G.mobs.forEach(o=>o.dead=true);P.x=17*16;P.y=8*16+12;P.dir=1;P.tx=null;W.at=15;W.act=()=>dungeonCleared(hx,hy);W.n=200;W.god=1;'''
 }
-AREA={'howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood','ratbite':'graveyard','bratbite':'rat_tunnel','palebite':'rat_tunnel','gnawbite':'rat_tunnel'}  # scenes outside the crypt
+AREA={'stairs':'dungeon1_f2','howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood','ratbite':'graveyard','bratbite':'rat_tunnel','palebite':'rat_tunnel','gnawbite':'rat_tunnel'}  # scenes outside the crypt
 # Family animations (v0.134): one attack, then the death. type, how far you stand, which area.
 for _k,(_t,_g,_a) in {'beetlebite':('beetle',12,'crossroads'),'ironbite':('ironshell',20,'crossroads'),'boarbite':('boar',16,'wolfwood'),
     'wispbite':('wisp',10,'chapel'),'zealotbite':('zealot',12,'chapel'),'ashbite':('ashcaller',12,'chapel'),'chantbite':('chanter',12,'chapel')}.items():

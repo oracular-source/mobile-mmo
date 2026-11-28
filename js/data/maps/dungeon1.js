@@ -47,9 +47,9 @@ MAPS.dungeon1 = {
     'XXXXXXXXXXXXX____________________XXXXXXXXXXXXX',
     'XXXXXXXXXXXX__C________________C__XXXXXXXXXXXX',
     'XXXXXXXXXXXN__C________________C__NXXXXXXXXXXX',
-    'XXXXXXXXXXXX_______C______C_______XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__C____C______C____C__XXXXXXXXXXXX',
-    'XXXXXXXXXXXN__C________________C__NXXXXXXXXXXX',
+    'XXXXXXXXXXXX______________________XXXXXXXXXXXX',
+    'XXXXXXXXXXXX__C___________________XXXXXXXXXXXX',
+    'XXXXXXXXXXXN__C___________________NXXXXXXXXXXX',
     'XXXXXXXXXXXX______________________XXXXXXXXXXXX',
     'XXXXXXXXXXXXX__B______________B__XXXXXXXXXXXXX',
     'XXXXXXXXXXXXXX__________________XXXXXXXXXXXXXX',
@@ -67,6 +67,15 @@ obj brazier 20 42
 obj brazier 25 42
 obj brazier 17 34
 obj brazier 28 34
+# v0.140 love pass: the catacomb's coffins were a matching grid. The wall ones stay; the middle pair is now a stone
+# sarcophagus and a coffin dragged out and left open; the east wall's south pair lies smashed; bones and cobwebs in corners.
+obj sarcophagus 19 37
+obj open_coffin 25 37
+obj smashed_coffin 31 38
+obj skull_pile 12 40
+obj cobweb 14 33
+obj cobweb 31 33
+obj urn 33 40
 spawn skeleton 14 16 38
 spawn corpse 14 17 40
 spawn skeleton 14 22 35
@@ -97,6 +106,10 @@ spawn great_wisp 15 18 22
 spawn cult_zealot 14-15 18 24
 spawn cult_ashcaller 14-15 19 25
 # small story: a monk the cult kept alive, caged in the south-east corner
+# v0.140 love pass: the mender camp sits round a fire of the monks' books, and the cult sleeps on bedrolls by the south wall
+obj book_pyre 24 21
+obj bedroll 18 28
+obj bedroll 20 28
 obj cage 27 26
 obj candle 26 28
 # the floor's chest, in a little alcove off the west wall, one candle left burning by it
@@ -109,6 +122,10 @@ obj brazier 14 4
 obj brazier 31 4
 obj brazier 14 14
 obj brazier 31 14
+# v0.140 love pass: the middle of the chamber was black. Daylight comes down through cracks in the vault (the chapel
+# grounds are right above), two shafts over the water
+obj light_shaft 17 8
+obj light_shaft 26 12
 named drowned_prior 15 22 9 group=prior
 spawn corpse 15 19 9 group=prior
 spawn skeleton 15 25 9 group=prior

@@ -343,6 +343,7 @@ function render(){
   rings.forEach(r=>{if(r.t<0)return;const p=r.t/r.life,rad=r.r*(0.4+0.6*p);lx.globalAlpha=1-p;lx.fillStyle=r.col||'#ffd27a';for(let a=0;a<48;a++){const an=a/48*6.283;lx.fillRect(Math.round(r.x+Math.cos(an)*rad),Math.round(r.y+Math.sin(an)*rad*0.6),2,1)}lx.globalAlpha=1});
   const instNow=zoneId==='dun'||(CHA&&CHA.instance);
   if(instNow&&run.portal&&CHA){const p=run.portal,x=Math.round(p.x),y=Math.round(p.y);for(let a=0;a<32;a++){if((a+Math.floor(time*6))%4===0)continue;const an=a/32*6.283;lx.fillStyle=a%2?'#ffd27a':'#fff0c8';lx.fillRect(Math.round(x+Math.cos(an)*9),Math.round(y+Math.sin(an)*4),1,1)}} // the way out
+  if(instNow&&run.stairs&&CHA)drawOutStairs(run.stairs); // v0.140: the way out rising from the floor
   if(instNow&&run.chest){const c=run.chest,x=Math.round(c.x),y=Math.round(c.y);lx.fillStyle='#0b0a0f';lx.fillRect(x-6,y-8,12,9);lx.fillStyle=c.open?'#3b2a1d':'#6e4a2a';lx.fillRect(x-5,y-7,10,7);lx.fillStyle='#c9a227';lx.fillRect(x-5,y-5,10,1);lx.fillRect(x-1,y-6,2,3);}
   if(player.tx!==null){lx.fillStyle='#c9a227';const x=Math.round(player.tx),y=Math.round(player.ty);lx.fillRect(x-2,y,1,1);lx.fillRect(x+2,y,1,1);lx.fillRect(x,y-1,1,1);lx.fillRect(x,y+1,1,1)}
   if(rangeShow>0){lx.fillStyle='#ff8a80';for(let a=0;a<64;a+=2){const an=a/64*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*rangeR),Math.round(player.y+Math.sin(an)*rangeR*0.8),1,1)}}
@@ -467,7 +468,7 @@ function render(){
   // v0.95: an area's own fixed lights are baked into its light map (area.js bakeLight); only lights that move (floaters,
   // hazards, rares, the Prior's lantern) are still stamped live here.
   const AR=curArea(),baked=!!(AR&&AR.lmCut);
-  const zl=AR?(baked?[]:AR.lights).concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))).concat(mobs.filter(m=>m.def.glow&&!m.dead).map(m=>({x:m.x,y:m.y-12,r:m.def.glow,w:0,c:46}))):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
+  const zl=AR?(baked?[]:AR.lights).concat(mobs.filter(m=>m.def.float&&!m.dead).map(m=>({x:m.x,y:m.y-10,r:26,w:26})),hazards.map(h=>({x:h.x,y:h.y,r:36+20*h.t/h.dur,w:40}))).concat(mobs.filter(m=>m.def.rare&&!m.dead).map(m=>({x:m.x,y:m.y-6,r:30,w:0,c:34}))).concat(mobs.filter(m=>m.def.glow&&!m.dead).map(m=>({x:m.x,y:m.y-12,r:m.def.glow,w:0,c:46}))).concat(stairsLight()):zoneId==='over'?[{x:CAMPFIRE.x,y:CAMPFIRE.y-3,r:70,w:36},{x:DOOR.x,y:DOOR.y-4,r:34,w:0}].concat(TORCHES.map(t=>({x:t.x,y:t.y-2,r:52,w:30}))):(zoneId==='arena'?ARENA:DUN).braziers.map(b=>({x:b.x,y:b.y-4,r:62,w:32}));
   // The darkness canvas lines up with the world's pixel grid (one game pixel bigger than the view on each side), so light
   // pools stay put on the ground while the camera glides.
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
@@ -491,7 +492,7 @@ function render(){
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.restore();
   drawGlows();
-  lx.save();lx.translate(-camX,-camY);fxDrawLit();castGlowDraw();lx.restore(); // the Bone Throw, over the dark (js/anim.js)
+  lx.save();lx.translate(-camX,-camY);fxDrawLit();castGlowDraw();if(run.stairs&&curArea()&&curArea().instance)drawStairsShaft(run.stairs);lx.restore(); // the Bone Throw, over the dark (js/anim.js)
   cx.setTransform(1,0,0,1,0,0); // back to screen pixels for the crisp text layer
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
@@ -619,3 +620,35 @@ function ui(){
   ctrlEls.forEach(el=>{const s=el.dataset.slot==='c'?0:+el.dataset.slot,a=ABI[loadout[s]];el.classList.toggle('playing',!!(a&&a.kind==='song'&&songOn(a.id)))});
   const sb=$('bsit');if(sb){sb.classList.toggle('sitting',player.sit);sb.textContent=player.sit?'Stand':'Sit'}
 }
+
+/* ---------- The way out of Dungeon 1 (v0.140, owner Nov 27): stairs that rise out of the floor ---------- */
+// What makes it read as stairs going up (3/4 view, refs: pixel dungeon stairs): stacked bands that get narrower and paler
+// toward the top, each with a bright lip on top and a dark riser under it, cut into the north wall, with daylight at the
+// top. How it plays: cracks run across the floor (0-0.9 s), then the steps grind up one at a time from the bottom, each
+// with a thump of dust, the wall above splits into an arch, and last the daylight pours down the steps.
+const STEP_N=6;
+function stairsP(S){return (time-S.t0)/STAIRS.form} // 0 to 1 while it forms
+function drawOutStairs(S){const x0=S.tx*T,yb=(S.ty+1)*T+6,t=time-S.t0,f=(X,Y,w,h,c)=>{lx.fillStyle=c;lx.fillRect(X,Y,w,h)};
+  // cracks first: a jagged split across the two tiles, then branches
+  if(t<1.4){const a=Math.min(1,t/0.9);lx.globalAlpha=t<0.9?1:Math.max(0,1-(t-0.9)/0.5);
+    for(let i=0;i<Math.round(28*a);i++)f(x0+2+i,yb-8+Math.round(Math.sin(i*1.7)*2),1,1,'#0b0a0f');
+    if(a>0.5){f(x0+9,yb-12,1,4,'#0b0a0f');f(x0+20,yb-6,1,5,'#0b0a0f');f(x0+25,yb-13,1,5,'#0b0a0f')}lx.globalAlpha=1}
+  // the arch in the wall above: a dark doorway that splits open as the steps reach it
+  const ao=Math.max(0,Math.min(1,(t-0.8)/1.8)),aw=Math.round(26*ao);
+  if(aw>1){const ax=x0+16-Math.round(aw/2),top=yb-38;f(ax-2,top-1,aw+4,22,'#4a4652');f(ax-1,top,aw+2,21,'#0b0a0f');f(ax,top+1,aw,20,'#1a1c26');
+    if(aw>6){f(ax-1,top,2,2,'#4a4652');f(ax+aw-1,top,2,2,'#4a4652');f(ax+1,top+1,1,1,'#4a4652');f(ax+aw-2,top+1,1,1,'#4a4652')} // rounded top
+    const day=Math.max(0,Math.min(1,(t-STAIRS.form+0.6)/0.8));if(day>0){lx.globalAlpha=day;f(ax+2,top+2,aw-4,5,'#e8e4cc');f(ax+1,top+7,aw-2,3,'#b8b4a0');lx.globalAlpha=1}}
+  // the steps, bottom (nearest, widest, darkest) to top (narrow, pale): each rises 3 px into place with a dust puff
+  for(let i=0;i<STEP_N;i++){const at=0.9+i*(STAIRS.form-1.4)/STEP_N,k=(t-at)/0.35;if(k<=0)continue;
+    if(!S['p'+i]){S['p'+i]=1;for(let j=0;j<10;j++)parts.push({x:x0+4+rr(0,24),y:yb-i*5-2,vx:rr(-14,14),vy:rr(-16,-4),t:0,life:rr(0.4,0.8),col:j%2?'#7a7368':'#5c5866'});if(i===STEP_N-1)shake(2,0.3)}
+    const up=Math.round(3*(1-Math.min(1,k))),w=30-i*2,sx=x0+16-w/2,sy=yb-6-i*5+up,sh=[44,52,60,70,82,96][i];
+    lx.globalAlpha=Math.min(1,k*1.5);f(sx-1,sy-1,w+2,7,'#0b0a0f');f(sx,sy,w,5,'rgb('+sh+','+(sh-2)+','+(sh+8)+')');f(sx,sy,w,1,'rgb('+(sh+40)+','+(sh+38)+','+(sh+44)+')');f(sx,sy+4,w,1,'rgb('+(sh-20)+','+(sh-22)+','+(sh-12)+')');
+    f(sx+3+((i*7)%(w-8)),sy+2,2,1,'rgb('+(sh-14)+','+(sh-16)+','+(sh-6)+')'); // a chip in each step
+    lx.globalAlpha=1}}
+// Daylight down the stairs once they're up: a cool pool of light on the steps and the floor below them.
+function stairsLight(){const S=run.stairs;if(!S||!curArea()||!curArea().instance)return[];const d=Math.max(0,Math.min(1,(time-S.t0-STAIRS.form+0.6)/0.8));return d>0?[{x:S.x,y:S.y-4,r:Math.round(30+34*d),w:0,c:Math.round(70*d)}]:[]}
+// Drawn over the dark: a soft slanted shaft from the arch down the steps, with motes drifting in it.
+function drawStairsShaft(S){const d=Math.max(0,Math.min(1,(time-S.t0-STAIRS.form+0.6)/0.8));if(d<=0)return;const x0=S.tx*T+16,yb=(S.ty+1)*T+6;
+  for(let r=0;r<30;r++){const w=10+Math.round(r*0.6);lx.globalAlpha=d*0.16*(1-r/34);lx.fillStyle='#f0ecd8';lx.fillRect(x0-Math.round(w/2),yb-34+r,w,1)}
+  lx.fillStyle='#fff8e0';for(let i=0;i<6;i++){const q=(time*0.18+i/6)%1;lx.globalAlpha=d*0.7*Math.sin(q*3.14);lx.fillRect(Math.round(x0-6+((i*5)%12)+Math.sin(time+i)*2),Math.round(yb-30+q*28),1,1)}
+  lx.globalAlpha=1}

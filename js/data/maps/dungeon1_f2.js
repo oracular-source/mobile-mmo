@@ -67,6 +67,11 @@ named bellringer 15 17 33 group=bell
 spawn cult_zealot 15 14 34 group=bell
 spawn cult_ashcaller 15 20 34 group=bell
 chest 22 32
+# v0.140 love pass: it's a foundry, so it looks like one: a cracked bell that came out of the mould wrong, firewood for
+# the melt, a shovel left in the slag
+obj fallen_bell 15 36
+obj log_stack 11 32
+obj shovel 12 37
 # v0.79 (boss pass): the passage north stays shut by an iron gate until the Bellringer is driven off (wails and vanishes at half health)
 seal 16 29 17 30 bellringer
 # 5. WISP ROOM: the old ritual hall round its ember pit. Two packs, one each side, each a summoner with its big wisp
@@ -87,7 +92,15 @@ spawn cult_zealot 15 24 24 group=east
 spawn great_wisp 15 26 20 group=east
 # 6. SANCTUM: Brother Malrec on the dais with his two deacons (Rite of Mending, Ash Bolt, Candle Wake as built);
 # the six candles in a ring are the ones that flare during Candle Wake
-obj censer 16 9
+# v0.140 love pass: the dais is an altar now (Malrec stands in front of it), a carpet runs from the door up to him,
+# candlesticks flank the altar. The pole censer that stood on the carpet's line is gone.
+obj altar 15 3
+obj carpet 16 5
+obj candlestick 14 3
+obj candlestick 19 3
+# v0.140 (owner, Nov 27): the way out. After the finale the floor behind the altar splits and stairs rise up to daylight.
+# The altar, Malrec and his deacons sit one row further south than before so the stairs have their own two rows.
+outstairs 16 1
 obj banner 11 1
 obj banner 22 1
 obj candle 10 6
@@ -96,9 +109,9 @@ obj candle 12 3
 obj candle 21 3
 obj candle 12 9
 obj candle 21 9
-named malrec 15 16 3 group=sanctum
-spawn cult_deacon 15 13 4 group=sanctum
-spawn cult_deacon 15 20 4 group=sanctum
+named malrec 15 16 4 group=sanctum
+spawn cult_deacon 15 13 5 group=sanctum
+spawn cult_deacon 15 20 5 group=sanctum
 # v0.79 (boss pass): when Malrec dies the Bellringer and the Drowned Prior come back (the finale); the sanctum floods
 # from the door, all but a ring of dry stone 3 tiles round the middle
 finale 8 1 25 12 ring=3

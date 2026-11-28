@@ -132,7 +132,8 @@ function drawGlows(){
 /* ---------- Zones: the overworld and the Dungeon 1 instance ---------- */
 let promptAction=null;
 // Stats for the current dungeon run, shown on the ending screen.
-const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null,cryptT0:null}; // cryptT0: when you came down the crypt stairs (for "Crypt cleared in m:ss")
+const run={t0:0,kills:0,xp:0,loot:[],chest:null,portal:null,stairs:null,cryptT0:null};
+const STAIRS={form:3.6}; // v0.140: how long the way-out stairs take to rise (render.js draws each step coming up) // cryptT0: when you came down the crypt stairs (for "Crypt cleared in m:ss")
 function finishRun(){
   const secs=Math.round(time-run.t0),mm=Math.floor(secs/60),ss=String(secs%60).padStart(2,'0');
   const loot=run.loot;
@@ -182,7 +183,7 @@ function enterZone(id,from,at){
   mobs.length=0;spawns.forEach(sp=>{sp.mob=null;if(sp.gone){sp.timer=Infinity;return}sp.timer=0;spawn(sp)}); // gone = killed earlier this dungeon run
   if(A&&A.rare){A.rare.sp.mob=null;if(A.rare.sp.up)spawn(A.rare.sp)} // a rare still out there waits for you (no reroll by walking in and out)
   player.target=null;player.tx=null;player.cast=null;player.queued=null;bubbles.length=0;parts.length=0;floats.length=0;
-  if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;player.x=DUN.start.x;player.y=DUN.start.y;log('Old Zone: the first crypt (frozen, kept to compare).','#c8a0ff');floatText(player.x,player.y-30,'Old crypt','#c8a0ff',true)}
+  if(id==='dun'){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.stairs=null;player.x=DUN.start.x;player.y=DUN.start.y;log('Old Zone: the first crypt (frozen, kept to compare).','#c8a0ff');floatText(player.x,player.y-30,'Old crypt','#c8a0ff',true)}
   else if(id==='arena'){player.x=ARENA.start.x;player.y=ARENA.start.y;log('Testing grounds. Spawn mobs from the DEV panel.','#ff8a80')}
   else if(A){const ex=(at&&A.exits.find(e=>e.name===at))||(from&&A.exits.find(e=>e.to===from)),p=ex?areaSpot(A,ex,player.lastMove):A.start;player.x=p.x;player.y=p.y;player.atExit=ex||null;player.exitGuard=ex||null;player.exitGuardT=time;player.atSummon=null;
     const col=(AREA_TINT[A.tint]||{}).text||'#9fd8c0';
@@ -195,7 +196,7 @@ function enterZone(id,from,at){
   // and the run clock and tally start (shown on the way out).
   // v0.66: only a fresh run resets (the floors were just rebuilt above); run.home = the floor you came in by.
   if(fresh)finaleReset();else if(finale.on)finaleAbort(); // v0.79: a new run starts clean; leaving the floor mid-finale puts it back to wait
-  if(A&&A.instance&&fresh){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.atPortal=false;run.wakes=0;run.home=A.id}
+  if(A&&A.instance&&fresh){run.t0=time;run.kills=0;run.xp=0;run.loot=[];run.chest=null;run.portal=null;run.stairs=null;run.atPortal=false;run.wakes=0;run.home=A.id}
   player.held=0;player.stunT=0;player.mireT=0;player.tollT=0;
   if(pet&&pet.charm)pet=null; // a charmed mob belongs to the zone you left
   if(pet){pet.x=player.x-10;pet.y=player.y+4;pet.target=null;}
@@ -241,6 +242,9 @@ function checkPortals(){
     const c=20+Math.floor(rr(0,15));inv.copper+=c;log('You open the chest: '+c+' copper.','#c9a227','loot');(run.chest.items||[pick(UNCOMMONS)]).forEach((id,i)=>giveItem(id,1,i));
     if(run.chest.offer){renderChestPick();log('Some things lie in the chest. Take one.','#ffd27a')}else lootPillar(run.chest.x,run.chest.y,run.chest.items||[]);saveInv();}
   if(inst&&run.portal){const near=dist(player,run.portal)<10;if(near&&!run.atPortal)finishRun();run.atPortal=near;}
+  // v0.140: the risen stairs work like a doorway: step onto either of their two tiles once they're up.
+  if(inst&&run.stairs){const S=run.stairs,tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),on=time-S.t0>=STAIRS.form&&(tx===S.tx||tx===S.tx+1)&&ty<=S.ty+1&&ty>=S.ty-1; // its two tiles and the row in front
+    if(on&&!run.atPortal)finishRun();run.atPortal=on}
   const A=curArea();
   if(A){checkSummon(A);checkChests(A);checkBars(A);checkSeals(A);checkLocks(A);const tx=Math.floor(player.x/T),ty=Math.floor(player.y/T),ex=A.exits.find(e=>exitTrigger(A,e,tx,ty)); // v0.94: doorways fire under your feet, not a tile early
     // The exit you just came out of wakes up 1 second after you arrive (owner, Nov 20; was "after walking 3 tiles away"):
@@ -606,8 +610,14 @@ function finaleDrain(A){const L=finale.L;if(!L||!A)return;L.rise=null;(L.risen||
 function finaleAbort(){if(!finale.on)return;finale.mobs.forEach(o=>{if(!o.dead)killQuiet(o);const i=mobs.indexOf(o);if(i>=0)mobs.splice(i,1)});
   finale.mobs=[];finaleDrain(finale.A);finale.on=false;finale.armed=true}
 // The end of the dungeon: Malrec's chest where he fell and the way out behind it (moved here from killMob in v0.79).
-function dungeonCleared(x,y){const A=curArea();floatText(player.x,player.y-40,A.name+' cleared!','#ffd27a',true);log('A chest and a way out appear where Brother Malrec fell.','#ffd27a');
-  run.chest={x:x,y:y+14,open:false};run.portal={x:x,y:y-12};banner(A.name+' cleared','in '+Math.floor((time-run.t0)/60)+':'+String(Math.round(time-run.t0)%60).padStart(2,'0'))}
+function dungeonCleared(x,y){const A=curArea();floatText(player.x,player.y-40,A.name+' cleared!','#ffd27a',true);log('A chest appears where Brother Malrec fell.','#ffd27a');
+  run.chest={x:x,y:y+14,open:false};
+  // v0.140 (owner, Nov 27): no more glowing ring. If the map marks a spot (outstairs), the floor there splits and a stair
+  // climbs out of it up to the daylight, a few seconds of grinding stone; walk onto it to leave. Otherwise the old ring.
+  const S=A.outStairs;if(S){run.portal=null;run.stairs={tx:S.tx,ty:S.ty,x:(S.tx+1)*T,y:(S.ty+1)*T,t0:time};shake(2,STAIRS.form*0.8);
+    log('The floor behind the altar cracks and grinds apart. Stone steps climb up out of it toward daylight.','#ffd27a')}
+  else run.portal={x:x,y:y-12};
+  banner(A.name+' cleared','in '+Math.floor((time-run.t0)/60)+':'+String(Math.round(time-run.t0)%60).padStart(2,'0'))}
 const hands=[],rings=[]; // Grasp of the Deep's hands and the Toll's ring of sound (drawn in render.js)
 
 /* ---------- Named rares (v0.32) ---------- */

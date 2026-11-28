@@ -90,7 +90,7 @@ def check(m, tiles, objs):
         elif k == 'exit': markers.append(dict(k=k, type=t[1], x=int(t[2]), y=int(t[3]), extra=t[4:]))
         elif k == 'fog': fogs.append(tuple(int(v) for v in t[1:5]))
         elif k == 'bar': markers.append(dict(k=k, type='bar', x=int(t[1]), y=int(t[2])))   # a barred gate (opens from one side in the game)
-        elif k in ('seal', 'lockin', 'finale'): pass   # finale (v0.79): the sanctum that floods when Malrec's finale starts   # lockin (v0.71): door tiles that shut behind you in a room until a named dies
+        elif k in ('seal', 'lockin', 'finale', 'outstairs'): pass   # outstairs (v0.140): the way out that rises after the last fight   # finale (v0.79): the sanctum that floods when Malrec's finale starts   # lockin (v0.71): door tiles that shut behind you in a room until a named dies
         elif k == 'seal': pass   # tiles shut by a slab until you touch the named object (the game opens them)
         elif k == 'label': pass
         elif k == 'critter': critters.append(dict(kind=t[1], x=float(t[2]), y=float(t[3])))

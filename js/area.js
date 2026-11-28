@@ -101,6 +101,9 @@ function* buildAreaGen(id){
     else if(k==='lockin'){const r=opt('room').split(',').map(Number);(A.locks=A.locks||[]).push({x0:+p[1],y0:+p[2],x1:+p[3],y1:+p[4],by:p[5],room:{x0:r[0],y0:r[1],x1:r[2],y1:r[3]},shut:false,done:false})}
     // The finale's room (v0.79, Dungeon 1's sanctum): tiles x0..x1, y0..y1 that flood when the finale starts, all but a dry
     // ring=N tiles round the middle (world.js startFinale). Walking back in after dying there starts the finale again.
+    // The way out (v0.140, owner Nov 27): stairs that rise out of the floor after the dungeon's last fight, x y = the left of
+    // two tiles (world.js dungeonCleared forms them, render.js draws them rising). Walk onto them to leave.
+    else if(k==='outstairs')A.outStairs={tx:+p[1],ty:+p[2]};
     else if(k==='finale')A.finale={x0:+p[1],y0:+p[2],x1:+p[3],y1:+p[4],ring:+opt('ring')||3}
     else if(k==='fog')A.fogs.push({x:+p[1]*T,y:+p[2]*T,w:+p[3]*T,h:+p[4]*T});
     else if(k==='chest')A.chests.push({x:px(+p[1]),y:py(+p[2]),tx:+p[1],ty:+p[2],open:false,at:0});
