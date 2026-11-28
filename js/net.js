@@ -12,9 +12,12 @@ const NET={
   idPrefix:'ashfen-hollow-v1-', // on the public server, so make it ours
   rate:0.1,        // seconds between position updates (10 a second)
   quiet:8,         // seconds without a word before the partner shows as "not responding"
-  letters:'ABCDEFGHJKMNPQRSTUVWXYZ' // no I, L or O: easy to read out loud
+  letters:'ABCDEFGHJKMNPQRSTUVWXYZ', // no I, L or O: easy to read out loud
+  timeout:20,      // seconds to wait for the phones to link up before giving up with a clear message
+  // STUN servers tell each phone its public address so the two can find a route to each other (free, public).
+  ice:[{urls:'stun:stun.l.google.com:19302'},{urls:'stun:stun1.l.google.com:19302'},{urls:'stun:stun.cloudflare.com:3478'}]
 };
-const net={role:null,state:'off',code:'',err:'',conn:null,peer:null,chan:null,sendT:0,heardT:0,lastZone:null,quiet:false};
+const net={role:null,state:'off',code:'',err:'',step:'',stepT:0,conn:null,peer:null,chan:null,sendT:0,heardT:0,lastZone:null,quiet:false};
 // The partner as the game draws it (null until they connect). x, y ease toward tx, ty so movement looks smooth at 10 updates a second.
 let remote=null;
 // This build's version, read from net.js's own cache tag, so two phones on different versions get told to reload.
@@ -25,6 +28,13 @@ const netLocal=/[?&]net=local/.test(location.search);
 function netName(){return (settings.netName||C.name).slice(0,14)}
 function netCode(){let s='';for(let i=0;i<4;i++)s+=NET.letters[Math.floor(Math.random()*NET.letters.length)];return s} // not rng(): never touch the game's dice
 function netStatus(){renderGroup()}
+// Which part of connecting we're on, shown on screen and in the Log, so a stuck join says where it stuck (v0.138).
+function netStep(t){net.step=t;net.stepT=performance.now()/1000;log('Group: '+t,'#7fa8c0');netStatus()}
+// Gives up after NET.timeout seconds with a message that names the stuck step.
+function netWatch(){const t0=performance.now()/1000,role=net.role;
+  setTimeout(()=>{if(net.state==='on'||net.state==='off'||net.role!==role||performance.now()/1000-t0<NET.timeout-0.5)return;
+    if(net.role==='host'&&net.state==='waiting'&&!net.knock)return; // a host just waiting for someone is fine
+    netFail('Could not link the phones (stuck at: '+net.step+'). Try with one phone on mobile data instead of Wi-Fi, then send Claude this message.')},NET.timeout*1000)}
 // Load PeerJS once, when it's first needed.
 function netLib(){return new Promise((ok,bad)=>{if(window.Peer)return ok();
   const s=document.createElement('script');s.src=NET.lib;s.onload=()=>window.Peer?ok():bad(new Error('PeerJS missing'));s.onerror=()=>bad(new Error('Could not load the connection library. Check your internet.'));document.head.appendChild(s)})}
@@ -34,10 +44,11 @@ function netFail(msg){net.err=msg;netClose(true);log('Group: '+msg,'#ff8a80')}
 function netHost(){if(net.state!=='off')return;net.role='host';net.code=netCode();net.err='';net.state='opening';netStatus();
   if(netLocal){netLocalOpen();return}
   netLib().then(()=>{
-    const p=new Peer(NET.idPrefix+net.code.toLowerCase());net.peer=p;
-    p.on('open',()=>{net.state='waiting';netStatus();log('Group: hosting. Your code is '+net.code+'.','#9fd8ff')});
+    netStep('reaching the matchmaker…');
+    const p=new Peer(NET.idPrefix+net.code.toLowerCase(),{config:{iceServers:NET.ice}});net.peer=p;
+    p.on('open',()=>{net.state='waiting';net.step='waiting for your partner';netStatus();log('Group: hosting. Your code is '+net.code+'.','#9fd8ff')});
     p.on('connection',c=>{if(net.conn){c.on('open',()=>{c.send({t:'full'});setTimeout(()=>c.close(),300)});return} // two players for now
-      netUse(c)});
+      net.knock=true;netStep('your partner found you; linking the phones…');netUse(c);netWatch()});
     p.on('error',e=>netFail(e.type==='unavailable-id'?'That code is taken. Tap Host again for a new one.':'Connection error ('+(e.type||e.message)+').'));
     p.on('disconnected',()=>{if(net.state==='waiting')p.reconnect()}) // lost the introducer while waiting: try again
   }).catch(e=>netFail(e.message))}
@@ -45,14 +56,18 @@ function netJoin(code){if(net.state!=='off')return;code=(code||'').toUpperCase()
   if(code.length!==4){net.err='Type the 4-letter code from the host.';netStatus();return}
   net.role='guest';net.code=code;net.err='';net.state='opening';netStatus();
   if(netLocal){netLocalOpen();return}
+  netWatch();netStep('loading the connection library…');
   netLib().then(()=>{
-    const p=new Peer();net.peer=p;
-    p.on('open',()=>{net.state='joining';netStatus();netUse(p.connect(NET.idPrefix+code.toLowerCase(),{reliable:true,serialization:'json'}))});
+    netStep('reaching the matchmaker…');
+    const p=new Peer({config:{iceServers:NET.ice}});net.peer=p;
+    p.on('open',()=>{net.state='joining';netStep('found the matchmaker; asking for game '+code+'…');netUse(p.connect(NET.idPrefix+code.toLowerCase(),{reliable:true,serialization:'json'}))});
     p.on('error',e=>netFail(e.type==='peer-unavailable'?'No game with code '+code+'. Check the code, and that the host is still on Host.':'Connection error ('+(e.type||e.message)+').'))
   }).catch(e=>netFail(e.message))}
 // A PeerJS connection, whichever side opened it.
 function netUse(c){net.conn=c;
   c.on('open',()=>netOpened());
+  // The direct phone-to-phone line's own progress (checking → connected, or failed / disconnected).
+  c.on('iceStateChanged',st=>{if(net.state!=='on'&&net.state!=='off')netStep('phone to phone: '+({checking:'trying routes…',connected:'linked, opening…',completed:'linked, opening…',failed:'no route found',disconnected:'line dropped',closed:'closed'}[st]||st))});
   c.on('data',d=>netMsg(d));
   c.on('close',()=>netLost());
   c.on('error',()=>netLost())}
@@ -63,13 +78,13 @@ function netLocalOpen(){const ch=new BroadcastChannel('ashfen-net-'+net.code);ne
     if(d.t==='come'){if(net.role==='guest'&&net.state==='joining')netOpened();return}netMsg(d)};
   if(net.role==='host'){net.state='waiting';log('Group: hosting. Your code is '+net.code+'.','#9fd8ff')}else{net.state='joining';ch.postMessage({t:'knock'})}
   netStatus()}
-function netOpened(){net.state='on';net.heardT=performance.now()/1000;net.quiet=false;net.err='';
+function netOpened(){net.state='on';net.step='';net.knock=false;net.heardT=performance.now()/1000;net.quiet=false;net.err='';
   netSend({t:'hi',name:netName(),cls:CLS,v:GAME_V});netSendState();netStatus()}
 function netSend(d){if(net.conn&&(net.state==='on'||d.t==='hi'))try{net.conn.send(d)}catch(e){}}
 // Leave on purpose (bye tells the partner right away) or after a failure.
 function netClose(quietly){if(net.state==='on'&&!quietly)netSend({t:'bye'});
   try{if(net.conn)net.conn.close()}catch(e){}try{if(net.peer)net.peer.destroy()}catch(e){}
-  net.conn=null;net.peer=null;net.chan=null;net.state='off';net.role=null;
+  net.conn=null;net.peer=null;net.chan=null;net.state='off';net.role=null;net.step='';net.knock=false;
   if(remote&&!quietly)log('Group: you left the game.','#9fd8ff');remote=null;netStatus()}
 function netLost(){if(net.state==='off')return;const who=remote?remote.name:'Your partner';net.err='';netClose(true);log('Group: lost the connection to '+who+'. Host or join again to reconnect.','#ff8a80')}
 
@@ -129,9 +144,9 @@ function renderGroup(){const box=$('groupbox');if(!box)return;
       '<button class="go" id="netjoin">Join</button>'+err+
       '<p class="hint">Works best when both phones are on the same Wi-Fi.</p>';
   }else if(net.state==='opening'||net.state==='joining'){
-    h='<p>'+(net.role==='host'?'Setting up your game…':'Looking for game <b>'+esc(net.code)+'</b>…')+'</p>'+err+'<button class="go" id="netleave">Cancel</button>';
+    h='<p>'+(net.role==='host'?'Setting up your game…':'Looking for game <b>'+esc(net.code)+'</b>…')+'</p>'+(net.step?'<p class="hint">Step: '+esc(net.step)+'</p>':'')+err+'<button class="go" id="netleave">Cancel</button>';
   }else if(net.state==='waiting'){
-    h='<p>Your code:</p><p class="netcode">'+esc(net.code)+'</p><p class="hint">Tell your partner. They open the game, go to Menu → Group, type the code and tap Join. Keep this screen on until they show up.</p>'+err+'<button class="go" id="netleave">Cancel</button>';
+    h='<p>Your code:</p><p class="netcode">'+esc(net.code)+'</p><p class="hint">Tell your partner. They open the game, go to Menu → Group, type the code and tap Join. Keep this screen on until they show up.</p>'+(net.knock?'<p class="hint">Step: '+esc(net.step)+'</p>':'')+err+'<button class="go" id="netleave">Cancel</button>';
   }else{const r=remote,A=r&&r.z?zoneName(r.z):null;
     h='<p>Playing with <b>'+esc(r?r.name:'…')+'</b>'+(r?' · '+esc(CLASSES[r.cls].name)+(r.lv?' · Lv '+r.lv:''):'')+'</p>'+
       '<p class="hint">'+(net.quiet?'Not responding…':r&&r.z===zoneId?'Here with you.':A?'In '+esc(A)+'.':'Somewhere else.')+(net.role==='host'?' You are hosting (code '+esc(net.code)+').':'')+'</p>'+
