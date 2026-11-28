@@ -10,7 +10,7 @@
 | **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | Rats done (owner: fantastic, v0.122–v0.127). Nov 27: **Family animations draft 1** review page (beetles + Ironshell, boar, ash wisp, zealot/ashcaller/chanter: attack and death each), not in the game yet | Owner marks draft 1, then build it into the game; then the other wisps and cultists reuse the moves; then Old Gnawbone's boss move |
 | **Items** ("… Continue on items"): drops, boss loot, enchanting, gold | v0.128 necklace slot (one ring + one necklace); v0.124 pink tricks | Owner plays with the new gear and runs balance checks; then more own items for Dungeon 1's named and the chapel's rares, if wanted |
 | **Map** ("… Continue on map"): maps, tiles, area art | v0.132 Ironshell alone in the crossroads' north-east corner by a pond (teaser dropped); v0.126 line of sight for spells; v0.123 crossroads love pass | Dungeon 1's love pass (D1–D4) and its exit. Reminder to raise: Town 1 |
-| **Character** ("… Continue on character animations"): player bodies and attack poses | v0.133 channel glow calmer (no specks or flutter); v0.130 channel glow on cast-time spells; v0.121 weapons in your hand (owner OK'd) | Owner looks at the channel glow on the phone. Card done otherwise; next ideas come from the owner |
+| **Character** ("… Continue on character animations"): player bodies and attack poses | v0.133 channel glow calmer (no specks or flutter); v0.130 channel glow on cast-time spells; v0.121 weapons in your hand (owner OK'd) | **Gear looks across the whole game** (armour showing + weapon scope): owner answers Claude's proposal (body stays 15 × 18, gear grows the outline; Zone 1 colour and trim only; tone Zone 1 weapons down), then a look-ladder review page |
 | **Spells** ("… Continue on spells"): player spell looks | — | Big spells as a setting (My spells: Big / Classic), then spells that grow with rank |
 | **Balance** ("… Continue on balance"): class and mob numbers, sim | — | Tune Malrec's finale for all 14; put gear in the sim; time the climb to Malrec |
 | **Skill tree** ("… Continue on skill tree"): design only for now | — | Owner approves the every-class-to-8 draft; build waits until Balance is idle |
@@ -19,3 +19,4 @@
 ## Open owner decisions
 - Animation: marks on Family animations draft 1.
 - Map: Town 1 (keeps getting put off).
+- Character: the gear-look proposal (board card "Gear looks across the whole game").
