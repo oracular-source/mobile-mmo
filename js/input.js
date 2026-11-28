@@ -67,5 +67,6 @@ function tapWorld(clientX,clientY,targetOnly){
   // sets tx (the sim's bots) keeps walking straight, and the sims stay the same.
   const g=walkGoal(player,wx,wy);player.tx=g.x;player.ty=g.y;player.tapGoal=g;player.stuckT=0;player.sit=false;
 }
-window.addEventListener('keydown',e=>{keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();if(e.shiftKey)backTarget();else nextTarget()}});
+window.addEventListener('keydown',e=>{if(/INPUT|TEXTAREA/.test(e.target.tagName))return; // typing a chat line or a code isn't moving or casting
+  keys[e.key.toLowerCase()]=true;const n=parseInt(e.key,10);if(n>=1&&n<=NSLOTS)castSlot(n-1);if(e.key==='Tab'){e.preventDefault();if(e.shiftKey)backTarget();else nextTarget()}});
 window.addEventListener('keyup',e=>{keys[e.key.toLowerCase()]=false});

@@ -332,3 +332,12 @@ body.land #banner{top:auto;bottom:10px}
 .ench3{text-shadow:0 0 3px rgba(127,224,216,.7)}
 .ench5{text-shadow:0 0 3px #7fe0d8,0 0 7px rgba(127,224,216,.9)}
 .orbrow{display:flex;gap:6px}.orbrow .sellall{flex:1}
+/* Menu → Group (multiplayer step 1, js/net.js): plain fields in the grey window style. */
+#groupbox .netl{display:block;margin:12px 0 0;font-size:12px;color:#c8c8c8}
+#groupbox input{display:block;width:100%;box-sizing:border-box;margin-top:4px;height:40px;padding:0 10px;font:16px ui-monospace,Menlo,monospace;background:#151515;color:#eee;border:1px solid #8a8a8a;border-radius:0}
+#groupbox #netcode{text-transform:uppercase;letter-spacing:6px;font-size:20px}
+#groupbox .netcode{font:700 40px ui-monospace,Menlo,monospace;letter-spacing:10px;text-align:center;margin:4px 0 10px;color:#9fd8ff}
+#groupbox .neterr{color:#ff8a80;font-size:12px;margin:10px 0 0}
+#groupbox .netsay{display:flex;gap:6px;margin-top:10px}
+#groupbox .netsay input{margin:0;flex:1}
+#groupbox .netsay button{height:40px;padding:0 14px}

@@ -13,7 +13,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Ashfen">
 <meta name="theme-color" content="#050507">
-<link rel="stylesheet" href="css/game.css?v=0.135">
+<link rel="stylesheet" href="css/game.css?v=0.136">
 </head>
 <body>
 <div id="app">
@@ -56,7 +56,7 @@
     <div id="intro" class="modal show">
       <div class="card">
         <div class="mhead"><h1>Ashfen Hollow</h1><button class="mx" id="introx" aria-label="Close" style="display:none">✕</button></div>
-        <p class="hint" style="margin:0 0 6px">Prototype v0.135 · pick a class</p>
+        <p class="hint" style="margin:0 0 6px">Prototype v0.136 · pick a class</p>
         <div id="clspick"></div>
         <div id="clsinfo"><div class="dfig"><canvas id="clscv" width="20" height="24"></canvas></div><div><b id="clsname"></b> <span id="clstag" class="hint"></span><div id="clsdesc" class="hint"></div></div></div>
         <button id="start" class="go">Play</button>
@@ -93,7 +93,7 @@
     <div id="menuUI" class="modal">
       <div class="card">
         <div class="mhead"><h1>Menu</h1><button class="mx" data-close="menuUI" aria-label="Close">✕</button></div>
-        <div class="tabs"><button data-tab="spells">Spells</button><button data-tab="skills">Skills</button><button data-tab="settings">Settings</button><button data-tab="help">Help</button></div>
+        <div class="tabs"><button data-tab="spells">Spells</button><button data-tab="skills">Skills</button><button data-tab="group">Group</button><button data-tab="settings">Settings</button><button data-tab="help">Help</button></div>
         <div id="paneSpells">
           <button class="go" id="barr">Arrange buttons on screen</button>
           <p class="hint">Swap spells here: drag a spell onto a slot, or tap a spell and then tap a slot. Slots swap if the spell is already loaded.</p>
@@ -104,6 +104,8 @@
         </div>
         <!-- Skills (v0.38): the skill tree forks. Pick one of two versions of an ability; swap later at any campfire. -->
         <div id="paneSkills"><div id="forkbox"></div></div>
+        <!-- Group (multiplayer step 1, js/net.js): host or join a game with a 4-letter code. -->
+        <div id="paneGroup"><div id="groupbox"></div></div>
         <div id="paneSettings"><div id="setbox"></div></div>
         <div id="paneHelp">
           <ul>
@@ -136,41 +138,42 @@
   </div>
 </div>
 <!-- The game code, in load order. Plain scripts (no build step) that share one scope. -->
-<script src="js/core.js?v=0.135"></script>
-<script src="js/data/sprites.js?v=0.135"></script>
-<script src="js/data/weapons.js?v=0.135"></script>
-<script src="js/rng.js?v=0.135"></script>
-<script src="js/save.js?v=0.135"></script>
-<script src="js/crash.js?v=0.135"></script>
-<script src="js/map.js?v=0.135"></script>
-<script src="js/data/classes.js?v=0.135"></script>
-<script src="js/data/icons.js?v=0.135"></script>
-<script src="js/data/mobs.js?v=0.135"></script>
-<script src="js/data/items.js?v=0.135"></script>
-<script src="js/data/tiles.js?v=0.135"></script>
-<script src="js/data/maps/graveyard.js?v=0.135"></script>
-<script src="js/data/maps/crypt.js?v=0.135"></script>
-<script src="js/data/maps/crossroads.js?v=0.135"></script>
-<script src="js/data/maps/rat_tunnel.js?v=0.135"></script>
-<script src="js/data/maps/wolfwood.js?v=0.135"></script>
-<script src="js/data/maps/chapel.js?v=0.135"></script>
-<script src="js/data/maps/dungeon1.js?v=0.135"></script>
-<script src="js/data/maps/dungeon1_f2.js?v=0.135"></script>
-<script src="js/state.js?v=0.135"></script>
-<script src="js/spawns.js?v=0.135"></script>
-<script src="js/fx.js?v=0.135"></script>
-<script src="js/anim.js?v=0.135"></script>
-<script src="js/path.js?v=0.135"></script>
-<script src="js/combat.js?v=0.135"></script>
-<script src="js/input.js?v=0.135"></script>
-<script src="js/ui.js?v=0.135"></script>
-<script src="js/world.js?v=0.135"></script>
-<script src="js/area.js?v=0.135"></script>
-<script src="js/update.js?v=0.135"></script>
-<script src="js/render.js?v=0.135"></script>
-<script src="js/sim.js?v=0.135"></script>
-<script src="js/dev.js?v=0.135"></script>
-<script src="js/minimap.js?v=0.135"></script>
-<script src="js/main.js?v=0.135"></script>
+<script src="js/core.js?v=0.136"></script>
+<script src="js/data/sprites.js?v=0.136"></script>
+<script src="js/data/weapons.js?v=0.136"></script>
+<script src="js/rng.js?v=0.136"></script>
+<script src="js/save.js?v=0.136"></script>
+<script src="js/crash.js?v=0.136"></script>
+<script src="js/map.js?v=0.136"></script>
+<script src="js/data/classes.js?v=0.136"></script>
+<script src="js/data/icons.js?v=0.136"></script>
+<script src="js/data/mobs.js?v=0.136"></script>
+<script src="js/data/items.js?v=0.136"></script>
+<script src="js/data/tiles.js?v=0.136"></script>
+<script src="js/data/maps/graveyard.js?v=0.136"></script>
+<script src="js/data/maps/crypt.js?v=0.136"></script>
+<script src="js/data/maps/crossroads.js?v=0.136"></script>
+<script src="js/data/maps/rat_tunnel.js?v=0.136"></script>
+<script src="js/data/maps/wolfwood.js?v=0.136"></script>
+<script src="js/data/maps/chapel.js?v=0.136"></script>
+<script src="js/data/maps/dungeon1.js?v=0.136"></script>
+<script src="js/data/maps/dungeon1_f2.js?v=0.136"></script>
+<script src="js/state.js?v=0.136"></script>
+<script src="js/spawns.js?v=0.136"></script>
+<script src="js/fx.js?v=0.136"></script>
+<script src="js/anim.js?v=0.136"></script>
+<script src="js/path.js?v=0.136"></script>
+<script src="js/combat.js?v=0.136"></script>
+<script src="js/input.js?v=0.136"></script>
+<script src="js/ui.js?v=0.136"></script>
+<script src="js/world.js?v=0.136"></script>
+<script src="js/area.js?v=0.136"></script>
+<script src="js/update.js?v=0.136"></script>
+<script src="js/render.js?v=0.136"></script>
+<script src="js/sim.js?v=0.136"></script>
+<script src="js/dev.js?v=0.136"></script>
+<script src="js/minimap.js?v=0.136"></script>
+<script src="js/net.js?v=0.136"></script>
+<script src="js/main.js?v=0.136"></script>
 </body>
 </html>

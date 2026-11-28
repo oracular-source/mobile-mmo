@@ -323,3 +323,10 @@ No style takes: same setting as the chapel grounds and the crypt (Nov 20). **Nav
 - Weapon drawings are upright, at game size, with a grip row (`tools/weapon_looks.py`). The look follows power, never rarity colour; size stops growing at look 4; named keep their tier's shape in their maker's colours.
 - The weapon must fit how the class fights; the Monk shows no weapon; the Bard plays the lute and wears his rapier at the left hip, point down and back.
 - A new pose frame needs nothing extra: draw it holding the old weapon and `tools/player_frames.py` cuts it out and measures the grip and angle (rules per class in `weapon_px`).
+
+## Other players (multiplayer step 1, v0.136)
+- **Your partner looks like you would in their class:** the same rags body and weapon in hand (`remoteImg` in `js/net.js` reuses `mkRags`), the same shadow under the feet, walking and sitting frames. No attack poses yet.
+- **Name over the head** in light blue `#9fd8ff` (mobs' names use their con colour, so a player never reads as a mob), with a thin health bar under it (black edge, `#d8433e` fill) and, while they cast, a cast bar in the spell's colour under that.
+- **Their casts:** a small upward spark burst in the spell's colour and the spell's name as floating word text; a two-pixel glow flickers in front of them while a cast charges.
+- **Speech bubbles** sit higher over a partner than over an NPC (above the name and bar).
+- **Not responding** (no word for 8 s): they draw at half see-through until they're back.

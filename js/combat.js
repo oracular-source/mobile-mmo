@@ -84,6 +84,7 @@ function xpEven(lv){return lv*lv*4+6}
 // How tough a regular mob is next to a standard one of its level: (health with armor x damage), square-rooted so a mob
 // that's twice as tanky and hits twice as hard pays double. Capped by TOUGH_RANGE.
 function toughness(def,lv){
+  def=def.base||def; // a group-scaled mob pays like its normal self (how group XP splits is decided in multiplayer step 2)
   if(def.named||def.rare||def.boss||def.end)return 1;
   const ehp=(def.hp+def.hpl*lv)/(1-(def.armor||0))/(STD_MOB.hp+STD_MOB.hpl*lv),hit=(def.dmg+def.dmgl*lv)/(STD_MOB.dmg+STD_MOB.dmgl*lv);
   return Math.max(TOUGH_RANGE[0],Math.min(TOUGH_RANGE[1],Math.sqrt(ehp*hit)));
@@ -455,6 +456,7 @@ function applyAbility(a,t,fromHide){
 }
 function applyAbilityCore(a,t,fromHide){
   animPlayer(a,t); // looks only (js/anim.js): the body's attack or cast pose
+  netCast(a); // multiplayer: your partner sees you cast (js/net.js; does nothing when not connected)
   const L=player.lvl,mult=(a.melee?meleeMult():spellMult())*(a.melee&&player.buffs.stance>0&&player.stanceHit?player.stanceHit:1);
   if(a.hpCost){const c=Math.round(maxHP(L)*a.hpCost);player.hp=Math.max(1,player.hp-c);floatText(player.x,player.y-20,'-'+c,'#a3252f');log(a.name+' costs you '+c+' health.','#c87a80')}
   // A Backstab from Hide never misses: they didn't see you coming.

@@ -20,3 +20,4 @@ Every asset in the game is listed here with its source and license.
 | Player bodies and attack poses for all 14 classes (`PLAYER15` in `js/data/sprites.js`, from `tools/player_pass_draft.py` via `tools/player_frames.py`), draft sheet `art/drafts/players-pass-draft2.png` (v0.112) | Made for this game (Claude, Nov 27) | Original |
 | Teaser video soundtrack (`tools/teaser/music.py`, synthesized from sine waves and noise; not in the game) | Made for this project (Claude, Nov 21) | Original |
 | `js/data/weapons.js` (weapon looks, all types and tiers) | Made by us (Claude, from the owner-approved draft 4) | Original |
+| PeerJS 1.5.4 (multiplayer connection library, `js/net.js` loads it from unpkg.com only when you tap Host or Join; not stored in the repo) | PeerJS contributors, https://peerjs.com | MIT licence (code, not art) |

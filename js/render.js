@@ -359,7 +359,7 @@ function render(){
   const A0=curArea(),ents=entsBuf;ents.length=0;
   for(let i=0;i<mobs.length;i++)ents.push(mobs[i]);
   if(zoneId==='over')for(let i=0;i<npcs.length;i++)ents.push(npcs[i]);
-  if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);
+  if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);if(remoteHere())ents.push(remote); // your partner (multiplayer, js/net.js)
   if(A0){const tv=treesInView(A0);for(let i=0;i<tv.length;i++)ents.push(tv[i])}
   ents.sort(byY);
   // A tree you (or your target) are behind fades so you never lose sight of the fight.
@@ -391,6 +391,12 @@ function render(){
       if(player.cast&&player.cast.a.melee){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
+    // Your partner: their class's look and weapon, walking or sitting, a glow while they cast (multiplayer step 1, js/net.js).
+    if(e===remote){const im=remoteImg(e),wf=walkFrame(im,e.walk,e.moving&&!e.sit),fo=im&&im.fo||0;
+      shadow(Math.round(e.x)+(e.dir<0?-fo:fo),e.y,5);if(net.quiet)lx.globalAlpha=0.5;
+      drawSprite(wf.im,e.x,e.y+1,e.dir,wf.bob,e.sit);lx.globalAlpha=1;
+      if(e.cast){lx.fillStyle=e.cast.col||'#cfc8b2';const k=Math.floor(time*10)%4;lx.fillRect(Math.round(e.x)+e.dir*6,Math.round(e.y)-11-k%2,1,1);lx.fillRect(Math.round(e.x)+e.dir*5,Math.round(e.y)-13+k%2,1,1)}
+      return}
     if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
     if(e===pet||e===pet2){const im=IMG[e.img||'pet']||IMG.pet;
       if(e.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
@@ -490,6 +496,11 @@ function render(){
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
+  // Your partner's name over their head, with a thin health bar and their cast bar (multiplayer step 1).
+  if(remoteHere()){const r=remote,sx=(r.x-camX)*S,sy=(r.y-24-camY)*S,w=26*dpr,h=3*dpr;
+    cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(r.name,sx,sy);cx.fillStyle='#9fd8ff';cx.fillText(r.name,sx,sy);
+    cx.fillStyle='#000';cx.fillRect(sx-w/2-dpr,sy+6*dpr-dpr,w+2*dpr,h+2*dpr);cx.fillStyle='#3a1418';cx.fillRect(sx-w/2,sy+6*dpr,w,h);cx.fillStyle='#d8433e';cx.fillRect(sx-w/2,sy+6*dpr,w*Math.max(0,Math.min(1,r.hp/r.mhp)),h);
+    if(r.cast){cx.fillStyle='#000';cx.fillRect(sx-w/2-dpr,sy+10*dpr-dpr,w+2*dpr,h+2*dpr);cx.fillStyle=r.cast.col||'#cfc8b2';cx.fillRect(sx-w/2,sy+10*dpr,w*r.cast.p,h)}}
   // Sleeping (mesmerized) mobs: "Zz" and seconds left, so you know when to re-mez.
   mobs.forEach(m=>{if(m.dead||!(m.mez>0))return;const sx=(m.x-camX)*S,sy=(m.y-IMG[m.def.img].h-(m===t?14:4)-camY)*S;cx.font='700 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';const s='Zz '+Math.ceil(m.mez);cx.strokeText(s,sx,sy);cx.fillStyle=m.mez<4?'#ffb37a':'#e0c3ff';cx.fillText(s,sx,sy)});
   // A boss casting its big spell: a purple bar over its head that fills up, so you can see it coming and stun it or step away.
@@ -505,7 +516,7 @@ function render(){
     cx.globalAlpha=0.7;cx.fillStyle='#c9a227';cx.beginPath();cx.arc(bx+joy.dx*k*dpr,by+joy.dy*k*dpr,16*dpr,0,Math.PI*2);cx.fill();cx.globalAlpha=1;
   }
   bubbles.forEach(b=>{
-    const o=b.o,sx=(o.x-camX)*S,sy=(o.y-22-camY)*S,fs=Math.round(10*dpr),pad=5*dpr,maxW=170*dpr;
+    const o=b.o,sx=(o.x-camX)*S,sy=(o.y-(o===remote?30:22)-camY)*S,fs=Math.round(10*dpr),pad=5*dpr,maxW=170*dpr;
     cx.font=fs+'px ui-monospace,Menlo,monospace';
     const words=b.text.split(' '),ls=[];let cur='';words.forEach(w=>{const t2=cur?cur+' '+w:w;if(cx.measureText(t2).width>maxW&&cur){ls.push(cur);cur=w}else cur=t2});if(cur)ls.push(cur);
     const w=Math.max(...ls.map(l=>cx.measureText(l).width))+pad*2,h=ls.length*fs*1.25+pad*2;

@@ -85,3 +85,13 @@ const STD_MOB={hp:50,hpl:20,dmg:3.2,dmgl:1.5};
 const TOUGH_RANGE=[0.5,2];
 // 3) Spawn count lives in the map files: enough mobs that one clear takes you through most of an area's levels.
 // Check all three with DEV -> Testing grounds -> Zone 1 pace.
+// Group scaling (owner, Nov 27, a rough first pass; the real balance pass comes later). When more than one player
+// shares a mob (multiplayer step 2), it gets tougher, but less than "double": two players deal about twice the damage
+// and split the mob's hits between them, so a group still kills faster and safer than one player alone (groups are
+// rewarded, never required). For n players, each player past the first adds:
+//   hp:    +75% of the mob's health        (2 players: 1.75x health)
+//   armor: +0.05 armor, never above armorCap (2 players: an armor-0 rat takes 5% less from every hit)
+//   dmg:   +15% to its hits                 (2 players: 1.15x damage)
+// With the armor, two players face about 1.84x the effective health with about 2x the damage: kills ~8% faster,
+// and each player takes roughly 58% of the hits they would alone. Solo (n = 1) is unchanged.
+const GROUP_SCALE={hp:0.75,armor:0.05,armorCap:0.75,dmg:0.15};

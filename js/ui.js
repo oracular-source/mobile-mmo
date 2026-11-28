@@ -345,8 +345,8 @@ function pauseWatch(){
 let menuTab='spells';
 function setMenuTab(t){menuTab=t;
   document.querySelectorAll('#menuUI .tabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===t));
-  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';$('paneSkills').style.display=t==='skills'?'':'none';
-  selected=null;if(t==='spells')renderBook();else if(t==='skills')renderForks();else if(t==='settings')renderSettings();
+  $('paneSpells').style.display=t==='spells'?'':'none';$('paneSettings').style.display=t==='settings'?'':'none';$('paneHelp').style.display=t==='help'?'':'none';$('paneSkills').style.display=t==='skills'?'':'none';$('paneGroup').style.display=t==='group'?'':'none';
+  selected=null;if(t==='spells')renderBook();else if(t==='skills')renderForks();else if(t==='settings')renderSettings();else if(t==='group')renderGroup();
   $('menuUI').querySelector('.card').scrollTop=0}
 // One window at a time (the frames stay tappable above windows now, so tapping yours while the Menu is open swaps).
 function openModal(id){if(arranging)setArranging(false);document.querySelectorAll('.modal.show').forEach(m=>{if(m.id!==id&&m.id!=='intro')m.classList.remove('show')});
