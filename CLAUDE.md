@@ -27,6 +27,7 @@ Don't add multiplayer, accounts or server code until I say we're in phase 3.
 - One feature per session; big builds are fine (owner, Nov 19), e.g. a whole system plus its content in one go. Finish it, test it, then stop.
 - Keep code simple and readable over clever. Add short comments that explain *why*.
 - Before finishing, open the game in a headless browser if you can and check for JavaScript errors.
+- **Review in bulk (owner, Nov 27):** the draft → review page → notes → build flow works, so scale it: draft several pieces at once (e.g. several mob families) on one artifact review page showing what's new (side by side with today only when it helps), so I can give all my notes in one go.
 - When I report a bug, ask for what I saw (or a screenshot) before guessing.
 - When a feature works, commit with a short, clear message.
 - Work flows through `docs/board.md` (lean): one card at a time (a card can be a big build), ideas go to the backlog before any building, defects before features. Update the board's Now/Next, changelog and known issues with every change.
