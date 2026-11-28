@@ -47,10 +47,16 @@ function con(lv){const d=lv-player.lvl;return d<=-2?'#5fbf5f':d===-1?'#5fa8ff':d
 let shakeT=0,shakeA=0;function shake(a,d){if(logMute)return;if(shakeT<=0||a>shakeA)shakeA=a;shakeT=Math.max(shakeT,d)}
 let slowArea=null; // the current area if it has slow ground (set by enterZone), else null
 const WADE=0.6;    // speed in flood water
+// How deep someone stands in slow water, 0 (dry) to 1. Flood water fills its tiles; the crossroads creek has curved, drawn
+// banks (v0.52), so wading there follows the drawn water, not the square tile (v0.123, owner: you sank to your knees
+// while still on the bank). Used for the slowdown here and the wading look in render.js.
+function wadeDepth(x,y){const SA=slowArea;if(!SA)return 0;const tx=Math.floor(x/T),ty=Math.floor(y/T);
+  if(tx<0||ty<0||tx>=SA.w||ty>=SA.h||!SA.slow[ty*SA.w+tx])return 0;
+  if(SA.rows[ty][tx]!=='~'||!SA.wetV)return 1;const v=SA.wetV(x,y);return v>0.04?Math.min(1,(v-0.04)/0.22):0}
 function moveToward(e,tx,ty,spd,dt){
   const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);if(d<0.5)return true;
   // Flood water (v0.63, Dungeon 1) slows anyone wading it, you, pets and mobs alike; floating things skim over it.
-  const SA=slowArea;if(SA&&!(e.def&&e.def.float)){const sx=Math.floor(e.x/T),sy=Math.floor(e.y/T);if(sx>=0&&sy>=0&&sx<SA.w&&sy<SA.h&&SA.slow[sy*SA.w+sx])spd*=WADE}
+  const SA=slowArea;if(SA&&!(e.def&&e.def.float)){const sx=Math.floor(e.x/T),sy=Math.floor(e.y/T);if(sx>=0&&sy>=0&&sx<SA.w&&sy<SA.h&&SA.slow[sy*SA.w+sx]&&wadeDepth(e.x,e.y)>0)spd*=WADE}
   const step=Math.min(d,spd*dt),vx=dx/d*step,vy=dy/d*step;
   // Feet, not a point (v0.64, owner: "you can walk through the water a bit"): water you can't wade stops your whole feet,
   // a few pixels either side and in front, so half your body never hangs out over a pond. Only ever stops a move that

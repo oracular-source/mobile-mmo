@@ -42,8 +42,8 @@ MAPS.crossroads = {
     ',,,,T,,,:,,,,,,,,,TT,,,,,==,,,T,,,,,TT,TTTTTTTTT',
     'TTTTTT,:,,,,,,,,,b,T,,,,,==,,T,,,,,,,TTTTTTTTTTT',
     ',TTT,,:,,,T,,,,,,,b,,,,,,==,,,,,,,,,,TTTTTTTTTTT',
-    'TTTT,,:,,,TT,,,,,,,TT,,,,==,T,,,,,,,,TTTTTTTTTTT',
-    'TTTT,:,,,TTTT,,,,,TT,,,,,==,TTT,,,,,TTT,TTTTTTTT',
+    'TTTT,,:,,,TT,,,,,,,TT,,,,==,,,,,,,,,,TTTTTTTTTTT',
+    'TTTT,:,,,TTTT,,,,,TT,,,,,==,,TT,,,,,TTT,TTTTTTTT',
     'TTT,,,,,,TT,TTT,,TT,T,,,,==,,,TTT,TTTTTTTTTTTT,T',
     'T,TTT,,TTTTTTTTTTTTT,,,,,==,,,,,TTT,TT,TTTTTTT,T',
     'TTTTTTTTTTTTTTTTLLLLLLL,,==,,LLLLLLTTTTTTTTTTTTT',
@@ -55,7 +55,7 @@ obj campfire 20 25
 obj signpost 27 29
 obj sinkhole 39 22
 obj lantern 37 24   # v0.64: moved to the path side (it boxed you in north of the sinkhole)
-obj torch 2 28
+obj lantern 2 28   # v0.123 (love pass X1): a lantern on a post marks the road west to the graveyard (was a lone torch)
 # ways in and out
 exit south 25 40 to=town1 lit   # v0.64: at the closed gate (Town 1 isn't built yet)
 exit west 0 30 to=graveyard
@@ -98,7 +98,8 @@ spawn beetle 3 36 6
 # small stories and wear (heart pass, v0.59)
 obj town_gate 23 41   # v0.64: a gatehouse in a palisade wall, doors shut
 obj wagon 11 32
-obj bedroll 18 24
+obj bedroll 18 24 open   # v0.123 (love pass X3): a traveller camps here: bedroll laid out, pack by the fire
+obj pack 22 24
 obj fallen_log 19 27
 obj fishing_rod 26 10
 fog 3 10 17 8

@@ -422,9 +422,18 @@ function render(){
     // Wading (v0.64): in slow water (Dungeon 1's flood, the crossroads creek) the water covers your feet and shins, with a
     // ripple ring that moves, so you can see why you're slow. Floating things (wisps, the sword) skim over.
     if(slowArea&&!e.dead&&!(e.def&&e.def.float)&&e.img!=='blade'&&e!==decoy&&!(e===player&&player.dead>0)){const SA=slowArea,tx=Math.floor(e.x/T),ty=Math.floor(e.y/T);
-      if(tx>=0&&ty>=0&&tx<SA.w&&ty<SA.h&&SA.slow[ty*SA.w+tx]){const x=Math.round(e.x),y=Math.round(e.y),fl=SA.rows[ty][tx]==='z',w=e===player?16:Math.min(26,Math.max(12,Math.round(((IMG[e.img]||{}).w||14)*0.9))),ph=Math.floor(time*5+x)%4;
-        lx.fillStyle=fl?AP.flood[1]:AP.water;lx.fillRect(x-w/2,y-3,w,5);lx.fillStyle=fl?AP.floodHi:AP.waterHi;lx.fillRect(x-w/2-1+ph%2,y-3,w+2,1);
-        lx.fillStyle=AP.glint;lx.globalAlpha=0.5;lx.fillRect(x-w/2-2-ph,y-1,2,1);lx.fillRect(x+w/2+ph,y-1,2,1);lx.globalAlpha=1}}
+      const dep=tx>=0&&ty>=0&&tx<SA.w&&ty<SA.h&&SA.slow[ty*SA.w+tx]?wadeDepth(e.x,e.y):0;
+      // v0.123 (owner): the wading look starts only once you're really in the water and gets deeper as you go in; a splash
+      // when you step in, and a ring of ripples spreading from your legs while you're in it.
+      if(dep>0&&!e._wd)e._spl=time;e._wd=dep;
+      if(dep>0){const x=Math.round(e.x),y=Math.round(e.y),fl=SA.rows[ty][tx]==='z',w=e===player?16:Math.min(26,Math.max(12,Math.round(((IMG[e.img]||{}).w||14)*0.9))),ph=Math.floor(time*5+x)%4,hh=2+Math.round(3*dep);
+        lx.fillStyle=fl?AP.flood[1]:AP.water;lx.fillRect(x-w/2,y+2-hh,w,hh);lx.fillStyle=fl?AP.floodHi:AP.waterHi;lx.fillRect(x-w/2-1+ph%2,y+2-hh,w+2,1);
+        lx.fillStyle=AP.glint;lx.globalAlpha=0.5;lx.fillRect(x-w/2-2-ph,y-1,2,1);lx.fillRect(x+w/2+ph,y-1,2,1);
+        const rt=(time*0.9+x*0.013)%1,rr=w/2+1+rt*7;lx.globalAlpha=0.45*(1-rt); // the spreading ripple ring, flattened (3/4 view)
+        for(let a=0;a<20;a++){const an=a/20*6.283;lx.fillRect(Math.round(x+Math.cos(an)*rr),Math.round(y+Math.sin(an)*rr*0.35),1,1)}
+        const st=time-(e._spl||-9);if(st<0.4){lx.globalAlpha=1-st/0.4; // the splash: drops thrown up and out, falling back
+          for(let k=0;k<6;k++){const dx=(k-2.5)*3.2*(1+st*3),dy=-8*st*(1+k%2)+22*st*st;lx.fillRect(Math.round(x+dx),Math.round(y-2+dy),1,1+(k%2))}}
+        lx.globalAlpha=1}}
     lx.translate(-ox,-oy);lx.globalAlpha=1});
   if(A0)drawAreaCritters(A0,1); // perched crows, owl, bats, chimney smoke (v0.49)
   beams.forEach(b=>line(b.x1,b.y1,b.x2,b.y2,b.col));

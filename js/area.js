@@ -1502,6 +1502,14 @@ function drawChapelProp(g,R,o,X,Y,W,H,shadow){
     // The monks' white banner, torn down and left crumpled at the foot of the wall: pale cloth, a gold sun stitched on it.
     shadow(X+2,Y+12,13,2);R(X+1,Y+7,14,7,AP.out);R(X+2,Y+8,12,5,'#c8c0b0');R(X+2,Y+11,12,2,'#a39c8e');R(X+5,Y+6,6,2,AP.out);R(X+6,Y+7,4,1,'#d8d0c0');
     R(X+7,Y+9,3,2,'#c9a227');R(X+6,Y+10,1,1,'#c9a227');R(X+10,Y+10,1,1,'#c9a227');R(X+8,Y+8,1,1,'#c9a227');R(X+12,Y+12,3,1,'#5a4030');return true}
+  if(k==='bedroll'&&o.opt==='open'){
+    // v0.123 (love pass X3): a traveller's bedroll laid out by the crossroads fire, sized for the 15 x 18 character lying on
+    // it (about 22 px long): a hide groundsheet, a grey wool blanket with its top corner turned back, a rolled cloak for a
+    // pillow at the head end (toward the fire's warmth).
+    shadow(X-2,Y+13,25,2);R(X-3,Y+4,26,10,AP.out);R(X-2,Y+5,24,8,'#6a5038');R(X-2,Y+5,24,1,'#8a6a4a'); // groundsheet
+    R(X+4,Y+5,17,8,AP.out);R(X+5,Y+6,15,6,'#5e5e64');R(X+5,Y+6,15,1,'#78787e');R(X+5,Y+11,15,1,'#45454a');for(let x=X+8;x<X+20;x+=4)R(x,Y+7,1,4,'#4e4e54'); // blanket and folds
+    R(X+4,Y+6,4,3,'#8e8e94');R(X+4,Y+9,4,1,AP.out); // turned-back corner
+    R(X-3,Y+3,8,7,AP.out);R(X-2,Y+4,6,5,'#4a5a3a');R(X-2,Y+4,6,1,'#5e6e4a');R(X,Y+4,1,5,'#36422a');return true} // rolled cloak pillow
   if(k==='bedroll'){
     // A cultist's bedroll: a rolled blanket with a sack for a pillow.
     shadow(X+1,Y+12,14,2);R(X+1,Y+6,14,7,AP.out);R(X+2,Y+7,12,5,'#5a4a3c');R(X+2,Y+7,12,1,'#6e5c4a');R(X+5,Y+7,1,5,'#3e3228');R(X+10,Y+7,1,5,'#3e3228');
