@@ -132,7 +132,7 @@ def frame(id, body_mods=None, over=None, bob=0, drop=()):
         if 0<=x<GW and 0<=y<GH: g[y][x]=c
     return g
 def render(id, g, S=1):
-    W,H=GW+2,GH+2; pal={**COMMON, **NPC[id]['pal'], **GLOWPAL}
+    W,H=GW+2,GH+2; pal={'W':'#e8f4ff',**COMMON, **NPC[id]['pal'], **GLOWPAL}
     G=[['.']*W]+[['.']+r+['.'] for r in g]+[['.']*W]
     solid=lambda x,y: 0<=x<W and 0<=y<H and G[y][x] not in GLOW and G[y][x]!='.'
     im=Image.new('RGBA',(W,H),(0,0,0,0))
@@ -182,25 +182,17 @@ def loop(id):
             mods[(11,7)]='.'
             return frame(id,mods,o)
         F=[(frame(id),1000),(lifted(1),140),(lifted(2),160),(lifted(3),600),(lifted(2),140),(lifted(1),140),(frame(id),900)]
-    if id=='wizard':  # the orb swirls and sends motes up, the hat star twinkles, he floats on a glow
-        hat={}   # owner: the designs are good, only the animation changes (no taller hat)
+    if id=='wizard':  # owner (Nov 28): keep only the staff animation: the orb swirls and sends sparks floating up.
+        # He stands still: no float, no beard sway, no hat star twinkle.
         n=10
         for k in range(n):
-            bob=1 if 2<=k<=7 else 0
-            o=dict(hat)
-            if bob: hat_b={(x,y-1):c for (x,y),c in hat.items()}; o=hat_b
-            ox,oy=B(10,1); oy-=bob
+            o={}; ox,oy=B(10,1)
             o[(ox,oy)]='W' if k%3==0 else 'M'
             o[(ox-1,oy)]='~' if k%3==1 else 'M'; o[(ox+1,oy)]='~' if k%3==2 else 'M'
-            for m in range(3):                      # three motes drifting up from the orb, staggered
+            for m in range(3):                      # three sparks drifting up from the orb, staggered
                 t=(k+m*3)%n; mx=ox+(-1,1,0)[m]+(1 if t%4==2 else 0); my=oy-2-t
                 if my>=0 and t<7: o[(mx,my)]='^' if m==1 else '~'
-            if k in (3,4,8): sx,sy=B(5,3); sy-=bob; o.update({(sx,sy-1):'+',(sx-1,sy):'+',(sx+1,sy):'+',(sx,sy+1):'+'})
-            if bob:                                  # the glow under his feet while he floats
-                fx,fy=B(3,16); o.update({(fx,fy):'^',(fx+5,fy):'^',(fx+2,fy):'~',(fx+3,fy):'~'})
-            mods={}
-            if k%4 in (1,2): mods[(5,11)]='V'; mods[(6,11)]='B'    # the beard sways
-            F.append((frame(id,mods,o,bob=bob),150))
+            F.append((frame(id,{},o),150))
     return F
 
 if __name__=='__main__':
