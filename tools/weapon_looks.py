@@ -1,8 +1,8 @@
-# Weapon looks, draft 2 (Items lane, Nov 27). Every weapon type drawn at each look tier, natively at game size.
+# Weapon looks, draft 4 (Items lane, Nov 27). Every weapon type drawn at each look tier, natively at game size.
 # The look follows the weapon's power (look tier), never its rarity colour: a stronger weapon never looks plainer.
 # Zone 1 uses looks 1-4 (no weapon = empty hand); later zones add 5, 6... Named weapons keep their tier's shape and
 # swap in their maker's colours (Skeleton King: bone and violet; Malrec: soot iron and ember).
-# Run: python3 tools/weapon_looks.py -> art/drafts/weapons-draft2.png (sheet) and art/drafts/weapons-draft2-held.png
+# Run: python3 tools/weapon_looks.py -> art/drafts/weapons-draft4.png (sheet) and art/drafts/weapons-draft4-held.png
 from PIL import Image, ImageDraw
 
 def outline(rows):
@@ -33,7 +33,7 @@ NAMED={'sk':{'y':'#e4dccb','Y':'#a89c84','g':'#b48cff','o':'#a89c84','O':'#6e645
 W={}
 W['staff']={
 1:(["O"]+["o"]*13+["O"],8),
-2:(["oO.",".oO",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".O.",".O."],8),
+2:(["og.",".oO",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".O.",".O."],8),
 3:([".g.","igi",".i.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".o.",".y.",".o.",".o.",".i."],8),
 4:([".y.y.","y.g.y",".yiy.","..i..","..o..","..y..","..o..","..o..","..o..","..o..","..o..","..o..","..y..","..o..","..o..","..i..","..Y.."],10)}
 W['sword']={
@@ -79,6 +79,18 @@ W['rapier']={
 2:([".l.",".l.",".l.",".l.",".l.",".l.",".l.",".l.","yYy","yo.",".Y."],9),
 3:(["..l.","..l.","..l.","..l.","..l.","..l.","..l.","..l.","..l.","yYYy","y.o.",".yy."],10),
 4:(["..l..","..l..","..l..","..l..","..l..","..l..","..l..","..l..","..l..","..l..","yYgYy","y.o.y",".yYy."],11)}
+W['crook']={
+# Druid: living wood with a curled hook at the top (no point to stab with), leaves on it.
+1:([".oo.","o..o","L..o","...o","...o","...o","...o","...o","...o","...o","...o","...o","...o","...o","...O"],9),
+2:([".oo.","o..o","oL.o","L..o","...o","...o","...o","...o","...o","...o","...o","...o","...o","...o","...O"],9),
+3:([".oo.","o..o","og.o","L..o","...y","...o","...o","...o","...o","...o","...o","...o","...y","...o","...O"],9),
+4:(["..ooo.",".o...o","o.g..o","oL...o",".L...y",".....o",".....o",".....o",".....o",".....o",".....o",".....o",".....y",".....o",".....o",".....Y"],10)}
+W['scepter']={
+# Short rod with a big glowing orb head in the class colour: half a staff's length so it never reads as one.
+1:([".I.","IgI",".I.",".o.",".o.",".o.",".o.",".I."],5),
+2:([".l.","lgl","lgl",".l.",".o.",".o.",".o.",".o.",".i."],6),
+3:(["y.y","ygy","ygy",".y.",".i.",".o.",".o.",".o.",".o.",".y."],7),
+4:(["y...y",".ygy.","ygggy",".ygy.","..y..","..i..","..o..","..y..","..o..","..o..","..y.."],8)}
 # Fist weapons sit on the hand itself: a small patch over the fist (row 0 = top of the fist).
 W['fists']={
 # Worn on both fists, drawn a little bigger than the hand so they read (owner, Nov 27).
@@ -86,9 +98,9 @@ W['fists']={
 2:(["lil","wWw","wWw"],0),
 3:(["yly","iii","wWw"],0),
 4:(["l.l","yly","igi","iiI"],1)}
-ORDER=['staff','sword','axe','dagger','mace','greatsword','bow','spear','rapier','fists']
-WHO={'staff':'Druid, Necro, Enchanter, Wizard, Magician','sword':'Warrior, Paladin, SK','axe':'Warrior','dagger':'Rogue',
-     'mace':'Cleric','greatsword':'Paladin, SK','bow':'Ranger','spear':'Shaman','rapier':'Bard','fists':'Monk'}
+ROWS=[('Wizard','staff','#7dbbff'),('Necromancer','staff','#b48cff'),('Magician','scepter','#ff9a4a'),('Enchanter','scepter','#e0c3ff'),
+      ('Druid','crook','#7dffa6'),('Shaman','spear','#7de0d0'),('Warrior','sword','#ffd27a'),('Shadow Knight','sword','#ff3b30','#24222a'),
+      ('Cleric','mace','#fff0b0','#d8c890'),('Paladin','mace','#6aa8ff','#3a68c0'),('Bard','rapier','#ff7dc8'),('Rogue','dagger','#9aff7d'),('Ranger','bow','#7dffa6')]
 
 def img(rows,pal):
     rows=outline(rows);h=len(rows);w=len(rows[0])
@@ -98,8 +110,11 @@ def img(rows,pal):
             if c!='.': im.putpixel((x,y),tuple(int(pal[c][i:i+2],16) for i in (1,3,5))+(255,))
     return im
 
-def pal(look,named=None):
+def pal(look,named=None,acc=None,grip=None):
     p=dict(BASE);p.update(LOOK[look])
+    if grip=='#24222a': p['y']='#4a4650';p['Y']='#2e2c36'  # Shadow Knight: black hilt, dark iron guard and pommel
+    if grip: p['o']=grip;p['O']=grip  # handle in the class colour (owner, Nov 27: Cleric, Paladin, Shadow Knight)
+    if acc and look>=2: p['g']=acc  # class colour from look 2 up (look 1 is plain)
     if named: p.update(NAMED[named])
     return p
 
@@ -109,8 +124,8 @@ MONK=["......kk.......","....kkhhkk.....","...ksssssSk....","..kTTTTTTTTk...",".
 "..kkHnnnnNTk...","...kwwkwwkTk...","...kwwkwwkk....","...kwwkwwk.....","...kOOkOOk.....","....kk.kk......"]
 MPAL={'k':'#0b0a0f','h':'#1a1820','s':'#d9a77c','S':'#f0c99a','e':'#1a1820','T':'#4a4a52','H':'#8a7a60','n':'#6e6048',
       'N':'#56493a','W':'#cfc8b2','w':'#8a7f70','O':'#4a3b33'}
-def held(weapon,look,named=None):
-    body=img_raw(MONK,MPAL);rows,grip=W[weapon][look];wi=img(rows,pal(look,named))
+def held(weapon,look,named=None,acc=None,handle=None):
+    body=img_raw(MONK,MPAL);rows,grip=W[weapon][look];wi=img(rows,pal(look,named,acc,handle))
     can=Image.new('RGBA',(22,24),(0,0,0,0));ox,oy=2,5;can.alpha_composite(body,(ox,oy))
     if weapon=='fists':
         h=wi.height  # bottom of the patch sits on the bottom of each hand (row 10)
@@ -134,22 +149,21 @@ if __name__=='__main__':
     Z=4;CW=22*Z+16;BG=(28,26,34,255)
     cols=[(1,None,'1 white'),(2,None,'2 green'),(3,None,'3 blue'),(3,'sk','3 Skel. King'),(4,None,'4 top Z1'),(4,'mal','4 Malrec')]
     H=24*Z+14
-    sheet=Image.new('RGBA',(118+CW*len(cols),30+H*len(ORDER)),BG);d=ImageDraw.Draw(sheet)
+    sheet=Image.new('RGBA',(118+CW*len(cols),30+H*len(ROWS)),BG);d=ImageDraw.Draw(sheet)
     for j,(lk,nm,lab) in enumerate(cols): d.text((118+j*CW+4,10),lab,fill=(220,214,200,255))
-    for i,wp in enumerate(ORDER):
+    for i,row in enumerate(ROWS):
+        cl,wp,acc=row[:3];hd=row[3] if len(row)>3 else None
         y0=30+i*H
-        d.text((6,y0+30),wp,fill=(255,220,150,255))
-        words=WHO[wp].split(', ')
-        for k,wd in enumerate(words): d.text((6,y0+46+k*13),wd,fill=(150,144,160,255))
+        d.text((6,y0+30),cl,fill=(255,220,150,255));d.text((6,y0+46),wp,fill=(150,144,160,255))
         for j,(lk,nm,lab) in enumerate(cols):
-            h=held(wp,lk,nm)
+            h=held(wp,lk,nm,acc,hd if not nm else None)
             sheet.alpha_composite(h.resize((22*Z,24*Z),Image.NEAREST),(118+j*CW,y0))
-            sheet.alpha_composite(h,(118+j*CW+22*Z-8,y0+24*Z-26))  # true size in the corner
-    sheet.save('art/drafts/weapons-draft2.png')
+            sheet.alpha_composite(h,(118+j*CW+22*Z-8,y0+24*Z-26))
+    sheet.save('art/drafts/weapons-draft4.png')
     # Zone ladder: why looks follow power, not colour.
     lad=[('Z1 green',2,None),('Z1 blue',3,None),('Skel. King pink',3,'sk'),('Malrec pink',4,'mal'),('Z2 (preview): same size, new metal',5,None)]
     L=Image.new('RGBA',(len(lad)*130+90,24*5+40),BG);d=ImageDraw.Draw(L)
     for j,(lab,lk,nm) in enumerate(lad):
         h=held('sword',lk,nm);L.alpha_composite(h.resize((22*5,24*5),Image.NEAREST),(10+j*130,8));d.text((14+j*130,24*5+14),lab,fill=(220,214,200,255))
-    L.save('art/drafts/weapons-draft2-ladder.png')
+    L.save('art/drafts/weapons-draft4-ladder.png')
     print('ok')
