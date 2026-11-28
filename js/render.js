@@ -78,9 +78,9 @@ function mkSkin(id){
 // walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
 // ---------- Gear looks by zone (character lane, owner Nov 27; js/data/looks.js from tools/gear_looks.py) ----------
 // What you wear shows: a worn chest or head item swaps that part's colours for its zone's look. The swapped letters become
-// stand-in letters (1-5 head, 6-9 @ # chest) so head colours apply only above the shoulders and chest colours only below.
+// stand-in letters (1-5 head, 6-9 @ # $ % chest) so head colours apply only above the shoulders and chest colours only below.
 // lk = {chest: zone look, head: zone look}; 0 or missing = rags.
-const LOOK_HEAD='12345',LOOK_CHEST='6789@#';
+const LOOK_HEAD='12345',LOOK_CHEST='6789@#$%';
 function dress(rows,cls,lk){const L=GEAR_LOOKS[cls];if(!L||!lk)return rows;
   const hl=Object.keys((L.head||{})[lk.head]||{}),cl=Object.keys((L.chest||{})[lk.chest]||{});if(!hl.length&&!cl.length)return rows;
   let hy=rows.findIndex(r=>r.indexOf('H')>=0||r.indexOf('n')>=0);if(hy<0)hy=0;   // first row with clothes = the shoulders

@@ -4,41 +4,42 @@
 # (the owner's "start really small"): a chest item dyes the clothes, a head item dyes the hat, hood or helm. No shape changes.
 # Head colours apply only above the shoulders (rows before the first clothes row), chest colours only from there down, so a
 # letter both parts share (the Cleric's white, the Magician's red, the Monk's dark cloth) changes in the right place only.
-# Run: python3 tools/gear_looks.py -> js/data/looks.js and art/drafts/gear-z1-draft1.png (+ -game.png)
+# Run: python3 tools/gear_looks.py -> js/data/looks.js and art/drafts/gear-z1-draft2.png (+ -game.png)
 import os,sys,json;sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 
 # LOOKS[class][slot][zone look] = {letter: colour}. Rags (no item) = look 0 = the class's own colours.
-LOOKS={
- 'druid':   {'chest':{1:{'H':'#6f8a4e','n':'#587040','N':'#435632','d':'#334226'}},
-             'head': {1:{'L':'#86b84a','G':'#5e8a36','h':'#8a5e36'}}},
- 'warrior': {'chest':{1:{'H':'#94704a','n':'#7a5636','N':'#5a3e26','d':'#40291a'}},
-             'head': {1:{'R':'#7c6a52','h':'#5a3e26'}}},
- 'paladin': {'chest':{1:{'H':'#f0ece0','n':'#dcd6c4','N':'#a8a49a','d':'#86827a'}},
-             'head': {1:{'J':'#b8bcc8','j':'#7e8292'}}},
- 'shadowknight':{'chest':{1:{'H':'#5e4e58','n':'#4a3c46','N':'#362a34','d':'#281e28'}},
-             'head': {1:{'J':'#5c6076','j':'#363a4a'}}},
- 'rogue':   {'chest':{1:{'H':'#5c6052','n':'#474b40','N':'#363a32','d':'#2a2c26'}},
-             'head': {1:{'A':'#3c4238','a':'#2a2e27','Q':'#1a1c18'}}},
- 'necro':   {'chest':{1:{'H':'#5c4c60','n':'#473a4c','N':'#352a3a','d':'#26202a'}},
-             'head': {1:{'A':'#4c4054','a':'#352b3c','Q':'#221a27'}}},
- 'ranger':  {'chest':{1:{'H':'#6c7650','n':'#555e3e','N':'#41482e','d':'#323822'}},
-             'head': {1:{'A':'#527040','a':'#3c562c','Q':'#2a3c1c'}}},
- 'cleric':  {'chest':{1:{'H':'#a89c88','n':'#91856f','N':'#786e5e','d':'#665d50','W':'#eee8d8','Y':'#c49a3e'}},
-             'head': {1:{'W':'#eee8d8'}}},
- 'enchanter':{'chest':{1:{'H':'#806896','n':'#695282','N':'#53406a','d':'#433058'}},
-             'head': {1:{'A':'#6a50a2','a':'#523a8c','Q':'#38265e'}}},
- 'wizard':  {'chest':{1:{'H':'#56669a','n':'#3c4a7a','N':'#2c3860','d':'#222a48'}},
-             'head': {1:{'A':'#5a6c9e','a':'#445482','Q':'#2e3a64'}}},
- 'magician':{'chest':{1:{'H':'#9c6650','n':'#844f3c','N':'#6a3b2c','d':'#572d20','R':'#c4542e'}},
-             'head': {1:{'R':'#c6582e','r':'#8e321c'}}},
- 'shaman':  {'chest':{1:{'H':'#5e7a72','n':'#486258','N':'#384e46','d':'#2a3c36'}},
-             'head': {1:{'A':'#9c7c58','a':'#7a5c42','Q':'#544030'}}},
- 'monk':    {'chest':{1:{'H':'#b48c50','n':'#9a7440','N':'#7c5c30'}},
-             'head': {1:{'T':'#8a2a2a'}}},
- 'bard':    {'chest':{1:{'H':'#a2606e','n':'#8a4a5a','N':'#723846'}},
-             'head': {1:{'A':'#8e3258','a':'#64203e'}}},
+LOOKS={   # draft 2 (owner, Nov 27: v0.142 was "pretty much nothing"): each class's own colour, brighter and easier to read,
+          # plus a gold or class-colour trim on the belt or sash. Wizard (B) and Warrior (C, bright red) picked by the owner.
+ 'druid':   {'chest':{1:{'H':'#9ad060','n':'#76b044','N':'#568a30','d':'#3e6622','y':'#f4c868'}},
+             'head': {1:{'L':'#c0f060','G':'#88c844','h':'#b07a40'}}},
+ 'warrior': {'chest':{1:{'H':'#d05a58','n':'#b03a3c','N':'#86262c','d':'#5e1820','y':'#f4c868'}},
+             'head': {1:{'R':'#e04848','h':'#6e4a2a'}}},
+ 'paladin': {'chest':{1:{'H':'#ffffff','n':'#f4f0e4','N':'#c4c0b4','d':'#9c988e','y':'#ffd24a'}},
+             'head': {1:{'J':'#e4e8f4','j':'#a0a8c0'}}},
+ 'shadowknight':{'chest':{1:{'H':'#8a4a6a','n':'#6e3456','N':'#52243e','d':'#3a182c','y':'#d03a4a'}},
+             'head': {1:{'J':'#7a82a8','j':'#4a5070'}}},
+ 'rogue':   {'chest':{1:{'H':'#7c9a5c','n':'#5e7a44','N':'#465c32','d':'#344424','y':'#c8aa60'}},
+             'head': {1:{'A':'#566e48','a':'#3e5234','Q':'#283622'}}},
+ 'necro':   {'chest':{1:{'H':'#8a62a0','n':'#6c4886','N':'#52346a','d':'#3a2450','y':'#b08ae0'}},
+             'head': {1:{'A':'#6e5288','a':'#503a68','Q':'#34264a'}}},
+ 'ranger':  {'chest':{1:{'H':'#8aa45c','n':'#6c8644','N':'#526832','d':'#3c4c24','y':'#d4b060'}},
+             'head': {1:{'A':'#6c9a48','a':'#527a34','Q':'#3a5624'}}},
+ 'cleric':  {'chest':{1:{'H':'#e0d4b8','n':'#cabd9e','N':'#aa9e80','d':'#8c826a','W':'#ffffff','Y':'#ffcc4a','y':'#ffcc4a'}},
+             'head': {1:{'W':'#ffffff'}}},
+ 'enchanter':{'chest':{1:{'H':'#a880d0','n':'#8c64b8','N':'#6e4c98','d':'#563a7c','y':'#e0c060'}},
+             'head': {1:{'A':'#9468e0','a':'#764cc4','Q':'#54348e'}}},
+ 'wizard':  {'chest':{1:{'H':'#6a8ae0','n':'#4866c4','N':'#344e9e','d':'#263a7a','y':'#f0c860'}},
+             'head': {1:{'A':'#6e8ae6','a':'#506ac8','Q':'#38509e'}}},
+ 'magician':{'chest':{1:{'H':'#d8805a','n':'#bc6040','N':'#964830','d':'#743422','R':'#ff7038'}},
+             'head': {1:{'R':'#ff7a38','r':'#c44420'}}},
+ 'shaman':  {'chest':{1:{'H':'#78b8a4','n':'#5a9a86','N':'#447c6a','d':'#325e50','y':'#e0b850'}},
+             'head': {1:{'A':'#c89a64','a':'#a0784c','Q':'#765636'}}},
+ 'monk':    {'chest':{1:{'H':'#f0b858','n':'#d89a40','N':'#b07a2e','T':'#b02a2a'}},
+             'head': {1:{'T':'#d03434'}}},
+ 'bard':    {'chest':{1:{'H':'#e07890','n':'#c45a74','N':'#a0445c','y':'#ffcc50'}},
+             'head': {1:{'A':'#c84080','a':'#962c5c'}}},
 }
-HEAD_KEYS='12345';CHEST_KEYS='6789@#'   # stand-in letters the game swaps in, so head and chest colours never mix
+HEAD_KEYS='12345';CHEST_KEYS='6789@#$%'   # stand-in letters the game swaps in, so head and chest colours never mix
 
 def head_rows(rows):
     """Rows above the shoulders: everything before the first row with clothes (H or n)."""
@@ -98,11 +99,11 @@ if __name__=='__main__':
             for j,(ch,hd) in enumerate(((0,0),(1,0),(0,1),(1,1))):
                 im=body(cls,ch,hd);im=im.resize((im.width*S,im.height*S),Image.NEAREST)
                 sh.alpha_composite(im,(x0+LW+j*cw,y+rh-im.height))
-    sh.save('art/drafts/gear-z1-draft1.png')
+    sh.save('art/drafts/gear-z1-draft2.png')
     g=Image.new('RGBA',(14*17*3+20,2*20*3+10),BG)
     for i,cls in enumerate(ids):
         for r,(ch,hd) in enumerate(((0,0),(1,1))):
             im=body(cls,ch,hd);im=im.resize((im.width*3,im.height*3),Image.NEAREST)
             g.alpha_composite(im,(10+i*17*3,5+r*60+60-im.height))
-    g.save('art/drafts/gear-z1-draft1-game.png')
+    g.save('art/drafts/gear-z1-draft2-game.png')
     print('wrote js/data/looks.js and the review sheet')
