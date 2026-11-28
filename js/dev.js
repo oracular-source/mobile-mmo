@@ -10,7 +10,12 @@ function devAct(a){
   else if(a==='old'){dev.old=!dev.old;log('Dev: old look '+(dev.old?'on':'off')+'.','#ff8a80')}
   else if(a==='god'){dev.god=!dev.god;log('Dev: god mode '+(dev.god?'on':'off')+'.','#ff8a80')}
   else if(a==='kill'){const t=player.target;if(t&&!t.dead)hitMob(t,t.hp+999,'direct','dev strike');else log('Dev: no target.','#ff8a80')}
+  // Loot by rarity (owner, Nov 27): pick the colour you want to test. Every pink for your class, including named and Malrec ones.
+  else if(a==='white'){giveItem(pick(COMMONS));saveInv()}
   else if(a==='gear'){giveItem(pick(UNCOMMONS));saveInv()}
+  else if(a==='pink'){giveItem(pick(Object.keys(ITEMS).filter(id=>ITEMS[id].rar==='named'&&ITEMS[id].slot&&forMe(id))));saveInv()}
+  // Your weapon type's whole Zone 1 ladder (white to Malrec), for testing weapon looks as they get built.
+  else if(a==='wpns'){Object.keys(ITEMS).filter(id=>ITEMS[id].slot==='weapon'&&forMe(id)).sort((x,y)=>(ITEMS[x].look||0)-(ITEMS[y].look||0)).forEach((id,i)=>giveItem(id,1,i));saveInv()}
   else if(a==='rare'){giveItem(pick(RARES));saveInv()}
   else if(a==='boss'){giveItem(pick(BOSS1));saveInv()}
   else if(a==='copper'){inv.copper+=500;saveInv();log('Dev: +500 copper.','#ff8a80')}
@@ -53,7 +58,7 @@ function renderDev(){
   const g=(...btns)=>'<div class="dgrid">'+btns.join('')+'</div>';
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
-    sec('loot','Loot',g(b('gear','Uncommon'),b('rare','Rare'),b('boss','Skeleton King item'),b('copper','+500 copper'),b('orbs','+5 orbs')))+
+    sec('loot','Loot',g(b('white','White'),b('gear','Green'),b('rare','Blue'),b('pink','Pink'),b('boss','Skeleton King item'),b('wpns','All my weapons'),b('copper','+500 copper'),b('orbs','+5 orbs')))+
     sec('tp','Teleport',g(b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
     // Old Zone (owner, Nov 27): the first build (Gate Road, guards, the first crypt), kept only to compare then and now.
     // Frozen: not part of the game, nobody works on it.
