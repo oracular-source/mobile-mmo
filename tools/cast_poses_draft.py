@@ -286,31 +286,27 @@ def bellringer(S):
     def strain(st, i):
         dy = 2 + st; dx = -1 if i % 2 else 0  # lifts higher each beat and shakes side to side: the strain is the tell
         return heave(dy, dx)
-    # The clapper stays one straight, rigid bar from his fist to the floor (owner, Nov 27: it must never bend):
-    # a 2-pixel iron handle and, on the same line, the fat iron head resting on the ground.
-    import math
+    # The clapper stays one straight, rigid, UPRIGHT bar (owner, Nov 27, twice: a tilted bar read as a bent spoon). He drives
+    # it straight down in front of him: the same clapper drawn head-down (flipped top to bottom, never turned), the iron
+    # head on the floor, his fist on the top of the handle.
     bare = {p: c for p, c in body.items() if not (p[0] >= 15 and p[1] <= 12 and c in 'knmN')}  # no stub of the handle left over his head
-    A, B = (20, 13), (31, h - 3)
-    L = math.hypot(B[0] - A[0], B[1] - A[1]); ux, uy = (B[0] - A[0]) / L, (B[1] - A[1]) / L; px_, py_ = -uy, ux
-    bar = {}
-    steps = int(L * 2)
-    for j in range(steps + 1):
-        t = j / 2; cx_, cy_ = A[0] + ux * t, A[1] + uy * t
-        head = t > L - 6.5
-        half = 2.3 if head else 0.6
-        k = -half
-        while k <= half:
-            q = (round(cx_ + px_ * k), round(cy_ + py_ * k))
-            bar[q] = ('N' if k < -0.5 else 'n' if k < 1.2 else 'm') if head else ('N' if k < 0 else 'n')
-            k += 0.5
-    hit = reoutline(over(bare, outlined(bar)))
-    hit = over(hit, {(19, 13): 's', (20, 13): 'S', (19, 14): 's', (20, 14): 's'})
-    dust = {(27, h - 1): 'u', (36, h - 2): 'U', (26, h - 2): 'U', (37, h - 1): 'u', (35, h - 3): 'u', (28, h - 3): 'U'}
+    iron = {p: c for p, c in maul.items() if c not in 'sS' and p[1] <= 24}
+    for y in range(12, 17):  # the handle under his old fist: fill it in from a plain row of the handle
+        for x in range(18, 25):
+            iron.pop((x, y), None)
+            if (x, 18) in maul: iron[(x, y)] = maul[(x, 18)]
+    top = min(y for _, y in iron); bot = max(y for _, y in iron)
+    dx = 6; dy = (h - 2) - bot - top  # flipped so the head is at the bottom, resting on the floor row
+    flipped = {(x + dx, top + bot - y + dy): c for (x, y), c in iron.items()}
+    hx = 20 + dx; fy = min(y for _, y in flipped)
+    hit = reoutline(put(over(bare, flipped), arm((16, 12), (hx, fy + 1), 'h', 's')))
+    hit = over(hit, {(hx - 1, fy + 1): 's', (hx, fy + 1): 'S', (hx + 1, fy + 1): 's', (hx - 1, fy + 2): 's', (hx, fy + 2): 's', (hx + 1, fy + 2): 'S'})
+    dust = {(22, h - 1): 'u', (31, h - 2): 'U', (21, h - 2): 'U', (32, h - 1): 'u', (30, h - 3): 'u', (23, h - 3): 'U'}
     rings = {}
     import math
     for r, col in ((7, '3'), (10, '2')):
         for j in range(-6, 7):
-            a = math.radians(j * 12); rings[(round(31 + math.cos(a) * r), round(h - 4 + math.sin(a) * r * 0.5))] = col
+            a = math.radians(j * 12); rings[(round(27 + math.cos(a) * r), round(h - 4 + math.sin(a) * r * 0.5))] = col
     return [frame(ready, pal, 400, 'Ready (as today)')] + \
         hold(strain, pal, 1.5, ['Toll starts: heaves the clapper up', 'Higher, straining (it shakes)', 'Higher still', 'Up over his shoulder (step back now!)']) + \
         [frame(over(over(hit, dust), rings), pal, 120, 'Release: slams it into the floor: dust, the toll rings out (stuns anyone close)'),

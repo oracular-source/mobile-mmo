@@ -2,12 +2,12 @@
 
 **Read this first.** Updated on every push and copied into the claude.ai Project on every push (the bigger docs at least every 3 pushes), so a chat that can't reach GitHub still knows the current state. The full detail lives in `docs/board.md`.
 
-**Live version: v0.148** (Nov 27, 2026). Game: https://oracular-source.github.io/mobile-mmo/
+**Live version: v0.149** (Nov 27, 2026). Game: https://oracular-source.github.io/mobile-mmo/
 
 ## Lanes: last shipped → next pickup
 | Lane (start phrase) | Last shipped | Next pickup |
 | --- | --- | --- |
-| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.147 enemies cast with their bodies: cast poses for all 11 caster moves (Bellringer's clapper stays straight); v0.141 cultist deaths; v0.134 beetles, boar, ash wisp and cultists attack and die | Owner looks at v0.147 and v0.134 on the phone; then the other wisps and cultists reuse the moves, then Old Gnawbone's boss move |
+| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.149 the Bellringer's clapper stays upright on the slam; v0.147 enemies cast with their bodies: cast poses for all 11 caster moves; v0.141 cultist deaths; v0.134 beetles, boar, ash wisp and cultists attack and die | Owner looks at v0.149 and v0.134 on the phone; then the other wisps and cultists reuse the moves, then Old Gnawbone's boss move |
 | **Multiplayer** ("… Continue on multiplayer"): two players, phone to phone | v0.138 joining shows its steps and a reason when stuck (first try stuck on same Wi-Fi); v0.136 step 1: see each other (Menu → Group, Host / Join, chat); group scaling numbers | Works on mobile data (same Wi-Fi fails: relay card, later). **Next: step 2, shared mobs + heal your partner** (owner said go; not while Balance is building) |
 | **Items** ("… Continue on items"): drops, boss loot, enchanting, gold | v0.146 chests refill hourly (was 10 min); v0.144 climb with gear sim (review page "Zone 1 climb with gear"); v0.131 one pink per boss | **Parked (owner: enough items for now).** Reopens with notes from the owner's full Zone 1 playthrough |
 | **Map** ("… Continue on map"): maps, tiles, area art | v0.148 **Town 1 draft 2**: round and cozier, the wizard's stable and a paddock of horses (DEV → Teleport → Town 1 (draft) only); v0.143 Town 1 buildings drawn, Dungeon 1 censers and pool fixed; v0.140 Dungeon 1 stairs out and love pass | **Owner reviews Town 1 draft 2 on the phone**, then the **Town 1 build**: townsfolk at their stations, services move from campfires to them, open the crossroads gate, start in town |
