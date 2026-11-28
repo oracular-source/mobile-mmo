@@ -9,8 +9,12 @@ const ABI={};AB.forEach(a=>ABI[a.id]=a);
 const at=(arr,a)=>arr[0]+arr[1]*Math.max(0,player.lvl-(a?a.lvl:0)); // value that grows each level
 const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl)):0;
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
-const forMe=id=>{const c=ITEMS[id].cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)}; // personal loot: only gear your class can use drops for you
-const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring');
+// Personal loot: only gear your class can use drops for you. Weapons go by weapon type (WPN_OF: a Paladin finds maces), armour by gear group.
+const forMe=id=>{const it=ITEMS[id];if(it.slot==='weapon')return it.wt===WPN_OF[CLS];const c=it.cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)};
+// Random pools leave out the items that belong to one mob (a named's ring, a rare mob's own item): those only come from that mob.
+const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring'&&!ITEMS[id].src&&id!=='fangruff');
+// No duplicates of a mob's own items (owner, Nov 27): a pink or a rare mob's own blue you already have (worn or in your bags) won't drop again.
+const owned=id=>Object.keys(inv.equip).some(sl=>inv.equip[sl]===id)||inv.bags.some(b=>b&&b.id===id);
 const COMMONS=pool('common'),UNCOMMONS=pool('uncommon'),RARES=pool('rare'),BOSS1=pool('named').filter(id=>id.indexOf('b1')===0),MALREC=pool('named').filter(id=>id.indexOf('mal')===0);
 const JUNK={rat:'whisker',beetle:'shell',dead:'bone',gnaw:'whisker',crat:'whisker',trat:'whisker',brat:'whisker',cskel:'bone',boss1:'bone',ironshell:'shell',palerat:'whisker',bride:'bone',wolf:'pelt',greyfang:'pelt',oldscar:'pelt',boar:'tusk',zealot:'cultrag',ashcaller:'cultrag',chanter:'cultrag',acolyte:'cultrag',wisp:'ember',mender:'dcultjunk',deacon:'dcultjunk',malrec:'dcultjunk',prior:'bone',bellringer:'cultrag',gwisp:'ember',summoner:'cultrag'};
 const BAG_SIZE=16, STAT_KEYS=[['ac','AC'],['sta','STA'],['str','STR'],['wis','WIS'],['int','INT']];

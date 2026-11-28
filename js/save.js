@@ -18,7 +18,7 @@ const store={
    The whole save carries one number. When a future release changes how something is saved,
    bump SAVE_VERSION and add a step below that turns the old shape into the new one, so
    players keep their characters instead of losing them. Steps run in order, oldest first. */
-const SAVE_VERSION=3;
+const SAVE_VERSION=4;
 const SAVE_STEPS={
   // 0 → 1 (v0.14.1): saves from before version numbers. Shapes are unchanged; just clear out
   // any value that can't be read (half-written or corrupted) so it can't cause trouble later.
@@ -27,7 +27,12 @@ const SAVE_STEPS={
   // counts). Both default to nothing, so old saves need no change: every item starts in perfect condition.
   2(){},
   // 2 → 3 (v0.100): worn gear gains optional enchant steps (inv.ench, b.e). Defaults to none, so old saves need no change.
-  3(){}
+  3(){},
+  // 3 → 4 (v0.119, Items lane): the greatsword and axe are gone (owner, Nov 27: one weapon type per class). Items that were cut become
+  // the sword of the same step, worn or in bags, keeping their wear and enchant: the greatswords fold into the sword ladder.
+  4(){const swap={greatsword:'axe',b1great:'b1blade',malblade:'malaxe'};
+    store.keys().forEach(k=>{if(k.indexOf('ashfen-inv')!==0)return;const v=store.get(k,null);if(!v||!v.bags)return;
+      v.bags.forEach(b=>{if(b&&swap[b.id])b.id=swap[b.id]});Object.keys(v.equip||{}).forEach(sl=>{if(swap[v.equip[sl]])v.equip[sl]=swap[v.equip[sl]]});store.set(k,v)})}
 };
 (function upgradeSave(){
   const keys=store.keys();

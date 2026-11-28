@@ -165,7 +165,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 95.7,
+"kill": 94.8,
 "dmg": 0
 },
 {
@@ -213,7 +213,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 70.4,
+"kill": 71.3,
 "dmg": 10
 },
 {
@@ -261,7 +261,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 57.0,
+"kill": 56.8,
 "dmg": 0
 },
 {
@@ -357,7 +357,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.8,
+"kill": 37.5,
 "dmg": 0
 },
 {
@@ -405,7 +405,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 36.0,
+"kill": 36.2,
 "dmg": 0
 }
 ],
@@ -621,10 +621,10 @@
 {
 "lvl": 6,
 "fight": "Old Gnawbone (lvl 6)",
-"wins": 9,
-"deaths": 1,
-"kill": 72.1,
-"dmg": 174
+"wins": 10,
+"deaths": 0,
+"kill": 71.8,
+"dmg": 175
 },
 {
 "lvl": 7,
@@ -671,7 +671,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 61.9,
+"kill": 62.2,
 "dmg": 151
 },
 {
@@ -719,8 +719,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.7,
-"dmg": 109
+"kill": 42.7,
+"dmg": 108
 },
 {
 "lvl": 9,
@@ -767,8 +767,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 39.1,
-"dmg": 83
+"kill": 39.5,
+"dmg": 84
 },
 {
 "lvl": 10,
@@ -815,7 +815,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 38.0,
+"kill": 37.4,
 "dmg": 73
 }
 ],
@@ -1130,7 +1130,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 33.3,
-"dmg": 84
+"dmg": 83
 },
 {
 "lvl": 9,
@@ -1178,7 +1178,7 @@
 "wins": 10,
 "deaths": 0,
 "kill": 25.3,
-"dmg": 40
+"dmg": 41
 },
 {
 "lvl": 10,
@@ -1225,8 +1225,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 24.4,
-"dmg": 37
+"kill": 24.6,
+"dmg": 39
 }
 ],
 "necro": [
@@ -2215,7 +2215,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 91.6,
+"kill": 93.0,
 "dmg": 0
 },
 {
@@ -2311,7 +2311,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 93.6,
+"kill": 90.1,
 "dmg": 0
 },
 {
@@ -2359,7 +2359,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 93.5,
+"kill": 93.2,
 "dmg": 0
 },
 {
@@ -2407,7 +2407,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 95.4,
+"kill": 99.1,
 "dmg": 0
 },
 {
@@ -2455,7 +2455,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 85.8,
+"kill": 83.3,
 "dmg": 0
 }
 ],
@@ -2674,7 +2674,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 301
+"dmg": 295
 },
 {
 "lvl": 7,
@@ -2721,8 +2721,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 8,
 "deaths": 2,
-"kill": 68.0,
-"dmg": 413
+"kill": 68.4,
+"dmg": 415
 },
 {
 "lvl": 8,
@@ -2769,8 +2769,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 42.5,
-"dmg": 243
+"kill": 43.8,
+"dmg": 249
 },
 {
 "lvl": 9,
@@ -2817,8 +2817,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.8,
-"dmg": 194
+"kill": 42.2,
+"dmg": 189
 },
 {
 "lvl": 10,
@@ -2865,8 +2865,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.9,
-"dmg": 174
+"kill": 37.5,
+"dmg": 171
 }
 ],
 "shadowknight": [
@@ -3084,7 +3084,7 @@
 "wins": 0,
 "deaths": 10,
 "kill": 0,
-"dmg": 233
+"dmg": 236
 },
 {
 "lvl": 7,
@@ -3131,7 +3131,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 54.7,
+"kill": 54.2,
 "dmg": 208
 },
 {
@@ -3179,8 +3179,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 42.9,
-"dmg": 131
+"kill": 43.3,
+"dmg": 137
 },
 {
 "lvl": 9,
@@ -3227,15 +3227,15 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 34.3,
-"dmg": 91
+"kill": 33.8,
+"dmg": 89
 },
 {
 "lvl": 10,
 "fight": "Rat",
 "wins": 10,
 "deaths": 0,
-"kill": 19.4,
+"kill": 19.3,
 "dmg": 0
 },
 {
@@ -3275,8 +3275,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 31.4,
-"dmg": 74
+"kill": 33.5,
+"dmg": 84
 }
 ],
 "wizard": [
@@ -4265,7 +4265,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 100.5,
+"kill": 100.1,
 "dmg": 0
 },
 {
@@ -4313,7 +4313,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 91.5,
+"kill": 91.3,
 "dmg": 0
 },
 {
@@ -4361,7 +4361,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 84.4,
+"kill": 84.1,
 "dmg": 0
 },
 {
@@ -4409,7 +4409,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 80.5,
+"kill": 80.8,
 "dmg": 0
 },
 {
@@ -4505,7 +4505,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 66.3,
+"kill": 67.2,
 "dmg": 0
 }
 ],
@@ -4771,8 +4771,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 52.3,
-"dmg": 185
+"kill": 52.7,
+"dmg": 186
 },
 {
 "lvl": 8,
@@ -4819,7 +4819,7 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 43.3,
+"kill": 43.2,
 "dmg": 121
 },
 {
@@ -4867,8 +4867,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 40.1,
-"dmg": 103
+"kill": 40.3,
+"dmg": 98
 },
 {
 "lvl": 10,
@@ -4915,8 +4915,8 @@
 "fight": "Old Gnawbone (lvl 6)",
 "wins": 10,
 "deaths": 0,
-"kill": 37.9,
-"dmg": 79
+"kill": 37.3,
+"dmg": 78
 }
 ],
 "shaman": [

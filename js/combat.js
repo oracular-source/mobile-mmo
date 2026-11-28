@@ -323,11 +323,14 @@ function namedOffer(type,pinks,n){
   const first=!lootMem.first[type],p=LOOT.namedPink+LOOT.pinkStep*(lootMem.dry[type]||0),out=[];let pink=false;
   for(let i=0;i<n;i++){let id=null;
     for(let tries=0;tries<6&&(!id||out.indexOf(id)>=0);tries++){
-      if(pinks.length&&rng()<p){id=pick(pinks)}
+      const left=pinks.filter(x=>!owned(x)&&out.indexOf(x)<0); // pinks you already have never drop again: you get a normal roll instead
+      if(left.length&&rng()<p){id=pick(left)}
       else id=(first&&i===0)||rng()<LOOT.namedBlue?blueOrGreen():pick(UNCOMMONS.length?UNCOMMONS:COMMONS)}
     if(ITEMS[id].rar==='named')pink=true;out.push(id)}
   lootMem.first[type]=1;lootMem.dry[type]=pink?0:(lootMem.dry[type]||0)+1;saveLoot();return out}
-const NAMED_PINKS={gnaw:()=>['gnawring'],greyfang:()=>['fangring'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
+const NAMED_PINKS={gnaw:()=>['gnawring'],greyfang:()=>['fangring','fangruff'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
+// A rare mob's own item (src in items.js): it's the blue a rare drops, unless you already have it (then any blue for your class).
+const OWN_ITEM={};Object.keys(ITEMS).forEach(id=>{if(ITEMS[id].src)OWN_ITEM[ITEMS[id].src]=id});
 function rollLoot(m){
   const got=[];
   if(rng()<0.6)got.push(JUNK[m.type]);
@@ -338,7 +341,7 @@ function rollLoot(m){
     if(m.lv>=LOOT.mobRareLv&&rng()<LOOT.mobRare*cave&&RARES.length)got.push(pick(RARES))}
   // Summon keys: only from that area's mobs, in that area (the zone check comes first, so the arena sim rolls nothing extra).
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
-  if(m.def.rare)got.push(rng()<LOOT.rareMobBlue?blueOrGreen():pick(UNCOMMONS)); // a rare always pays one item: green, sometimes blue
+  if(m.def.rare){const own=OWN_ITEM[m.type];got.push(rng()<LOOT.rareMobBlue?(own&&!owned(own)?own:blueOrGreen()):pick(UNCOMMONS))} // a rare always pays one item: green, sometimes its own blue
   if(NAMED_PINKS[m.type])got.push(namedOffer(m.type,NAMED_PINKS[m.type](),1)[0]);
   // The Skeleton King's item waits in his chest; Brother Malrec's chest offers three and you pick one (owner, Nov 27).
   const toChest=items=>{if(run.chest){run.chest.items=items;return}got.push.apply(got,items)};
