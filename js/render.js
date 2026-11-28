@@ -88,8 +88,10 @@ function dress(rows,cls,lk){const L=GEAR_LOOKS[cls];if(!L||!lk)return rows;
 function dressPal(cls,lk){const L=GEAR_LOOKS[cls],p={};if(!L||!lk)return p;
   Object.values((L.head||{})[lk.head]||{}).forEach((v,i)=>p[LOOK_HEAD[i]]=v);
   Object.values((L.chest||{})[lk.chest]||{}).forEach((v,i)=>p[LOOK_CHEST[i]]=v);return p}
-// The zone look a slot shows: the worn item's zl (Zone 1 when it has none), 0 with nothing worn.
-function slotLook(eq,sl){const id=eq&&eq[sl];return id&&ITEMS[id]?(ITEMS[id].zl||1):0}
+// The look a slot shows (owner, Nov 27): white and green show nothing (rags); blue shows its zone's look (zl, Zone 1 when it
+// has none); pink shows the colours of the boss it came from (GEAR_MAKER), so you can tell where gear was won.
+function slotLook(eq,sl){const id=eq&&eq[sl],it=id&&ITEMS[id];if(!it)return 0;
+  if(it.rar==='named')return GEAR_MAKER[id]||it.zl||1;return it.rar==='rare'?(it.zl||1):0}
 function mkRags(id,wid,lk){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
   // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.

@@ -61,7 +61,7 @@ def maker_looks():
             if cls in('monk','bard'):ch.pop('d',None)
             hd={k:M['head'][i] for i,k in enumerate(HEAD_ROLES[cls])}
             LOOKS[cls]['chest'][mk]=ch;LOOKS[cls]['head'][mk]=hd
-# maker_looks()  # back burner (owner, Nov 27): call this to add the boss colour looks again
+maker_looks()
 def item_makers():
     import re
     src=open('js/data/items.js').read();out={}
@@ -105,7 +105,8 @@ if __name__=='__main__':
      "// What you wear shows on the character, one look step per zone. GEAR_LOOKS[class][slot][zone look] = {letter: colour};\n"
      "// no item = the class's own (rags) colours. Zone 1 is colour only. Head colours apply above the shoulders, chest colours\n"
      "// below (js/render.js dress()). An item's zone look is its zl field (js/data/items.js), Zone 1 when it has none.\n"
-          "const GEAR_LOOKS="+J(data)+";\nconst GEAR_SLOTS=['chest','head'];\n")  # back burner: +"const GEAR_MAKER="+J(item_makers())
+          "// Rarity (owner, Nov 27): white and green show nothing, blue the zone look (1), pink its boss's colours (GEAR_MAKER[item]).\n"
+     "const GEAR_LOOKS="+J(data)+";\nconst GEAR_SLOTS=['chest','head'];\nconst GEAR_MAKER="+J(item_makers())+";\n")
     # Review sheet: every class four ways: rags, chest item, head item, both. Standing, with its starter weapon look 1.
     from PIL import Image,ImageDraw,ImageFont
     import player_frames as F, player_pass_draft as PD, look_ladder_draft as LL
