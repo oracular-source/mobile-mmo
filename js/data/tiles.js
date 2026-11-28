@@ -158,6 +158,7 @@ hay_bale     1 1 1      ground 0     -    0
 trough       2 1 1      ground 0     -    0
 barrels      1 1 1      ground 0     -    0
 bench        2 1 1      ground 0     -    0
+hitching_post 3 1 1     ground 0     -    0
 `;
 // Objects that are only partly solid (v0.86, owner: "invisible walls behind the tree"). One row per footprint row, top to
 // bottom, '#' = solid. Objects not listed are solid on their whole footprint when blocks = 1. The giant tree's trunk and

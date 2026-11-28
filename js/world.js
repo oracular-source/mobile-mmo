@@ -670,7 +670,7 @@ const vr=(a,b)=>a+Math.random()*(b-a);
 function areaCritters(A){
   if(A.crit)return A.crit;
   A.crit=[];A.rip=[];A.smoke=[];A.ripT=0;A.smokeT=0;
-  (A.critDefs||[]).forEach(d=>{for(let i=0;i<d.n;i++){const c={kind:d.kind,hx:d.x,hy:d.y,x:d.x,y:d.y,ph:Math.random()*6.28,dir:Math.random()<0.5?1:-1,t:0,st:'sit',pk:vr(1,4),hop:vr(1,5),blink:vr(2,6),look:0};
+  (A.critDefs||[]).forEach(d=>{for(let i=0;i<d.n;i++){const c={kind:d.kind,tied:d.tied,hx:d.x,hy:d.y,x:d.x,y:d.y,ph:Math.random()*6.28,dir:Math.random()<0.5?1:-1,t:0,st:'sit',pk:vr(1,4),hop:vr(1,5),blink:vr(2,6),look:0};
     if(d.kind==='moth'){c.r=vr(5,9)+i*2;c.sp=vr(0.8,1.6)}if(d.kind==='bat'){c.r=vr(13,19)+i*4;c.sp=vr(0.9,1.4)}if(d.kind==='firefly'){c.r=vr(10,26);c.sp=vr(0.15,0.35);c.hx+=vr(-12,12);c.hy+=vr(-8,8)} // bats swing out past the tower's sides so they show against the sky and walls
     // a crow standing where you could walk is on the ground; anywhere else it's perched up on something
     if(d.kind==='crow')c.ground=!d.high;
@@ -724,13 +724,13 @@ function updateAreaCritters(A,dt){
       else if(c.t>14&&home>170){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
     else if(c.kind==='horse'){
       // (Town 1 draft 2) the wizard's horses in their paddock: graze, lift the head, swish the tail, now and then amble a
-      // few steps. They're tame: come close and they lift their heads and turn to look at you, they never bolt.
+      // few steps (a horse tied at the rail stays put). They're tame: come close and they lift their heads and turn to look at you, they never bolt.
       if(c.coat===undefined){c.coat=(A.crit.filter(q=>q.kind==='horse').indexOf(c))%3;c.pose='graze';c.hop=vr(1,4)}
       c.hop-=dt;if(c.walk>0){c.walk-=dt;const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;if(blocked(nx+c.dir*10,ny)||blocked(nx,ny)||Math.hypot(nx-c.hx,ny-c.hy)>26)c.walk=0;else{c.x=nx;c.y=ny}}
       const near=d<52&&player.dead<=0;
       if(near){c.pose='stand';c.dir=player.x>c.x?1:-1;c.walk=0}
       else if(c.hop<=0){c.hop=vr(2,6);const r=Math.random();
-        if(r<0.45)c.pose='graze';else if(r<0.75)c.pose='stand';else{const a=Math.random()*6.28;c.vx=Math.cos(a)*9;c.vy=Math.sin(a)*5;c.dir=c.vx>0?1:-1;c.walk=vr(1,2.2)}}
+        if(r<0.45)c.pose='graze';else if(r<0.75)c.pose='stand';else if(c.tied)c.pose='stand';else{const a=Math.random()*6.28;c.vx=Math.cos(a)*9;c.vy=Math.sin(a)*5;c.dir=c.vx>0?1:-1;c.walk=vr(1,2.2)}}
       c.swish=Math.sin(time*1.7+c.ph*3)>0.92}
     else if(c.kind==='eyes'){
       // (v0.82, owner: v0.81's two dots didn't read) a wolf watching from the treeline: a low dark head-and-shoulders

@@ -23,12 +23,12 @@ MAPS.town1 = {
     ',T,T,TT,T,L,,,,,,,,,==,,,,,,,,,L,TTTTTT,TT',
     ',T,T,TTT,LL,,,,:::,,ss,,:::,,,,LL,TTTTT,T,',
     'TTTTT,,,,L,,,,,,,,ssssss,,,,,,,,L,,TTTTTTT',
-    'TT,TTTTT,L,,,,,,,ssssssss,,jjjjjL,TTTTTTT,',
-    'TT,,TTT,,L,,,,,,,ssssssss,,j,,,,L,,TT,TTTT',
-    'TTTT,TT,,L,,,,,:ssssssssss,j,,,,L,,TTT,,,T',
-    'TT,TTTT,,L,,,,:,ssssssssss,j,,,,L,,TTTTT,T',
-    'TTTTT,T,,L,,,,,,,ssssssss,,j,,,,L,,TTTTTTT',
-    'TTTTTT,T,L,,,,,,,ssssssss,,jjjjjL,TT,TTTTT',
+    'TT,TTTTT,L,,,,,,,ssssssss,,,,,,,L,TTTTTTT,',
+    'TT,,TTT,,L,,,,,,,ssssssss,,,,,,,L,,TT,TTTT',
+    'TTTT,TT,,L,,,,,:ssssssssss,,,,,,L,,TTT,,,T',
+    'TT,TTTT,,L,,,,:,ssssssssss,,,,,,L,,TTTTT,T',
+    'TTTTT,T,,L,,,,,,,ssssssss,,,,,,,L,,TTTTTTT',
+    'TTTTTT,T,L,,,,,,,ssssssss,,,,,,,L,TT,TTTTT',
     'TTT,TTTT,L,,,,,,,:ssssss,,,,,,,,L,,TTT,T,T',
     'TTT,TTTT,LL,,,,,,:,:ss:,,,,,,,,LL,TTT,TTTT',
     ',,T,,TT,T,L,,,,,,::,,,:,,,,,,,,L,TTTTTTT,T',
@@ -50,8 +50,8 @@ MAPS.town1 = {
   ],
   things: `
 # Town 1 DRAFT 2 (owner, Nov 27): round and cozier. The palisade is a circle, everyone stands round a round flagstone
-# square a few steps from the hearth, worn paths to each door. The wizard keeps a stable and a paddock of horses beside
-# his tower (why does a wizard sell horses? nobody knows). Wrapped in forest so the mirrored edge is woods.
+# square a few steps from the hearth, worn paths to each door. The wizard keeps a stable beside his tower, his horses tied
+# at a rail (why does a wizard sell horses? nobody knows). Wrapped in forest so the mirrored edge is woods.
 exit north 20 0 to=crossroads at=south lit
 obj lantern 22 4
 obj torch 18 10
@@ -76,13 +76,14 @@ obj well 15 27
 # south, facing the gate across the square: the wizard's tower, his scrying orb on the square's edge (main quest)
 obj wizard_tower 19 28 half
 obj orb_stand 20 24 half
-# south-east: the wizard's stable, and his paddock against the town wall (your first mount comes from here)
+# south-east: the wizard's stable; two of his horses tied at a hitching rail beside it, a trough and hay (your first
+# mount comes from here). Owner (Nov 27): no paddock fence, a town doesn't have a fence in the middle.
 obj stable 23 25
-obj hay_bale 31 19
-obj trough 29 22
-critter horse 29.6 21.0
-critter horse 30.8 21.7
-critter horse 28.8 20.0
+obj hitching_post 28 21
+obj hay_bale 31 21
+obj trough 28 23
+critter horse 28.9 22.8 1 tied
+critter horse 30.7 22.8 1 tied
 # life
 critter crow 25.2 24.6 1 high
 critter crow 15.3 22.4 1 high

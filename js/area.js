@@ -88,7 +88,7 @@ function* buildAreaGen(id){
         else if(TYPES[sp.type]&&TYPES[sp.type].camp&&!sp.aloof){const mate=A.spawns.find(o=>o!==sp&&TYPES[o.type]&&TYPES[o.type].camp&&Math.hypot(o.x-sp.x,o.y-sp.y)<=3*T);
           sp.group=mate?(mate.group=mate.group||'cp'+A.spawns.indexOf(mate)):null}}
     else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3),at:(p.find(s=>s.indexOf('at=')===0)||'at=').slice(3)}); // at = the exit you arrive by on the other side
-    else if(k==='critter')(A.critDefs=A.critDefs||[]).push({kind:p[1],x:+p[2]*T,y:+p[3]*T,n:+p[4]||1,high:p.indexOf('high')>0}); // small living things (v0.49, world.js)
+    else if(k==='critter')(A.critDefs=A.critDefs||[]).push({kind:p[1],x:+p[2]*T,y:+p[3]*T,n:+p[4]||1,high:p.indexOf('high')>0,tied:p.indexOf('tied')>0}); // small living things (v0.49, world.js)
     // A barred gate (v0.62, the chapel's east gate): closed until you lift the bar from the inside (the side named, W = west).
     // Once opened it stays open for every character (saved under ashfen-gates).
     else if(k==='bar')(A.bars=A.bars||[]).push({tx:+p[1],ty:+p[2],id:p[3],from:p[4]||'W'});
@@ -1566,6 +1566,12 @@ function drawTownProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,B=Y+H;
     const bar=(x,y)=>{R(x,y,9,12,AP.out);R(x+1,y+1,7,10,'#6a4a2a');R(x+1,y+1,2,10,'#8a6440');R(x+1,y+3,7,1,AP.iron);R(x+1,y+8,7,1,AP.iron);R(x+1,y,7,2,'#4a3220')};
     shadow(X,B-2,16,3);R(X+8,B-9,8,8,AP.out);R(X+9,B-8,6,6,AP.plank);R(X+9,B-8,6,1,AP.plankHi);R(X+9,B-5,6,1,AP.plankDk); // crate behind
     bar(X,B-13);bar(X+6,B-12);return true}
+  if(k==='hitching_post'){
+    // A hitching rail by the stable (owner, Nov 27: no paddock fence in the middle of town): two stout posts, one worn
+    // rail across, the horses' lead ropes looped over it and hanging down to where they stand.
+    shadow(X+2,B-3,W-4,3);[X+3,X+W-7].forEach(px=>{R(px,B-16,5,15,AP.out);R(px+1,B-15,3,13,AP.wood);R(px+1,B-15,1,13,AP.woodHi);R(px+1,B-15,3,1,AP.plankHi)});
+    R(X+3,B-14,W-6,4,AP.out);R(X+4,B-13,W-8,2,AP.plank);R(X+4,B-13,W-8,1,AP.plankHi);
+    [X+14,X+W-17].forEach(rx=>{R(rx,B-14,3,3,'#a89060');R(rx+1,B-11,1,7,'#a89060')});return true}
   if(k==='bench'){
     // A plank bench by the hearth, backless, two thick legs.
     shadow(X+2,B-3,W-3,3);R(X+2,B-10,W-4,4,AP.out);R(X+3,B-9,W-6,2,AP.plank);R(X+3,B-9,W-6,1,AP.plankHi);
