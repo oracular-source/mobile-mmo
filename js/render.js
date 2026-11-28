@@ -76,10 +76,24 @@ function mkSkin(id){
 }
 // Rags (gear tier 0): head + body + starter weapon on a 20x24 grid, coloured from RAGS. Also makes two
 // walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
-function mkRags(id,wid){
+// ---------- Gear looks by zone (character lane, owner Nov 27; js/data/looks.js from tools/gear_looks.py) ----------
+// What you wear shows: a worn chest or head item swaps that part's colours for its zone's look. The swapped letters become
+// stand-in letters (1-5 head, 6-9 @ # chest) so head colours apply only above the shoulders and chest colours only below.
+// lk = {chest: zone look, head: zone look}; 0 or missing = rags.
+const LOOK_HEAD='12345',LOOK_CHEST='6789@#';
+function dress(rows,cls,lk){const L=GEAR_LOOKS[cls];if(!L||!lk)return rows;
+  const hl=Object.keys((L.head||{})[lk.head]||{}),cl=Object.keys((L.chest||{})[lk.chest]||{});if(!hl.length&&!cl.length)return rows;
+  let hy=rows.findIndex(r=>r.indexOf('H')>=0||r.indexOf('n')>=0);if(hy<0)hy=0;   // first row with clothes = the shoulders
+  return rows.map((r,y)=>{let o='';for(const c of r){const i=y<hy?hl.indexOf(c):cl.indexOf(c);o+=i<0?c:(y<hy?LOOK_HEAD:LOOK_CHEST)[i]}return o})}
+function dressPal(cls,lk){const L=GEAR_LOOKS[cls],p={};if(!L||!lk)return p;
+  Object.values((L.head||{})[lk.head]||{}).forEach((v,i)=>p[LOOK_HEAD[i]]=v);
+  Object.values((L.chest||{})[lk.chest]||{}).forEach((v,i)=>p[LOOK_CHEST[i]]=v);return p}
+// The zone look a slot shows: the worn item's zl (Zone 1 when it has none), 0 with nothing worn.
+function slotLook(eq,sl){const id=eq&&eq[sl];return id&&ITEMS[id]?(ITEMS[id].zl||1):0}
+function mkRags(id,wid,lk){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
   // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.
-  const pf=PLAYER15[id];if(pf){const pal=Object.assign({},RAG15_COMMON,pf.c),im=mk(pf.s,pal);im.ax=pf.s[0].length>>1;im.steps=[mk(pf.a,pal),mk(pf.b,pal)];
+  const pf0=PLAYER15[id];if(pf0){const D=r=>dress(r,id,lk),pf=lk?Object.assign({},pf0,{s:D(pf0.s),a:D(pf0.a),b:D(pf0.b),p:Object.fromEntries(Object.entries(pf0.p).map(([k,v])=>[k,v.map(D)]))}):pf0;const pal=Object.assign({},RAG15_COMMON,pf.c,dressPal(id,lk)),im=mk(pf.s,pal);im.ax=pf.s[0].length>>1;im.steps=[mk(pf.a,pal),mk(pf.b,pal)];
     im.fo=feetX(pf.s)-(pf.s[0].length>>1); // feet column relative to the middle, for the shadow
     // Owner (Nov 27): legs froze mid-run whenever an attack or cast went off, because a pose frame carries standing (or
     // lunging) legs. Each pose frame also gets three leg versions taken from the walk cycle (standing, left foot, right
@@ -103,8 +117,9 @@ function playerImg(){
   if(dev.skin||(dev.old&&!C.sprite)){const k='skin_'+CLS;if(!IMG[k])IMG[k]=mkSkin(CLS)||IMG.druid;return IMG[k]}
   if(dev.old)return IMG[C.sprite];
   // Keyed by the equipped weapon too: equipping or removing one builds (once) the pictures with that weapon in hand.
-  const w=inv.equip.weapon,it=w&&ITEMS[w],wid=it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[CLS]?w:'',k='rags_'+CLS+'|'+wid;
-  if(!IMG[k])IMG[k]=mkRags(CLS,wid)||IMG.druid;return IMG[k];
+  const w=inv.equip.weapon,it=w&&ITEMS[w],wid=it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[CLS]?w:'',
+    lk={chest:slotLook(inv.equip,'chest'),head:slotLook(inv.equip,'head')},k='rags_'+CLS+'|'+wid+'|'+lk.chest+lk.head;
+  if(!IMG[k])IMG[k]=mkRags(CLS,wid,lk)||IMG.druid;return IMG[k];
 }
 // ---------- Weapon layer (character lane, Nov 27; owner OK'd the draft 4 looks) ----------
 // The body frames have their old weapon cut out (tools/player_frames.py) and know where the hand closes and which way the

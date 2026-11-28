@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Zone 1 gear looks</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@600&family=Inter:wght@400;600&display=swap">
+<style>
+/* VOICE: a quiet design review, plain words, owner decides.
+   IDEA: a character sheet pinned on the studio wall, rags to legend left to right.
+   PICTURE: the ladder itself, big, pixel-crisp.
+   COLOUR and TYPE: the game's mossy dark green ground, parchment text, ember gold for steps; Pixelify Sans titles, Inter body.
+   LAYOUT: one column for a phone; ladder first, then step notes, then questions. */
+:root{color-scheme:dark;--bg:#2b3322;--card:#343e28;--ink:#ece4cf;--dim:#b8b29c;--gold:#ffd27a;--line:#4a5638}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,4vw,48px) max(5vw,14px);max-width:1040px;margin:auto}
+h1{font:600 clamp(30px,6vw,44px)/1.05 'Pixelify Sans',Inter,sans-serif;margin:0 0 8px;color:var(--gold);text-wrap:balance}
+h2{font:600 24px/1.2 'Pixelify Sans',Inter,sans-serif;margin:28px 0 10px;color:var(--gold)}
+p{margin:0 0 12px;max-width:66ch}.dim{color:var(--dim);font-size:14px}
+.scroll{overflow-x:auto;scroll-snap-type:x mandatory;border:1px solid var(--line);border-radius:10px;background:#343e28}
+.scroll img{display:block;image-rendering:pixelated;height:auto}
+.big{width:956px;max-width:none}
+.game{width:488px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--gold);font-weight:600}
+td:first-child{white-space:nowrap;font-weight:600}
+ol li{margin-bottom:12px;max-width:66ch}
+b{color:var(--gold);font-weight:600}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--dim)}.stack td:empty{display:none}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head><body>
+<div class="band">
+<h1>Zone 1 gear looks, in the game (v0.142)</h1>
+<p>One look step per zone, starting small. Wearing a chest item dyes your clothes; a head item dyes your hat, hood or helm. Every item today is Zone 1, so they all show this same small step up from rags. No shape changes yet.</p>
+<div class="scroll"><img style="width:1000px;max-width:none" src="gear-z1-draft1.png" alt="All 14 classes: no gear, Zone 1 chest, Zone 1 head, both"></div>
+<p class="dim" style="margin-top:8px">Shown 5×. Each class: no gear, chest only, head only, both.</p>
+<h2>At game size</h2>
+<p>Top row rags, bottom row with a Zone 1 chest and head (3×).</p>
+<div class="scroll"><img style="width:734px;max-width:none" src="gear-z1-draft1-game.png" alt="All 14 classes at near game size, rags and Zone 1"></div>
+<h2>How to test on your phone</h2>
+<ol>
+<li>Open the game with <b>?dev</b> on the end of the link and pick any class.</li>
+<li>Tap <b>DEV → Loot → White</b> (or Green / Blue) a few times until you get a chest or head item.</li>
+<li>Tap your portrait to open the Character screen and put it on. Your character changes colour right away; take it off and the rags come back.</li>
+<li>Walk, attack and cast: the new colours stay on every move.</li>
+</ol>
+<h2>Questions for you</h2>
+<ol>
+<li><b>Too small, or about right?</b> A few are very quiet (Cleric, Shadow Knight, Rogue's hood). Push any of them a step further?</li>
+<li><b>Any colour you'd change</b> for a class?</li>
+<li>Still open from the ladder: <b>weapon pace</b> (weapons reach their biggest shape in Zone 1), <b>shields</b> changing with gear, and when <b>capes</b> arrive.</li>
+</ol>
+<p class="dim">Next zones add one small detail each, in the order of the look ladder (hat bobble, belt, trim and so on).</p>
+</div>
+</body></html>
