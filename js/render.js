@@ -76,17 +76,17 @@ function mkSkin(id){
 }
 // Rags (gear tier 0): head + body + starter weapon on a 20x24 grid, coloured from RAGS. Also makes two
 // walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
-function mkRags(id){
+function mkRags(id,wid){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
   // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.
   const pf=PLAYER15[id];if(pf){const pal=Object.assign({},RAG15_COMMON,pf.c),im=mk(pf.s,pal);im.ax=pf.s[0].length>>1;im.steps=[mk(pf.a,pal),mk(pf.b,pal)];
-    im.fx=feetX(pf.s);
+    im.fo=feetX(pf.s)-(pf.s[0].length>>1); // feet column relative to the middle, for the shadow
     // Owner (Nov 27): legs froze mid-run whenever an attack or cast went off, because a pose frame carries standing (or
     // lunging) legs. Each pose frame also gets three leg versions taken from the walk cycle (standing, left foot, right
     // foot): the bottom 5 rows, columns 0-10 of the standing body (legs only; a staff foot at 11+ stays the pose's own).
     const wk=[pf.s,pf.a,pf.b],mid=pf.s[0].length>>1;
     im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i],
-      legs:wk.map(w=>mk(withLegs(r,pf.x[k][i]-mid,w),pal))}))});return im}
+      legs:wk.map(w=>mk(withLegs(r,pf.x[k][i]-mid,w),pal))}))});return wid?armed(im,pf,id,wid):im}
   const q=RAG15[id];if(q){const pal=Object.assign({},RAG15_COMMON,q.c),im=mk(q.r,pal);im.steps=[mk(q.a,pal),mk(q.b,pal)];return im}
   const c=RAGS[id];if(!c)return null;
   const W=20,g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>{const a=r.split('');while(a.length<W)a.push('.');return a});
@@ -102,8 +102,49 @@ function mkRags(id){
 function playerImg(){
   if(dev.skin||(dev.old&&!C.sprite)){const k='skin_'+CLS;if(!IMG[k])IMG[k]=mkSkin(CLS)||IMG.druid;return IMG[k]}
   if(dev.old)return IMG[C.sprite];
-  const k='rags_'+CLS;if(!IMG[k])IMG[k]=mkRags(CLS)||IMG.druid;return IMG[k];
+  // Keyed by the equipped weapon too: equipping or removing one builds (once) the pictures with that weapon in hand.
+  const w=inv.equip.weapon,it=w&&ITEMS[w],wid=it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[CLS]?w:'',k='rags_'+CLS+'|'+wid;
+  if(!IMG[k])IMG[k]=mkRags(CLS,wid)||IMG.druid;return IMG[k];
 }
+// ---------- Weapon layer (character lane, Nov 27; owner OK'd the draft 4 looks) ----------
+// The body frames have their old weapon cut out (tools/player_frames.py) and know where the hand closes and which way the
+// weapon pointed (PLAYER15 g / pg: [x, y, degrees clockwise from straight up]). The equipped weapon's look (js/data/weapons.js:
+// the item's type and look tier (wt, look in items.js), named makers' colours) is turned to that angle and drawn behind the body, so the fist closes
+// over the grip. No weapon equipped = empty hand. The Monk fights with his fists: his hand wraps never show.
+function weaponPal(cls,wid){const cw=CLASS_WEAPON[cls],acc=cw[1],handle=cw[2],look=ITEMS[wid].look,maker=WEAPON_MAKER[wid],P=WEAPON_PAL;
+  const p=Object.assign({k:'#0b0a0f'},P.base,P.look[look]);
+  if(handle&&!maker){if(handle==='#24222a'){p.y='#4a4650';p.Y='#2e2c36'}p.o=handle;p.O=handle} // Shadow Knight: black hilt, dark iron guard
+  if(look>=2)p.g=acc;if(maker)Object.assign(p,P.named[maker]);return p}
+// One weapon turned to an angle: nearest-pixel rotation of its upright drawing about the grip, then its own outline.
+// Returns {c, gx, gy}: the picture and where the grip sits in it.
+function weaponAt(rows,gr,deg,pal){
+  const line=rows[gr],hc=[];for(let i=0;i<line.length;i++)if('oOIi'.indexOf(line[i])>=0)hc.push(i);
+  const gc=hc.length?hc[hc.length>>1]:line.length>>1,a=deg*Math.PI/180,sq=deg%90===0,
+    cs=sq?Math.round(Math.cos(a)):Math.cos(a),sn=sq?Math.round(Math.sin(a)):Math.sin(a);
+  let x0=1e9,x1=-1e9,y0=1e9,y1=-1e9;const W=Math.max.apply(null,rows.map(r=>r.length)),H=rows.length;
+  [[-0.5,-0.5],[W-0.5,-0.5],[-0.5,H-0.5],[W-0.5,H-0.5]].forEach(q=>{const u=q[0]-gc,v=q[1]-gr,X=u*cs-v*sn,Y=u*sn+v*cs;
+    x0=Math.min(x0,X);x1=Math.max(x1,X);y0=Math.min(y0,Y);y1=Math.max(y1,Y)});
+  x0=Math.floor(x0);y0=Math.floor(y0);x1=Math.ceil(x1);y1=Math.ceil(y1);
+  const out=[];for(let Y=y0;Y<=y1;Y++){let r='';for(let X=x0;X<=x1;X++){const sx=Math.round(X*cs+Y*sn+gc),sy=Math.round(-X*sn+Y*cs+gr);
+    r+=sy>=0&&sy<H&&sx>=0&&sx<rows[sy].length?rows[sy][sx]:'.'}out.push(r)}
+  const at=(x,y)=>(out[y]||'')[x],g=[];
+  for(let y=-1;y<=out.length;y++){let r='';for(let x=-1;x<=out[0].length;x++){const c=at(x,y);
+    if(c&&c!=='.'){r+=c;continue}const n=[at(x+1,y),at(x-1,y),at(x,y+1),at(x,y-1)].some(q=>q&&q!=='.');r+=n?'k':'.'}g.push(r)}
+  return{c:mk(g,pal).c,gx:1-x0,gy:1-y0}}
+// A body picture with the weapon behind it. The canvas grows to fit the weapon, evenly left and right (so the middle stays
+// the middle) and at the top; growth at the bottom is kept in by, so the feet stay on the ground.
+function withWeapon(im,m,wp){if(!m)return im;const w=wp(m[2]),ox=m[0]-w.gx,oy=m[1]-w.gy,
+    L=Math.max(0,-ox,ox+w.c.width-im.w),T=Math.max(0,-oy),B=Math.max(0,oy+w.c.height-im.h),
+    c=document.createElement('canvas');c.width=im.w+2*L;c.height=im.h+T+B;const g=c.getContext('2d');
+  g.drawImage(w.c,ox+L,oy+T);g.drawImage(im.c,L,T);
+  const f=document.createElement('canvas');f.width=c.width;f.height=c.height;const fg=f.getContext('2d');fg.translate(c.width,0);fg.scale(-1,1);fg.drawImage(c,0,0);
+  return{c:c,f:f,w:c.width,h:c.height,by:B,pad:L}}
+function armed(im,pf,cls,wid){const type=ITEMS[wid].wt,look=ITEMS[wid].look,T=WEAPON_LOOKS[type],L=T[look]||T[Math.min(4,look)];
+  if(!L)return im;const pal=weaponPal(cls,wid),cache={},wp=deg=>cache[deg]||(cache[deg]=weaponAt(L[0],L[1],deg,pal));
+  const gs=pf.g&&pf.g.s,o=withWeapon(im,gs,wp);o.fo=im.fo;o.steps=im.steps.map(st=>withWeapon(st,gs,wp));o.poses={};
+  Object.keys(im.poses).forEach(k=>{o.poses[k]=im.poses[k].map((p,i)=>{const m=pf.pg&&pf.pg[k]&&pf.pg[k][i],a=withWeapon(p.im,m,wp);
+    return{im:a,ax:p.ax+(a.pad||0),legs:p.legs.map(l=>withWeapon(l,m,wp))}})});
+  return o}
 // Walk cycle for pictures that have step frames: stand, left foot up, stand, right foot up (body rises on steps).
 // Copy the walk frame's legs (bottom 5 rows, standing columns 0-10) into a pose frame; sh = pose column minus standing column.
 function withLegs(pose,sh,walk){const P=pose.map(r=>r.split('')),dy=P.length-walk.length;
@@ -184,12 +225,12 @@ const MOB_POSE_IMG={};Object.keys(MOB_POSES).forEach(k=>{const P=MOB_POSES[k],o=
 function drawSprite(img,x,y,dir,bob,sit){
   const im=dir<0?img.f:img.c,w=img.w,h=img.h;
   // Round the position first, then offset by whole pixels: with an odd width (15) Math.round(x-w/2) flipped a pixel out of step with the camera, so sprites shook while walking sideways (v0.27.4).
-  const dx=Math.round(x)-(w>>1),dy=Math.round(y)-h+(bob||0);
+  const dx=Math.round(x)-(w>>1),dy=Math.round(y)-h+(img.by||0)+(bob||0);
   if(sit){lx.drawImage(im,0,0,w,h-4,dx,dy+4,w,h-4)}else lx.drawImage(im,dx,dy);
 }
 // A pose frame can be wider than the standing body (a sword thrust out front): ax is the column that lines up with the
 // body's middle, so the body stays put and only the weapon reaches out. Facing left, the frame is mirrored, and so is ax.
-function drawPose(p,x,y,dir){const im=p.im,dx=Math.round(x)-(dir<0?im.w-1-p.ax:p.ax),dy=Math.round(y)-im.h+(p.by||0);lx.drawImage(dir<0?im.f:im.c,dx,dy)}
+function drawPose(p,x,y,dir){const im=p.im,dx=Math.round(x)-(dir<0?im.w-1-p.ax:p.ax),dy=Math.round(y)-im.h+(p.by||0)+(im.by||0);lx.drawImage(dir<0?im.f:im.c,dx,dy)} // im.by: a player frame grown at the bottom to fit a weapon
 function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
   const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let err=dx+dy;lx.fillStyle=col;
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
@@ -327,7 +368,7 @@ function render(){
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
       const pim=playerImg(),pp=player.sit||player.fd>0?null:playerPose(pim),wf=walkFrame(pim,player.walk,moving&&!player.sit);
       // Shadow under the feet: the feet column measured from the standing picture, mirrored when facing left.
-      const fo=pim&&pim.fx!=null?pim.fx-(pim.w>>1):0;shadow(Math.round(player.x)+(player.dir<0?-fo:fo),player.y,5);
+      const fo=pim&&pim.fo||0;shadow(Math.round(player.x)+(player.dir<0?-fo:fo),player.y,5);
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
       if(pp)drawPose(moving&&pp.legs?{im:pp.legs[wf.leg||0],ax:pp.ax}:pp,player.x,player.y+1,player.dir); // attack or cast pose (js/anim.js); legs keep walking
       else drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);

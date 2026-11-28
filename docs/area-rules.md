@@ -297,3 +297,8 @@ No style takes: same setting as the chapel grounds and the crypt (Nov 20). **Nav
 - **No weapon = empty hand**, so taking a weapon off is easy to see.
 - **One type per class** (list in `design.md`). Shared types tell classes apart with a gem in the class colour from look 2; maces add a class-colour handle (Cleric pale gold, Paladin blue); the Shadow Knight's sword has a black hilt and dark iron guard. **Crook** (Druid): living wood with a curled hook at the top and leaves, no point. **Scepter** (Magician, Enchanter): half a staff's length with an orb head in the class colour, so it never reads as a staff. Monks carry nothing.
 
+## Weapons in the hand (character lane, v0.121, Nov 27; owner OK'd the draft 4 looks)
+- The equipped weapon is its own layer, never part of the body: body frames are drawn with an empty fist, and each frame records the grip (where the hand closes) and the weapon's angle (clockwise from straight up). The weapon's upright drawing is turned to that angle about its grip and drawn **behind** the body, so the fist covers the grip.
+- Weapon drawings are upright, at game size, with a grip row (`tools/weapon_looks.py`). The look follows power, never rarity colour; size stops growing at look 4; named keep their tier's shape in their maker's colours.
+- The weapon must fit how the class fights; the Monk shows no weapon; the Bard plays the lute and wears his rapier at the left hip, point down and back.
+- A new pose frame needs nothing extra: draw it holding the old weapon and `tools/player_frames.py` cuts it out and measures the grip and angle (rules per class in `weapon_px`).

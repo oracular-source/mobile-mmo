@@ -1,4 +1,5 @@
 [
+{"file": "v0.121-weapons-in-hand.gif", "title": "Weapons in your hand", "version": "v0.121", "date": "2026-11-27", "tag": "Characters", "note": "Warrior, Wizard, Ranger and Bard go from empty hands through looks 1 to 4 (white, green, Skeleton King, Malrec) while attacking and casting."},
 {"file": "v0.117-greyfang-bite.gif", "title": "Greyfang bites for real", "version": "v0.117", "date": "2026-11-27", "tag": "Animation", "note": "Greyfang crouches, lunges with his jaws wide (a long row of fangs top and bottom) and snaps them fully shut on you."},
 {"file": "v0.117-old-scar-bite.gif", "title": "Old Scar bites for real", "version": "v0.117", "date": "2026-11-27", "tag": "Animation", "note": "The rare wolf gets the same physical bite as the pack, keeping his torn ear, blind eye and scar."},
 {"file": "v0.116-run-attack-legs.gif", "title": "Running attacks and steady shadows", "version": "v0.116", "date": "2026-11-27", "tag": "Animation", "note": "Warrior, Druid and Rogue running back and forth while attacking: the legs keep stepping through every swing and cast, the Warrior's new forward slash, and a steady shadow under the feet."},
