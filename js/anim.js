@@ -198,6 +198,7 @@ function animPlayer(a,t){if(logMute||!a)return;const im=playerImg(),P=im&&im.pos
   else if(P.cast)k='cast';
   if(!k)return;
   player.pose={k:k,t0:time};
+  if(main&&phys)player.aura={t0:time}; // basic attack: a tiny aura round the weapon in the class colour (owner, Nov 28)
   if(k==='cast'&&!(a.cast>0)&&!a.melee)player.flash={a:a,t0:time}; // instant spell: a short glow at the staff tip, sized by its mana
   if(main||!a.melee)return; // plain main attack; spells keep their own looks
   // Ability flair, small for now.
@@ -230,6 +231,13 @@ function castGlowDraw(){const c=player.castTip;if(!c)return;const p=c.p,T=c.tier
   lx.globalCompositeOperation='lighter';lx.globalAlpha=0.25+(GLOW_TIER.a[T]-0.25)*p;lx.drawImage(castGlowStamp(r,c.col),c.x-r,c.y-r);lx.globalCompositeOperation='source-over';
   lx.globalAlpha=Math.min(1,0.4+p);lx.fillStyle='#fffbe8';lx.fillRect(c.x,c.y,1,1);
   if(T===2&&p>0.5){lx.globalAlpha=Math.min(1,(p-0.5)*2);lx.fillRect(c.x-1,c.y,3,1);lx.fillRect(c.x,c.y-1,1,3)}lx.globalAlpha=1}
+// Weapon aura (character lane, owner Nov 28; first step of "Hits that grow with damage"): every basic attack, melee too,
+// lights a very small soft glow round the weapon's head in the class colour. It rises through the wind-up, peaks on the
+// strike and fades. Tiny on purpose: it happens constantly; it can grow later (big hits, the gleam idea on the board).
+const AURA={r:3,a:0.55,t:PPOSE.main[0]+PPOSE.main[1]+0.12}; // radius px, peak strength, seconds
+function auraDraw(){const c=player.atkTip;if(!c)return;const s=Math.sin(Math.PI*Math.min(1,c.p));
+  lx.globalCompositeOperation='lighter';lx.globalAlpha=AURA.a*s;lx.drawImage(castGlowStamp(AURA.r,c.col),c.x-AURA.r,c.y-AURA.r);
+  lx.globalCompositeOperation='source-over';lx.globalAlpha=1}
 // Ability flair drawing (in the world, before the lighting, like the mob slashes).
 function playerFxDraw(f){const p=f.t/f.life;
   if(f.k==='parc'){lx.fillStyle='#f2eee0';const base=f.dir>0?0:Math.PI; // a thin arc sweeping round in front, top to bottom

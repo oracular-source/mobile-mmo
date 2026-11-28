@@ -404,6 +404,13 @@ function render(){
           tx=player.dir<0?dx+im.w-1-pp.tip[0]:dx+pp.tip[0];ty=dy+pp.tip[1]}
         else{tx=Math.round(player.x)+player.dir*6;ty=Math.round(player.y)-10}
         player.castTip={x:tx,y:ty,p:player.cast?Math.min(1,player.cast.time/ga.cast):1-flE/FLASH_T,col:ga.col,tier:glowTier(ga)}}
+      // Weapon aura on a basic attack (js/anim.js auraDraw): at the weapon's tip in the pose, or the fist / in front of the body.
+      player.atkTip=null;const au=player.aura,auE=au?time-au.t0:9;if(auE>=AURA.t)player.aura=null;
+      if(au&&auE<AURA.t&&!player.sit&&!player.cast){let tx,ty;
+        if(pp&&pp.tip){const im=moving&&pp.legs?pp.legs[wf.leg||0]:pp.im,dx=Math.round(player.x)-(player.dir<0?im.w-1-pp.ax:pp.ax),dy=Math.round(player.y+1)-im.h+(pp.by||0)+(im.by||0);
+          tx=player.dir<0?dx+im.w-1-pp.tip[0]:dx+pp.tip[0];ty=dy+pp.tip[1]}
+        else{tx=Math.round(player.x)+player.dir*7;ty=Math.round(player.y)-8}
+        const cw=CLASS_WEAPON[CLS];player.atkTip={x:tx,y:ty,p:auE/AURA.t,col:cw&&cw[1]||'#ffd27a'}}
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.buffs.aura>0){lx.fillStyle='#ffd27a';for(let a=0;a<16;a++){if((a+Math.floor(time*8))%2)continue;const an=a/16*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*8),Math.round(player.y-7+Math.sin(an)*10),1,1)}}
@@ -511,7 +518,7 @@ function render(){
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.restore();
   drawGlows();
-  lx.save();lx.translate(-camX,-camY);fxDrawLit();castGlowDraw();if(run.stairs&&curArea()&&curArea().instance)drawStairsShaft(run.stairs);lx.restore(); // the Bone Throw, over the dark (js/anim.js)
+  lx.save();lx.translate(-camX,-camY);fxDrawLit();castGlowDraw();auraDraw();if(run.stairs&&curArea()&&curArea().instance)drawStairsShaft(run.stairs);lx.restore(); // the Bone Throw, over the dark (js/anim.js)
   cx.setTransform(1,0,0,1,0,0); // back to screen pixels for the crisp text layer
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';
