@@ -72,7 +72,7 @@ function* buildAreaGen(id){
       A.objs.push(o)}
     const opt=n=>(p.find(s=>s.indexOf(n+'=')===0)||'').slice(n.length+1); // name=value extras on a line
     if(k==='spawn'||k==='named'){const lv=p[2].split('-').map(Number),sp={type:AREA_MOBS[p[1]]||'dead',x:px(+p[3]),y:py(+p[4]),timer:0,mob:null,group:null,lv:[lv[0],lv[lv.length-1]]};A.spawns.push(sp);
-      if(p.indexOf('aloof')>4)sp.aloof=1; // v0.125: seen but out of reach (never fights, never joins a camp)
+      if(p.indexOf('aloof')>4)sp.aloof=1; // v0.126: seen but out of reach (never fights, never joins a camp)
       // A named remembers its spawn, the object you touch to summon it and the key that takes (v0.31).
       if(k==='named'){A.named.push({x:+p[3],y:+p[4],name:p[1],sp:sp,summon:opt('summon'),key:opt('key')});
         // A wandering named (v0.39, Greyfang): walks its route loop; pack=N wolves walk with it and fight as one group.

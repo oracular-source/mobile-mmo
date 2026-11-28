@@ -203,7 +203,7 @@ function fearThink(e,from,spd,dt){
   if(e.fearCower){moveToward(e,Math.floor(e.x/T)*T+8,Math.floor(e.y/T)*T+8,spd,dt);return} // boxed in by camps: cowers
   fleeFrom(e,from,spd,dt)} // nothing fit and no camp in the way: the v0.101 safety-map run
 
-// Line of sight (v0.125, owner: mobs could cast at you through walls). A straight line between two people that crosses no
+// Line of sight (v0.126, owner: mobs could cast at you through walls). A straight line between two people that crosses no
 // wall tile (stone walls, palisades, rock and cave walls, pillars, boulders) can carry a spell; fences, trees, graves and
 // water don't block it. Checked from about chest height so standing hard against a wall still sees along it.
 function sightClear(a,b){const A=typeof curArea==='function'?curArea():null;if(!A)return true;

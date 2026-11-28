@@ -90,7 +90,7 @@ obj lantern 26 38
 # ways in and out
 exit south 28 39 to=wolfwood at=north
 exit dungeon 27 22 to=dungeon1 at=out lit
-# the east path down to the crossroads fell away (v0.125): the barred gate now opens onto a ledge with a view
+# the east path down to the crossroads fell away (v0.126): the barred gate now opens onto a ledge with a view
 # the east gate is barred: it opens from the inside (west) and stays open
 bar 44 18 chapel_east_gate W
 # on the road in: lone wisps and the first camp (10)

@@ -125,10 +125,10 @@ critter rabbit 14 36.5
 critter rabbit 41.5 16.5
 # secret: a chest at the end of a deer trail in the south-west woods
 chest 5 38
-# Ironshell's nook (v0.125, owner, Nov 27; replaces the steep east path up to the chapel, where level 1-3 players met level
+# Ironshell's nook (v0.126, owner, Nov 27; replaces the steep east path up to the chapel, where level 1-3 players met level
 # 10-14 cultists): the path trails off into a grass gap in the trees and a hidden pocket under the chapel's wall. Ironshell
 # is always home, guarding a chest. Up behind the wall a few cultists walk about: you can see and tap them, but no one can
-# reach anyone (aloof = they never join a fight; the wall blocks spells both ways, line of sight v0.125).
+# reach anyone (aloof = they never join a fight; the wall blocks spells both ways, line of sight v0.126).
 named ironshell 3 43 11
 chest 43 9
 spawn cult_zealot 12 46 10 aloof

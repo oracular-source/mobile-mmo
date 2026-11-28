@@ -368,7 +368,7 @@ function mobCast(m,dt){const c=m.def.cast;
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.bolt=c.every;
     if(dist(m,player)>c.range){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' falls short. You were out of range.','#9fb8e0');return false}
-    if(!sightClear(m,player)){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' breaks on the wall.','#9fb8e0');return false} // v0.125
+    if(!sightClear(m,player)){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' breaks on the wall.','#9fb8e0');return false} // v0.126
     beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:c.col});burst(player.x,player.y-8,c.col,8);
     if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the '+c.name.toLowerCase()+'.','#9fb8e0');return false}
     mobSpellHit(m,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
