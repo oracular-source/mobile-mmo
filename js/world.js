@@ -287,8 +287,8 @@ function bossThink(m,dt){
     if(m.casting.bone&&!m.casting.thrown&&m.casting.t>=m.casting.dur-BONE_FLIGHT)boneLaunch(m); // thrown a moment early so it lands with the hit (looks only)
     if(m.casting.t<m.casting.dur)return true;
     const foe=m.casting.foe;m.casting=null;m.bolt=BOLT.every;
-    if(foe){if(!remoteHere()||dist(m,foe)>BOLT.range){boneLand(m,'miss');if(remoteHere())floatText(foe.x,foe.y-20,'MISS','#c8a0ff');return false} // at your partner (multiplayer): their phone takes the hit
-      boneLand(m,'hit');burst(foe.x,foe.y-8,'#e8e0c8',8);netSpellAlly(m,8+2*m.lv,'Bone Throw','#c8a0ff',true);return false}
+    if(foe){if(!peerHere(foe)||dist(m,foe)>BOLT.range){boneLand(m,'miss');if(peerHere(foe))floatText(foe.x,foe.y-20,'MISS','#c8a0ff');return false} // at another player (multiplayer): their phone takes the hit
+      boneLand(m,'hit');burst(foe.x,foe.y-8,'#e8e0c8',8);netSpellAlly(m,foe,8+2*m.lv,'Bone Throw','#c8a0ff',true);return false}
     if(dist(m,player)>BOLT.range){boneLand(m,'miss');floatText(player.x,player.y-20,'MISS','#c8a0ff');log('The bone falls short. You were out of range.','#9fb8e0');return false}
     burst(player.x,player.y-8,'#e8e0c8',8); // bone shards (the same roll count as the old purple burst, so the sim is unchanged)
     if(player.buffs.deflect>0){boneLand(m,'dodge');floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You knock the bone aside.','#9fb8e0');return false}
@@ -296,7 +296,7 @@ function bossThink(m,dt){
     let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('The Skeleton King hurls a bone at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m);
     return false}
   m.bolt=(m.bolt===undefined?BOLT.first:m.bolt)-dt;
-  const bf=remote?castFoe(m):player; // multiplayer: he throws at whoever he's fighting
+  const bf=net.state==='on'?castFoe(m):player; // multiplayer: he throws at whoever he's fighting
   if(m.bolt<=0&&dist(m,bf)<BOLT.range&&sightClear(m,bf)){m.casting={name:'Bone Throw',t:0,dur:BOLT.cast,bone:1};if(bf!==player)m.casting.foe=bf;floatText(m.x,m.y-34,'Bone Throw!','#e8e0c8');
     log('The Skeleton King raises a bone to throw! Stun or fear him, or get out of range.','#c8a0ff');return true}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('The Skeleton King calls the dead to its side!','#ffb37a');
@@ -382,15 +382,15 @@ function chantThink(m,dt){m.chantCd=(m.chantCd===undefined?CHANT.first:m.chantCd
 function mobCast(m,dt){const c=m.def.cast;
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;const foe=m.casting.foe;m.casting=null;m.bolt=c.every;castPlay(m,'bolt');
-    if(foe){if(!remoteHere()||dist(m,foe)>c.range||!sightClear(m,foe)){if(remoteHere())floatText(foe.x,foe.y-20,'MISS',c.col);return false} // at your partner (multiplayer)
-      beams.push({x1:m.x,y1:m.y-12,x2:foe.x,y2:foe.y-8,t:0,col:c.col});burst(foe.x,foe.y-8,c.col,8);netSpellAlly(m,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
+    if(foe){if(!peerHere(foe)||dist(m,foe)>c.range||!sightClear(m,foe)){if(peerHere(foe))floatText(foe.x,foe.y-20,'MISS',c.col);return false} // at another player (multiplayer)
+      beams.push({x1:m.x,y1:m.y-12,x2:foe.x,y2:foe.y-8,t:0,col:c.col});burst(foe.x,foe.y-8,c.col,8);netSpellAlly(m,foe,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
     if(dist(m,player)>c.range){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' falls short. You were out of range.','#9fb8e0');return false}
     if(!sightClear(m,player)){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' breaks on the wall.','#9fb8e0');return false} // v0.126
     beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:c.col});burst(player.x,player.y-8,c.col,8);
     if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the '+c.name.toLowerCase()+'.','#9fb8e0');return false}
     mobSpellHit(m,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
   m.bolt=(m.bolt===undefined?c.first:m.bolt)-dt;
-  const cf=remote?castFoe(m):player; // multiplayer: it casts at whoever it's fighting
+  const cf=net.state==='on'?castFoe(m):player; // multiplayer: it casts at whoever it's fighting
   if(m.bolt<=0&&dist(m,cf)<c.range&&(victim(m)===player||cf!==player)&&sightClear(m,cf)){m.casting={name:c.name,t:0,dur:c.dur};if(cf!==player)m.casting.foe=cf;floatText(m.x,m.y-26,c.name+'!',c.col);
     if(c.boss)log(cap(m.def.name)+' begins casting '+c.name+'! Stun or fear it, or get out of range.',c.col);return true}
   return false}
@@ -407,12 +407,12 @@ function wispBlink(m,dt){m.blinkCd=(m.blinkCd===undefined?rr(3,5):m.blinkCd)-dt;
   return false}
 // Ember Brand (the Ashen Acolyte): a ring of embers flares under you; 1.5 s to step out of it, then a big burn inside.
 const BRAND={first:5,every:9,dur:1.5,r:20,x:1.5},hazards=[];
-function brandThink(m,dt){if(m.casting)return;const bt=remote?castFoe(m):player; // multiplayer: under whoever it's fighting
+function brandThink(m,dt){if(m.casting)return;const bt=net.state==='on'?castFoe(m):player; // multiplayer: under whoever it's fighting
   m.brandCd=(m.brandCd===undefined?BRAND.first:m.brandCd)-dt;if(m.brandCd>0||dist(m,bt)>120)return;m.brandCd=BRAND.every;
-  {const h={x:bt.x,y:bt.y,r:BRAND.r,t:0,dur:BRAND.dur,m:m};if(bt!==player)h.ally=1;hazards.push(h);if(remote)netHazard(h)}castPlay(m,'brand');floatText(m.x,m.y-26,'Ember Brand!','#ff8a3c');log(cap(m.def.name)+' brands the ground under you with embers! Move!','#ff8a3c')}
+  {const h={x:bt.x,y:bt.y,r:BRAND.r,t:0,dur:BRAND.dur,m:m};hazards.push(h);if(net.state==='on')netHazard(h)}castPlay(m,'brand');floatText(m.x,m.y-26,'Ember Brand!','#ff8a3c');log(cap(m.def.name)+' brands the ground under you with embers! Move!','#ff8a3c')}
 function updateHazards(dt){for(let i=hazards.length-1;i>=0;i--){const h=hazards[i];h.t+=dt;if(h.t<h.dur)continue;hazards.splice(i,1);
   for(let k=0;k<14;k++)parts.push({x:h.x+rr(-h.r,h.r),y:h.y+rr(-h.r*0.6,h.r*0.6),vx:rr(-6,6),vy:-rr(14,30),t:0,life:0.7,col:k%2?'#ff8a3c':'#ffd27a'});
-  if(player.dead||!h.m||h.m.dead||h.ally)continue; // ally: laid under your partner; their phone checks their feet
+  if(player.dead||!h.m||h.m.dead)continue; // multiplayer: every phone checks its own player's feet against every ring
   if(Math.hypot((player.x-h.x)/h.r,(player.y-h.y)/(h.r*0.6))<=1)mobSpellHit(h.m,(8+2*h.m.lv)*(h.mult||BRAND.x),h.label||'Ember Brand','#ff8a3c');else log('The embers flare where you stood.','#9aa')}}
 
 /* ---------- Dungeon 1 (v0.63): the altar switch, menders, Grasp of the Deep, Toll, Candle Wake ---------- */
@@ -528,7 +528,7 @@ function resetLocks(){const A=curArea();if(!A||!A.locks)return;A.locks.forEach(L
 // (or drag the fight away from it). Uses the same ground hazards as Ember Brand.
 const GBURN={first:4,every:8,dur:1.6,r:34,x:1.1};
 function burnThink(m,dt){if(m.casting)return;m.burnCd=(m.burnCd===undefined?GBURN.first:m.burnCd)-dt;if(m.burnCd>0||dist(m,player)>GBURN.r+30)return;m.burnCd=GBURN.every;
-  {const h={x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'};hazards.push(h);if(remote)netHazard(h)}castPlay(m,'flare');floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
+  {const h={x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'};hazards.push(h);if(net.state==='on')netHazard(h)}castPlay(m,'flare');floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
   log(cap(m.def.name)+' flares up! Get out of the ring of fire.','#ff8a3c')}
 // Toll: he heaves the bell's clapper up for 1.5 s (a bar over his head), then slams it down. Counter: step back to mid range
 // (slowed, not stunned), or stun him first. In the finale the ring also knocks Grasp's hands back down.

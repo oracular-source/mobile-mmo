@@ -12,9 +12,9 @@ let pet2=null; // v0.38: the Necro's second skeleton (Bone Pair fork). It runs t
 // A mob that's after "the pet" goes for the skeleton that last hit it (m.petT).
 // Multiplayer (v0.142): on the host, a monster whose top threat is your partner goes for them; on the guest, a copy of the
 // host's monster goes for whoever the host says (tg 2 = you). Solo never gets past the first check.
-const victim=m=>remote&&(m.mirror||m.threat.ally>0)?netVictim(m):victimSolo(m);
-function netVictim(m){if(m.mirror)return m.tg===2?(pet&&m.threat.pet>m.threat.p?pet:player):(remoteHere()?remote:player);
-  return !(decoy&&dist(m,decoy)<110)&&allyOn(m)&&m.threat.ally>m.threat.p&&m.threat.ally>m.threat.pet?remote:victimSolo(m)}
+// Multiplayer: once another player is involved (a mirror on a guest, or threat from another player on the host), js/net.js
+// netVictim picks by threat across every player. Solo never gets past the first check.
+const victim=m=>(m.mirror||m.threat.a)&&net.state==='on'?netVictim(m):victimSolo(m);
 const victimSolo=m=>(decoy&&dist(m,decoy)<110)?decoy:((pet||pet2)&&m.threat.pet>m.threat.p)?(pet2&&m.petT===pet2?pet2:(pet||pet2)):player;
 // Runs fn with the second skeleton standing in as "pet", then puts both back (pet2 becomes null if it died meanwhile).
 function withPet2(fn){if(!pet2)return;const keep=pet;pet=pet2;try{fn()}finally{pet2=pet;pet=keep}}
@@ -54,12 +54,12 @@ function arriveEnd(){if(!player.arriving)return;player.arriving=0;player.arriveT
 // True while m should leave you (and your pet beside you) alone because you just arrived.
 function arriveHold(m){if(!player.arriving)return false;if(time<player.arriveT)return true;if(!m.arrCalm)return false;
   const d=dist(m,player);if(d>m.def.aggro+ARRIVE.pad||d<Math.min(m.arrD,m.def.aggro)*ARRIVE.close){m.arrCalm=0;return false}return true}
-function engage(m,byPet,ally){ // ally: your partner pulled it (multiplayer host)
+function engage(m,byPet,ally){ // ally: the id of another player who pulled it (multiplayer host)
   if(m.mirror){if(byPet)m.threat.pet+=1;else m.threat.p+=1;if(!player.target)player.target=m;return} // a copy of the host's monster: the host decides
   if(m.dead||(player.dead&&!ally)||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
   if(m.aloof)return; // v0.126: seen but out of reach : never joins a fight (kept for teasers; unused since v0.132)
   arriveEnd(); // a fight started: arrival calm is over
-  if(ally){m.threat.ally=Math.max(1,m.threat.ally||0);m.allyHad=1}else if(byPet)m.threat.pet+=1;else m.threat.p+=1;
+  if(ally)allyEngage(m,ally);else if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target&&!ally)player.target=m;}
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
   const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;animHowl(m);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
@@ -69,13 +69,13 @@ function engage(m,byPet,ally){ // ally: your partner pulled it (multiplayer host
 // src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
 function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
-  const ally=src==='ally'||src==='allypet'; // your partner's hit (multiplayer host): worked out on their phone already
+  const ally=src==='ally'||src==='allypet'; // another player's hit (multiplayer host): worked out on their phone already
   if(src!=='npc'&&!ally&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
   if(src!=='npc'&&!ally&&m.crack>0)dmg*=1.2; // Sunder (Warrior fork): cracked armor
   dmg=Math.max(1,Math.round(dmg));
   if(m.mirror){mirrorHit(m,dmg,kind,label,src);return} // guest: a copy of the host's monster; the host applies the hit
   m.hp-=dmg;
-  if(ally){m.adm=(m.adm||0)+dmg;floatText(m.x,m.y-18,String(dmg),'#9fd8ff',0,'small');engage(m,false,true)}
+  if(ally){m.adm=(m.adm||0)+dmg;floatText(m.x,m.y-18,String(dmg),'#9fd8ff',0,'small');engage(m,false,m._af||'?')} // _af: which player (js/net.js authIn)
   else if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
   else if(src==='pet'){m.petT=pet;m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
@@ -550,7 +550,7 @@ function applyAbilityCore(a,t,fromHide){
     if(a.buff==='stance'){player.stanceX=a.stanceX||0;player.stanceHit=a.stanceHit||0;player.retal=a.retal?at(a.retal,a)*meleeMult():0}
     if(a.shelter){player.hots=(player.hots||[]).filter(o=>o.id!=='shelter');player.hots.push({id:'shelter',name:'Divine Shelter',t:at(a.dur,a),next:1,heal:at(a.shelter,a)*mult,holy:0,holyAll:0})}
     if(a.wrath){player.wrathT=at(a.dur,a);player.wrath={dmg:at(a.wrath,a)*mult,r:a.wrathR}}
-    if(a.buff==='fshield')player.fsPet=a.onPet?1:0;if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');if(remote)netBuffAlly(a,player.buffs[a.buff]);} // multiplayer: group buffs land on your partner too
+    if(a.buff==='fshield')player.fsPet=a.onPet?1:0;if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');if(net.state==='on')netBuffAlly(a,player.buffs[a.buff]);} // multiplayer: group buffs land on players close by too
   else if(a.kind==='lifetap'){
     beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
     const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);
