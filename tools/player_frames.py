@@ -5,6 +5,10 @@
 # Run: python3 tools/player_frames.py
 import os,sys,json,re;sys.path.insert(0,os.path.dirname(os.path.abspath(__file__)))
 import player_pass_draft as PD, warrior_draft as W
+import warrior_swing_draft as WS
+# Owner (Nov 27): the old chop ended with the blade pointing at the ground and read as stabbing down; option A,
+# a forward slash ending just below level, replaces it for all three knights (same body as chop_2, so same head spot).
+W.F['slash_2']=WS.O['A'][2];PD.HEADBOX['slash_2']=PD.HEADBOX['chop_2']
 outline=W.outline
 
 def step(rows,side):
@@ -36,8 +40,8 @@ SHIFT={'rogue':1,'monk':1}  # strike frames that step one pixel forward (body dr
 def frames(id):
     d=PD.D[id];poses={}
     if id in KNIGHTS:
-        F=W.F if id=='warrior' else {k:PD.rehead(k,PD.heads[id]) for k in ('chop_1','chop_2','stab_1','stab_2')}
-        poses['main']=[(F['chop_1'],0),(F['chop_2'],1)]   # auto attack: raise, chop
+        F=W.F if id=='warrior' else {k:PD.rehead(k,PD.heads[id]) for k in ('chop_1','slash_2','stab_1','stab_2')}
+        poses['main']=[(F['chop_1'],0),(F['slash_2'],1)]   # auto attack: raise, slash forward
         poses['skill']=[(F['stab_1'],0),(F['stab_2'],1)]  # abilities: draw back, thrust
     elif id in PD.GLOW:
         poses['cast']=[(d['act'],0),(d['act'],0)]

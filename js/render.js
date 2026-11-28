@@ -80,7 +80,13 @@ function mkRags(id){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
   // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.
   const pf=PLAYER15[id];if(pf){const pal=Object.assign({},RAG15_COMMON,pf.c),im=mk(pf.s,pal);im.ax=pf.s[0].length>>1;im.steps=[mk(pf.a,pal),mk(pf.b,pal)];
-    im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i]}))});return im}
+    im.fx=feetX(pf.s);
+    // Owner (Nov 27): legs froze mid-run whenever an attack or cast went off, because a pose frame carries standing (or
+    // lunging) legs. Each pose frame also gets three leg versions taken from the walk cycle (standing, left foot, right
+    // foot): the bottom 5 rows, columns 0-10 of the standing body (legs only; a staff foot at 11+ stays the pose's own).
+    const wk=[pf.s,pf.a,pf.b],mid=pf.s[0].length>>1;
+    im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i],
+      legs:wk.map(w=>mk(withLegs(r,pf.x[k][i]-mid,w),pal))}))});return im}
   const q=RAG15[id];if(q){const pal=Object.assign({},RAG15_COMMON,q.c),im=mk(q.r,pal);im.steps=[mk(q.a,pal),mk(q.b,pal)];return im}
   const c=RAGS[id];if(!c)return null;
   const W=20,g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>{const a=r.split('');while(a.length<W)a.push('.');return a});
@@ -99,11 +105,19 @@ function playerImg(){
   const k='rags_'+CLS;if(!IMG[k])IMG[k]=mkRags(CLS)||IMG.druid;return IMG[k];
 }
 // Walk cycle for pictures that have step frames: stand, left foot up, stand, right foot up (body rises on steps).
+// Copy the walk frame's legs (bottom 5 rows, standing columns 0-10) into a pose frame; sh = pose column minus standing column.
+function withLegs(pose,sh,walk){const P=pose.map(r=>r.split('')),dy=P.length-walk.length;
+  for(let y=walk.length-5;y<walk.length;y++)for(let x=0;x<=10;x++){const X=x+sh;if(P[y+dy]&&X>=0&&X<P[y+dy].length)P[y+dy][X]=walk[y][x]}
+  return P.map(r=>r.join(''))}
+// Where the feet are (the middle column of the boots, 'O', in the bottom rows, left of any staff), so the shadow sits under
+// the feet rather than under the picture's middle; most classes stand a pixel left of the middle (owner, Nov 27).
+function feetX(rows){const h=rows.length;let n=0,t=0;for(let y=h-3;y<h;y++)for(let x=0;x<=10&&x<rows[y].length;x++)if(rows[y][x]==='O'){n++;t+=x}
+  return n?Math.round(t/n):rows[0].length>>1}
 function walkFrame(img,walk,moving){
   if(!moving)return{im:img,bob:0};
   const f=Math.floor(walk*6)%4; // a bit slower than before so the steps read clearly
   if(!img.steps)return{im:img,bob:f%2};
-  return{im:f===1?img.steps[0]:f===3?img.steps[1]:img,bob:0}; // feet move, body stays put (the bob made it look jittery)
+  return{im:f===1?img.steps[0]:f===3?img.steps[1]:img,bob:0,leg:f===1?1:f===3?2:0}; // feet move, body stays put (the bob made it look jittery)
 }
 
 /* ---------- Render ---------- */
@@ -162,7 +176,9 @@ function lightStamp(r,amb,kind){
   }
   g.putImageData(id,0,0);stampCache[key]=c;return c;
 }
-function shadow(x,y,r){lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2,2);lx.fillRect(x-r+1,y+1,r*2-2,1)}
+// Whole pixels and the same width on both sides of x (owner, Nov 27: shadows shook, because a fractional position
+// smeared the edge pixels a little differently every frame while the body snapped to whole pixels).
+function shadow(x,y,r){x=Math.round(x);y=Math.round(y);lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2+1,2);lx.fillRect(x-r+1,y+1,r*2-1,1)}
 // Mob attack frames (MOB_POSES, from tools/mob_attack_draft.py) turned into pictures once: each with its ax and by.
 const MOB_POSE_IMG={};Object.keys(MOB_POSES).forEach(k=>{const P=MOB_POSES[k],o={t:P.t};['wind','smear','hit','rec'].forEach(s=>{o[s]={im:mk(P[s].rows,P.pal),ax:P[s].ax,by:P[s].by}});MOB_POSE_IMG[k]=o});
 function drawSprite(img,x,y,dir,bob,sit){
@@ -308,11 +324,12 @@ function render(){
   const drawEnt=e=>{
     if(e===player){
       if(player.dead>0)return;
-      shadow(player.x,player.y,6);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
       const pim=playerImg(),pp=player.sit||player.fd>0?null:playerPose(pim),wf=walkFrame(pim,player.walk,moving&&!player.sit);
+      // Shadow under the feet: the feet column measured from the standing picture, mirrored when facing left.
+      const fo=pim&&pim.fx!=null?pim.fx-(pim.w>>1):0;shadow(Math.round(player.x)+(player.dir<0?-fo:fo),player.y,5);
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
-      if(pp)drawPose(pp,player.x,player.y+1,player.dir); // attack or cast pose (js/anim.js)
+      if(pp)drawPose(moving&&pp.legs?{im:pp.legs[wf.leg||0],ax:pp.ax}:pp,player.x,player.y+1,player.dir); // attack or cast pose (js/anim.js); legs keep walking
       else drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);
       lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}

@@ -1,4 +1,5 @@
 [
+{"file": "v0.116-run-attack-legs.gif", "title": "Running attacks and steady shadows", "version": "v0.116", "date": "2026-11-27", "tag": "Animation", "note": "Warrior, Druid and Rogue running back and forth while attacking: the legs keep stepping through every swing and cast, the Warrior's new forward slash, and a steady shadow under the feet."},
 {"file": "v0.114-wolf-bite.gif", "title": "Blight wolf bites for real", "version": "v0.113", "date": "2026-11-27", "tag": "Animation", "note": "The wolf crouches, springs in with its jaws open and snaps them fully shut on you, then pulls back. No floating fangs."},
 {"file": "v0.114-king-swing.gif", "title": "Skeleton King's overhead swing", "version": "v0.113", "date": "2026-11-27", "tag": "Animation", "note": "He holds his sword overhead, brings it down in one big arc and the blade bites the floor in a puff of dust, then drags it back up."},
 {"file": "v0.114-skeleton-swing.gif", "title": "Crypt skeleton sword swing", "version": "v0.113", "date": "2026-11-27", "tag": "Animation", "note": "The skeleton raises its sword back (the tell), one fast smear, holds the hit with a small lunge, then recovers."},
