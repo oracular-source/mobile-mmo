@@ -138,8 +138,8 @@ function update(dt){
       else if(m.arrCalm&&arriveHold(m)){} // calm after your arrival: stands its ground, doesn't wander into you
       else{m.wt-=dt;if(m.wt<=0){m.wt=rr(2,6);m.wx=m.hx+rr(-20,20);m.wy=m.hy+rr(-14,14);if(blocked(m.wx,m.wy)){m.wx=m.hx;m.wy=m.hy}}
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);}
-      if(!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
-      else if(pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
+      if(!m.aloof&&!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
+      else if(!m.aloof&&pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
     }else if(m.state==='chase'){
       if(player.dead){m.state='return';return}
       if(m.fear>0){m.fear-=dt;if(spd>0)fearThink(m,player,spd*0.7,dt);return} // feared: zig-zags away from you and steers clear of other camps (js/path.js)

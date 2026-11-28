@@ -83,7 +83,7 @@ def check(m, tiles, objs):
             if kind not in objs: E.append(f'unknown object {kind}'); continue
             o = dict(objs[kind], kind=kind, x=x, y=y)
             placed.append(o)
-        elif k == 'spawn': markers.append(dict(k=k, type=t[1], lv=lv_range(t[2]), x=int(t[3]), y=int(t[4])))
+        elif k == 'spawn': markers.append(dict(k=k, type=t[1], lv=lv_range(t[2]), x=int(t[3]), y=int(t[4]), aloof='aloof' in t[5:]))  # aloof: seen but out of reach on purpose (v0.125)
         elif k == 'named': markers.append(dict(k=k, type=t[1], lv=lv_range(t[2]), x=int(t[3]), y=int(t[4]), extra=t[5:]))
         elif k == 'rare': markers.append(dict(k=k, type=t[1], x=int(t[2]), y=int(t[3])))
         elif k == 'chest': markers.append(dict(k=k, type='chest', x=int(t[1]), y=int(t[2])))
@@ -193,7 +193,7 @@ def check(m, tiles, objs):
                 if walk(nx, ny) and (nx, ny) not in dist:
                     dist[(nx, ny)] = dist[(x, y)] + 1; q.append((nx, ny))
         for mk in markers:
-            if (mk['x'], mk['y']) not in dist: E.append(f"can't reach {mk['k']} {mk['type']} at {mk['x']},{mk['y']} from the start")
+            if (mk['x'], mk['y']) not in dist and not mk.get('aloof'): E.append(f"can't reach {mk['k']} {mk['type']} at {mk['x']},{mk['y']} from the start")
         for o in placed:
             d = door(o)
             if d and d not in dist: E.append(f"can't reach the {o['kind']} door at {d[0]},{d[1]}")

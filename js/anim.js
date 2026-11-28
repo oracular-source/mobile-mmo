@@ -64,7 +64,8 @@ function poseFrame(m){const P=MOB_POSE_IMG[m.def.img];if(!P||m.casting)return nu
   if(m.swT>0){const e=(m.swDur||0)-m.swT;return e<t[1]?P.smear:e<t[1]+t[2]?P.hit:P.rec}
   if(m.near>0&&m.atk>0&&m.atk<t[0]&&m.aimX!==undefined)return P.wind;
   return null}
-function mobAnim(m){let dx=0,dy=0;if(MOB_POSES[m.def.img])return{dx:0,dy:0}; // drawn frames move the body themselvesconst img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
+function mobAnim(m){let dx=0,dy=0;if(MOB_POSES[m.def.img])return{dx:0,dy:0}; // drawn frames move the body themselves
+  const img=IMG[m.def.img],L=Math.min(6,Math.max(3,Math.round(((img&&img.w)||14)*0.18)));
   if(m.near>0&&m.atk>0&&m.atk<0.3&&m.aimX!==undefined){const k=(0.3-m.atk)/0.3,ax=m.aimX-m.x,ay=m.aimY-m.y,d=Math.hypot(ax,ay)||1;dx-=ax/d*k;dy-=ay/d*k} // the wind-up: leans back a pixel
   if(m.swT>0){const p=1-m.swT/(m.swDur||SWING),o=p<0.25?p/0.25:1-(p-0.25)/0.75;dx+=m.swx*L*o;dy+=m.swy*L*o*0.7}
   return{dx:Math.round(dx),dy:Math.round(dy)}}

@@ -51,6 +51,7 @@ function arriveHold(m){if(!player.arriving)return false;if(time<player.arriveT)r
   const d=dist(m,player);if(d>m.def.aggro+ARRIVE.pad||d<Math.min(m.arrD,m.def.aggro)*ARRIVE.close){m.arrCalm=0;return false}return true}
 function engage(m,byPet){
   if(m.dead||player.dead||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
+  if(m.aloof)return; // v0.125: seen but out of reach (the cultists up behind Ironshell's nook): they never join a fight
   arriveEnd(); // a fight started: arrival calm is over
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
@@ -416,6 +417,7 @@ function cast(a,quiet){
     if(!picked&&(!t||t.dead)){t=nearestMob(a.range)||nearestMob(150);if(t)player.target=t;}
     if(!t){if(!quiet)log('No enemy nearby.','#9aa');return false}
     if(dist(player,t)>a.range){if(!quiet){log('Out of range. Move closer.','#ff8a80');floatText(player.x,player.y-24,'Out of range','#ff8a80')}rangeShow=0.8;rangeR=a.range;return false}
+    if(!sightClear(player,t)){if(!quiet){log("You can't see your target from here.",'#ff8a80');floatText(player.x,player.y-24,'Not in sight','#ff8a80')}return false} // v0.125: no casting through walls
     if(a.kind==='backstab'&&!hidden()&&!behind(t)&&!openTo(t)&&!(player.kidney>0)){if(!quiet){log('Backstab needs you hidden, behind the target, or the target stunned or Evaded.','#ff8a80');floatText(player.x,player.y-24,'Get behind it','#ff8a80')}return false}
     if(a.undeadOnly&&!isUndead(t)){if(!quiet){log(a.name+' only works on the undead.','#ff8a80');floatText(player.x,player.y-24,'Undead only','#ff8a80')}return false}
     if((a.kind==='mez'||a.kind==='charm')&&t.def.boss){if(!quiet)log(cap(t.def.name)+' can not be '+(a.kind==='mez'?'mesmerized':'charmed')+'.','#ff8a80');return false}

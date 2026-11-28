@@ -13,13 +13,13 @@ MAPS.crossroads = {
     ',TTTTTTTTTTTTTFTTTTTTTT,,==,,,,FT,,T,T,,,,,,,,~~',
     'TTTT,TTTTTTTTT,,TTT,TTT,,==,,,,,,,T,,,T,,,~~~~~~',
     'TTTTTTTTTT,TTTTTTT,TTTT,,==,,,,,,,,,,,,~~~~~~~,,',
-    'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~,,,,,,',
-    'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,,,,,,,,',
-    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT::',
-    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,T:,T',
-    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTT:,TT',
-    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,:TTT',
-    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,:TTTT',
+    'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~TTTWWW',
+    'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,T,,,Wnn',
+    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,T,,,Wnn',
+    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,T,,,Wnn',
+    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTT,,,Wnn',
+    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,,WWW',
+    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,,TTTT',
     'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,:TTTT',
     '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,:,,TTT',
     '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,:,,,TT',
@@ -61,7 +61,6 @@ exit south 25 40 to=town1 lit   # v0.64: at the closed gate (Town 1 isn't built 
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
-exit east_path 47 10 to=chapel at=east_path   # v0.62: the steep path up to the chapel's east gate (it opens from the chapel side)
 # by the town road: the easiest rats
 spawn rat 1 21 37
 spawn rat 1 28 33
@@ -73,7 +72,6 @@ spawn rat 2 6 29
 spawn beetle 2-3 9 13
 spawn beetle 2-3 13 12
 spawn beetle 2-3 6 14
-rare ironshell 10 16
 # east of the crossing, toward the sinkhole
 spawn rat 2 31 27
 spawn rat 2-3 34 24
@@ -98,8 +96,6 @@ spawn beetle 3 36 6
 # small stories and wear (heart pass, v0.59)
 obj town_gate 23 41   # v0.64: a gatehouse in a palisade wall, doors shut
 obj wagon 11 32
-obj bedroll 18 24 open   # v0.123 (love pass X3): a traveller camps here: bedroll laid out, pack by the fire
-obj pack 22 24
 obj fallen_log 19 27
 obj fishing_rod 26 10
 fog 3 10 17 8
@@ -129,6 +125,14 @@ critter rabbit 14 36.5
 critter rabbit 41.5 16.5
 # secret: a chest at the end of a deer trail in the south-west woods
 chest 5 38
+# Ironshell's nook (v0.125, owner, Nov 27; replaces the steep east path up to the chapel, where level 1-3 players met level
+# 10-14 cultists): the path trails off into a grass gap in the trees and a hidden pocket under the chapel's wall. Ironshell
+# is always home, guarding a chest. Up behind the wall a few cultists walk about: you can see and tap them, but no one can
+# reach anyone (aloof = they never join a fight; the wall blocks spells both ways, line of sight v0.125).
+named ironshell 3 43 11
+chest 43 9
+spawn cult_zealot 12 46 10 aloof
+spawn cult_chanter 12 47 11 aloof
 label 24 24 Crossroads
 label 40 19 Sinkhole
 label 25 9 Old bridge

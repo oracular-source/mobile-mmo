@@ -33,8 +33,8 @@ MAPS.chapel = {
     'FFFnvnqqqqqaaqqaaaaaaqaaaaaaaaaqaaaaaqaqaaaaW::O',
     'FFFvvnqqqqqaaaaaaqqqaaaaasssssqaaaaaaaaaaqaaW::F',
     'FFFnnn:nnnWqa+o++o+aaaaqqsssssaaaaaaqqaaaaaaW::F',
-    'FFFnn::nvrWaaqaaaaaqaaaqqsssssqaaaaaaaaaaaqaW::O',
-    'FFFnna:avFWaTaaaaqaaaqaaaqaaaaaaaaaqaaaaqaqaW:::',
+    'FFFnn::nvrWaaqaaaaaqaaaqqsssssqaaaaaaaaaaaqaW:OO',
+    'FFFnna:avFWaTaaaaqaaaqaaaqaaaaaaaaaqaaaaqaqaW::O',
     'FFFnnn:naFWqq++o+++aaqaaqaqaqqqaaaqaqaaaaqaaWOOF',
     'FFFnvn:anFWaqaaqaaaqqqaaaaaaaaaaaaqaaaaqaaaaWOOO',
     'FFFnn::vnFWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWbbF',
@@ -90,7 +90,7 @@ obj lantern 26 38
 # ways in and out
 exit south 28 39 to=wolfwood at=north
 exit dungeon 27 22 to=dungeon1 at=out lit
-exit east_path 47 25 to=crossroads at=east_path
+# the east path down to the crossroads fell away (v0.125): the barred gate now opens onto a ledge with a view
 # the east gate is barred: it opens from the inside (west) and stays open
 bar 44 18 chapel_east_gate W
 # on the road in: lone wisps and the first camp (10)

@@ -283,7 +283,7 @@ function bossThink(m,dt){
     let dmg=tankMods((8+2*m.lv)*rr(0.85,1.15));dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg;if(dmg>0)floatText(player.x,player.y-20,String(dmg),'#c8a0ff');log('The Skeleton King hurls a bone at YOU for '+dmg+'.','#c8a0ff');if(player.hp<=0&&!lastStand())playerDie(m);
     return false}
   m.bolt=(m.bolt===undefined?BOLT.first:m.bolt)-dt;
-  if(m.bolt<=0&&dist(m,player)<BOLT.range){m.casting={name:'Bone Throw',t:0,dur:BOLT.cast,bone:1};floatText(m.x,m.y-34,'Bone Throw!','#e8e0c8');
+  if(m.bolt<=0&&dist(m,player)<BOLT.range&&sightClear(m,player)){m.casting={name:'Bone Throw',t:0,dur:BOLT.cast,bone:1};floatText(m.x,m.y-34,'Bone Throw!','#e8e0c8');
     log('The Skeleton King raises a bone to throw! Stun or fear him, or get out of range.','#c8a0ff');return true}
   if(!m.added&&m.hp<m.maxhp/2){m.added=true;log('The Skeleton King calls the dead to its side!','#ffb37a');
     [[-18,6],[18,6]].forEach(o=>{const sp={type:'cskel',x:m.x+o[0],y:m.y+o[1],timer:0,mob:null,group:null,lv:[5,5],noRespawn:true};if(blocked(sp.x,sp.y)){sp.x=m.x;sp.y=m.y}const a=spawn(sp);a.state='chase';burst(a.x,a.y-6,'#b48cff',8)})}
@@ -368,11 +368,12 @@ function mobCast(m,dt){const c=m.def.cast;
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
   if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.bolt=c.every;
     if(dist(m,player)>c.range){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' falls short. You were out of range.','#9fb8e0');return false}
+    if(!sightClear(m,player)){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' breaks on the wall.','#9fb8e0');return false} // v0.125
     beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:c.col});burst(player.x,player.y-8,c.col,8);
     if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the '+c.name.toLowerCase()+'.','#9fb8e0');return false}
     mobSpellHit(m,c.boss?(8+2*m.lv):(m.def.dmg+m.def.dmgl*m.lv)*c.x,c.name,c.col);return false}
   m.bolt=(m.bolt===undefined?c.first:m.bolt)-dt;
-  if(m.bolt<=0&&dist(m,player)<c.range&&victim(m)===player){m.casting={name:c.name,t:0,dur:c.dur};floatText(m.x,m.y-26,c.name+'!',c.col);
+  if(m.bolt<=0&&dist(m,player)<c.range&&victim(m)===player&&sightClear(m,player)){m.casting={name:c.name,t:0,dur:c.dur};floatText(m.x,m.y-26,c.name+'!',c.col);
     if(c.boss)log(cap(m.def.name)+' begins casting '+c.name+'! Stun or fear it, or get out of range.',c.col);return true}
   return false}
 // A spell or burn on you from a mob: same softening as the King's bolt (Warrior passives, shields), plus the level gap.

@@ -26,6 +26,6 @@ function spawn(sp){
   let type=sp.type;
   const T0=TYPES[type],range=type==='gnaw'?T0.lv:(sp.lv||T0.lv),lv=Math.floor(rr(range[0],range[1]+1));
   const m={sp:sp,type:type,def:T0,lv:lv,maxhp:T0.hp+T0.hpl*lv,x:sp.x,y:sp.y,hx:sp.x,hy:sp.y,state:'idle',wt:rr(1,4),wx:sp.x,wy:sp.y,root:0,snare:0,dots:[],atk:1,dir:1,dead:false,walk:0,pdmg:0,odmg:0};
-  m.hp=m.maxhp;m.threat={p:0,pet:0};sp.mob=m;mobs.push(m);return m;
+  m.hp=m.maxhp;m.threat={p:0,pet:0};if(sp.aloof)m.aloof=1;sp.mob=m;mobs.push(m);return m;
 }
 spawns.forEach(spawn);
