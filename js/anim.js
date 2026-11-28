@@ -181,6 +181,7 @@ function animPlayer(a,t){if(logMute||!a)return;const im=playerImg(),P=im&&im.pos
   else if(P.cast)k='cast';
   if(!k)return;
   player.pose={k:k,t0:time};
+  if(k==='cast'&&!(a.cast>0)&&!a.melee)player.flash={a:a,t0:time}; // instant spell: a short glow at the staff tip, sized by its mana
   if(main||!a.melee)return; // plain main attack; spells keep their own looks
   // Ability flair, small for now.
   if(a.kind==='cleave'){fxo.push({k:'parc',x:player.x,y:player.y-7,dir:player.dir,r:Math.min(13,(a.radius||16)*0.6),t:0,life:0.2});return}
@@ -203,10 +204,15 @@ function castGlowStamp(r,col){const k=r+col;if(CGLOW[k])return CGLOW[k];
   for(let y=0;y<z;y++)for(let x=0;x<z;x++){const v=Math.max(0,1-Math.hypot(x-r,y-r)/(r+0.5)),o=(y*z+x)*4;d[o]=R;d[o+1]=G;d[o+2]=B;d[o+3]=v*v*255}
   g.putImageData(id,0,0);return CGLOW[k]=c}
 // Owner (Nov 27, v0.133): no drifting motes and no flutter; just a steady glow that grows brighter as the bar fills.
-function castGlowDraw(){const c=player.castTip;if(!c)return;const p=c.p,r=Math.round(3+6*p);
-  lx.globalCompositeOperation='lighter';lx.globalAlpha=0.3+0.5*p;lx.drawImage(castGlowStamp(r,c.col),c.x-r,c.y-r);lx.globalCompositeOperation='source-over';
-  lx.globalAlpha=1;lx.fillStyle='#fffbe8';lx.fillRect(c.x,c.y,1,1);
-  if(p>0.5){lx.globalAlpha=Math.min(1,(p-0.5)*2);lx.fillRect(c.x-1,c.y,3,1);lx.fillRect(c.x,c.y-1,1,3)}lx.globalAlpha=1}
+// Owner (Nov 27, v0.135): how big and bright it can get comes from the spell's mana cost, in three steps (GLOW_TIER), for
+// cast-time and instant spells alike; c.p is how far along it is (the cast bar, or the instant flash fading out).
+const GLOW_TIER={r:[5,7,9],a:[0.5,0.65,0.8],light:[14,20,26]}; // small (under 10 mana), medium (10-19), big (20+)
+const FLASH_T=PPOSE.cast[0]+PPOSE.cast[1]; // an instant spell glows as long as its cast pose lasts
+function glowTier(a){const m=a.mana||0;return m>=20?2:m>=10?1:0}
+function castGlowDraw(){const c=player.castTip;if(!c)return;const p=c.p,T=c.tier,r=Math.max(2,Math.round(2+(GLOW_TIER.r[T]-2)*p));
+  lx.globalCompositeOperation='lighter';lx.globalAlpha=0.25+(GLOW_TIER.a[T]-0.25)*p;lx.drawImage(castGlowStamp(r,c.col),c.x-r,c.y-r);lx.globalCompositeOperation='source-over';
+  lx.globalAlpha=Math.min(1,0.4+p);lx.fillStyle='#fffbe8';lx.fillRect(c.x,c.y,1,1);
+  if(T===2&&p>0.5){lx.globalAlpha=Math.min(1,(p-0.5)*2);lx.fillRect(c.x-1,c.y,3,1);lx.fillRect(c.x,c.y-1,1,3)}lx.globalAlpha=1}
 // Ability flair drawing (in the world, before the lighting, like the mob slashes).
 function playerFxDraw(f){const p=f.t/f.life;
   if(f.k==='parc'){lx.fillStyle='#f2eee0';const base=f.dir>0?0:Math.PI; // a thin arc sweeping round in front, top to bottom

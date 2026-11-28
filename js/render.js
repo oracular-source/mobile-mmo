@@ -377,11 +377,13 @@ function render(){
       lx.globalAlpha=1;
       // Channel glow (character lane, owner Nov 27): a spell with a cast time charges at the staff tip (or the hand, or in
       // front of the body for classes with no cast pose); js/anim.js castGlowDraw draws it and the light pool grows with it.
-      if(player.cast&&!player.cast.a.melee&&!player.sit){let tx,ty;
+      const fl0=player.flash,flE=fl0?time-fl0.t0:9;if(flE>=FLASH_T||player.cast)player.flash=null;
+      const ga=player.cast&&!player.cast.a.melee?player.cast.a:player.flash?player.flash.a:null;
+      if(ga&&!player.sit){let tx,ty;
         if(pp&&pp.tip){const im=moving&&pp.legs?pp.legs[wf.leg||0]:pp.im,dx=Math.round(player.x)-(player.dir<0?im.w-1-pp.ax:pp.ax),dy=Math.round(player.y+1)-im.h+(pp.by||0)+(im.by||0);
           tx=player.dir<0?dx+im.w-1-pp.tip[0]:dx+pp.tip[0];ty=dy+pp.tip[1]}
         else{tx=Math.round(player.x)+player.dir*6;ty=Math.round(player.y)-10}
-        player.castTip={x:tx,y:ty,p:Math.min(1,player.cast.time/player.cast.a.cast),col:player.cast.a.col}}
+        player.castTip={x:tx,y:ty,p:player.cast?Math.min(1,player.cast.time/ga.cast):1-flE/FLASH_T,col:ga.col,tier:glowTier(ga)}}
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.buffs.aura>0){lx.fillStyle='#ffd27a';for(let a=0;a<16;a++){if((a+Math.floor(time*8))%2)continue;const an=a/16*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*8),Math.round(player.y-7+Math.sin(an)*10),1,1)}}
@@ -465,7 +467,7 @@ function render(){
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
   // v0.72 (owner, Nov 21): the player no longer carries a light; you see by the world's own lights and ambient.
   // PLAYER_LIGHT = 1 brings the old glow back (radius 95) if dark spots turn out unreadable on the phone.
-  const ct=player.castTip,lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(ct?[{x:ct.x,y:ct.y,r:8+18*ct.p,w:0,steady:1}]:[],zl) // channel glow lights the ground around the caster
+  const ct=player.castTip,lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(ct?[{x:ct.x,y:ct.y,r:6+(GLOW_TIER.light[ct.tier]-6)*ct.p,w:0,steady:1}]:[],zl) // channel glow lights the ground around the caster
     .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c||l.steady?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
   if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
   dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);

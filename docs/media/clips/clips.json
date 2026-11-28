@@ -1,4 +1,5 @@
 [
+{"file": "v0.135-glow-by-mana.gif", "title": "Staff glow sized by mana", "version": "v0.135", "date": "2026-11-27", "tag": "Animation", "note": "Druid (Mend, small), Necro (Raise Bones, medium) and Cleric (Greater Heal, big) charge a cast, then each fires a cheap and a dearer instant spell: the glow's size follows the mana cost."},
 {"file": "v0.134-beetle-attack-death.gif", "title": "Mire beetle: pincers and a flip", "version": "v0.134", "date": "2026-11-27", "tag": "Animation", "note": "Rears up with its pincers open, snaps them shut on you; dies on its back, legs flailing, then curled in."},
 {"file": "v0.134-ironshell-attack-death.gif", "title": "Ironshell: the shell ram", "version": "v0.134", "date": "2026-11-27", "tag": "Animation", "note": "Rears up high, rams forward and his shell thumps down with dust; dies on his back with a thud."},
 {"file": "v0.134-boar-attack-death.gif", "title": "Thornback boar: tusk toss", "version": "v0.134", "date": "2026-11-27", "tag": "Animation", "note": "Head down, charges in and tosses its tusks up; dies knees first, belly down, one last kick."},
