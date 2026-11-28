@@ -93,14 +93,15 @@ function netLost(){if(net.state==='off')return;const who=remote?remote.name:'You
 function netSendState(){const p=player,moving=p.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
   const w=inv.equip.weapon;
   netSend({t:'s',z:zoneId,x:Math.round(p.x*10)/10,y:Math.round(p.y*10)/10,d:p.dir,m:moving&&!p.sit?1:0,sit:p.sit?1:0,dead:p.dead>0?1:0,hid:hidden()||p.fd>0?1:0,
-    hp:Math.round(p.hp),mhp:Math.round(maxHP(p.lvl)),lv:p.lvl,cls:CLS,w:w&&ITEMS[w]?w:'',name:netName(),
+    hp:Math.round(p.hp),mhp:Math.round(maxHP(p.lvl)),lv:p.lvl,cls:CLS,w:w&&ITEMS[w]?w:'',name:netName(),ch:inv.equip.chest||'',hd:inv.equip.head||'',
+    pt:[pet,pet2].filter(q=>q&&q.hp>0).map(q=>[q.img||'pet',Math.round(q.x),Math.round(q.y),q.dir<0?-1:1,Math.round(q.hp),Math.round(q.maxhp)]), // step 3: your partner sees your pets
     c:p.cast&&!p.cast.a.melee?{n:p.cast.a.name,col:p.cast.a.col,p:Math.min(1,p.cast.time/p.cast.a.cast)}:0})}
 function netMsg(d){if(!d||!d.t)return;net.heardT=performance.now()/1000;if(net.quiet){net.quiet=false;netStatus()}
   if(d.t==='full'){netFail('That game already has two players.');return}
   if(d.t==='bye'){const who=remote?remote.name:'Your partner';netClose(true);log('Group: '+who+' left the game.','#9fd8ff');return}
   if(d.t==='hi'){const first=!remote;netRemote(d);if(first){log('Group: '+remote.name+' ('+(CLASSES[d.cls]?CLASSES[d.cls].name:d.cls)+') joined. Say hi from Menu → Group.','#9fd8ff');banner('Playing together',remote.name+' is here')}
     if(d.v!==GAME_V)log('Group: '+remote.name+' is on v'+d.v+', you are on v'+GAME_V+'. Both reload the page so you match.','#ffd27a');netStatus();return}
-  if(netHostMsg(d)||netGuestMsg(d)||netHealMsg(d))return; // step 2: shared mobs and heals
+  if(netHostMsg(d)||netGuestMsg(d)||netHealMsg(d)||netStep3Msg(d))return; // steps 2 and 3: shared mobs, heals, spells, buffs
   if(d.t==='s'){netRemote(d);return}
   if(d.t==='c'&&remote){if(remote.z===zoneId){burst(remote.x,remote.y-10,d.col||'#cfc8b2',6,true);floatText(remote.x,remote.y-24,d.n,d.col||'#cfc8b2',false,'word')}return}
   if(d.t==='say'&&remote&&typeof d.text==='string'){const t=d.text.slice(0,120);if(remoteHere())say(remote,t,true);else log(remote.name+' says, "'+t+'"','#d8c8ff');return}}
@@ -113,7 +114,11 @@ function netRemote(d){const known=!!remote,cls=CLASSES[d.cls]?d.cls:'druid';
   if(known&&zoneChanged&&r.z){log('Group: '+r.name+(d.z===zoneId?' is here with you.':' went to '+(zoneName(d.z)||'another area')+'.'),'#9fd8ff');netStatus()}
   r.z=d.z;r.tx=d.x;r.ty=d.y;if(zoneChanged||Math.hypot(r.x-d.x,r.y-d.y)>48){r.x=d.x;r.y=d.y} // a jump (new area, a blink): snap instead of sliding
   if(d.dead&&!r.dead&&net.role==='host'&&net.shared)netAllyDown(); // the guest went down: monsters on them go home
-  r.hid=!!d.hid;r.dir=d.d<0?-1:1;r.moving=!!d.m;r.sit=!!d.sit;r.dead=!!d.dead;r.hp=d.hp;r.mhp=d.mhp||1;r.lv=d.lv;r.w=d.w&&ITEMS[d.w]?d.w:'';r.cast=d.c||null}
+  r.hid=!!d.hid;r.dir=d.d<0?-1:1;r.moving=!!d.m;r.sit=!!d.sit;r.dead=!!d.dead;r.hp=d.hp;r.mhp=d.mhp||1;r.lv=d.lv;r.w=d.w&&ITEMS[d.w]?d.w:'';r.cast=d.c||null;
+  r.ch=d.ch&&ITEMS[d.ch]?d.ch:'';r.hd=d.hd&&ITEMS[d.hd]?d.hd:''; // step 3: their chest and head looks
+  // Their pets (step 3): drawn like yours, sliding to where their phone says.
+  const pl=Array.isArray(d.pt)?d.pt.slice(0,2):[];r.pets=pl.map((q,i)=>{const o=(r.pets&&r.pets[i]&&r.pets[i].img===q[0])?r.pets[i]:{rpet:1,img:IMG[q[0]]?q[0]:'pet',x:q[1],y:q[2],walk:0};
+    o.tx=q[1];o.ty=q[2];o.dir=q[3]<0?-1:1;o.hp=q[4];o.maxhp=q[5]||1;if(zoneChanged||Math.hypot(o.x-q[1],o.y-q[2])>48){o.x=q[1];o.y=q[2]}return o})}
 // Called when you cast anything (js/combat.js applyAbilityCore): your partner sees a spark and the spell's name.
 function netCast(a){if(net.state!=='on'||simState.busy||!a)return;netSend({t:'c',n:a.name,col:a.col})}
 function netSay(text){text=(text||'').trim().slice(0,120);if(!text||net.state!=='on')return;netSend({t:'say',text:text});
@@ -129,12 +134,14 @@ function netTick(dt){
   if(net.state==='on'){net.sendT-=dt;if(net.sendT<=0){net.sendT=NET.rate;netSendState()}
     const q=performance.now()/1000-net.heardT>NET.quiet;if(q!==net.quiet){net.quiet=q;if(q&&remote)log('Group: '+remote.name+' is not responding (screen off, or the connection dropped?).','#ffd27a');netStatus()}}
   if(remote){const r=remote,k=Math.min(1,dt*12);r.x+=(r.tx-r.x)*k;r.y+=(r.ty-r.y)*k;
-    if(r.moving)r.walk+=dt*1.4;else r.walk=0}}
+    if(r.moving)r.walk+=dt*1.4;else r.walk=0;
+    (r.pets||[]).forEach(o=>{const dx=o.tx-o.x,dy=o.ty-o.y;if(Math.abs(dx)+Math.abs(dy)>0.3)o.walk+=dt*1.4;o.x+=dx*k;o.y+=dy*k})}}
 // Is the partner drawn in this area right now?
 function remoteHere(){return remote&&net.state==='on'&&remote.z===zoneId&&!remote.dead}
 // The partner's picture: their class's rags look with their weapon in hand (same pictures as yours, built once and kept).
-function remoteImg(r){const it=r.w&&ITEMS[r.w],wid=it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[r.cls]?r.w:'',k='rags_'+r.cls+'|'+wid;
-  if(!IMG[k])IMG[k]=mkRags(r.cls,wid)||IMG.druid;return IMG[k]}
+function remoteImg(r){const it=r.w&&ITEMS[r.w],wid=it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[r.cls]?r.w:'',
+    eq={chest:r.ch,head:r.hd},lk={chest:slotLook(eq,'chest'),head:slotLook(eq,'head')},k='rags_'+r.cls+'|'+wid+'|'+lk.chest+lk.head; // same key as yours, so a shared look is built once
+  if(!IMG[k])IMG[k]=mkRags(r.cls,wid,lk)||IMG.druid;return IMG[k]}
 
 /* ---------- Menu → Group ---------- */
 function renderGroup(){const box=$('groupbox');if(!box)return;
@@ -212,7 +219,8 @@ function netSendMobs(dt){netMobT-=dt;netRosterT-=dt;if(netMobT>0)return;netMobT=
     if(time-(m._ns||-9)<(near?SHARE.fast:SHARE.slow)-0.01)return;m._ns=time;
     const v=m.state==='chase'?victim(m):null;
     l.push([m.nid,m.type,m.lv,m.gn||1,nr1(m.x),nr1(m.y),Math.ceil(m.hp),Math.round(m.maxhp),ST_CODE[m.state]||0,m.dir<0?-1:1,v===remote?2:v?1:0,m.near>0?1:0,
-      nr1(m.root),nr1(m.snare),nr1(m.stun),nr1(m.mez),nr1(m.fear),nr1(m.aslow),m.chill||0,nr1(m.mark)])});
+      nr1(m.root),nr1(m.snare),nr1(m.stun),nr1(m.mez),nr1(m.fear),nr1(m.aslow),m.chill||0,nr1(m.mark),
+      m.casting&&m.casting.dur?[String(m.casting.name||'').slice(0,20),nr1(m.casting.t),nr1(m.casting.dur)]:0])}); // step 3: the cast bar, so your partner can see it coming and break it
   if(l.length)netSend({t:'m',l:l});
   if(netRosterT<=0){netRosterT=SHARE.roster;netSend({t:'mr',l:mobs.filter(m=>!m.dead&&m.nid!=null).map(m=>m.nid)})}}
 // Called from killMob (combat.js): the guest gets the kill too (its own XP and loot).
@@ -232,6 +240,7 @@ function mirrorApply(e){if(!netGuestMirror())return;let m=mirrors.get(e[0]);if(m
   m.tx=e[4];m.ty=e[5];m.wx=e[4];m.wy=e[5];if(Math.hypot(m.x-e[4],m.y-e[5])>48){m.x=e[4];m.y=e[5]}
   const st=ST_NAME[e[8]]||'idle';if(m.state==='chase'&&st!=='chase'){m.threat.p=0;m.threat.pet=0}m.state=st;
   m.dir=e[9];m.tg=e[10];m.near=e[11]?0.3:0;
+  const cs=e[20];m.casting=Array.isArray(cs)?{name:String(cs[0]),t:+cs[1]||0,dur:+cs[2]||1,shown:1}:null; // the host's cast bar (display only here)
   // Effects: the host's word, except one you just put on (it may not have reached the host yet).
   const H={root:e[12],snare:e[13],stun:e[14],mez:e[15],fear:e[16],aslow:e[17],chill:e[18],mark:e[19]}; // lost, discord, crack: only ever set by you here
   for(const k in H){m._h[k]=H[k];if(!(time-(m._mine[k]||-9)<SHARE.keep))m[k]=H[k];m._last[k]=m[k]||0}}
@@ -239,6 +248,7 @@ function mirrorApply(e){if(!netGuestMirror())return;let m=mirrors.get(e[0]);if(m
 function mirrorTick(m,dt){
   if(tickDots(m,dt))return;
   ['root','snare','aslow','discord','stun','mez','fear','lost','crack','near'].forEach(k=>{if(m[k]>0)m[k]=Math.max(0,m[k]-dt)});
+  if(m.casting&&m.casting.shown){m.casting.t+=dt;if(m.casting.t>m.casting.dur+0.3)m.casting=null}
   if(m.chill>0){m.chillT=(m.chillT||8)-dt;if(m.chillT<=0)m.chill=0}if(m.weak&&m.weak.t>0)m.weak.t-=dt;
   const dx=m.tx-m.x,dy=m.ty-m.y,d=Math.hypot(dx,dy);if(d>0.05){const k=Math.min(1,dt*10);m.x+=dx*k;m.y+=dy*k;m.walk+=dt*1.4}}
 // Your hit on a mirror (combat.js hitMob): shows here at once, the host applies it for real.
@@ -309,3 +319,34 @@ function netHealMsg(d){if(d.t!=='hl'&&d.t!=='ho')return false;const who=remote?r
     player.hots.push({id:id,name:String(d.n||'Heal').slice(0,24),t:Math.min(60,+d.d||0),next:2,heal:Math.max(0,Math.min(9999,+d.h||0)),holy:0,holyAll:0});
     log(who+"'s "+(d.n||'heal')+' is on you ('+Math.round(+d.d||0)+'s).','#7dffa6');return true}
   return false}
+
+/* ---------- Step 3, part 1 (v0.154): monster spells at either of you, group buffs ----------
+   Casters and bosses aim at whoever they're fighting. When the host's monster casts at the guest, the host's phone shows the
+   cast and the beam, and the guest's phone takes the hit with its own dodges and shields ('sp'). Ground rings (Ember Brand,
+   a wisp's Fire Ring) are sent to the guest too ('hz'), so each phone shows the ring and hurts only its own player. */
+// Host: who a caster aims at. Your partner when they're the one it's fighting; otherwise you (as in solo).
+function castFoe(m){if(remote&&allyOn(m)&&victim(m)===remote)return remote;return player}
+// Host: the spell landed on your partner.
+function netSpellAlly(m,base,label,col,king){if(!net.shared||m.nid==null)return;
+  netSend({t:'sp',i:m.nid,b:Math.round(base*100)/100,n:String(label).slice(0,24),c:col,k:king?1:0})}
+// Host: a ground ring was laid down (at you or your partner): your partner's phone draws it and checks their own feet.
+function netHazard(h){if(net.role!=='host'||!net.shared||!h.m||h.m.nid==null)return;
+  netSend({t:'hz',i:h.m.nid,x:Math.round(h.x),y:Math.round(h.y),r:h.r,d:h.dur,mu:h.mult||0,n:h.label||''})}
+function netStep3Msg(d){
+  if(d.t==='sp'&&net.role==='guest'){const m=mirrors.get(d.i);if(!m||m.dead||player.dead)return true;const col=d.c||'#c8a0ff',base=Math.max(0,Math.min(9999,+d.b||0));
+    beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:col});burst(player.x,player.y-8,col,8);
+    if(player.buffs.deflect>0){floatText(player.x,player.y-20,'DODGE','#cfd6e0');log('You dodge the '+String(d.n||'spell').toLowerCase()+'.','#9fb8e0');return true}
+    if(d.k){let dmg=Math.max(1,Math.round(tankMods(base*rr(0.85,1.15))));if(dev.god)dmg=0;dmg=Math.round(shieldDmg(dmg));player.hp-=dmg; // the Skeleton King's bone: no level gap, like solo
+      if(dmg>0)floatText(player.x,player.y-20,String(dmg),col);log(cap(m.def.name)+' hurls a bone at YOU for '+dmg+'.',col);if(player.hp<=0&&!lastStand())playerDie(m);return true}
+    mobSpellHit(m,base,String(d.n||'spell'),col);return true}
+  if(d.t==='hz'&&net.role==='guest'){const m=mirrors.get(d.i);if(!m||m.dead)return true;
+    hazards.push({x:+d.x||0,y:+d.y||0,r:Math.max(4,Math.min(60,+d.r||20)),t:0,dur:Math.max(0.3,Math.min(5,+d.d||1.5)),m:m,mult:+d.mu||0,label:d.n?String(d.n).slice(0,24):undefined});
+    floatText(m.x,m.y-26,(d.n||'Ember Brand')+'!','#ff8a3c');return true}
+  if(d.t==='bf'){if(player.dead||GROUP_BUFFS.indexOf(d.k)<0)return true;const dur=Math.max(0,Math.min(99999,+d.d||0)),who=remote?remote.name:'Your partner';
+    player.buffs[d.k]=Math.max(player.buffs[d.k]||0,dur);burst(player.x,player.y-6,'#c8b07a',10,true);log(who+"'s "+String(d.n||'buff')+' is on you'+(dur<100?' ('+Math.round(dur)+'s)':'')+'.','#c8b07a');return true}
+  return false}
+// Buffs that work as "you and everyone nearby" (EverQuest style): cast one with your partner close by and it lands on them too.
+// Only buffs that are plain numbers on the player (no pets, stances or shields that need your own class's code).
+const GROUP_BUFFS=['bark','clarity','wolf','ward'];
+function netBuffAlly(a,dur){if(GROUP_BUFFS.indexOf(a.buff)<0||!remoteHere()||dist(player,remote)>SHARE.healRange)return;
+  netSend({t:'bf',k:a.buff,d:dur,n:a.name});burst(remote.x,remote.y-6,a.col,10,true);log(a.name+' is on '+remote.name+' too.','#c8b07a')}

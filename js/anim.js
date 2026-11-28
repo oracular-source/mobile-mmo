@@ -87,8 +87,8 @@ function mobAnim(m){let dx=0,dy=0;if(MOB_POSES[m.def.img])return{dx:0,dy:0}; // 
 // Same rules as the old Shadow Bolt: a 2 s cast, stun or fear breaks it, out of range it falls short. During the cast he
 // lifts a thigh bone over his head; just before the cast ends he throws it, so it lands the moment the hit does.
 function boneLaunch(m){m.casting.thrown=1;if(logMute)return;const img=IMG[m.def.img],h=(img&&img.h)||30;
-  const slow=m.aslow>0&&m.slowCast?(m.aslowX||1.6):1,far=dist(m,player)>BOLT.range;
-  let tx=player.x,ty=player.y-8;if(far){const d=dist(m,player)||1;tx=m.x+(player.x-m.x)/d*BOLT.range;ty=m.y+(player.y-m.y)/d*BOLT.range} // out of range: it drops short
+  const P=m.casting.foe||player,slow=m.aslow>0&&m.slowCast?(m.aslowX||1.6):1,far=dist(m,P)>BOLT.range; // foe: thrown at your partner (multiplayer)
+  let tx=P.x,ty=P.y-8;if(far){const d=dist(m,P)||1;tx=m.x+(P.x-m.x)/d*BOLT.range;ty=m.y+(P.y-m.y)/d*BOLT.range} // out of range: it drops short
   fxo.push({k:'bone',m:m,x0:m.x+m.dir*4,y0:m.y-h-4,tx:tx,ty:ty,home:!far,t:0,life:BONE_FLIGHT*slow,spin:m.dir,out:null})}
 // The hit lands (world.js tells us how it went): 'hit', 'dodge' or 'miss'.
 function boneLand(m,out){const b=fxo.find(f=>f.k==='bone'&&f.m===m&&!f.out);if(b)b.out=out}

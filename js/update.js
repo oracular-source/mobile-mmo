@@ -121,7 +121,7 @@ function update(dt){
     if(m.tiger>0)m.tiger-=dt; // Tiger Leap's window
     if(m.chill>0){m.chillT-=dt;if(m.chillT<=0)m.chill=0}
     if(m.chantT>0)m.chantT-=dt; // a chanter's song (v0.62)
-    if(m.casting&&(m.mez>0||m.stun>0||m.fear>0||m.lost>0||m.state!=='chase'||player.dead))interruptCast(m);
+    if(m.casting&&(m.mez>0||m.stun>0||m.fear>0||m.lost>0||m.state!=='chase'||(player.dead&&!m.casting.foe)))interruptCast(m); // foe: casting at your partner (multiplayer) keeps going while you're down
     if(m.mez>0){m.mez-=dt;if(m.mez<=0)log(cap(m.def.name)+' wakes up.','#ffb37a');return;} // asleep: stands still until hit or the mez ends
     if(m.stun>0){m.stun-=dt;return;} // stunned: no moving, no attacking
     const spd=m.def.spd*(m.snare>0?0.5:1)*(m.root>0?0:1)*(1-0.12*(m.chill||0)); // each chill stack: -12% speed

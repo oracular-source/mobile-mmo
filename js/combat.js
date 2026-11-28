@@ -550,7 +550,7 @@ function applyAbilityCore(a,t,fromHide){
     if(a.buff==='stance'){player.stanceX=a.stanceX||0;player.stanceHit=a.stanceHit||0;player.retal=a.retal?at(a.retal,a)*meleeMult():0}
     if(a.shelter){player.hots=(player.hots||[]).filter(o=>o.id!=='shelter');player.hots.push({id:'shelter',name:'Divine Shelter',t:at(a.dur,a),next:1,heal:at(a.shelter,a)*mult,holy:0,holyAll:0})}
     if(a.wrath){player.wrathT=at(a.dur,a);player.wrath={dmg:at(a.wrath,a)*mult,r:a.wrathR}}
-    if(a.buff==='fshield')player.fsPet=a.onPet?1:0;if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');}
+    if(a.buff==='fshield')player.fsPet=a.onPet?1:0;if(a.val){player.bval=player.bval||{};player.bval[a.buff]=at(a.val,a)*mult}burst(player.x,player.y-6,a.col,12,true);log(a.name+' is on you'+durTxt(player.buffs[a.buff])+'.','#c8b07a');if(remote)netBuffAlly(a,player.buffs[a.buff]);} // multiplayer: group buffs land on your partner too
   else if(a.kind==='lifetap'){
     beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});burst(t.x,t.y-6,a.beam,6);
     const dmg=Math.max(1,Math.round(at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult));hitMob(t,dmg,'direct',a.name);

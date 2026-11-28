@@ -379,7 +379,7 @@ function render(){
   const A0=curArea(),ents=entsBuf;ents.length=0;
   for(let i=0;i<mobs.length;i++)ents.push(mobs[i]);
   if(zoneId==='over')for(let i=0;i<npcs.length;i++)ents.push(npcs[i]);
-  if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);if(remoteHere())ents.push(remote); // your partner (multiplayer, js/net.js)
+  if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);if(remoteHere()){ents.push(remote);(remote.pets||[]).forEach(q=>ents.push(q))} // your partner and their pets (multiplayer, js/net.js)
   if(A0){const tv=treesInView(A0);for(let i=0;i<tv.length;i++)ents.push(tv[i])}
   ents.sort(byY);
   // A tree you (or your target) are behind fades so you never lose sight of the fight.
@@ -418,7 +418,7 @@ function render(){
       if(e.cast){lx.fillStyle=e.cast.col||'#cfc8b2';const k=Math.floor(time*10)%4;lx.fillRect(Math.round(e.x)+e.dir*6,Math.round(e.y)-11-k%2,1,1);lx.fillRect(Math.round(e.x)+e.dir*5,Math.round(e.y)-13+k%2,1,1)}
       return}
     if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
-    if(e===pet||e===pet2){const im=IMG[e.img||'pet']||IMG.pet;
+    if(e===pet||e===pet2||e.rpet){const im=IMG[e.img||'pet']||IMG.pet; // rpet: your partner's pet
       if(e.img==='blade'){shadow(e.x,e.y,2);drawSprite(im,e.x,e.y-4+Math.round(Math.sin(time*3)),e.dir,0,false);return} // the sword floats
       shadow(e.x,e.y,Math.max(4,Math.round(im.w/2.4)));
       if(im.steps){const mv=e._lw!==e.walk;e._lw=e.walk;drawSprite(walkFrame(im,e.walk,mv).im,e.x,e.y+1,e.dir,0,false)} // new pets step their legs, standing still when idle
