@@ -32,6 +32,11 @@ for _k,(_t,_g,_a) in {'beetlebite':('beetle',12,'crossroads'),'ironbite':('irons
   SETUP[_k]=("const m=G.mobs.find(m=>m.type==='%s'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+%d;P.y=m.y-3;m.state='chase';"
     "m.threat={p:999,pet:0};m.atk=0.5;m.bolt=99;m.castT=99;m.chargeCd=99;W.focus={x:m.x+%d,y:m.y-4};W.at=42;W.act=()=>killMob(m);W.n=84;W.god=1;")%(_t,_g,_g//2)
   AREA[_k]=_a
+# Cultist deaths (v0.136): the three ways a cultist falls, each forced in turn (the game picks one at random).
+for _k,_r in {'cultdeath1':0.0,'cultdeath2':0.5,'cultdeath3':0.9}.items():
+  SETUP[_k]=("const m=G.mobs.find(m=>m.type==='zealot'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+22;P.y=m.y-3;m.state='idle';"
+    "W.at=8;W.act=()=>{const R=Math.random;Math.random=()=>%s;killMob(m);Math.random=R};W.n=80;W.god=1;")%_r
+  AREA[_k]='chapel'
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:

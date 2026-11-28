@@ -24,7 +24,8 @@ function animSwing(m,v){if(logMute)return;
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
 function animDeath(m){if(logMute)return;const img=IMG[m.def.img];if(!img)return;
   if(m.def.death==='bones'){boneCollapse(m,img);return}
-  if(m.def.death==='flip'&&MOB_DEATH_IMG[m.def.img]){const D=MOB_DEATH_IMG[m.def.img];fxo.push({k:'flip',D:D,x:m.x,y:m.y+1-(m.def.float?6:0),dir:m.dir,t:0,life:D.t.reduce((a,b)=>a+b,0)});return} // a family death drawn as frames (rats, beetles, boar, wisp, cultists); a floating wisp dies where it hovers
+  if(m.def.death==='flip'&&MOB_DEATH_IMG[m.def.img]){const k=m.def.img,vs=[k,k+'_2',k+'_3'].filter(v=>MOB_DEATH_IMG[v]),D=MOB_DEATH_IMG[vs[Math.floor(Math.random()*vs.length)]]; // cultists have 2 more deaths, picked at random (looks only, so Math.random, not the game's dice)
+    fxo.push({k:'flip',D:D,x:m.x,y:m.y+1-(m.def.float?6:0),dir:m.dir,t:0,life:D.t.reduce((a,b)=>a+b,0)});return} // a family death drawn as frames (rats, beetles, boar, wisp, cultists); a floating wisp dies where it hovers
   if(m.def.float)return;
   fxo.push({k:'fall',img:img,x:m.x,y:m.y+1,dir:m.dir,t:0,life:0.55});fxBits(m.x,m.y-1,['#6e6458','#8a7f70','#5a5248'],8,16,4,0.9)}
 

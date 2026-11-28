@@ -53,9 +53,9 @@ const TYPES={
   // wisp drifts toward it; one that reaches it heals it (kill or snare them). end = the dungeon's last boss: 6x XP, a chest
   // and the way out with the run summary. vanish = at half health it wails and vanishes instead of dying (v0.79); it comes
   // back with the other one when Malrec dies (the finale, world.js). drift = a candle wisp: doesn't fight, just drifts to its master. noxp = no XP or loot.
-  mender:{name:'a fen mender',img:'mender',lv:[14,15],hp:44,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:50,armor:0,camp:1,
+  mender:{name:'a fen mender',img:'mender',death:'flip',lv:[14,15],hp:44,hpl:18,dmg:2.6,dmgl:1.2,spd:27,aggro:50,armor:0,camp:1,
     heal:{name:'Mend',first:2.5,every:6,dur:1.5,x:0.3,below:0.75,col:'#9be37a'}},
-  deacon:{name:'a cult deacon',img:'deacon',lv:[15,15],hp:55,hpl:22,dmg:3.2,dmgl:1.45,spd:27,aggro:56,armor:0.15},
+  deacon:{name:'a cult deacon',img:'deacon',death:'flip',lv:[15,15],hp:55,hpl:22,dmg:3.2,dmgl:1.45,spd:27,aggro:56,armor:0.15},
   prior:{name:'the Drowned Prior',img:'prior',lv:[15,15],hp:230,hpl:58,dmg:5,dmgl:2,spd:23,aggro:60,undead:1,armor:0.1,named:1,grasp:1,vanish:1,glow:38,zone:'Dungeon 1'},
   bellringer:{name:'the Bellringer',img:'bellringer',lv:[15,15],hp:210,hpl:54,dmg:5.6,dmgl:2.2,spd:25,aggro:58,armor:0.15,named:1,toll:1,vanish:1,zone:'Dungeon 1'},
   malrec:{name:'Brother Malrec',img:'malrec',lv:[15,15],hp:240,hpl:60,dmg:4.2,dmgl:1.6,spd:26,aggro:70,armor:0.1,named:1,end:1,wake:1,zone:'Dungeon 1',

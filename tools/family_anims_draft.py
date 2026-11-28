@@ -225,10 +225,52 @@ def cultist_death(body_rows, pal, item_on_ground, label_item):
     hood = {(x + 6, y + h - 9): c for (x, y), c in ready.items() if y <= 5}
     heap = reoutline(over(heap_low, hood))
     shut = {'e': 'f'}
+    # Owner (Nov 27): cultists are higher level than rats, so they stay down a moment longer (more dramatic).
     return [frame(ready, pal, 300, 'Hit (alive)'),
-            frame(over(recolour(kneel, shut), item_on_ground[0]), pal, 150, 'Death: drops to its knees, ' + label_item),
-            frame(over(recolour(slump, shut), item_on_ground[1]), pal, 150, 'Slumps forward'),
-            frame(over(recolour(heap, shut), item_on_ground[1]), pal, 170, 'Face down, gone at once')]
+            frame(over(recolour(kneel, shut), item_on_ground[0]), pal, 180, 'Death: drops to its knees, ' + label_item),
+            frame(over(recolour(slump, shut), item_on_ground[1]), pal, 180, 'Slumps forward'),
+            frame(over(recolour(heap, shut), item_on_ground[1]), pal, 1200, 'Face down, lies there a moment'),
+            frame(over(recolour(heap, shut), item_on_ground[1]), pal, 500, 'Fades')]
+
+# Owner (Nov 27): two more cultist deaths, picked at random, so a camp doesn't all fall the same way.
+CLOTH = (["..kkkk......", ".kHaaakkkk..", "kaaaaaaaaakk", "kddaaaaddddk", ".kkdddkkkkk.", "...kk......."],
+         ["....kkkk....", "kkkkHaaakk..", "kaaaaaaaaak.", ".kdddaaaadk.", "..kkkkddkk..", "......kk...."])
+def cultist_death_wind(body_rows, pal, item):
+    """Blown away: the life goes out of him and he crumbles to ash inside his robe; the empty robe slumps, then the
+    wind catches it and carries it off, fluttering, while the ash blows after it."""
+    h, w = len(body_rows), len(body_rows[0]); ready = grid_to_px(body_rows); shut = {'e': 'f'}
+    kneel = recolour(grid_to_px(drop_rows(body_rows, [13, 14, 15, 16])), shut)
+    ash = lambda pts: {p: c for p, c in zip(pts, 'ZlZlZlZl')}  # pale flecks: dark grey vanished at night
+    empty = grid_to_px([body_rows[i] for i in (14, 16, 17, 18)], 0, h - 4)  # an empty robe lying in a crumple
+    out = [frame(ready, pal, 300, 'Hit (alive)'),
+           frame(over(over(kneel, item), ash([(3, 6), (12, 4), (6, 2), (14, 9)])), pal, 150, 'Death: sags, ash spills from the sleeves'),
+           frame(over(over(empty, item), ash([(4, h - 6), (9, h - 8), (12, h - 7), (7, h - 10)])), pal, 170, 'Crumbles to ash: the robe drops empty')]
+    for i in range(6):
+        cl = grid_to_px(CLOTH[i % 2], w // 2 - 6 - 3 * (i + 1), h - 6 - 3 * (i + 1) - (i % 2))
+        trail = ash([(w // 2 - 3 * i + 2, h - 3 - 2 * i), (w // 2 - 3 * i + 5, h - 5 - 2 * i), (w // 2 - 3 * i, h - 1 - i)])
+        out.append(frame(over(over(trail, cl), item), pal, 110 if i < 5 else 320,
+                         'The wind takes the robe, fluttering away' if i == 0 else ('Gone on the wind' if i == 5 else '')))
+    return out
+
+def cultist_death_burn(body_rows, pal, item):
+    """Burns up: embers catch at the hem and climb, the robe charring black behind them, then he falls in as a heap
+    of ash with a last ember glowing in it."""
+    h = len(body_rows); ready = grid_to_px(body_rows); shut = {'e': 'f'}
+    def burnt(front):
+        out = {}
+        for (x, y), c in ready.items():
+            if y > front: out[(x, y)] = 'k' if c == 'k' else 'D'
+            elif y == front and c != 'k': out[(x, y)] = 'G' if x % 2 else 'g'
+            else: out[(x, y)] = shut.get(c, c)
+        return out
+    pile = grid_to_px(["....kkk....", "..kkZlZkk..", ".kZlZgZlZk.", "kZlZcZlZcZk", "kkkkkkkkkkk"], len(body_rows[0]) // 2 - 5, h - 5)  # pale ash with a dark outline so it reads at night
+    smoke = {(len(body_rows[0]) // 2, h - 7): 'Z', (len(body_rows[0]) // 2 + 1, h - 9): 'z', (len(body_rows[0]) // 2 - 1, h - 11): 'Z'}
+    return [frame(ready, pal, 300, 'Hit (alive)'),
+            frame(over(burnt(h - 3), item), pal, 140, 'Death: embers catch at the hem'),
+            frame(over(burnt(h - 9), item), pal, 140, 'They climb, the robe charring black'),
+            frame(over(burnt(h - 15), item), pal, 140, 'Up to the hood'),
+            frame(over(over(pile, smoke), item), pal, 900, 'Falls in: a heap of ash, one ember left'),
+            frame(over(pile, item), pal, 500, 'Fades')]
 
 def cultist_sets(S):
     R, P = S['REDO_SPR'], S['REDO_PAL']; out = {}
@@ -247,6 +289,7 @@ def cultist_sets(S):
                             frame(shift(rest, 1, 0), zp, 130, 'Back')]
     lying = stamp(rot_cw(sk), (13, h - 1))
     out['zealot_death'] = cultist_death(z, zp, (lying, lying), 'the sickle falls')
+    out['zealot_death_2'] = cultist_death_wind(z, zp, lying); out['zealot_death_3'] = cultist_death_burn(z, zp, lying)
     # Ashcaller: pulls the ember to his chest, shoves it at you, it flares and spits sparks.
     a = clean(R['ashcaller'], ASH_FIX); ap = dict(P['ashcaller']); h = len(a); body = grid_to_px(a)
     rest = put(put(body, arm((10, 9), (12, 8))), stamp(ember(), (12, 7)))
@@ -261,6 +304,7 @@ def cultist_sets(S):
     gem = {(13, h - 2): 'g', (14, h - 2): 'G', (13, h - 1): 'k', (14, h - 1): 'k'}
     smoke = {(13, h - 2): 'O', (14, h - 4): 'z', (13, h - 6): 'z'}
     out['ashcaller_death'] = cultist_death(a, ap, (gem, smoke), 'the ember drops and goes out')
+    out['ashcaller_death_2'] = cultist_death_wind(a, ap, smoke); out['ashcaller_death_3'] = cultist_death_burn(a, ap, {})
     # Chanter: swings the censer up on its chain, brings it down on you, embers jump out.
     c = clean(R['chanter'], CHANT_FIX); cp = dict(P['chanter']); h = len(c); body = grid_to_px(c)
     cs = censer()
@@ -281,6 +325,11 @@ def cultist_sets(S):
                              frame(shift(rest, 1, 0), cp, 130, 'Back')]
     ground = stamp(cs, (15, h - 3))
     out['chanter_death'] = cultist_death(c, cp, (ground, ground), 'the censer drops')
+    out['chanter_death_2'] = cultist_death_wind(c, cp, ground); out['chanter_death_3'] = cultist_death_burn(c, cp, ground)
+    # The dungeon's hooded (menders and deacons) fall the same three ways, holding on to what's in their hands.
+    for k in ('mender', 'deacon'):
+        r, pk = R[k], dict(P[k])
+        out[k + '_death'] = cultist_death(r, pk, ({}, {}), 'slumping'); out[k + '_death_2'] = cultist_death_wind(r, pk, {}); out[k + '_death_3'] = cultist_death_burn(r, pk, {})
     return out
 
 def player(S):
@@ -340,6 +389,13 @@ def game_data(to_pose):
         frs = d[atk][1:]  # frame 0 is the ready pose (the normal sprite)
         poses[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal']}
         for slot, f in zip(['wind', 'smear', 'hit', 'rec'], frs): poses[name][slot] = to_pose(f, w, h)
-        frs = d[die][1:]
-        deaths[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, w, h) for f in frs]}
+        for suf in ('', '_2', '_3'):  # extra deaths picked at random in the game (cultists, owner Nov 27)
+            if die + suf not in d: continue
+            frs = d[die + suf][1:]
+            deaths[name + suf] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, w, h) for f in frs]}
+    for name in ('mender', 'deacon'):  # deaths only for now (their attacks come with the cast poses)
+        rows = S['REDO_SPR'][name]; w, h = len(rows[0]), len(rows)
+        for suf in ('', '_2', '_3'):
+            frs = d[name + '_death' + suf][1:]
+            deaths[name + suf] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, w, h) for f in frs]}
     return poses, deaths
