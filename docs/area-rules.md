@@ -157,7 +157,8 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 ## Channel glow (character lane, v0.130, Nov 27; owner asked for it)
 - **Only spells with a cast time** charge it; instant spells keep the quick staff lift, physical casts (Bandage) keep their small sparkle.
 - **Where:** the top of the held weapon in the cast pose (grip spot moved up by the weapon's grip row; the pose holds it upright); the open hand with no weapon; in front of the body (6 px out, 10 up) for classes with no cast pose.
-- **How it's drawn:** the spell's own colour. A soft round glow added on top of the dark (radius 3 → 9 px, strength 0.3 → 0.8 as the bar fills, a slight fast pulse); 2 → 6 one-pixel motes spiralling in toward the tip; a bright cream core pixel that grows a 3 × 3 cross past half; and a light pool cut out of the darkness, radius 8 → 26 px.
+- **How it's drawn:** the spell's own colour. A soft round glow added on top of the dark (radius 3 → 9 px, strength 0.3 → 0.8 as the bar fills, steady, no pulse); a bright cream core pixel that grows a 3 × 3 cross past half; and a light pool cut out of the darkness, radius 8 → 26 px.
+- **No motes or flutter (owner, Nov 27, v0.133):** the caster just holds the staff up and the tip glows bright; no specks drifting in, no pulsing, and the ground light doesn't flicker.
 - **Size rule:** small to start. Longer casts read as more energy just by filling longer; it can grow bigger and more dramatic later (owner's flavor rule).
 
 ## Animation and effects (animation lane, v0.102)

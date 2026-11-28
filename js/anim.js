@@ -193,21 +193,18 @@ function playerPose(img){const P=img&&img.poses;if(!P)return null;
   if(e<0||e>=T[0]+T[1]){player.pose=null;return null}
   return P[p.k][e<T[0]?0:1]}
 // Channel glow (character lane, owner Nov 27): while a spell with a cast time charges, light gathers at the staff tip in the
-// spell's colour and grows as the bar fills (a soft glow, motes drifting in, a bright core that becomes a small cross past
-// half), and render.js grows a light pool around it. Instant spells keep the quick lift. Small to start; can grow later.
+// spell's colour and grows as the bar fills (a soft glow and a bright core that becomes a small cross past half), and render.js grows a light pool around it. Instant spells keep the quick lift. Small to start; can grow later.
 const CGLOW={};
 function castGlowStamp(r,col){const k=r+col;if(CGLOW[k])return CGLOW[k];
   const n=parseInt(col.slice(1),16),R=n>>16,G=n>>8&255,B=n&255,z=r*2+1,c=document.createElement('canvas');c.width=c.height=z;
   const g=c.getContext('2d'),id=g.createImageData(z,z),d=id.data;
   for(let y=0;y<z;y++)for(let x=0;x<z;x++){const v=Math.max(0,1-Math.hypot(x-r,y-r)/(r+0.5)),o=(y*z+x)*4;d[o]=R;d[o+1]=G;d[o+2]=B;d[o+3]=v*v*255}
   g.putImageData(id,0,0);return CGLOW[k]=c}
-function castGlowDraw(){const c=player.castTip;if(!c)return;const p=c.p,pulse=0.85+0.15*Math.sin(time*14),r=Math.round(3+6*p);
-  lx.globalCompositeOperation='lighter';lx.globalAlpha=(0.3+0.5*p)*pulse;lx.drawImage(castGlowStamp(r,c.col),c.x-r,c.y-r);lx.globalCompositeOperation='source-over';
-  const n=2+Math.floor(p*4);lx.fillStyle=c.col; // motes drifting in toward the tip, more as it fills
-  for(let i=0;i<n;i++){const ph=(time*1.6+i/n)%1,an=i*2.4+time*0.7,d=(1-ph)*(7+4*p);lx.globalAlpha=0.4+0.6*ph;
-    lx.fillRect(Math.round(c.x+Math.cos(an)*d),Math.round(c.y+Math.sin(an)*d*0.8),1,1)}
+// Owner (Nov 27, v0.133): no drifting motes and no flutter; just a steady glow that grows brighter as the bar fills.
+function castGlowDraw(){const c=player.castTip;if(!c)return;const p=c.p,r=Math.round(3+6*p);
+  lx.globalCompositeOperation='lighter';lx.globalAlpha=0.3+0.5*p;lx.drawImage(castGlowStamp(r,c.col),c.x-r,c.y-r);lx.globalCompositeOperation='source-over';
   lx.globalAlpha=1;lx.fillStyle='#fffbe8';lx.fillRect(c.x,c.y,1,1);
-  if(p>0.5){lx.globalAlpha=Math.min(1,(p-0.5)*2)*pulse;lx.fillRect(c.x-1,c.y,3,1);lx.fillRect(c.x,c.y-1,1,3)}lx.globalAlpha=1}
+  if(p>0.5){lx.globalAlpha=Math.min(1,(p-0.5)*2);lx.fillRect(c.x-1,c.y,3,1);lx.fillRect(c.x,c.y-1,1,3)}lx.globalAlpha=1}
 // Ability flair drawing (in the world, before the lighting, like the mob slashes).
 function playerFxDraw(f){const p=f.t/f.life;
   if(f.k==='parc'){lx.fillStyle='#f2eee0';const base=f.dir>0?0:Math.PI; // a thin arc sweeping round in front, top to bottom

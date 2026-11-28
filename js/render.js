@@ -465,8 +465,8 @@ function render(){
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
   // v0.72 (owner, Nov 21): the player no longer carries a light; you see by the world's own lights and ambient.
   // PLAYER_LIGHT = 1 brings the old glow back (radius 95) if dark spots turn out unreadable on the phone.
-  const ct=player.castTip,lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(ct?[{x:ct.x,y:ct.y,r:8+18*ct.p,w:0}]:[],zl) // channel glow lights the ground around the caster
-    .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
+  const ct=player.castTip,lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(ct?[{x:ct.x,y:ct.y,r:8+18*ct.p,w:0,steady:1}]:[],zl) // channel glow lights the ground around the caster
+    .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c||l.steady?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
   if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
   dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);
   dg.globalCompositeOperation='destination-out';
