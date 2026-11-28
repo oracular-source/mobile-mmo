@@ -1,4 +1,4 @@
-// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, flying things (the Skeleton King's Bone Throw), Greyfang's roar-howl and wolf bites.
+// Animation kit (v0.102, animation lane): mob swings, hit flashes, deaths that sink, flying things (the Skeleton King's Bone Throw), Greyfang's roar-howl and wolf bites, the player's attack poses.
 'use strict';
 // Looks only. Everything here uses fr() (Math.random), never the game's rng(), and never changes a timer, a number or
 // a position the rules use, so fights and the sim roll exactly the same with or without it. While the sim runs
@@ -128,6 +128,7 @@ function fxDraw(){
     else if(f.k==='fall'){const p=f.t/f.life,im=f.img,h=Math.max(1,Math.round(im.h*(1-p*0.75))),w=im.w,dx=Math.round(f.x)-(w>>1),dy=Math.round(f.y)-h;
       lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}
     else if(f.k==='bones')bonesDraw(f)
+    else if(f.k==='parc'||f.k==='pthrust')playerFxDraw(f)
     else if(f.k==='bite'){const p=Math.min(1,f.t/0.1),gap=Math.round(5*(1-p)),fade=f.t>0.12?1-(f.t-0.12)/0.1:1;lx.globalAlpha=Math.max(0,fade); // two rows of fangs close on you
       for(let i=-2;i<=2;i++){const x=Math.round(f.x)+i*2,up=Math.round(f.y)-gap-1,lo=Math.round(f.y)+gap+1,long=i===-2||i===2;
         lx.fillStyle='#1c1820';lx.fillRect(x-1,up-2,3,long?4:3);lx.fillRect(x-1,lo-(long?1:0),3,long?4:3);
@@ -151,3 +152,39 @@ function fxDrawLit(){
       for(let k=2;k>=1;k--){const q=f.t-k*0.022,[gx,gy]=pos(q);drawBone(gx,gy,q*22*f.spin,12,0.15*(3-k))} // a fading blur behind it as it spins
       drawBone(bx,by,f.t*22*f.spin,12)}
     else if(f.k==='frag'){const fade=f.t>f.life-0.3?(f.life-f.t)/0.3:1;drawBone(f.x,f.y,f.ang,f.len,fade)}})}
+
+// ---------- Player attack poses (character lane, Nov 27; owner OK'd the draft 2 bodies and poses for all 14 classes) ----------
+// Looks only, same timing: when an attack or spell goes off (applyAbility), the body shows its pose for a moment, a
+// wind-up frame then the strike frame. Owner (Nov 27): the main attack stays plain (it happens constantly), abilities get
+// a little flair to start (a thin swipe arc for area swings, a short thrust streak and a few sparks for single hits), and
+// it can grow bigger and more dramatic later on. Spell looks stay as they are (the Spells lane owns those).
+const PPOSE={main:[0.07,0.16],skill:[0.09,0.2],cast:[0.08,0.18]}; // seconds: wind-up, strike
+function animPlayer(a,t){if(logMute||!a)return;const im=playerImg(),P=im&&im.poses;if(!P)return;
+  const main=a===ABI[loadout[0]],phys=(a.melee||a.shot)&&(a.tgt||a.kind==='cleave'); // weapon moves that hit enemies (not Bandage)
+  // Which pose: knights chop for the main attack and thrust for abilities; robe classes lift the staff for a melee main
+  // attack and cast for spells; everyone else has one pose for any weapon attack.
+  let k=null;
+  if(phys)k=!main&&P.skill?'skill':P.main?'main':null;
+  else if(P.cast)k='cast';
+  if(!k)return;
+  player.pose={k:k,t0:time};
+  if(main||!a.melee)return; // plain main attack; spells keep their own looks
+  // Ability flair, small for now.
+  if(a.kind==='cleave'){fxo.push({k:'parc',x:player.x,y:player.y-7,dir:player.dir,r:Math.min(13,(a.radius||16)*0.6),t:0,life:0.2});return}
+  if(t&&!t.dead){const dx=t.x-player.x,dy=t.y-player.y,d=Math.hypot(dx,dy)||1;
+    fxo.push({k:'pthrust',x:player.x+dx/d*6,y:player.y-8+dy/d*2,ux:dx/d,uy:dy/d,t:0,life:0.16});
+    fxBits(t.x,t.y-8,['#fff4dc','#ffd27a'],3,22,4,0.5)}}
+// The frame to draw right now ({im, ax}) or null for the normal standing/walking body. Spells with a cast time hold the
+// cast pose for the whole cast.
+function playerPose(img){const P=img&&img.poses;if(!P)return null;
+  if(player.cast&&P.cast)return P.cast[1];
+  const p=player.pose;if(!p||!P[p.k])return null;const e=time-p.t0,T=PPOSE[p.k];
+  if(e<0||e>=T[0]+T[1]){player.pose=null;return null}
+  return P[p.k][e<T[0]?0:1]}
+// Ability flair drawing (in the world, before the lighting, like the mob slashes).
+function playerFxDraw(f){const p=f.t/f.life;
+  if(f.k==='parc'){lx.fillStyle='#f2eee0';const base=f.dir>0?0:Math.PI; // a thin arc sweeping round in front, top to bottom
+    for(let j=0;j<10;j++){const q=j/9;if(q>p*1.8)break;const an=base+(f.dir>0?1:-1)*(-1.2+q*2.4);lx.globalAlpha=Math.max(0,1-p)*(0.35+0.5*q);
+      lx.fillRect(Math.round(f.x+Math.cos(an)*f.r),Math.round(f.y+Math.sin(an)*f.r*0.6),1,1)}lx.globalAlpha=1}
+  else if(f.k==='pthrust'){lx.fillStyle='#fff4dc';const n=Math.round(3+p*4); // a short streak along the thrust
+    for(let i=0;i<n;i++){lx.globalAlpha=Math.max(0,1-p)*(0.3+0.7*i/n);lx.fillRect(Math.round(f.x+f.ux*(i+p*4)),Math.round(f.y+f.uy*(i+p*4)),1,1)}lx.globalAlpha=1}}

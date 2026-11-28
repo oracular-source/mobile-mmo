@@ -78,6 +78,9 @@ function mkSkin(id){
 // walk frames where one foot lifts a pixel (feet are columns 4-7 and 10-13), so legs move instead of the whole body bobbing.
 function mkRags(id){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
+  // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.
+  const pf=PLAYER15[id];if(pf){const pal=Object.assign({},RAG15_COMMON,pf.c),im=mk(pf.s,pal);im.ax=pf.s[0].length>>1;im.steps=[mk(pf.a,pal),mk(pf.b,pal)];
+    im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i]}))});return im}
   const q=RAG15[id];if(q){const pal=Object.assign({},RAG15_COMMON,q.c),im=mk(q.r,pal);im.steps=[mk(q.a,pal),mk(q.b,pal)];return im}
   const c=RAGS[id];if(!c)return null;
   const W=20,g=RAG_HEADS[id].concat(RAG_BODIES[c.body]).map(r=>{const a=r.split('');while(a.length<W)a.push('.');return a});
@@ -166,6 +169,9 @@ function drawSprite(img,x,y,dir,bob,sit){
   const dx=Math.round(x)-(w>>1),dy=Math.round(y)-h+(bob||0);
   if(sit){lx.drawImage(im,0,0,w,h-4,dx,dy+4,w,h-4)}else lx.drawImage(im,dx,dy);
 }
+// A pose frame can be wider than the standing body (a sword thrust out front): ax is the column that lines up with the
+// body's middle, so the body stays put and only the weapon reaches out. Facing left, the frame is mirrored, and so is ax.
+function drawPose(p,x,y,dir){const im=p.im,dx=Math.round(x)-(dir<0?im.w-1-p.ax:p.ax),dy=Math.round(y)-im.h;lx.drawImage(dir<0?im.f:im.c,dx,dy)}
 function line(x0,y0,x1,y1,col){x0=Math.round(x0);y0=Math.round(y0);x1=Math.round(x1);y1=Math.round(y1);
   const dx=Math.abs(x1-x0),dy=-Math.abs(y1-y0),sx=x0<x1?1:-1,sy=y0<y1?1:-1;let err=dx+dy;lx.fillStyle=col;
   for(let i=0;i<400;i++){lx.fillRect(x0,y0,1,1);if(x0===x1&&y0===y1)break;const e2=2*err;if(e2>=dy){err+=dy;x0+=sx}if(e2<=dx){err+=dx;y0+=sy}}}
@@ -302,9 +308,10 @@ function render(){
       if(player.dead>0)return;
       shadow(player.x,player.y,6);
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
-      const wf=walkFrame(playerImg(),player.walk,moving&&!player.sit);
+      const pim=playerImg(),pp=player.sit||player.fd>0?null:playerPose(pim),wf=walkFrame(pim,player.walk,moving&&!player.sit);
       if(hidden())lx.globalAlpha=0.4; // hidden Rogue draws see-through
-      drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);
+      if(pp)drawPose(pp,player.x,player.y+1,player.dir); // attack or cast pose (js/anim.js)
+      else drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);
       lx.globalAlpha=1;
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}

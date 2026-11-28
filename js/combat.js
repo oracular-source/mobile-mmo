@@ -436,6 +436,7 @@ function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0
 // Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
 const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t,fromHide){
+  animPlayer(a,t); // looks only (js/anim.js): the body's attack or cast pose
   const L=player.lvl,mult=(a.melee?meleeMult():spellMult())*(a.melee&&player.buffs.stance>0&&player.stanceHit?player.stanceHit:1);
   if(a.hpCost){const c=Math.round(maxHP(L)*a.hpCost);player.hp=Math.max(1,player.hp-c);floatText(player.x,player.y-20,'-'+c,'#a3252f');log(a.name+' costs you '+c+' health.','#c87a80')}
   // A Backstab from Hide never misses: they didn't see you coming.
