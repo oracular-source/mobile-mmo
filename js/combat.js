@@ -51,7 +51,7 @@ function arriveHold(m){if(!player.arriving)return false;if(time<player.arriveT)r
   const d=dist(m,player);if(d>m.def.aggro+ARRIVE.pad||d<Math.min(m.arrD,m.def.aggro)*ARRIVE.close){m.arrCalm=0;return false}return true}
 function engage(m,byPet){
   if(m.dead||player.dead||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
-  if(m.aloof)return; // v0.126: seen but out of reach (the cultists up behind Ironshell's nook): they never join a fight
+  if(m.aloof)return; // v0.126: seen but out of reach : never joins a fight (kept for teasers; unused since v0.132)
   arriveEnd(); // a fight started: arrival calm is over
   if(byPet)m.threat.pet+=1;else m.threat.p+=1;
   if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}

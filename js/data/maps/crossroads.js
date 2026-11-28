@@ -15,11 +15,11 @@ MAPS.crossroads = {
     'TTTTTTTTTT,TTTTTTT,TTTT,,==,,,,,,,,,,,,~~~~~~~,,',
     'TTTTTTTTTTTbTTTTTTTTTT,,,==,,,b,,,,~~~~~~~,,,,,,',
     'TTTTTT,,b,,,,,T,,TT,,,,,,==,,,~~~~~~~~~,,,,,,,,,',
-    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,TT::',
-    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,,T,T:,T',
-    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,TTTTTTT:,TT',
-    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTTTTTT,:TTT',
-    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTTTT,,,:TTTT',
+    'T,TT,,,,,,,,,,,,,,ww,,,,,HH~~~~~~~~,,T,,,,,,,,,,',
+    ',TT,,,,,,,,,,,w,,,,w,~~~~HH~~~,,,,,,,,,,,~~,,,TT',
+    'TTT,,,,,,,w,w,wwww~~~~~~~==,,,,,,b,,,T,,,~~,:,,T',
+    'TT,,w,w,w,,www~~~~~~~,T,,==,,T,T,TTTTTT,,,,,:,,,',
+    'wwww,,www~~~~~~~~~,,,,,,,==,,,,TTTTTTT,,,,,:T,,T',
     'T,,w~~~~~~~~~~wwww,,,,,,,==,,,TTT,TTTTTT,,,:TTTT',
     '~~~~~~~~~w,,ww,,,,,,Tb,T,==,,,TTTTTTTTTT,,:,,TTT',
     '~~~~wwwww,,,,,,,,TTTTT,T,==,,,TTTTTTTTTT,,:,,,TT',
@@ -61,7 +61,6 @@ exit south 25 40 to=town1 lit   # v0.64: at the closed gate (Town 1 isn't built 
 exit west 0 30 to=graveyard
 exit north 26 0 to=wolfwood
 exit sinkhole 38 23 to=rat_tunnel at=mouth
-exit hollow 47 10 to=nook at=south   # v0.129 (owner): the old steep path up to the chapel now leads into Ironshell's hollow (js/data/maps/nook.js)
 # by the town road: the easiest rats
 spawn rat 1 21 37
 spawn rat 1 28 33
@@ -126,6 +125,10 @@ critter rabbit 14 36.5
 critter rabbit 41.5 16.5
 # secret: a chest at the end of a deer trail in the south-west woods
 chest 5 38
+# Ironshell (v0.132, owner, Nov 27): the big mossy beetle lives on his own in the far north-east corner, where the old path
+# up to the chapel used to go; the path now ends in a little glade with a pond. Always home (a named, not a rare).
+named ironshell 3 43 10
+critter frog 43.4 12.4
 label 24 24 Crossroads
 label 40 19 Sinkhole
 label 25 9 Old bridge
