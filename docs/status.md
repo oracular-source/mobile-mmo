@@ -2,12 +2,12 @@
 
 **Read this first.** Updated on every push and copied into the claude.ai Project on every push (the bigger docs at least every 3 pushes), so a chat that can't reach GitHub still knows the current state. The full detail lives in `docs/board.md`.
 
-**Live version: v0.140** (Nov 27, 2026). Game: https://oracular-source.github.io/mobile-mmo/
+**Live version: v0.141** (Nov 27, 2026). Game: https://oracular-source.github.io/mobile-mmo/
 
 ## Lanes: last shipped → next pickup
 | Lane (start phrase) | Last shipped | Next pickup |
 | --- | --- | --- |
-| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.139 cultists, menders and deacons die three ways at random (face down, floats away, burns up); v0.134 beetles (and Ironshell), boar, ash wisp and cultists attack and die for real | Owner looks at v0.134 on the phone; then mob cast poses (owner asked; card in the backlog), the other wisps and cultists reuse the moves, then Old Gnawbone's boss move |
+| **Animation** ("Connect to GitHub. Continue on animation"): enemy attacks, deaths, boss moves | v0.141 cultists, menders and deacons die three ways at random (face down, knocked back, burns up); v0.134 beetles (and Ironshell), boar, ash wisp and cultists attack and die for real | Owner looks at v0.134 on the phone; then mob cast poses (owner asked; card in the backlog), the other wisps and cultists reuse the moves, then Old Gnawbone's boss move |
 | **Multiplayer** ("… Continue on multiplayer"): two players, phone to phone | v0.138 joining shows its steps and a reason when stuck (first try stuck on same Wi-Fi); v0.136 step 1: see each other (Menu → Group, Host / Join, chat); group scaling numbers | Works on mobile data (same Wi-Fi fails: relay card, later). **Next: step 2, shared mobs + heal your partner** (owner said go; not while Balance is building) |
 | **Items** ("… Continue on items"): drops, boss loot, enchanting, gold | v0.131 one pink per boss (Skeleton King: weapon; Greyfang: ring; Ironshell: bracers), Malrec two pinks: his chest gives one at random plus a blue, no repeats; v0.128 necklace slot; v0.124 pink tricks | Owner plays with the new gear and runs balance checks; teleport orbs on the back burner (owner: wait for a bigger world and the mounts); later: dungeon tiers with stronger pinks |
 | **Map** ("… Continue on map"): maps, tiles, area art | v0.140 Dungeon 1: stairs rise behind Malrec's altar after the finale (the way out), quick love pass on both floors; v0.132 Ironshell's pond corner | **Town 1** (owner: stop tuning Zone 1, move on to the big scope) |

@@ -236,29 +236,21 @@ def cultist_death(body_rows, pal, item_on_ground, label_item):
 CLOTH = (["..kkkk......", ".kHaaakkkk..", "kaaaaaaaaakk", "kddaaaaddddk", ".kkdddkkkkk.", "...kk......."],
          ["....kkkk....", "kkkkHaaakk..", "kaaaaaaaaak.", ".kdddaaaadk.", "..kkkkddkk..", "......kk...."])
 def cultist_death_wind(body_rows, pal, item):
-    """Floats away (owner, Nov 27, replacing the blown-robe try that didn't read): the red eyes dim and go out, then the
-    whole body lifts off the ground stiff and drifts up and back, shrinking smaller each frame until it's gone, like a
-    leaf on the wind. What it held stays on the ground."""
-    h, w = len(body_rows), len(body_rows[0]); ready = grid_to_px(body_rows)
-    pal = dict(pal); pal['E'] = '#7a2a22'  # the eyes dimming
-    dim = recolour(ready, {'e': 'E'}); out_ = recolour(ready, {'e': 'f'})
-    def shrink(px, sc):  # nearest-pixel shrink for the drift (an effect for a few frames, not a sprite)
-        nw, nh = max(1, round(w * sc)), max(1, round(h * sc)); o = {}
-        for y in range(nh):
-            for x in range(nw):
-                c = px.get((int(x / sc), int(y / sc)))
-                if c: o[(x + (w - nw) // 2, y + (h - nh))] = c
-        return o
-    fr = [frame(ready, pal, 300, 'Hit (alive)'),
-          frame(over(dim, item), pal, 160, 'Death: the eyes dim'),
-          frame(over(out_, item), pal, 160, 'The eyes go out'),
-          frame(over(shift(out_, 0, -1), item), pal, 140, 'Lifts off the ground, stiff')]
-    for i, sc in enumerate((0.9, 0.78, 0.64, 0.5, 0.36, 0.22)):
-        body = shift(shrink(out_, sc), -2 * (i + 1), -3 * (i + 1) - 1)
-        specks = {(w // 2 + 3 - 2 * i, h - 2 - 2 * i): 'Z', (w // 2 - 2 * i, h - 4 - 3 * i): 'l'} if i < 4 else {}
-        fr.append(frame(over(over(specks, body), item), pal, 110 if i < 5 else 260,
-                        'Floats up and away, shrinking' if i == 0 else ('Gone' if i == 5 else '')))
-    return fr
+    """Knocked back and crumpling away (owner, Nov 27, third try: same size, no floating off): the red eyes dim, then he
+    is thrown backwards, leaning back as if hit, and crumples lower each frame as he slides away and fades, a few pale
+    flecks left hanging where he stood. What he held stays on the ground."""
+    h = len(body_rows); pal = dict(pal); pal['E'] = '#7a2a22'  # the eyes dimming
+    def pose(drop, back, lean, eyes):
+        px = recolour(grid_to_px(drop_rows(body_rows, drop)), {'e': eyes})
+        top = min(y for _, y in px)
+        return {(x - back - round((h - 1 - y) * lean * (h - 1 - y) / max(1, h - 1 - top)), y): c for (x, y), c in px.items()}  # leans back, more at the top
+    fleck = lambda n: {p: c for p, c in list({(9, h - 8): 'l', (11, h - 11): 'Z', (7, h - 13): 'Z', (12, h - 6): 'l'}.items())[:n]}
+    return [frame(grid_to_px(body_rows), pal, 300, 'Hit (alive)'),
+            frame(over(pose([], 1, 0.1, 'E'), item), pal, 140, 'Death: the eyes dim, he rocks back'),
+            frame(over(over(pose([], 3, 0.2, 'f'), item), fleck(2)), pal, 110, 'Thrown backwards, eyes out'),
+            frame(over(over(pose([13, 14, 15, 16], 5, 0.25, 'f'), item), fleck(3)), pal, 110, 'Crumples as he slides back'),
+            frame(over(over(pose(list(range(9, 17)), 7, 0.3, 'f'), item), fleck(4)), pal, 110, 'Lower'),
+            frame(over(over(pose(list(range(6, 17)), 9, 0.3, 'f'), item), fleck(2)), pal, 360, 'Fades away')]
 
 def cultist_death_burn(body_rows, pal, item):
     """Burns up: embers catch at the hem and climb, the robe charring black behind them, then he falls in as a heap
