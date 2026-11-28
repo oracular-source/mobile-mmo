@@ -18,7 +18,7 @@ function animSwing(m,v){if(logMute)return;
   // no slash or floating fangs over you. The frames carry the lunge.
   if(P){m.swDur=P.t[1]+P.t[2]+P.t[3];m.swT=m.swDur;return}
   m.swDur=SWING;m.swT=SWING;
-  if(m.def.bite)return; // other wolves (Greyfang, Old Scar): the lunge only until their own bite frames are drawn
+  if(m.def.bite)return; // a biter without its own frames yet: the lunge only, never floating fangs (physical attacks)
   fxo.push({k:'slash',x:v.x,y:v.y-8,ax:-dx/d,ay:-dy/d,t:0,life:0.16,col:m.def.slash||'#f2eee0'})}
 // A mob dies. Its family's death if it has one (def.death in js/data/mobs.js), otherwise it sinks into the ground and
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)

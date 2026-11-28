@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def load_sprites():
     js = r"""
 const fs=require('fs');const src=fs.readFileSync(process.argv[1],'utf8');
-const o=new Function(src+';return {UNDEAD_SPR,UNDEAD_PAL,REDO_SPR,REDO_PAL,RAG15,RAG15_COMMON}')();
+const o=new Function(src+';return {UNDEAD_SPR,UNDEAD_PAL,REDO_SPR,REDO_PAL,RAG15,RAG15_COMMON,WOLF_SPR,WOLF_PAL,PAL}')();
 process.stdout.write(JSON.stringify(o));"""
     out = subprocess.run(['node', '-e', js, os.path.join(ROOT, 'js/data/sprites.js')], capture_output=True, text=True, check=True)
     return json.loads(out.stdout)
@@ -139,45 +139,62 @@ def king(S):
     f.append(frame(pose((20, 13), (21, 25), 1, 0), pal, 160, 'Recover: drags it back up'))
     return f
 
-# ---------- the blight wolf: a real bite with its own jaws ----------
-def wolf(S):
-    rows = S['REDO_SPR']['wolf']; step = S['REDO_SPR']['wolfstep']; pal = S['REDO_PAL']['wolf']
+# ---------- wolves: a real bite with their own jaws ----------
+def bite(rows, step, pal, head_x, open_head, snap_rows, drop_row, lunge=3):
+    """Crouch, lunge jaws open, snap shut (held), pull back. head_x = first column of the head; open_head = the head
+    drawn jaws-open (rows from one row above the sprite); snap_rows = {row: new head row} for the jaws fully shut."""
     ready = grid_to_px(rows)
-    # Crouch: drop the body 1 px (one leg row taken out), head low, ready to spring.
-    crouch_rows = ['.' * len(rows[0])] + rows[:9] + rows[10:]
-    crouch = grid_to_px(crouch_rows)
-    crouch = {(x, y + (1 if x >= 18 and y <= 8 else 0)): c for (x, y), c in crouch.items() if not (x >= 18 and y == 9)} | {p: c for p, c in crouch.items() if p[0] >= 18 and p[1] >= 10}
-    # Head drawn open by hand (columns 17 on): upper jaw lifted, fangs top and bottom, red mouth between.
-    body_rows = [r[:17] for r in step]
-    open_head = [
-        "...k.k......",
-        "..kAkAk.....",
-        "kkAaAak.....",
-        "AAaaaeakkk..",
-        "aaaAaaaaaNk.",
-        "baaaawwkwwk.",
-        "aaaakrrrrk..",
-        "aaaakkwwkwk.",
-        "aaaaaaaak...",
-        "aaadkkkk....",
-    ]
-    lunge = grid_to_px(body_rows[1:9], 0, 0)
-    lunge = over(grid_to_px([r[:17] for r in step]), {})
-    lunge = {p: c for p, c in lunge.items() if p[0] < 17}
-    lunge = over(lunge, grid_to_px(open_head, 17, -1))
-    # Snap: jaws shut (the closed head), fangs locked over the lip, body as far forward as it goes.
-    snap_head = [r[17:] for r in rows]
+    # Crouch: drop the body 1 px (one leg row taken out), and the head another pixel, ready to spring.
+    crouch = grid_to_px(['.' * len(rows[0])] + rows[:drop_row] + rows[drop_row + 1:])
+    keep = {p: c for p, c in crouch.items() if not (p[0] >= head_x + 1 and p[1] <= drop_row)}
+    head = {(x, y + 1): c for (x, y), c in crouch.items() if x >= head_x + 1 and y <= drop_row - 1}
+    crouch = over(keep, head)
+    body = {p: c for p, c in grid_to_px(step).items() if p[0] < head_x}
+    lunge_px = over(body, grid_to_px(open_head, head_x, -1))
+    snap_head = [r[head_x:] for r in rows]
+    for i, r in snap_rows.items(): snap_head[i] = r
+    snap = over(body, grid_to_px(snap_head, head_x, 0))
+    return [frame(ready, pal, 500, 'Ready (as today)'),
+            frame(shift(crouch, -1, 0), pal, 160, 'Crouch: sinks back, head low (the tell)'),
+            frame(shift(lunge_px, lunge, -1), pal, 60, 'Lunge: springs in, jaws wide'),
+            frame(shift(snap, lunge + 1, 0), pal, 140, 'Snap: jaws fully shut, no mouth showing (held)'),
+            frame(shift(ready, 1, 0), pal, 110, 'Recover: pulls back, mouth shows again')]
+
+def wolf_open(rows, patch):
+    """Jaws-open head for the 27-wide wolf body (blight wolf, Old Scar): its own ears and eye on top, the snout one
+    pixel longer, fangs top and bottom with the red mouth between. patch = the body colour under the jaw ('b' for the
+    blight wolf's green rot, 'a' for plain fur)."""
+    h = [r[17:] for r in rows]
+    return [h[0] + '..', h[1] + '..', h[2] + '..', (h[3].rstrip('.') + 'k').ljust(12, '.'),
+            'aaaAaaaaaNk.', patch + 'aaaawwkwwk.', 'aaaakrrrrk..', 'aaaakkwwkwk.', 'aaaaaaaak...', 'aaadkkkk....']
+
+def wolf(S):
+    rows = S['REDO_SPR']['wolf']
     # Owner (Nov 27): on the snap the jaws are fully shut: teeth clenched in one row, no red mouth showing.
-    snap_head[5] = "baaaawwwwk"
-    snap_head[6] = "aaaaakkkk."
-    snap = over({p: c for p, c in grid_to_px(step).items() if p[0] < 17}, grid_to_px(snap_head, 17, 0))
-    f = []
-    f.append(frame(ready, pal, 500, 'Ready (as today)'))
-    f.append(frame(shift(crouch, -1, 0), pal, 160, 'Crouch: sinks back, head low (the tell)'))
-    f.append(frame(shift(lunge, 3, -1), pal, 60, 'Lunge: springs in, jaws wide'))
-    f.append(frame(shift(snap, 4, 0), pal, 140, 'Snap: jaws shut on you (held)'))
-    f.append(frame(shift(ready, 1, 0), pal, 110, 'Recover: pulls back'))
-    return f
+    return bite(rows, S['REDO_SPR']['wolfstep'], S['REDO_PAL']['wolf'], 17, wolf_open(rows, 'b'),
+                {5: "baaaawwwwk", 6: "aaaaakkkk."}, 9)
+
+def oldscar(S):
+    rows = S['REDO_SPR']['oldscar']
+    return bite(rows, S['REDO_SPR']['oldscarstep'], S['REDO_PAL']['oldscar'], 17, wolf_open(rows, 'a'),
+                {5: "aaaaawwwk.", 6: "aaaaakkkk."}, 9)
+
+def greyfang(S):
+    W = S['WOLF_SPR']; rows = W['greyfang']; pal = dict(S['PAL']); pal.update(S['WOLF_PAL']['greyfang'])
+    h = [r[24:] for r in rows]
+    # His head drawn jaws-open (columns 24 on, from one row above): upper jaw and nose lifted, a long row of upper
+    # fangs, the red mouth, lower fangs, the lower jaw dropped a pixel.
+    open_head = ['.' * 17] + h[0:6] + [
+        "AAAaaaaaaaaaaaaNk",
+        "AAAaaaaaawkwkwkwk",
+        "AAAAaadkrrrrrrk..",
+        "AAAAaaakwkwkwkk..",
+        "AAAdddddddkk.....",
+        "AAAddkkkk........",
+        "AAdkkk...........",
+    ] + h[13:]
+    snap = {7: "AAAaaaaaawwwwwwkk", 8: "AAAAaadaaaaakk...", 9: "AAAAaaadddkk.....", 10: "AAAdddddkkk......"}
+    return bite(rows, W['greyfangstep'], pal, 24, open_head, snap, 16, lunge=4)
 
 def player(S):
     r = S['RAG15']['warrior']; pal = dict(S['RAG15_COMMON']); pal.update(r['c'])
@@ -185,14 +202,14 @@ def player(S):
 
 def main():
     S = load_sprites()
-    data = {'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'player': player(S)}
+    data = {'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'oldscar': oldscar(S), 'greyfang': greyfang(S), 'player': player(S)}
     out = os.path.join(ROOT, 'art/drafts/mob-attacks-draft1.json')
     json.dump(data, open(out, 'w'), separators=(',', ':'))
     try:
         from PIL import Image
         scale = 6
         strips = []
-        for key in ('skeleton', 'king', 'wolf'):
+        for key in ('skeleton', 'king', 'wolf', 'oldscar', 'greyfang'):
             frs = data[key]
             allp = [(x, y) for f in frs for x, y, _ in f['px']]
             x0, y0 = min(p[0] for p in allp) - 2, min(p[1] for p in allp) - 2
@@ -229,7 +246,9 @@ def to_pose(f, base_w, base_h):
 def write_game_data(data, S):
     names = {'skeleton': ('skel', S['UNDEAD_SPR']['skel'], ['wind', 'smear', 'hit', 'rec']),
              'king': ('boss1', S['UNDEAD_SPR']['king'], ['wind', 'smear', 'hit', 'rec']),
-             'wolf': ('wolf', S['REDO_SPR']['wolf'], ['wind', 'smear', 'hit', 'rec'])}
+             'wolf': ('wolf', S['REDO_SPR']['wolf'], ['wind', 'smear', 'hit', 'rec']),
+             'oldscar': ('oldscar', S['REDO_SPR']['oldscar'], ['wind', 'smear', 'hit', 'rec']),
+             'greyfang': ('greyfang', S['WOLF_SPR']['greyfang'], ['wind', 'smear', 'hit', 'rec'])}
     out = {}
     for key, (name, base, slots) in names.items():
         frs = data[key][1:]  # frame 0 is the ready pose (the normal sprite)
@@ -246,4 +265,4 @@ def write_game_data(data, S):
 
 if __name__ == '__main__' and '--game' in sys.argv:
     S = load_sprites()
-    write_game_data({'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S)}, S)
+    write_game_data({'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'oldscar': oldscar(S), 'greyfang': greyfang(S)}, S)

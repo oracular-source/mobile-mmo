@@ -18,8 +18,10 @@ SETUP={
 'swing':'''const m=G.mobs.find(m=>m.type==='cskel'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
 'kingswing':'''const m=G.mobs.find(m=>m.def.boss);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.6;m.bolt=99;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
 'bite':'''const m=G.mobs.find(m=>m.type==='wolf'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.4;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
+'greyfangbite':'''const m=G.mobs.find(m=>m.type==='greyfang'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-4;m.state='chase';m.howled=true;m.threat={p:999,pet:0};m.atk=0.4;W.n=84;W.god=1;''',
+'scarbite':'''const m=G.mobs.find(m=>m.type==='wolf'&&!m.dead);m.type='oldscar';m.def=TYPES.oldscar;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.4;W.n=84;W.god=1;''',
 }
-AREA={'howl':'wolfwood','bite':'wolfwood'}  # scenes outside the crypt
+AREA={'howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood'}  # scenes outside the crypt
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:
