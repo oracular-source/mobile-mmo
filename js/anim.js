@@ -214,7 +214,7 @@ function animPlayer(a,t){if(logMute||!a)return;const im=playerImg(),P=im&&im.pos
   else if(P.cast)k='cast';
   if(!k)return;
   player.pose={k:k,t0:time};
-  if(main&&phys)player.aura={t0:time}; // basic attack: a tiny aura round the weapon in the class colour (owner, Nov 28)
+  if(main&&phys&&weaponShown())player.aura={t0:time}; // basic attack: a tiny aura round the weapon in the class colour; never bare-handed (owner, Nov 28)
   if(k==='cast'&&!(a.cast>0)&&!a.melee)player.flash={a:a,t0:time}; // instant spell: a short glow at the staff tip, sized by its mana
   if(main||!a.melee)return; // plain main attack; spells keep their own looks
   // Ability flair, small for now.

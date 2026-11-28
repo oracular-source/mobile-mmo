@@ -92,6 +92,8 @@ function dressPal(cls,lk){const L=GEAR_LOOKS[cls],p={};if(!L||!lk)return p;
 // has none); pink shows the colours of the boss it came from (GEAR_MAKER), so you can tell where gear was won.
 function slotLook(eq,sl){const id=eq&&eq[sl],it=id&&ITEMS[id];if(!it)return 0;
   if(it.rar==='named')return GEAR_MAKER[id]||it.zl||1;return it.rar==='rare'?(it.zl||1):0}
+// True when a weapon is drawn in your hand (an equipped weapon with a look, on a class that holds one; never the Monk).
+function weaponShown(){const w=inv.equip.weapon,it=w&&ITEMS[w];return !!(it&&WEAPON_LOOKS[it.wt]&&it.look&&CLASS_WEAPON[CLS])}
 function mkRags(id,wid,lk){
   // v0.68: the hand-drawn 15x18 look when there is one (all 14 classes); the 20x24 shrink below stays as a fallback.
   // Nov 27 (character lane): the approved draft 2 body with attack poses, built by tools/player_frames.py.

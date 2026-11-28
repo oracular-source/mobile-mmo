@@ -336,7 +336,7 @@ No style takes: same setting as the chapel grounds and the crypt (Nov 20). **Nav
 - **A named that lives in the dark carries its own light (v0.71):** the Drowned Prior melted into his black water and read as a plain hooded shape, so he now has a small cold light (`glow:38` in `mobs.js`, the lighting's cool tint) as if from his lantern. Use this for any named whose look gets lost in its room's dark.
 
 ## Weapon aura on basic attacks (character lane, v0.157, owner Nov 28)
-- Every basic attack that swings a weapon, a fist or a bow lights a **very small** soft glow round the weapon's head in the **class colour** (`CLASS_WEAPON[cls][1]`; Monk gold). Tiny on purpose: it happens constantly. It is the base the big-hit gleam builds on ("Hits that grow with damage").
+- Every basic attack that swings a weapon or a bow lights a **very small** soft glow round the weapon's head in the **class colour** (`CLASS_WEAPON[cls][1]`). **Never bare-handed (owner, Nov 28):** only when a weapon is drawn (`weaponShown()`), so no aura on the Monk's fists or an empty hand. Tiny on purpose: it happens constantly. It is the base the big-hit gleam builds on ("Hits that grow with damage").
 - **How it's drawn:** `animPlayer` sets `player.aura` on a weapon main attack; `render.js` finds the weapon tip in the pose (same spot as the channel glow; in front of the body when a pose has no tip) and `auraDraw` (js/anim.js) draws the channel glow stamp at radius 3, added light, strength 0.55 × a rise-and-fall curve over the pose plus 0.12 s (`AURA`). Spell basic attacks keep the instant staff flash instead.
 - Later, maybe a setting to turn other players' auras on or off if crowds get busy (owner).
 
