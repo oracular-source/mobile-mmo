@@ -115,44 +115,109 @@ NPC['wizard'] = dict(name='The wizard', job='Main quest; sells horses on the sid
 "..VVVVVVVVo..",
 "...OO..OO.o.."],None], pal={'U':'#3a3a8a','Y':'#e8c850','B':'#ece8e0','V':'#4a2a6a','M':'#7ab8ff','o':'#6e4a2a'})
 
-def second(id, rows):
-    r=[list(x) for x in rows]
-    if id=='gems':   # the gem catches the light: glint and a sparkle above it
-        r[11][10]='M'; r[10][11]='M'
-    if id=='bank':   # a coin flipped up from the purse
-        r[9][11]='Y'
-    if id=='marrow': # a wink and a grin
-        r[4][7]='s'; r[6][5]='S'
-    if id=='wizard': # the orb pulses brighter
-        r[0][10]='M'; r[1][9]='W'; r[1][10]='W'; r[1][11]='W'; r[0][9]='M'; r[0][11]='M'
-    return [''.join(x) for x in r]
-for k,v in NPC.items():
-    if v['frames'][1] is None: v['frames'][1]=second(k,v['frames'][0])
-    v['pal'].setdefault('W','#e8f4ff')
+# ---- Draft 2 (owner notes, Nov 28): real idle loops instead of two-frame twitches, drawn on a taller grid so a coin,
+# a lifted hat or sparks can rise above the head. Grid 17 x 24 fill (19 x 26 with outline); the body sits at BX, BY.
+# Glow pixels (GLOW) are drawn without an outline so sparks and motes read as light.
+GW, GH, BX, BY = 17, 24, 2, 8
+GLOW = set('*+~^')
+GLOWPAL = {'*':'#fff6c8','+':'#ffe070','~':'#9ad8ff','^':'#d8b0ff'}
+def frame(id, body_mods=None, over=None, bob=0, drop=()):
+    rows=[list(r.ljust(13,'.')) for r in NPC[id]['frames'][0]]
+    for (x,y),c in (body_mods or {}).items(): rows[y][x]=c
+    g=[['.']*GW for _ in range(GH)]
+    for y,r in enumerate(rows):
+        for x,c in enumerate(r):
+            if c!='.' and c not in drop: g[y+BY-bob][x+BX]=c
+    for (x,y),c in (over or {}).items():
+        if 0<=x<GW and 0<=y<GH: g[y][x]=c
+    return g
+def render(id, g, S=1):
+    W,H=GW+2,GH+2; pal={**COMMON, **NPC[id]['pal'], **GLOWPAL}
+    G=[['.']*W]+[['.']+r+['.'] for r in g]+[['.']*W]
+    solid=lambda x,y: 0<=x<W and 0<=y<H and G[y][x] not in GLOW and G[y][x]!='.'
+    im=Image.new('RGBA',(W,H),(0,0,0,0))
+    for y in range(H):
+        for x in range(W):
+            c=G[y][x]
+            if c=='.':
+                if any(solid(x+a,y+b) for a,b in((1,0),(-1,0),(0,1),(0,-1))): im.putpixel((x,y),(11,10,15,255))
+            else:
+                h=pal.get(c,'#ff00ff').lstrip('#'); im.putpixel((x,y),tuple(int(h[i:i+2],16) for i in (0,2,4))+(255,))
+    return im.resize((W*S,H*S),Image.NEAREST) if S>1 else im
+B=lambda x,y:(x+BX,y+BY)   # body coords -> grid coords
 
-def sprite(id, f, S=1):
-    rows=outline(NPC[id]['frames'][f]); pal={**COMMON, **NPC[id]['pal']}
-    im=Image.new('RGBA',(15,18),(0,0,0,0))
-    for y,row in enumerate(rows):
-        for x,c in enumerate(row):
-            if c!='.': im.putpixel((x,y),Image.new('RGB',(1,1),pal.get(c,'#ff00ff')).getpixel((0,0))+(255,))
-    return im.resize((15*S,18*S),Image.NEAREST) if S>1 else im
+def loop(id):
+    """List of (grid, ms) for one idle loop."""
+    F=[]
+    if id=='smith':   # rest, lift the hammer, bring it down on an unseen anvil: a burst of sparks
+        up={(10,10):'.',(10,11):'.',(10,12):'.',(11,12):'.',(10,13):'.',(11,13):'.',(10,9):'.',(10,6):'s',(10,5):'s',(10,4):'o',(10,3):'o',(10,2):'I',(11,2):'I',(10,1):'I',(11,1):'I'}
+        down={(10,10):'.',(10,11):'.',(10,12):'.',(11,12):'.',(10,13):'.',(11,13):'.',(10,9):'s',(11,9):'o',(12,9):'I',(12,10):'I'}
+        sp={B(13,9):'*',B(14,8):'+',B(13,11):'+',B(14,11):'*',B(15,10):'+',B(12,12):'+'}
+        F=[(frame(id),900),(frame(id,up),260),(frame(id,down,sp),120),(frame(id,down,{B(14,8):'+',B(15,11):'+'}),160),(frame(id,down),300),(frame(id),700)]
+    if id=='gems':    # lifts the gem under her chin, turns it in the light, it flashes, lowers it
+        base={(10,10):'.',(10,11):'.'}
+        lift={**base,(10,9):'s',(10,8):'m'}
+        held={**base,(10,9):'s',(9,8):'s',(8,7):'m'}
+        F=[(frame(id),900),(frame(id,lift),180),(frame(id,held),300),
+           (frame(id,{**held,(8,7):'M'},{B(8,5):'*',B(7,6):'+',B(9,6):'+',B(6,7):'+',B(10,7):'+',B(8,4):'+'}),140),
+           (frame(id,{**held,(8,7):'M'},{B(8,6):'*',B(10,6):'+'}),160),(frame(id,held),260),
+           (frame(id,{**held,(8,7):'M'},{B(9,6):'*'}),160),(frame(id,held),260),(frame(id,lift),180)]
+    if id=='bank':    # flicks a coin high over his head, spinning (face, edge, face...), catches it, eyes follow it
+        hand=(11,10); F=[(frame(id),900)]
+        path=[-2,-6,-10,-13,-15,-16,-15,-13,-10,-6,-2]
+        for k,dy in enumerate(path):
+            x,y=B(*hand); y+=dy; o={}
+            if k%2==0: o={(x,y):'Y',(x+1,y):'Y',(x,y+1):'Y',(x+1,y+1):'Y'}   # face on
+            else: o={(x,y):'+',(x,y+1):'+'}                                  # edge on: a thin bright line
+            mods={(11,10):'.',(10,9):'s'} if k<len(path)-1 else {}
+            if dy<=-10: mods.update({(4,3):'L',(7,3):'L'})                    # glasses glint as he looks up
+            F.append((frame(id,mods,o),80))
+        F.append((frame(id,{},{B(11,9):'*'}),160)); F.append((frame(id),700))
+    if id=='marrow':  # tips his hat right off his head, a little bow, puts it back
+        hat=[(x,y) for y in range(4) for x,c in enumerate(NPC[id]['frames'][0][y].ljust(13,'.')) if c=='T']
+        def lifted(dy, hand=True):
+            o={B(x,y-dy):'T' for x,y in hat}
+            if hand: o.update({B(11,4-dy+1):'s',B(11,5):'s',B(11,6):'s'})
+            mods={(x,y):('h' if y==3 and 3<=x<=8 else 'P' if NPC[id]['frames'][0][y][x] in 'T' and y<3 else '.') for x,y in hat}
+            mods[(11,7)]='.'
+            return frame(id,mods,o)
+        F=[(frame(id),1000),(lifted(1),140),(lifted(2),160),(lifted(3),600),(lifted(2),140),(lifted(1),140),(frame(id),900)]
+    if id=='wizard':  # the orb swirls and sends motes up, the hat star twinkles, he floats on a glow
+        hat={}   # owner: the designs are good, only the animation changes (no taller hat)
+        n=10
+        for k in range(n):
+            bob=1 if 2<=k<=7 else 0
+            o=dict(hat)
+            if bob: hat_b={(x,y-1):c for (x,y),c in hat.items()}; o=hat_b
+            ox,oy=B(10,1); oy-=bob
+            o[(ox,oy)]='W' if k%3==0 else 'M'
+            o[(ox-1,oy)]='~' if k%3==1 else 'M'; o[(ox+1,oy)]='~' if k%3==2 else 'M'
+            for m in range(3):                      # three motes drifting up from the orb, staggered
+                t=(k+m*3)%n; mx=ox+(-1,1,0)[m]+(1 if t%4==2 else 0); my=oy-2-t
+                if my>=0 and t<7: o[(mx,my)]='^' if m==1 else '~'
+            if k in (3,4,8): sx,sy=B(5,3); sy-=bob; o.update({(sx,sy-1):'+',(sx-1,sy):'+',(sx+1,sy):'+',(sx,sy+1):'+'})
+            if bob:                                  # the glow under his feet while he floats
+                fx,fy=B(3,16); o.update({(fx,fy):'^',(fx+5,fy):'^',(fx+2,fy):'~',(fx+3,fy):'~'})
+            mods={}
+            if k%4 in (1,2): mods[(5,11)]='V'; mods[(6,11)]='B'    # the beard sways
+            F.append((frame(id,mods,o,bob=bob),150))
+    return F
 
 if __name__=='__main__':
-    out='art/drafts/townsfolk-draft1'
-    S=8; ids=list(NPC); W=len(ids)*(15*S+40)+40
-    sheet=Image.new('RGB',(W,18*S*2+150),'#1e2226'); d=ImageDraw.Draw(sheet)
-    for i,id in enumerate(ids):
-        x=40+i*(15*S+40)
-        for f in (0,1):
-            sheet.paste(sprite(id,f,S),(x,20+f*(18*S+30)),sprite(id,f,S))
-        d.text((x,18*S*2+70),NPC[id]['name'],fill='#e8e2d4'); d.text((x,18*S*2+88),NPC[id]['job'][:24],fill='#a8a296')
-        if len(NPC[id]['job'])>24: d.text((x,18*S*2+104),NPC[id]['job'][24:],fill='#a8a296')
-    sheet.save(out+'.png')
-    frames=[]
-    for f in (0,1,0,1):
-        im=Image.new('RGB',(len(ids)*19*6,22*6),'#2f3d26')
-        for i,id in enumerate(ids): sp=sprite(id,f,6); im.paste(sp,(i*19*6+12,12),sp)
-        frames.append(im)
-    frames[0].save(out+'.gif',save_all=True,append_images=frames[1:],duration=[700,500,700,500],loop=0)
+    out='art/drafts/townsfolk-draft2'; ids=list(NPC); S=8
+    loops={id:loop(id) for id in ids}
+    # sheet: every frame of every loop, one row per person
+    mx=max(len(v) for v in loops.values()); cw=(GW+2)*S+10
+    sheet=Image.new('RGB',(mx*cw+20,len(ids)*((GH+2)*S+30)+10),'#1e2226'); d=ImageDraw.Draw(sheet)
+    for r,id in enumerate(ids):
+        for c,(g,ms) in enumerate(loops[id]):
+            im=render(id,g,S); sheet.paste(im,(10+c*cw,10+r*((GH+2)*S+30)),im)
+        d.text((10,10+r*((GH+2)*S+30)+(GH+2)*S+4),NPC[id]['name'],fill='#e8e2d4')
+    sheet.save(out+'-frames.png')
+    # one GIF per person at 6x, true timings
+    for id in ids:
+        fr=[];du=[]
+        for g,ms in loops[id]:
+            bg=Image.new('RGB',((GW+2)*6,(GH+2)*6),'#2f3d26'); im=render(id,g,6); bg.paste(im,(0,0),im); fr.append(bg); du.append(ms)
+        fr[0].save(f'{out}-{id}.gif',save_all=True,append_images=fr[1:],duration=du,loop=0)
     print('ok')
