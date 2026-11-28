@@ -57,6 +57,7 @@ function tapWorld(clientX,clientY,targetOnly){
   const r=cv.getBoundingClientRect(),wx=camX+(clientX-r.left)*dpr/S,wy=camY+(clientY-r.top)*dpr/S;
   if(zoneId==='over')for(const n of npcs){if(Math.hypot(wx-n.x,wy-(n.y-8))<13){if(n.kind==='peddler'&&nearMerchant()){say(n,'Let us see what you have found.',true);charTab='char';charSel=null;openModal('charUI')}else say(n,pick(LINES[n.kind]),true);return}}
   if(zoneId==='over'&&Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
+  {const A=curArea(),f=A&&A.folk&&A.folk.find(n=>Math.hypot(wx-n.x,wy-(n.y-9))<12);if(f){folkTap(f);return}} // townsfolk (v0.158): talk, then their service
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
   // Your partner (multiplayer): tapping them picks them for your heals (tap again to heal yourself). Your enemy target stays.

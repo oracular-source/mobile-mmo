@@ -49,6 +49,9 @@ AREA['toll']='dungeon1_f2'
 SETUP['gnawsqueal']=("const m=G.mobs.find(m=>m.type==='gnaw'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+34;P.y=m.y-2;m.state='chase';"
   "m.threat={p:999,pet:0};m.root=99;m.atk=99;m.hp=m.maxhp*0.65;W.n=75;W.god=1;")
 AREA['gnawsqueal']='rat_tunnel'
+# Town 1's townsfolk (v0.158): stand by the hearth and watch the square for 6 s: every idle loop plays.
+SETUP['town']="P.x=23.5*16;P.y=22*16;P.dir=-1;P.tx=null;G.mobs.length=0;W.n=180;W.god=1;"
+AREA['town']='town'
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:
@@ -60,6 +63,8 @@ async def main(scene):
     try: await pg.click('text=Play',timeout=1500)
     except Exception: pass
     await pg.wait_for_timeout(1500)
+    if AREA.get(scene)=='town':   # Town 1 is DEV-only (no ?area= entry yet): walk in by hand and let it build
+      await pg.evaluate("()=>__game.enterZone('town')");await pg.wait_for_timeout(2500)
     js='''()=>{const G=__game,P=G.player,W={};simState.busy=true;'''+SETUP[scene]+'''
       if(scene==='crowd'){}const cv=document.querySelector('canvas'),out=[];const dt=1/30;
       for(let i=0;i<W.n;i++){if(W.god)P.hp=P.maxhp;if(i===W.at&&W.act)W.act();time+=dt;update(dt);render();out.push(cv.toDataURL())}

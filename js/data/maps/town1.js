@@ -83,6 +83,12 @@ obj trough 29 22
 critter horse 29.6 21.0
 critter horse 30.8 21.7
 critter horse 28.8 20.0
+# townsfolk (v0.158): each stands at their station; tap one for their service
+npc smith 15.5 16.8
+npc gems 12.6 18.7
+npc bank 25.3 16.8
+npc marrow 15.3 21.6
+npc wizard 19.6 25.3
 # life
 critter crow 25.2 24.6 1 high
 critter crow 15.3 22.4 1 high

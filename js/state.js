@@ -32,6 +32,11 @@ const inv=(function(){
 inv.wear=(function(){try{const v=store.get(KEY('inv'),null);return v&&v.wear?v.wear:{}}catch(e){return {}}})();
 // Enchants (v0.100): inv.ench[slot] = the worn item's step (0 to 5); a bag item carries its own as b.e, the same way wear travels.
 inv.ench=(function(){try{const v=store.get(KEY('inv'),null);return v&&v.ench?v.ench:{}}catch(e){return {}}})();
+// The bank (v0.158, Town 1): one shared vault for every character on this phone (alts can pass things along), opened at
+// the banker. 24 slots for now (more bank space is the one thing the game may sell later). Saved apart from the bags.
+const BANK_SIZE=24;
+const bank=(function(){const d={slots:new Array(BANK_SIZE).fill(null)};try{const v=store.get('ashfen-bank',null);if(v&&v.slots)v.slots.forEach((b,i)=>{if(i<BANK_SIZE&&b&&ITEMS[b.id])d.slots[i]=b})}catch(e){}return d})();
+const saveBank=()=>store.set('ashfen-bank',{v:1,slots:bank.slots});
 const saveInv=()=>store.set(KEY('inv'),{v:1,bags:inv.bags,equip:inv.equip,copper:inv.copper,wear:inv.wear,ench:inv.ench});
 const broken=sl=>(inv.wear[sl]||0)>=100;
 const enchMul=e=>1+(e||0)*LOOT.enchStep;           // each step adds a small share of the item's own stats

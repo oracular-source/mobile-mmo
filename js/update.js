@@ -103,6 +103,7 @@ function update(dt){
     else if(tr.t<=0){traps.splice(i,1);log('Your '+tr.name+' rusts away.','#9aa')}}
   if(decoy){decoy.t-=dt;if(decoy.t<=0){burst(decoy.x,decoy.y-6,'#c8a0ff',8);decoy=null;log('Your Phantasm fades.','#9aa')}}
   if(zoneId==='over'){updateNPCs(dt);updateCritters(dt);}
+  folkWalkUp(); // walked up to a townsperson you tapped: they talk and open their service
   {const CAc=curArea();if(CAc)updateAreaCritters(CAc,dt);} // area critters (v0.49)
   if(!player.dead)checkPortals();
   updatePet(dt);

@@ -75,7 +75,7 @@ def check(m, tiles, objs):
 
     # objects and their footprints
     foot = {}   # (x,y) -> object index
-    placed, markers, fogs, critters = [], [], [], []
+    placed, markers, fogs, critters, npcs = [], [], [], [], []
     for t in m['things']:
         k = t[0]
         if k == 'obj':
@@ -94,6 +94,9 @@ def check(m, tiles, objs):
         elif k == 'seal': pass   # tiles shut by a slab until you touch the named object (the game opens them)
         elif k == 'label': pass
         elif k == 'critter': critters.append(dict(kind=t[1], x=float(t[2]), y=float(t[3])))
+        elif k == 'npc':   # townsfolk (v0.158): a known kind standing on open ground
+            if t[1] not in ('smith', 'gems', 'bank', 'marrow', 'wizard'): E.append(f'unknown townsperson: {t[1]}')
+            npcs.append((t[1], float(t[2]), float(t[3])))
         else: E.append(f'unknown line: {" ".join(t)}')
     # critters (v0.49): known kinds, on the map; frogs on open ground by water, moths near a light
     for c in critters:
@@ -130,6 +133,8 @@ def check(m, tiles, objs):
         return not m or m[p[1] - o['y']][p[0] - o['x']] == '#'
     solid = {p for p, i in foot.items() if solid_at(p, i)}
     walk = lambda x, y: inb(x, y) and T(x, y)['walk'] and (x, y) not in solid
+    for kind, nx, ny in npcs:   # townsfolk (v0.158) stand on open ground, not in a building or prop
+        if not walk(int(nx), int(ny - 0.1)): E.append(f'townsperson {kind} at {nx},{ny} stands on something solid')
 
     def door(o):
         return (o['x'] + o['w'] // 2, o['y'] + o['h']) if o['door'] == 'S' else None

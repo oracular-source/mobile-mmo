@@ -381,6 +381,7 @@ function render(){
   const A0=curArea(),ents=entsBuf;ents.length=0;
   for(let i=0;i<mobs.length;i++)ents.push(mobs[i]);
   if(zoneId==='over')for(let i=0;i<npcs.length;i++)ents.push(npcs[i]);
+  if(A0&&A0.folk)for(let i=0;i<A0.folk.length;i++)ents.push(A0.folk[i]); // Town 1's townsfolk
   if(pet)ents.push(pet);if(pet2)ents.push(pet2);if(decoy)ents.push(decoy);ents.push(player);if(remoteHere()){ents.push(remote);(remote.pets||[]).forEach(q=>ents.push(q))} // your partner and their pets (multiplayer, js/net.js)
   if(A0){const tv=treesInView(A0);for(let i=0;i<tv.length;i++)ents.push(tv[i])}
   ents.sort(byY);
@@ -434,6 +435,7 @@ function render(){
       else drawSprite(im,e.x,e.y+1,e.dir,Math.floor(e.walk*6)%2,false);
       if(e.charm&&Math.floor(time*3)%2===0){lx.fillStyle='#ff9de2';const hy=Math.round(e.y-im.h-3);lx.fillRect(Math.round(e.x)-1,hy,1,1);lx.fillRect(Math.round(e.x)+1,hy,1,1);lx.fillRect(Math.round(e.x),hy+1,1,1)} // little heart over a charmed mob
       return}
+    if(e.folk){shadow(e.x,e.y,5);drawFolk(e);return}
     if(e.kind){shadow(e.x,e.y,5);const mv=e.target||Math.hypot(e.x-e.hx,e.y-e.hy)>2;drawSprite(IMG[e.kind],e.x,e.y+1,e.dir,mv?(Math.floor(e.walk*6)%2):0,false);return}
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
@@ -557,6 +559,18 @@ function render(){
   });
   if(player.dead>0){cx.fillStyle='rgba(60,0,0,0.35)';cx.fillRect(0,0,cv.width,cv.height);}
 }
+
+/* ---------- Townsfolk (v0.158, Town 1) ---------- */
+// Each townsperson's frames (js/data/townsfolk.js) are drawn once into small canvases, then the idle loop picks one by
+// time (each person offset by ph so they don't all move together). Frames are 19 x 26 with the feet on the bottom rows.
+const FOLK_IMG={};
+function folkFrames(id){if(FOLK_IMG[id])return FOLK_IMG[id];const d=TOWNSFOLK[id];
+  FOLK_IMG[id]=d.frames.map(rows=>{const c=document.createElement('canvas');c.width=rows[0].length;c.height=rows.length;const g=c.getContext('2d');
+    rows.forEach((r,y)=>{for(let x=0;x<r.length;x++){const ch=r[x];if(ch==='.')continue;g.fillStyle=d.pal[ch]||'#f0f';g.fillRect(x,y,1,1)}});return c});
+  FOLK_IMG[id].total=d.seq.reduce((t,s)=>t+s[1],0);return FOLK_IMG[id]}
+function drawFolk(e){const d=TOWNSFOLK[e.folk],im=folkFrames(e.folk);let t=((time+e.ph*7)*1000)%im.total,f=d.seq[0][0];
+  for(const s of d.seq){if(t<s[1]){f=s[0];break}t-=s[1]}
+  const c=im[f];lx.drawImage(c,Math.round(e.x)-9,Math.round(e.y)+1-c.height)}
 
 /* ---------- HUD ---------- */
 // Buff bar names and colours come from the abilities that give them (plus a few that aren't on every class).

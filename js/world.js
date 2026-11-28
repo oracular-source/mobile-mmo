@@ -22,6 +22,13 @@ function say(o,text,force){
   bubbles.push({o:o,text:text,t:0});log(o.name+' says, "'+text+'"','#d8c8ff');
 }
 let chatT=12;
+// Townsfolk (v0.158, Town 1): who's standing near you. nearFolk('smith') is how the repair, enchant, bank and sell buttons
+// know you're at the right person. Tapping someone far off walks you up to them first (folkWalkUp opens them on arrival).
+const FOLK_REACH=40;
+const nearFolk=kind=>{const A=curArea();return !!(A&&A.folk&&A.folk.some(n=>n.folk===kind&&Math.hypot(player.x-n.x,player.y-n.y)<FOLK_REACH))};
+function folkWalkUp(){const f=player.folkGoal;if(!f)return;
+  if(curArea()!==f.area||player.tx===null&&Math.hypot(player.x-f.n.x,player.y-f.n.y)>=FOLK_REACH){if(player.tx===null)player.folkGoal=null;return}
+  if(Math.hypot(player.x-f.n.x,player.y-f.n.y)<FOLK_REACH-6){player.folkGoal=null;player.tx=null;player.tapGoal=null;folkOpen(f.n)}}
 function updateNPCs(dt){
   npcs.forEach(n=>{
     if(n.kind!=='guard')return;

@@ -369,7 +369,13 @@ $('partyrow').addEventListener('click',e=>{e.stopPropagation();if(remoteHere())a
 $('pframe').addEventListener('click',()=>{charTab='char';charSel=null;openModal('charUI')});
 let charTab='char',charSel=null; // charSel: {bag:i} or {slot:'head'}
 const DOLL_L=['head','neck','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];
-const nearMerchant=()=>{const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
+const nearMerchant=()=>{if(nearFolk('marrow'))return true;const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
+// Who does what (v0.158, Town 1): each service works at the right townsperson, and still at any campfire until Town 1's
+// gate opens (then the services move to town for good). Fork swaps stay at campfires (the hearth is one).
+const canRepair=()=>nearFire()||nearFolk('smith');
+const canEnchant=()=>nearFire()||nearFolk('gems');             // enchant, move enchants, dust into orbs
+const canBuyOrb=()=>nearFire()||nearFolk('gems')||nearFolk('marrow');
+const atBank=()=>nearFolk('bank');
 // Bag cells only fit a word, so show the item's last word ("Brittle Bone" -> "Bone"), which is usually the noun.
 const shortName=n=>{const w=n.replace(/^the /i,'').split(' ');return w[w.length-1]};
 // Longer words get smaller text so "Leggings" fits a bag square instead of being cut off.
@@ -378,20 +384,34 @@ $('ctabs').addEventListener('click',e=>{const b=e.target.closest('button[data-ta
 function slotCell(sl){const id=inv.equip[sl],it=id&&ITEMS[id],nm=SLOTS.find(x=>x[0]===sl)[1],sel=charSel&&charSel.slot===sl;
   return '<div class="dslot'+(sel?' sel':'')+'" data-act="pickslot" data-slot="'+sl+'"'+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+
     (it?'<span class="'+enchCls(inv.ench[sl])+'" style="color:'+RAR[it.rar]+'">'+(inv.ench[sl]?'+'+inv.ench[sl]+' ':'')+shortName(it.name)+'</span>'+(inv.wear[sl]?'<small style="color:'+(broken(sl)?'#ff6b6b':'#e0b060')+'">'+(broken(sl)?'broken':(100-inv.wear[sl])+'%')+'</small>':''):'<span class="q">'+nm+'</span>')+'</div>'}
+// Tapping a townsperson (v0.158): walk up if they're far, then they say a line and open what they do.
+function folkTap(n){if(Math.hypot(player.x-n.x,player.y-n.y)<FOLK_REACH){folkOpen(n);return}
+  const g=walkGoal(player,n.x,n.y+10);player.tx=g.x;player.ty=g.y;player.tapGoal=g;player.stuckT=0;player.sit=false;player.folkGoal={n:n,area:curArea()}}
+function folkOpen(n){const d=TOWNSFOLK[n.folk];player.dir=n.x>player.x?1:-1;say(n,pick(d.lines),true);
+  if(n.folk==='wizard')return;                       // the quest line comes later; for now he talks
+  charTab=n.folk==='bank'?'bank':'char';charSel=null;openModal('charUI')}
 function renderChar(){
   document.querySelectorAll('#ctabs button').forEach(b=>b.classList.toggle('active',b.dataset.tab===charTab));
   const L=player.lvl;$('ctitle').textContent=C.name+' · Lv '+L;let h='';
-  if(charTab==='char'){
+  if(charTab==='bank'){
+    // The bank (v0.158, Town 1): one shared vault for every character on this phone, opened at the banker. Tap a bag
+    // item to put it in, tap a vault item to take it out. Copper stays on you.
+    const here=atBank();
+    h+='<div class="bhead"><span>Bank '+bank.slots.filter(Boolean).length+'/'+bank.slots.length+'</span><span class="q">'+(here?'tap to move items':'visit the banker in Town 1')+'</span></div>';
+    h+='<div class="bag8">'+bank.slots.map((b,i)=>{const it=b&&ITEMS[b.id];return '<div class="bc8"'+(here&&it?' data-act="bankout" data-i="'+i+'"':'')+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+(it?'<span style="color:'+RAR[it.rar]+';font-size:'+fitPx(shortName(it.name))+'px">'+(b.e?'+'+b.e+' ':'')+shortName(it.name)+'</span>'+(b.n>1?'<small>'+b.n+'</small>':''):'')+'</div>'}).join('')+'</div>';
+    h+='<div class="bhead"><span>Your bags</span></div><div class="bag8">'+inv.bags.map((b,i)=>{const it=b&&ITEMS[b.id];return '<div class="bc8"'+(here&&it?' data-act="bankin" data-i="'+i+'"':'')+(it?' style="border-color:'+RAR[it.rar]+'"':'')+'>'+(it?'<span style="color:'+RAR[it.rar]+';font-size:'+fitPx(shortName(it.name))+'px">'+(b.e?'+'+b.e+' ':'')+shortName(it.name)+'</span>'+(b.n>1?'<small>'+b.n+'</small>':''):'')+'</div>'}).join('')+'</div>';
+  }
+  else if(charTab==='char'){
     const near=nearMerchant();
     h+='<div class="doll"><div class="dcol">'+DOLL_L.map(slotCell).join('')+'</div><div class="dfig"><canvas id="dollcv" width="15" height="18"></canvas></div><div class="dcol">'+DOLL_R.map(slotCell).join('')+'</div>';
     h+='<div class="dstats"><div>HP <b>'+maxHP(L)+'</b></div>'+(C.mana?'<div>Mana <b>'+maxMP(L)+'</b></div>':'')+
       STAT_KEYS.map(k=>'<div>'+k[1]+' <b>'+r1(stat(k[0]))+'</b></div>').join('')+'<div class="cop">'+inv.copper+' copper</div></div></div>';
     // Repairs (v0.97): death wears your gear instead of costing XP; fix it all at any campfire.
-    const rc=repairCost();if(rc)h+=nearFire()?'<button data-act="repair" class="sellall">Repair all · '+rc+' copper</button>':'<div class="bhead"><span class="q">Gear worn · repair at any campfire ('+rc+'c)</span></div>';
+    const rc=repairCost();if(rc)h+=canRepair()?'<button data-act="repair" class="sellall">Repair all · '+rc+' copper</button>':'<div class="bhead"><span class="q">Gear worn · repair at a campfire or the smith ('+rc+'c)</span></div>';
     // Enchanting (v0.100): orbs and dust at a glance; at a campfire (the forge's stand-in until Town 1) make or buy orbs.
-    const orbs=bagCount('orb1'),dust=bagCount('dust'),fire=nearFire();
-    if(orbs||dust||fire)h+='<div class="bhead"><span style="color:'+RAR.orb+'">Orbs '+orbs+' · Dust '+dust+'/'+LOOT.dustPerOrb+'</span>'+(fire?'':'<span class="q">enchant at a campfire</span>')+'</div>';
-    if(fire)h+='<div class="orbrow">'+(dust>=LOOT.dustPerOrb?'<button data-act="makeorb" class="sellall">Make orb · '+LOOT.dustPerOrb+' dust</button>':'')+'<button data-act="buyorb" class="sellall">Buy orb · '+LOOT.orbPrice+' copper</button></div>';
+    const orbs=bagCount('orb1'),dust=bagCount('dust'),fire=canEnchant()||canBuyOrb(),ench=canEnchant();
+    if(orbs||dust||fire)h+='<div class="bhead"><span style="color:'+RAR.orb+'">Orbs '+orbs+' · Dust '+dust+'/'+LOOT.dustPerOrb+'</span>'+(ench?'':'<span class="q">enchant at a campfire or the gem cutter</span>')+'</div>';
+    if(fire)h+='<div class="orbrow">'+(ench&&dust>=LOOT.dustPerOrb?'<button data-act="makeorb" class="sellall">Make orb · '+LOOT.dustPerOrb+' dust</button>':'')+(canBuyOrb()?'<button data-act="buyorb" class="sellall">Buy orb · '+LOOT.orbPrice+' copper</button>':'')+'</div>';
     const used=inv.bags.filter(Boolean).length;
     h+='<div class="bhead"><span>Bags '+used+'/'+inv.bags.length+'</span>'+(near?'<span class="q">Marrow is buying</span>':'')+'</div>'; // v0.60: no sell note where there's no merchant
     if(near)h+='<button data-act="selljunk" class="sellall">Sell all junk</button>';
@@ -432,9 +452,9 @@ function detailStrip(near){
     if(!it)return '<b>'+nm+'</b> <span class="q">· empty. Equip something from your bags.</span>';
     const w=inv.wear[sl]||0,e=inv.ench[sl]||0;
     // Enchant button: one orb plus a copper fee that grows with each step; only at a campfire.
-    const eb=e>=LOOT.enchMax?'<button disabled>+'+LOOT.enchMax+' (max)</button>':nearFire()?'<button data-act="enchant">Enchant to +'+(e+1)+' · 1 orb + '+LOOT.enchFee[e]+'c</button>':'';
+    const eb=e>=LOOT.enchMax?'<button disabled>+'+LOOT.enchMax+' (max)</button>':canEnchant()?'<button data-act="enchant">Enchant to +'+(e+1)+' · 1 orb + '+LOOT.enchFee[e]+'c</button>':'';
     return '<b class="'+enchCls(e)+'" style="color:'+RAR[it.rar]+'">'+enchName(it,e)+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span>'+(w?' · <span style="color:'+(w>=100?'#ff6b6b':'#e0b060')+'">'+(w>=100?'broken: no stats until repaired':'condition '+(100-w)+'%')+'</span>':'')+'<br>'+(itemStats(it,e)||'No stats')+trickLine(it)+
-      (e?' <span class="q">(+'+r1(e*LOOT.enchStep*100)+'%)</span>':'')+(!nearFire()&&e<LOOT.enchMax&&bagCount('orb1')?'<br><span class="q">Enchant it at any campfire.</span>':'')+
+      (e?' <span class="q">(+'+r1(e*LOOT.enchStep*100)+'%)</span>':'')+(!canEnchant()&&e<LOOT.enchMax&&bagCount('orb1')?'<br><span class="q">Enchant it at a campfire or the gem cutter.</span>':'')+
       '<div class="acts"><button data-act="unequip">Take off</button>'+eb+'</div>'}
   const b=inv.bags[charSel.bag];if(!b)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
   const it=ITEMS[b.id],be=b.e||0;let h='<b class="'+enchCls(be)+'" style="color:'+RAR[it.rar]+'">'+enchName(it,be)+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
@@ -443,39 +463,42 @@ function detailStrip(near){
     const diffs=STAT_KEYS.map(k=>{const d=r1((it[k[0]]||0)*enchMul(be)-(cur&&cur[k[0]]||0)*enchMul(ce));return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
     h+='<br><span class="q">vs '+(cur?enchName(cur,ce):'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');
     // Moving an enchant (v0.100): so a new drop never feels like losing your +4. The worn item's steps go onto this one as you equip it.
-    if(cur&&ce>be&&nearFire())move='<button data-act="moveench">Equip with +'+ce+' · '+LOOT.moveFee*(ce-be)+'c</button>';
-    else if(cur&&ce>be)h+='<br><span class="q">At a campfire you can move your +'+ce+' onto this.</span>'}
+    if(cur&&ce>be&&canEnchant())move='<button data-act="moveench">Equip with +'+ce+' · '+LOOT.moveFee*(ce-be)+'c</button>';
+    else if(cur&&ce>be)h+='<br><span class="q">At a campfire or the gem cutter you can move your +'+ce+' onto this.</span>'}
   // Gear breaks down into orb dust (enchanted gear gives some of its orbs back); junk and keys can still be destroyed.
   const dz=it.slot?dustFor(b):0;
   return h+'<div class="acts">'+(it.slot?'<button data-act="equip">Equip</button>':'')+move+(near?'<button data-act="sell">Sell</button>':'')+(it.slot?'<button data-act="breakdown">Break down · '+dz+' dust</button>':'<button data-act="destroy">Destroy</button>')+'</div>';
 }
 $('cbox').addEventListener('click',e=>{
   const el=e.target.closest('[data-act]');if(!el)return;const act=el.dataset.act;const bi=charSel&&charSel.bag!=null?charSel.bag:null;
-  if(act==='pick'){const i=+el.dataset.i;charSel=inv.bags[i]&&!(charSel&&charSel.bag===i)?{bag:i}:null}
+  if(act==='bankin'||act==='bankout'){const i=+el.dataset.i,from=act==='bankin'?inv.bags:bank.slots,to=act==='bankin'?bank.slots:inv.bags,b=from[i];
+    if(!b||!atBank()){}else{const st=ITEMS[b.id].slot?-1:to.findIndex(x=>x&&x.id===b.id&&!x.e&&!x.w),j=st>=0?st:to.indexOf(null); // stack plain things
+      if(j<0)log(act==='bankin'?'The bank is full.':'Your bags are full.','#ff8a80');else{if(st>=0)to[j].n+=b.n;else to[j]=b;from[i]=null;saveBank()}}}
+  else if(act==='pick'){const i=+el.dataset.i;charSel=inv.bags[i]&&!(charSel&&charSel.bag===i)?{bag:i}:null}
   else if(act==='pickslot'){const sl=el.dataset.slot;charSel=charSel&&charSel.slot===sl?null:{slot:sl}}
   else if(act==='unequip'&&charSel&&charSel.slot){const sl=charSel.slot,id=inv.equip[sl];if(!id)return;const i=inv.bags.indexOf(null);if(i<0){log('Your bags are full.','#ff8a80');return}
     inv.bags[i]=gearItem(id,inv.wear[sl],inv.ench[sl]);delete inv.equip[sl];delete inv.wear[sl];delete inv.ench[sl];log('You remove the '+ITEMS[id].name+'.','#9aa');charSel={bag:i}}
   else if(act==='equip'&&bi!==null){const it=ITEMS[inv.bags[bi].id];equipBag(bi);log('You equip the '+it.name+'.',RAR[it.rar]);charSel=inv.bags[bi]?{bag:bi}:{slot:it.slot}}
   else if(act==='moveench'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],sl=it.slot,ce=inv.ench[sl]||0,be=b.e||0,fee=LOOT.moveFee*(ce-be);
-    if(!nearFire())log('Move enchants at any campfire.','#9aa');else if(inv.copper<fee)log('Moving the enchant costs '+fee+' copper; you have '+inv.copper+'.','#ff8a80');
+    if(!canEnchant())log('Move enchants at a campfire or the gem cutter.','#9aa');else if(inv.copper<fee)log('Moving the enchant costs '+fee+' copper; you have '+inv.copper+'.','#ff8a80');
     else{inv.copper-=fee;inv.ench[sl]=be;b.e=ce;if(!b.e)delete b.e;equipBag(bi);/* swap the steps, then wear the new item: the old one keeps the new one's old steps */
       log('Your +'+ce+' moves onto the '+it.name+' ('+fee+' copper).',RAR.orb,'main');burst(player.x,player.y-10,RAR.orb,14,true);charSel={slot:sl}}}
   else if(act==='enchant'&&charSel&&charSel.slot){const sl=charSel.slot,id=inv.equip[sl],e=inv.ench[sl]||0,fee=LOOT.enchFee[e];
-    if(!id||e>=LOOT.enchMax){}else if(!nearFire())log('Enchant at any campfire.','#9aa');else if(!bagCount('orb1'))log('You need an Enchant Orb.','#ff8a80');
+    if(!id||e>=LOOT.enchMax){}else if(!canEnchant())log('Enchant at a campfire or the gem cutter.','#9aa');else if(!bagCount('orb1'))log('You need an Enchant Orb.','#ff8a80');
     else if(inv.copper<fee)log('This step costs '+fee+' copper; you have '+inv.copper+'.','#ff8a80');
     else{takeItem('orb1',1);inv.copper-=fee;inv.ench[sl]=e+1;const nm=enchName(ITEMS[id],e+1);
       log('The orb sinks into your gear: '+nm+'.',RAR.orb,'main');banner('Enchanted',nm,RAR.orb);burst(player.x,player.y-10,RAR.orb,e+1>=5?30:e+1>=3?22:16,true)}}
   else if(act==='breakdown'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],d=dustFor(b);inv.bags[bi]=null;
     if(!addDust(d)){inv.bags[bi]=b;log('No room for the dust.','#ff8a80')}else{log('You break down the '+enchName(it,b.e)+' into '+d+' orb dust.',RAR.orb,'loot');charSel=null}}
-  else if(act==='makeorb'){if(!nearFire())log('Make orbs at any campfire.','#9aa');else if(bagCount('dust')<LOOT.dustPerOrb)log('You need '+LOOT.dustPerOrb+' dust.','#ff8a80');
+  else if(act==='makeorb'){if(!canEnchant())log('Make orbs at a campfire or the gem cutter.','#9aa');else if(bagCount('dust')<LOOT.dustPerOrb)log('You need '+LOOT.dustPerOrb+' dust.','#ff8a80');
     else{takeItem('dust',LOOT.dustPerOrb);giveItem('orb1',1)}}
-  else if(act==='buyorb'){if(!nearFire())log('Buy orbs at any campfire.','#9aa');else if(inv.copper<LOOT.orbPrice)log('An orb costs '+LOOT.orbPrice+' copper; you have '+inv.copper+'.','#ff8a80');
+  else if(act==='buyorb'){if(!canBuyOrb())log('Buy orbs at a campfire, the gem cutter or Marrow.','#9aa');else if(inv.copper<LOOT.orbPrice)log('An orb costs '+LOOT.orbPrice+' copper; you have '+inv.copper+'.','#ff8a80');
     else if(giveItem('orb1',1)){inv.copper-=LOOT.orbPrice;log('You buy an Enchant Orb for '+LOOT.orbPrice+' copper.','#c9a227','loot')}}
   else if(act==='sell'&&bi!==null){const b=inv.bags[bi],it=ITEMS[b.id],c=it.value*b.n;inv.copper+=c;inv.bags[bi]=null;charSel=null;log('Marrow pays you '+c+' copper for the '+it.name+(b.n>1?' ×'+b.n:'')+'.','#c9a227')}
   else if(act==='selljunk'){let c=0;inv.bags.forEach((b,i)=>{if(b&&ITEMS[b.id].rar==='junk'){c+=ITEMS[b.id].value*b.n;inv.bags[i]=null}});charSel=null;
     log(c?'Marrow pays you '+c+' copper for your junk.':'You have no junk to sell.','#c9a227','loot');inv.copper+=c}
-  else if(act==='repair'){const rc=repairCost();if(!rc){}else if(!nearFire())log('Repair at any campfire.','#9aa');else if(inv.copper<rc)log('Repairs cost '+rc+' copper; you have '+inv.copper+'.','#ff8a80');
-    else{inv.copper-=rc;inv.wear={};log('You mend your gear by the fire for '+rc+' copper.','#c9a227','loot');banner('Gear repaired',rc+' copper','#c9a227')}}
+  else if(act==='repair'){const rc=repairCost();if(!rc){}else if(!canRepair())log('Repair at a campfire or the smith.','#9aa');else if(inv.copper<rc)log('Repairs cost '+rc+' copper; you have '+inv.copper+'.','#ff8a80');
+    else{inv.copper-=rc;inv.wear={};log((nearFolk('smith')?'The smith mends your gear for ':'You mend your gear by the fire for ')+rc+' copper.','#c9a227','loot');banner('Gear repaired',rc+' copper','#c9a227')}}
   else if(act==='destroy'&&bi!==null){log('You destroy the '+ITEMS[inv.bags[bi].id].name+'.','#9aa');inv.bags[bi]=null;charSel=null}
   player.hp=Math.min(player.hp,maxHP(player.lvl));player.mp=Math.min(player.mp,maxMP(player.lvl));
   saveInv();renderChar();

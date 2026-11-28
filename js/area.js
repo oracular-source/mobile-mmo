@@ -88,6 +88,7 @@ function* buildAreaGen(id){
         else if(TYPES[sp.type]&&TYPES[sp.type].camp&&!sp.aloof){const mate=A.spawns.find(o=>o!==sp&&TYPES[o.type]&&TYPES[o.type].camp&&Math.hypot(o.x-sp.x,o.y-sp.y)<=3*T);
           sp.group=mate?(mate.group=mate.group||'cp'+A.spawns.indexOf(mate)):null}}
     else if(k==='exit')A.exits.push({name:p[1],tx:+p[2],ty:+p[3],to:(p.find(s=>s.indexOf('to=')===0)||'to=?').slice(3),at:(p.find(s=>s.indexOf('at=')===0)||'at=').slice(3)}); // at = the exit you arrive by on the other side
+    else if(k==='npc'&&TOWNSFOLK[p[1]])(A.folk=A.folk||[]).push({folk:p[1],name:TOWNSFOLK[p[1]].name,x:+p[2]*T,y:+p[3]*T,ph:(A.folk||[]).length*0.37}); // townsfolk (v0.158, Town 1): stand at their station, tap for their service
     else if(k==='critter')(A.critDefs=A.critDefs||[]).push({kind:p[1],x:+p[2]*T,y:+p[3]*T,n:+p[4]||1,high:p.indexOf('high')>0,tied:p.indexOf('tied')>0}); // small living things (v0.49, world.js)
     // A barred gate (v0.62, the chapel's east gate): closed until you lift the bar from the inside (the side named, W = west).
     // Once opened it stays open for every character (saved under ashfen-gates).
