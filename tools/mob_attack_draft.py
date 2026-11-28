@@ -8,6 +8,7 @@ swings the sword in its hand); floating effects are only for spells.
 """
 import json, os, subprocess, sys
 
+MOUTH_RED = '#7a1a22'  # inside every open mouth (the wolves' red; owner picked red over black, Nov 27)
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 def load_sprites():
@@ -236,10 +237,10 @@ def rat_frames(rows, step, pal, head_x, open_rows, snap_rows, eye):
     return bite, death
 
 def rats(S):
-    R = S['SPR']; pal = dict(S['PAL']); pal.update(S['RAT_PAL']['rat']); pal['w'] = '#e8e2d4'
+    R = S['SPR']; pal = dict(S['PAL']); pal.update(S['RAT_PAL']['rat']); pal['w'] = '#e8e2d4'; pal['r'] = MOUTH_RED
     # Small rat (16x8): head from column 11. Open: snout lifted a pixel, a tooth under it. Snap: the tooth tucked in.
     small = rat_frames(R['rat'], R['ratstep'], pal, 11,
-                       {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."},
+                       {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "drwk."},
                        {4: "aaAwp"}, (13, 3))
     B = S['REDO_SPR']; bpal = S['REDO_PAL']['brat']; bpal = dict(bpal); bpal['w'] = '#efe6cc'
     # Big tunnel rat (29x13): head from column 21. Open: top jaw up, the yellow incisors split top and bottom with the
@@ -253,11 +254,11 @@ def rats(S):
     return out
 
 # ---------- the Pale Rat and Old Gnawbone: rear back, jaws wide on the big teeth, then bite down (owner, Nov 27) ----------
-def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth, mouth='k'):
+def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth, mouth='r'):
     """The head thrown back, drawn from the sprite's own head so the face keeps its size and the eye stays where it is
     on the face (owner, Nov 27: the first try grew the faces). The upper head (rows above jaw_row) is lifted more the
     further forward it is: steps = [(from column, lift), ...]. The lower jaw stays. The gap between them is the open
-    mouth: black from mouth_x forward, fur behind, a black lip at the front, and a lower tooth pointing up."""
+    mouth: red from mouth_x forward, fur behind, a black lip at the front, and a lower tooth pointing up."""
     px = grid_to_px(rows)
     up, low = {}, {}
     for (x, y), c in px.items():
@@ -273,7 +274,7 @@ def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth, mouth='k'):
         ys_up = [y for (xx, y) in up if xx == x]; ys_lo = [y for (xx, y) in low if xx == x]
         if not ys_up or not ys_lo: continue
         for y in range(max(ys_up) + 1, min(ys_lo)):
-            head[(x, y)] = mouth if x >= mouth_x else 'a'  # inside of the mouth: black (owner, Nov 27: brown looked bad on the Pale Rat; black for every mouth)
+            head[(x, y)] = mouth if x >= mouth_x else 'a'  # inside of the mouth: red, the wolves' mouth red (owner, Nov 27: picked red over black side by side)
     for (x, y) in lower_tooth: head[(x, y)] = lower_tooth[(x, y)]
     return head
 
@@ -296,11 +297,11 @@ def big_rats(S):
     B = S['REDO_SPR']
     pr = B['palerat']
     ph = rear_head(pr, 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'})
-    pale = rear_bite(pr, B['paleratstep'], S['REDO_PAL']['palerat'], 19, ph, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+    pale = rear_bite(pr, B['paleratstep'], dict(S['REDO_PAL']['palerat'], r=MOUTH_RED), 19, ph, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
     br = B['brat']  # the big tunnel rat: same body as the Pale Rat, same rear-back bite (owner, Nov 27)
     bh = rear_head(br, 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'})
-    big = rear_bite(br, B['bratstep'], S['REDO_PAL']['brat'], 19, bh, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
-    R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw']); g = R['gnaw']
+    big = rear_bite(br, B['bratstep'], dict(S['REDO_PAL']['brat'], r=MOUTH_RED), 19, bh, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+    R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw']); gpal['r'] = MOUTH_RED; g = R['gnaw']
     gh = rear_head(g, 30, 15, 36, [(33, 1), (36, 2)], {(38, 14): 'Y'})
     gnaw = rear_bite(g, R['gnawstep'], gpal, 30, gh, {14: "aaaaaadkYYYk"}, lunge=4)
     return {'palerat_bite': pale, 'brat_bite': big, 'gnaw_bite': gnaw}
@@ -431,10 +432,10 @@ if __name__ == '__main__' and '--game' in sys.argv:
     S = load_sprites()
     d = {'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'oldscar': oldscar(S), 'greyfang': greyfang(S)}
     d.update(rats(S))
-    cpal = dict(S['PAL']); cpal.update(S['RAT_PAL']['crat']); cpal['w'] = '#e8e2d4'
-    cb, cd = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], cpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."}, {4: "aaAwp"}, (13, 3))
+    cpal = dict(S['PAL']); cpal.update(S['RAT_PAL']['crat']); cpal['w'] = '#e8e2d4'; cpal['r'] = MOUTH_RED
+    cb, cd = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], cpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "drwk."}, {4: "aaAwp"}, (13, 3))
     d['crat_bite'] = cb; d['crat_death'] = cd
-    tpal = dict(S['PAL']); tpal.update(S['RAT_PAL']['trat']); tpal['w'] = '#e8e2d4'  # Old Gnawbone's tunnel-rat adds
-    tb, td = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], tpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."}, {4: "aaAwp"}, (13, 3))
+    tpal = dict(S['PAL']); tpal.update(S['RAT_PAL']['trat']); tpal['w'] = '#e8e2d4'; tpal['r'] = MOUTH_RED  # Old Gnawbone's tunnel-rat adds
+    tb, td = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], tpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "drwk."}, {4: "aaAwp"}, (13, 3))
     d['trat_bite'] = tb; d['trat_death'] = td
     write_game_data(d, S)
