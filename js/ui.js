@@ -365,6 +365,7 @@ $('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');set
   const show=e=>{const f=e.target.closest&&e.target.closest('.fx');if(!f)return;e.stopPropagation();const r=f.getBoundingClientRect(),v=$('view').getBoundingClientRect();
     tip.textContent=f.dataset.n;tip.style.display='block';tip.style.left=Math.max(2,Math.min(v.width-tip.offsetWidth-2,r.left-v.left))+'px';tip.style.top=(r.bottom-v.top+3)+'px';clearTimeout(tt);tt=setTimeout(()=>tip.style.display='none',1500)};
   ['buffbar','tfx'].forEach(id=>{$(id).addEventListener('pointerdown',show);$(id).addEventListener('click',e=>{if(e.target.closest('.fx'))e.stopPropagation()})})}
+$('partyrow').addEventListener('click',e=>{e.stopPropagation();if(remoteHere())allyToggle();else if(remote)log(remote.name+(remote.dead?' is down.':' is not in this area.'),'#9aa')}); // multiplayer: pick your partner for heals
 $('pframe').addEventListener('click',()=>{charTab='char';charSel=null;openModal('charUI')});
 let charTab='char',charSel=null; // charSel: {bag:i} or {slot:'head'}
 const DOLL_L=['head','neck','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];

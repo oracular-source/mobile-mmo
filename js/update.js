@@ -106,17 +106,11 @@ function update(dt){
   {const CAc=curArea();if(CAc)updateAreaCritters(CAc,dt);} // area critters (v0.49)
   if(!player.dead)checkPortals();
   updatePet(dt);
-  spawns.forEach(sp=>{if(!sp.mob){sp.timer-=dt;if(sp.timer<=0){spawn(sp);rollRare(curArea())}}}); // every respawn has a small chance to bring out the area's rare
+  if(!netGuestMirror())spawns.forEach(sp=>{if(!sp.mob){sp.timer-=dt;if(sp.timer<=0){spawn(sp);rollRare(curArea())}}}); // every respawn has a small chance to bring out the area's rare
   mobs.forEach(m=>{
     if(m.dead)return;
-    for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
-      // Shaman's small stacking bonus: each DoT ticks 10% harder for every other DoT on the same mob.
-      // Thornsnare ticks only while the mob is walking (not while it stands and swings, or is held).
-      if(d.next<=0&&d.walk&&(m.root>0||m.stun>0||m.mez>0||m.state!=='chase'||dist(m,victim(m))<=12)){d.next+=3}
-      else if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).reduce((n,o)=>n+(o.cnt||1),0)-(d.cnt||1)):1; // Stinging Swarm counts as two
-        const ds=d.id==='mrot'&&m.aslow>0&&m.deepSlow?m.deepSlow:1; // Deep Slow (Enchanter fork): Mind Rot hits harder on a slowed mob
-        hitMob(m,d.dmg*sx*ds*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return;}
-      if(d.t<=0){m.dots.splice(i,1);if(d.boom){bombGo(m,d);if(m.dead)return}log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
+    if(m.mirror){mirrorTick(m,dt);return} // multiplayer guest: a copy of the host's monster (js/net.js)
+    if(tickDots(m,dt))return;
     if(m.root>0){m.root-=dt;if(m.root<=0)log('The root on '+m.def.name+' wears off.','#ffb37a')}
     if(m.snare>0){m.snare-=dt;if(m.snare<=0)log('The snare on '+m.def.name+' wears off.','#9aa')}
     if(m.aslow>0)m.aslow-=dt;
@@ -140,32 +134,36 @@ function update(dt){
       moveToward(m,m.wx,m.wy,m.def.spd*0.35,dt);}
       if(!m.aloof&&!player.dead&&!(player.fd>0)&&!hidden()&&!(m.calm>0)&&dist(m,player)<m.def.aggro&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m);log(cap(m.def.name)+' notices you!','#ffb37a')}
       else if(!m.aloof&&pet&&dist(m,pet)<m.def.aggro*0.8&&m.lv>player.lvl-3&&!arriveHold(m)){engage(m,true);log(cap(m.def.name)+' notices your skeleton!','#ffb37a')}
+      else if(remote&&net.shared&&net.role==='host'&&!m.aloof&&!remote.dead&&!remote.hid&&!(m.calm>0)&&dist(m,remote)<m.def.aggro&&m.lv>(remote.lv||1)-3){engage(m,false,true)} // multiplayer: it notices your partner
     }else if(m.state==='chase'){
-      if(player.dead){m.state='return';return}
+      const pOut=player.dead&&!allyOn(m); // multiplayer: with you down, a monster on your partner keeps at them
+      if(pOut){m.state='return';return}
       if(m.fear>0){m.fear-=dt;if(spd>0)fearThink(m,player,spd*0.7,dt);return} // feared: zig-zags away from you and steers clear of other camps (js/path.js)
       // Evaded: stands confused, doesn't turn or attack. If you Hide meanwhile, it gives up and walks home.
       if(m.lost>0){m.lost-=dt;if(hidden()){m.lost=0;m.state='return';m.threat.p=0;log(cap(m.def.name)+' loses track of you.','#9aa')}return}
       const v=victim(m);
+      if(m.allyHad&&v===player&&m.threat.p<=0&&m.threat.pet<=0&&!(m.threat.ally>0)){m.state='return';m.allyHad=0;return} // your partner shook it off (Feign, Evade, death): it goes home
       if(v===player&&player.fd>0&&m!==player.fdKeep){m.state='idle';m.wx=m.x;m.wy=m.y;m.threat.p=0;return} // fooled by Feign Death; stays where it is, no heal
       const d=dist(m,v);
       if(m.def.adds)namedAdds(m);
       if(m.def.callAt&&rareCall(m,dt,spd))return; // the Pale Rat running for help
-      if(m.def.boss&&bossThink(m,dt))return;if(m.dead||player.dead)return; // casting: stands still
+      if(m.def.boss&&bossThink(m,dt))return;if(m.dead||pOut)return; // casting: stands still
       // Dungeon 1 (v0.63): healers, the Prior's Grasp of the Deep, the Bellringer's Toll, Malrec's Candle Wake.
       if(m.def.wake)candleWake(m);
-      if(m.def.heal&&healThink(m,dt))return;if(m.dead||player.dead)return;
-      if(m.def.grasp&&graspThink(m,dt))return;if(m.dead||player.dead)return;
-      if(m.def.toll&&tollThink(m,dt))return;if(m.dead||player.dead)return;
-      if(m.def.cast&&mobCast(m,dt))return;if(m.dead||player.dead)return; // chapel casters (v0.62): stand still while the bar fills
+      if(m.def.heal&&healThink(m,dt))return;if(m.dead||pOut)return;
+      if(m.def.grasp&&graspThink(m,dt))return;if(m.dead||pOut)return;
+      if(m.def.toll&&tollThink(m,dt))return;if(m.dead||pOut)return;
+      if(m.def.cast&&mobCast(m,dt))return;if(m.dead||pOut)return; // chapel casters (v0.62): stand still while the bar fills
       if(m.def.chant)chantThink(m,dt);if(m.def.brand)brandThink(m,dt);if(m.def.burn)burnThink(m,dt);if(m.def.blink)wispBlink(m,dt);
       if(m.def.flee&&wolfFlee(m,dt,spd))return; // a wolf running off at low health
       if(m.def.charge&&boarCharge(m,v,d,dt,spd))return; // the boar lowering its head or rushing in
       if(d>11){if(spd>0)pathTo(m,v.x,v.y,spd,dt)} // around trees and walls, not into them (js/path.js)
       else{m.dir=v.x>m.x?1:-1;m.aimX=v.x;m.aimY=v.y;m.near=0.2;m.atk-=dt;if(m.atk<=0){m.atk=2*(m.aslow>0?(m.aslowX||1.6):1)*(m.discord>0?1.25:1); // Slow Mind 60% slower, Drowsy 40%, Bard's Discord 25%
         animSwing(m,v); // looks only (js/anim.js): the lunge and slash
-        if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
+        if(remote)netSwing(m,v); // multiplayer: your partner sees it (and takes the hit if it's at them)
+        if(v===decoy){floatText(decoy.x,decoy.y-20,'miss','#c8a0ff')}else if(v===remote){}else if(v===pet||v===pet2)hurtPet(m,v);else hurtPlayer(m)}}
     }else if(m.state==='return'){
-      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.riseCd=undefined;m.riseN=0;m.wakes=0}
+      if(pathTo(m,m.hx,m.hy,m.def.spd*1.6,dt)||Math.hypot(m.x-m.hx,m.y-m.hy)<3){m.state='idle';if((m.gn||1)!==partyN)mobScale(m); /* multiplayer: back home, it takes the group size */m.allyHad=0;m.hp=m.maxhp;m.root=0;m.snare=0;m.aslow=0;m.chill=0;m.mark=0;m.weak=null;m.crack=0;m.ruin=0;m.fled=false;m.fleeT=0;m.fleeTo=null;m.rush=false;m.wind=0;m.howled=false;m.shouted=false;m.chantT=0;m.casting=null;m.bolt=undefined;m.brandCd=undefined;m.healCd=undefined;m.graspCd=undefined;m.tollCd=undefined;m.riseCd=undefined;m.riseN=0;m.wakes=0}
     }
   });
   updateHazards(dt);finaleTick(dt);if(shakeT>0)shakeT=Math.max(0,shakeT-dt);
@@ -177,3 +175,14 @@ function update(dt){
   fxTick(dt); // swing, hit and death animations, the Bone Throw (js/anim.js)
   for(let i=beams.length-1;i>=0;i--){beams[i].t+=dt;if(beams[i].t>0.15)beams.splice(i,1)}
 }
+// A mob's DoTs tick (yours and your pet's). Returns true if the mob died. Shared with the multiplayer guest's mirrors (js/net.js).
+function tickDots(m,dt){
+    for(let i=m.dots.length-1;i>=0;i--){const d=m.dots[i];d.t-=dt;d.next-=dt;
+      // Shaman's small stacking bonus: each DoT ticks 10% harder for every other DoT on the same mob.
+      // Thornsnare ticks only while the mob is walking (not while it stands and swings, or is held).
+      if(d.next<=0&&d.walk&&(m.root>0||m.stun>0||m.mez>0||m.state!=='chase'||dist(m,victim(m))<=12)){d.next+=3}
+      else if(d.next<=0){d.next+=3;const sx=C.dotStack&&!d.pet?1+C.dotStack*(m.dots.filter(o=>!o.pet).reduce((n,o)=>n+(o.cnt||1),0)-(d.cnt||1)):1; // Stinging Swarm counts as two
+        const ds=d.id==='mrot'&&m.aslow>0&&m.deepSlow?m.deepSlow:1; // Deep Slow (Enchanter fork): Mind Rot hits harder on a slowed mob
+        hitMob(m,d.dmg*sx*ds*rr(0.9,1.1),'dot',d.name||'Creeping Rot',d.pet?'pet':undefined);if(m.dead)return true;}
+      if(d.t<=0){m.dots.splice(i,1);if(d.boom){bombGo(m,d);if(m.dead)return true}log((d.name||'Creeping Rot')+' on '+m.def.name+' wears off.','#9aa')}}
+  return false}

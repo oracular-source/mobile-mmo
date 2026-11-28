@@ -24,7 +24,7 @@ const overSpawns=spawns;
 const mobs=[];
 // Players sharing the world's mobs (multiplayer step 2 sets this; DEV -> World -> "Group of 2" tries it solo).
 // Mobs spawned while it's above 1 get a scaled copy of their type (GROUP_SCALE in js/data/mobs.js).
-let partyN=1;
+let partyN=1,mobSeq=0; // mobSeq: every monster's id, so the two phones can talk about the same one
 function groupDef(T0,n){if(n<=1)return T0;const G=GROUP_SCALE,k=n-1;
   return Object.assign({},T0,{hp:T0.hp*(1+G.hp*k),hpl:T0.hpl*(1+G.hp*k),dmg:T0.dmg*(1+G.dmg*k),dmgl:T0.dmgl*(1+G.dmg*k),
     armor:Math.min(G.armorCap,(T0.armor||0)+G.armor*k),base:T0})}
@@ -32,6 +32,6 @@ function spawn(sp){
   let type=sp.type;
   const T0=groupDef(TYPES[type],partyN),range=type==='gnaw'?T0.lv:(sp.lv||T0.lv),lv=Math.floor(rr(range[0],range[1]+1));
   const m={sp:sp,type:type,def:T0,lv:lv,maxhp:T0.hp+T0.hpl*lv,x:sp.x,y:sp.y,hx:sp.x,hy:sp.y,state:'idle',wt:rr(1,4),wx:sp.x,wy:sp.y,root:0,snare:0,dots:[],atk:1,dir:1,dead:false,walk:0,pdmg:0,odmg:0};
-  m.hp=m.maxhp;m.threat={p:0,pet:0};if(sp.aloof)m.aloof=1;sp.mob=m;mobs.push(m);return m;
+  m.hp=m.maxhp;m.nid=++mobSeq;m.gn=partyN;m.threat={p:0,pet:0};if(sp.aloof)m.aloof=1;sp.mob=m;mobs.push(m);return m;
 }
 spawns.forEach(spawn);

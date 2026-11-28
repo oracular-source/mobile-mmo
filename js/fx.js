@@ -70,5 +70,5 @@ function moveToward(e,tx,ty,spd,dt){
   e.walk+=dt;
   return d<=step+0.01;
 }
-const inCombat=()=>mobs.some(m=>!m.dead&&m.state==='chase');
+const inCombat=()=>mobs.some(m=>!m.dead&&m.state==='chase'&&!(remote&&mobOnAlly(m))); // multiplayer: a monster on your partner isn't your fight
 function nearestMob(maxD){let best=null,bd=maxD;mobs.forEach(m=>{if(m.dead)return;const d=dist(m,player);if(d<bd){bd=d;best=m}});return best}

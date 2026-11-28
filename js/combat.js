@@ -10,7 +10,12 @@ const grounds=[]; // circles on the floor: Paladin's Consecrate, Shaman's Venom 
 const traps=[]; // Ranger's Spike Traps: wait at a spot and go off on the first mob that steps in
 let pet2=null; // v0.38: the Necro's second skeleton (Bone Pair fork). It runs through the same pet code by swapping in (withPet2).
 // A mob that's after "the pet" goes for the skeleton that last hit it (m.petT).
-const victim=m=>(decoy&&dist(m,decoy)<110)?decoy:((pet||pet2)&&m.threat.pet>m.threat.p)?(pet2&&m.petT===pet2?pet2:(pet||pet2)):player;
+// Multiplayer (v0.142): on the host, a monster whose top threat is your partner goes for them; on the guest, a copy of the
+// host's monster goes for whoever the host says (tg 2 = you). Solo never gets past the first check.
+const victim=m=>remote&&(m.mirror||m.threat.ally>0)?netVictim(m):victimSolo(m);
+function netVictim(m){if(m.mirror)return m.tg===2?(pet&&m.threat.pet>m.threat.p?pet:player):(remoteHere()?remote:player);
+  return !(decoy&&dist(m,decoy)<110)&&allyOn(m)&&m.threat.ally>m.threat.p&&m.threat.ally>m.threat.pet?remote:victimSolo(m)}
+const victimSolo=m=>(decoy&&dist(m,decoy)<110)?decoy:((pet||pet2)&&m.threat.pet>m.threat.p)?(pet2&&m.petT===pet2?pet2:(pet||pet2)):player;
 // Runs fn with the second skeleton standing in as "pet", then puts both back (pet2 becomes null if it died meanwhile).
 function withPet2(fn){if(!pet2)return;const keep=pet;pet=pet2;try{fn()}finally{pet2=pet;pet=keep}}
 let petOther=null; // while withPet2 runs: the main pet, so the second skeleton can pick a different mob
@@ -49,12 +54,13 @@ function arriveEnd(){if(!player.arriving)return;player.arriving=0;player.arriveT
 // True while m should leave you (and your pet beside you) alone because you just arrived.
 function arriveHold(m){if(!player.arriving)return false;if(time<player.arriveT)return true;if(!m.arrCalm)return false;
   const d=dist(m,player);if(d>m.def.aggro+ARRIVE.pad||d<Math.min(m.arrD,m.def.aggro)*ARRIVE.close){m.arrCalm=0;return false}return true}
-function engage(m,byPet){
-  if(m.dead||player.dead||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
+function engage(m,byPet,ally){ // ally: your partner pulled it (multiplayer host)
+  if(m.mirror){if(byPet)m.threat.pet+=1;else m.threat.p+=1;if(!player.target)player.target=m;return} // a copy of the host's monster: the host decides
+  if(m.dead||(player.dead&&!ally)||m.def.drift)return; // a candle wisp never turns to fight (v0.63)
   if(m.aloof)return; // v0.126: seen but out of reach : never joins a fight (kept for teasers; unused since v0.132)
   arriveEnd(); // a fight started: arrival calm is over
-  if(byPet)m.threat.pet+=1;else m.threat.p+=1;
-  if(m.state!=='chase'){m.state='chase';if(!player.target)player.target=m;}
+  if(ally){m.threat.ally=Math.max(1,m.threat.ally||0);m.allyHad=1}else if(byPet)m.threat.pet+=1;else m.threat.p+=1;
+  if(m.state!=='chase'){m.state='chase';if(!player.target&&!ally)player.target=m;}
   // Greyfang howls (v0.40): his pack comes from much farther off than a normal group's 70.
   const reach=m.def.howl?260:70;if(m.def.howl&&!m.howled){m.howled=true;animHowl(m);log(cap(m.def.name)+' throws back his head and howls!','#ffb37a')}
   if(m.sp.group)mobs.forEach(o=>{if(o!==m&&!o.dead&&o.sp.group===m.sp.group&&o.state!=='chase'&&!(o.calm>0)&&dist(o,m)<reach){o.state='chase';log(cap(o.def.name)+' joins the fight!','#ffb37a')}});
@@ -63,10 +69,14 @@ function engage(m,byPet){
 // src 'npc' = a guard. XP only goes to the player if they did at least half the damage.
 function hitMob(m,dmg,kind,label,src){
   if(m.dead)return;
-  if(src!=='npc'&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
-  if(src!=='npc'&&m.crack>0)dmg*=1.2; // Sunder (Warrior fork): cracked armor
-  dmg=Math.max(1,Math.round(dmg));m.hp-=dmg;
-  if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
+  const ally=src==='ally'||src==='allypet'; // your partner's hit (multiplayer host): worked out on their phone already
+  if(src!=='npc'&&!ally&&m.mark)dmg*=m.mark; // Ranger's Hunter's Mark: your (and your pet's) hits do more
+  if(src!=='npc'&&!ally&&m.crack>0)dmg*=1.2; // Sunder (Warrior fork): cracked armor
+  dmg=Math.max(1,Math.round(dmg));
+  if(m.mirror){mirrorHit(m,dmg,kind,label,src);return} // guest: a copy of the host's monster; the host applies the hit
+  m.hp-=dmg;
+  if(ally){m.adm=(m.adm||0)+dmg;floatText(m.x,m.y-18,String(dmg),'#9fd8ff',0,'small');engage(m,false,true)}
+  else if(src==='npc'){m.odmg+=dmg;floatText(m.x,m.y-18,String(dmg),'#cfd6e0',0,'small');log(label+' hits '+m.def.name+' for '+dmg+'.','#b8c4d4','fight');}
   else if(src==='pet'){m.petT=pet;m.pdmg+=dmg;m.threat.pet+=dmg*((pet&&pet.threat)||3)+(m.petHit?0:20);m.petHit=1;floatText(m.x,m.y-18,String(dmg),'#d8d2c0',0,'small');log('Your '+petName()+' hits '+m.def.name+' for '+dmg+'.','#bdb6a0','fight');engage(m,true);}
   else{m.pdmg+=dmg;m.threat.p+=dmg;floatText(m.x,m.y-18,String(dmg),kind==='dot'?'#9be37a':kind==='song'?'#ffd27a':kind==='shield'?'#ff9a4a':'#ffffff',0,(kind==='dot'||kind==='song'||kind==='shield')?'small':'hit');log('Your '+label+' hits '+m.def.name+' for '+dmg+'.','#e8e2cf','fight');engage(m);}
   // Anything that hits a sleeping (mesmerized) mob wakes it, angry.
@@ -102,9 +112,9 @@ function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the
   if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
   if(how!=='vanish')animDeath(m); // each family has its own death now; the old white spark burst is gone (owner, Nov 27)
   if(how!=='vanish')log('You have slain '+m.def.name+'!','#ffd27a');
-  forkOnDeath(m);
+  forkOnDeath(m);netKill(m,how); // multiplayer: the guest gets the kill too
   let xp=xpFor(m.lv,m.def,player.lvl);
-  const credit=m.pdmg>=m.odmg;
+  const credit=m.pdmg+(m.adm||0)>=m.odmg; // your partner's damage counts as yours (adm)
   if(player.lvl>=LEVEL_CAP)xp=0;
   if(!credit){xp=0;log('The guards did most of the work. No experience or loot.','#9aa');}
   if(xp>0){player.xp+=xp;log('You gain experience!','#c9a227');}
@@ -205,7 +215,7 @@ function playerDie(m){
   // The death panel (v0.37) shows these; you stay down until you tap Respawn.
   $('dkiller').textContent='Slain by '+m.def.name;$('dxp').textContent=worn.length?(brk?brk+' item'+(brk>1?'s':'')+' broken · repair at a campfire':'Your gear is worn (−'+LOOT.wearDeath+'%)'):'';
   // Death ends every fight: clear threat and lingering DoTs (a DoT tick after you respawn used to re-aggro the mob), then send mobs home.
-  mobs.forEach(o=>{if(o.dead)return;o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'});
+  mobs.forEach(o=>{if(o.dead)return;const al=allyOn(o);o.threat.p=0;o.threat.pet=0;o.petHit=0;o.dots=[];if(al)return;o.root=0;o.snare=0;o.fear=0;o.stun=0;o.lost=0;if(o.state==='chase')o.state='return'}); // multiplayer: a monster your partner is fighting keeps fighting them
   player.buffs={};player.bval={};player.lsUsed=false;player.hots=[];player.songs=[];decoy=null;grounds.length=0;traps.length=0; // buffs (Clarity, Barkskin...) and songs last until you die
   if(pet&&pet.charm)releaseCharm(true);
   else if(pet){log('Your '+petName()+' is gone.','#9aa');pet=null;}
@@ -421,6 +431,7 @@ function cast(a,quiet){
   // Reaping Cleave (Shadow Knight fork) needs two or more mobs next to you; Rending Blow needs your target next to you.
   if(a.need2&&mobs.filter(m=>!m.dead&&dist(m,player)<=a.radius).length<2){if(!quiet)log(a.fork+' needs two or more enemies next to you.','#9aa');return false}
   if((a.single||a.needT)&&!(player.target&&!player.target.dead&&dist(player.target,player)<=a.radius)){if(!quiet)log(a.fork+' needs your target next to you.','#9aa');return false}
+  if((a.kind==='heal'||a.kind==='hot')&&allyPicked()&&!allyReach(quiet))return false; // healing your partner: in range and in sight
   if(a.tgt){
     t=player.target;
     // Mesmerize goes on the closest awake mob coming at you that you are NOT fighting, so you can keep hitting your target.
@@ -435,6 +446,7 @@ function cast(a,quiet){
     if(a.kind==='backstab'&&!hidden()&&!behind(t)&&!openTo(t)&&!(player.kidney>0)){if(!quiet){log('Backstab needs you hidden, behind the target, or the target stunned or Evaded.','#ff8a80');floatText(player.x,player.y-24,'Get behind it','#ff8a80')}return false}
     if(a.undeadOnly&&!isUndead(t)){if(!quiet){log(a.name+' only works on the undead.','#ff8a80');floatText(player.x,player.y-24,'Undead only','#ff8a80')}return false}
     if((a.kind==='mez'||a.kind==='charm')&&t.def.boss){if(!quiet)log(cap(t.def.name)+' can not be '+(a.kind==='mez'?'mesmerized':'charmed')+'.','#ff8a80');return false}
+    if(a.kind==='charm'&&t.mirror){if(!quiet)log("Charm doesn't work on shared monsters yet.",'#ff8a80');return false}
     if(a.kind==='charm'&&(t.def.named||t.lv>player.lvl)){if(!quiet)log('Charm only works on ordinary mobs your level or lower.','#ff8a80');return false}
     if(t.x!==player.x)player.dir=t.x>player.x?1:-1;
   }
@@ -505,9 +517,11 @@ function applyAbilityCore(a,t,fromHide){
     // Shatter Burst (Wizard fork): splashes onto every mob near the target and chills them.
     if(a.burstR){mobs.filter(m=>m!==t&&!m.dead&&dist(m,t)<=a.burstR).forEach(m=>{hitMob(m,at(a.dmg)*a.burstX*rr(0.85,1.15)*(1-m.def.armor)*mult,'direct',a.name);if(!m.dead){m.chill=Math.min(4,(m.chill||0)+1);m.chillT=8}})}
   }else if(a.kind==='heal'){const h=a.full?maxHP(L)-player.hp:Math.round(at(a.heal)*rr(0.9,1.1)*mult);
+    if(netHealAlly(a,a.full?0:h)){if(a.holy)holyPulse(at(a.heal)*mult*a.holy,a.name);return} // your partner is picked: it lands on them
     if(a.overShield){const over=player.hp+h-maxHP(L);if(over>0){player.vshield=Math.round(over);player.vshieldT=8;floatText(player.x+6,player.y-30,'shield '+Math.round(over),'#a0d890')}} // Verdant Touch (Druid fork)
     player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#7dffa6');burst(player.x,player.y-6,a.col,12,true);log(a.name+' heals you for '+h+'.','#7dffa6','fight');
     if(a.holy)holyPulse(Math.max(at(a.heal)*mult,h)*a.holy,a.name);}
+  else if(a.kind==='hot'&&netHotAlly(a,at(a.dur,a),at(a.heal,a)*mult)){}
   else if(a.kind==='hot'){player.hots=(player.hots||[]).filter(o=>o.id!==a.id);player.hots.push({id:a.id,name:a.name,t:at(a.dur,a),next:2,heal:at(a.heal,a)*mult,holy:a.holy||0,holyAll:a.holyAll||0});if(a.ward)player.ward=at(a.dur,a);/* Warding Renew: blocks the next big hit while it lasts */burst(player.x,player.y-6,a.col,10,true);log(a.name+' is on you ('+Math.round(at(a.dur,a))+'s).','#7dffa6');}
   else if(a.kind==='root'){t.root=at(a.dur,a)*durMult(t);burst(t.x,t.y,a.col,8);log(cap(t.def.name)+' is held by roots ('+Math.round(t.root)+'s).','#c8b07a');engage(t);}
   else if(a.kind==='snare'){if(a.dmg){if(a.beam)beams.push({x1:player.x,y1:player.y-8,x2:t.x,y2:t.y-6,t:0,col:a.beam});hitMob(t,at(a.dmg)*rr(0.85,1.15)*(1-t.def.armor)*mult,'direct',a.name);if(t.dead)return}
@@ -567,7 +581,7 @@ function applyAbilityCore(a,t,fromHide){
   else if(a.kind==='taunt'){
     // Challenge (Paladin fork): every mob fighting near you. Rebuke: the one mob also hits softer.
     const tt=a.aoe?[t].concat(mobs.filter(m=>m!==t&&!m.dead&&m.state==='chase'&&dist(m,player)<=a.aoe)):[t];
-    tt.forEach(m=>{m.threat.p=Math.max(m.threat.p,m.threat.pet+40);engage(m);burst(m.x,m.y-8,a.col,8);floatText(m.x,m.y-26,'TAUNT','#ffb37a');if(a.weak)weaken(m,a.weak,a.weakT)});
+    tt.forEach(m=>{m.threat.p=Math.max(m.threat.p,m.threat.pet+40);engage(m);burst(m.x,m.y-8,a.col,8);floatText(m.x,m.y-26,'TAUNT','#ffb37a');if(a.weak)weaken(m,a.weak,a.weakT);netTaunt(m)});
     log(tt.length>1?tt.length+' enemies turn their attention to YOU.':cap(t.def.name)+' turns its attention to YOU.','#ffb37a');}
   else if(a.kind==='decoy'){decoy={x:player.x+12*player.dir,y:player.y,dir:player.dir,t:at(a.dur,a)};burst(decoy.x,decoy.y-6,a.col,14,true);log('A see-through copy of you appears. Nearby enemies attack it instead ('+Math.round(decoy.t)+'s).','#c8a0ff');}
   // Ground circles: at your feet (Consecrate, Venom Totem) or on your target (Volley). "all" = hurts any mob, not just undead.
@@ -652,7 +666,7 @@ function pinkTricks(a,t,before){
       if(t)trickSpark(t.x,t.y);}
     if(tr.heal){const h=Math.max(1,Math.round(maxHP(L)*tr.heal));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2');trickSpark(player.x,player.y);trickNote(tr,'mends you for '+h+'.')}
     if(tr.mana){const g=Math.max(1,Math.round(maxMP(L)*tr.mana));player.mp=Math.min(maxMP(L),player.mp+g);floatText(player.x+6,player.y-30,'+'+g+' mana','#ff9de2');trickSpark(player.x,player.y)}
-    if(tr.taunt&&t&&!t.dead){t.threat.p=Math.max(t.threat.p,t.threat.pet+40);engage(t);floatText(t.x,t.y-26,'TAUNT','#ff9de2')}
+    if(tr.taunt&&t&&!t.dead){t.threat.p=Math.max(t.threat.p,t.threat.pet+40);engage(t);netTaunt(t);floatText(t.x,t.y-26,'TAUNT','#ff9de2')}
     if(tr.share&&pet&&!pet.charm){const h=Math.round(Math.max(0,player.hp-before.hp)*tr.share);if(h>0){pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#ff9de2')}}
     if(tr.holy){const near=mobs.filter(m=>!m.dead&&isUndead(m)&&m.state==='chase'&&dist(m,player)<=40);near.forEach(m=>{hitMob(m,tr.holy,'holy',tr.item);trickSpark(m.x,m.y)})}
     if(tr.petFirst&&pet)pet.firstHit=tr.petFirst;

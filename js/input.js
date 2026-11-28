@@ -59,6 +59,8 @@ function tapWorld(clientX,clientY,targetOnly){
   if(zoneId==='over'&&Math.hypot(wx-SIGN.x,wy-(SIGN.y-11))<11){say(SIGN,SIGN.text,true);return}
   let best=null,bd=1e9;
   mobs.forEach(m=>{if(m.dead)return;const img=IMG[m.def.img];const d=Math.hypot(wx-m.x,wy-(m.y-img.h/2));if(d<Math.max(12,img.h*0.8)&&d<bd){bd=d;best=m}});
+  // Your partner (multiplayer): tapping them picks them for your heals (tap again to heal yourself). Your enemy target stays.
+  if(remoteHere()){const dr=Math.hypot(wx-remote.x,wy-(remote.y-9));if(dr<11&&dr<bd){allyToggle();return}}
   if(best){switchTarget(best);if(settings.tapCast&&!(best.mez>0))castSlot(0);return} // tapping a sleeping mob only targets it
   if(!targetOnly&&tapSummon(wx,wy))return; // the throne or bone pile, when you're standing at it
   if(targetOnly)return; // second finger missed: don't walk, the joystick is steering

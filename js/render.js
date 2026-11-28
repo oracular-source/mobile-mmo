@@ -516,7 +516,7 @@ function render(){
   if(t&&!t.dead){const sx=(t.x-camX)*S,sy=(t.y-(IMG[t.def.img].h)-6-camY)*S;cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(cap(t.def.name),sx,sy);cx.fillStyle=con(t.lv);cx.fillText(cap(t.def.name),sx,sy)}
   // Your partner's name over their head, with a thin health bar and their cast bar (multiplayer step 1).
   if(remoteHere()){const r=remote,sx=(r.x-camX)*S,sy=(r.y-24-camY)*S,w=26*dpr,h=3*dpr;
-    cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';cx.strokeText(r.name,sx,sy);cx.fillStyle='#9fd8ff';cx.fillText(r.name,sx,sy);
+    cx.font='600 '+Math.round(10*dpr)+'px ui-monospace,Menlo,monospace';cx.lineWidth=3*dpr;cx.strokeStyle='#000';const nm=(player.ally?'+ ':'')+r.name;cx.strokeText(nm,sx,sy);cx.fillStyle=player.ally?'#ffd27a':'#9fd8ff';cx.fillText(nm,sx,sy); // gold with a + while picked for your heals
     cx.fillStyle='#000';cx.fillRect(sx-w/2-dpr,sy+6*dpr-dpr,w+2*dpr,h+2*dpr);cx.fillStyle='#3a1418';cx.fillRect(sx-w/2,sy+6*dpr,w,h);cx.fillStyle='#d8433e';cx.fillRect(sx-w/2,sy+6*dpr,w*Math.max(0,Math.min(1,r.hp/r.mhp)),h);
     if(r.cast){cx.fillStyle='#000';cx.fillRect(sx-w/2-dpr,sy+10*dpr-dpr,w+2*dpr,h+2*dpr);cx.fillStyle=r.cast.col||'#cfc8b2';cx.fillRect(sx-w/2,sy+10*dpr,w*r.cast.p,h)}}
   // Sleeping (mesmerized) mobs: "Zz" and seconds left, so you know when to re-mez.
@@ -582,6 +582,11 @@ function ui(){
     pb.style.width=Math.max(0,w)+'%';pb.style.background=col;
     const tg=pet.hold?'held':pet.target&&!pet.target.dead?'› '+cap(pet.target.def.name.replace(/^an? /,'')):'';
     if($('petnm').textContent!==nm)$('petnm').textContent=nm;if($('pettg').textContent!==tg)$('pettg').textContent=tg;}
+  // Your partner's row (multiplayer): health, and whether your heals go to them. Tapping it picks them (js/ui.js).
+  {const on=net.state==='on'&&!!remote,row=$('partyrow');if(row.style.display!==(on?'block':'none'))row.style.display=on?'block':'none';
+    if(on){const r=remote,here=remoteHere(),nm=r.name+(r.lv?' · Lv '+r.lv:''),st=r.dead?'down':!here?'away':player.ally?'+ healing':'';
+      if($('partynm').textContent!==nm)$('partynm').textContent=nm;if($('partyst').textContent!==st)$('partyst').textContent=st;
+      $('partybar').style.width=(r.dead?0:Math.max(0,Math.min(100,100*r.hp/(r.mhp||1))))+'%';row.classList.toggle('picked',!!player.ally)}}
   ['bpetatk','bpetback'].forEach(id=>{const b=$(id);if(b)b.style.display=pet&&!player.dead?'flex':'none'});
   const bb0=$('bpetback');if(bb0)bb0.classList.toggle('held',!!(pet&&pet.hold));
   $('pxp').style.width=(L>=LEVEL_CAP?100:Math.min(100,100*player.xp/need(L)))+'%'; // capped: a save from before v0.34.1 can hold more XP than the new table needs (it dings on the next kill)
