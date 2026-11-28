@@ -149,9 +149,10 @@ function* buildAreaGen(id){
     // Town 1 (v0.143, owner Nov 27: a small hub round one square): the forge's open hearth, lit windows, the gem cutter's lamp, the wizard's orb.
     if(o.kind==='forge'){A.lights.push({x:o.x*T+14,y:o.y*T+20,r:48,w:40});A.flames.push({x:o.x*T+14,y:o.y*T+18,big:1})}
     if(o.kind==='townhouse'||o.kind==='bank')A.lights.push({x:o.x*T+(o.kind==='bank'?24:20),y:(o.y+o.h)*T-8,r:28,w:22});
-    if(o.kind==='wizard_tower')A.lights.push({x:o.x*T+24,y:(o.y+o.h)*T-28,r:30,w:0,c:30});
+    if(o.kind==='wizard_tower')A.lights.push({x:o.x*T+(o.ox||0)+24,y:(o.y+o.h)*T-28,r:30,w:0,c:30});
     if(o.kind==='gem_table'){A.lights.push({x:o.x*T+16,y:o.y*T,r:30,w:24});A.flames.push({x:o.x*T+27,y:o.y*T-6,big:0,lamp:1})}
     if(o.kind==='orb_stand')A.lights.push({x:cx,y:o.y*T-6,r:36,w:0,c:46});
+    if(o.kind==='stable'){A.lights.push({x:o.x*T+24,y:(o.y+o.h)*T-6,r:34,w:26});A.flames.push({x:o.x*T+25,y:(o.y+o.h)*T-24,big:0,lamp:1})} // a lantern hung by the stable door
     if(o.kind==='shack')A.lights.push({x:o.x*T+15,y:o.y*T+30,r:30,w:24}); // the gravedigger is home: his window throws a little warm light (v0.82)
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
@@ -598,6 +599,7 @@ function* paintAreaGen(A){ // pauses between rows (see Build in slices)
       else if(n==='stone_wall'){const isW=(x,y)=>{const m=name(x,y);return m==='stone_wall'||m==='gate'};drawStoneWall(R,g,bx,by,isW(tx,ty-1),isW(tx,ty+1),isW(tx+1,ty),isW(tx-1,ty),tx,ty)}
       else if(n==='pillar')drawColumn(R,g,bx,by,ah(tx,ty,17));
       else if(n==='palisade'){const isP=(x,y)=>name(x,y)==='palisade';drawPalisade(R,bx,by,isP(tx-1,ty),isP(tx+1,ty),tx,ty)}
+      else if(n==='rail_fence'){const isJ=(x,y)=>{const m=name(x,y);return m==='rail_fence'||m==='palisade'},isR=(x,y)=>name(x,y)==='rail_fence';drawRailFence(R,g,bx,by,isJ(tx-1,ty),isJ(tx+1,ty),isR(tx,ty-1),isR(tx,ty+1),tx,ty)}
       else if(n==='earth_wall'||n==='rat_hole'){} // drawn earlier as one shape (paintEarthWalls, v0.74)
       else if(n==='dirt_pile')drawDirtPile(R,bx,by,ah(tx,ty,14));
       else if(n==='bridge')drawBridge(R,bx,by,name(tx,ty-1)!=='bridge',name(tx,ty+1)!=='bridge');
@@ -1165,6 +1167,19 @@ function drawPalisade(R,bx,by,l,rt,tx,ty){
     if(ah(tx*4+i,ty,151)<0.3)R(x+1,top+8+Math.floor(ah(tx,ty,152)*6),2,1,AP.woodDk)} // a knot
   R(bx-(l?0:1),by+1,16+(l?0:1)+(rt?0:1),3,AP.out);R(bx,by+2,16,1,AP.rut); // the rail
   R(bx,by+12,16,3,AP.dirt);R(bx,by+12,16,1,AP.dirtHi);if(ah(tx,ty,153)<0.5)R(bx+3+Math.floor(ah(tx,ty,154)*8),by+11,3,1,AP.moss)}
+// Paddock fence (Town 1 draft 2, the wizard's horses): split-rail fence, two weathered rails on a post per tile. A run across
+// the screen shows both rails side on; a run up and down the screen shows the rails from above as a narrow strip with
+// its posts. Rails butt into the palisade where the paddock meets the town wall.
+function drawRailFence(R,g,bx,by,l,rt,up,dn,tx,ty){
+  const post=(x,y,h)=>{R(x-1,y-1,4,h+2,AP.out);R(x,y,2,h,AP.wood);R(x,y,1,h,AP.woodHi);R(x,y,2,1,AP.plankHi)};
+  const hz=l||rt||!(up||dn),lean=ah(tx,ty,160)<0.25?1:0;
+  if(up||dn){const y0=up?by-3:by+1,y1=dn?by+16:by+12;g.fillStyle='rgba(0,0,0,0.3)';g.fillRect(bx+10,y0+2,2,y1-y0);
+    R(bx+5,y0,6,y1-y0,AP.out);R(bx+6,y0,1,y1-y0,AP.plankHi);R(bx+7,y0,2,y1-y0,AP.plank);R(bx+9,y0,1,y1-y0,AP.plankDk)}
+  if(hz){const x0=l?bx:bx+5,x1=rt?bx+16:bx+11;g.fillStyle='rgba(0,0,0,0.3)';g.fillRect(x0,by+13,x1-x0,2);
+    [3,8].forEach((y,i)=>{const yy=by+y+(i===0?0:lean);R(x0,yy-1,x1-x0,4,AP.out);R(x0,yy,x1-x0,2,AP.plank);R(x0,yy,x1-x0,1,AP.plankHi);
+      if(ah(tx,ty,161+i)<0.4)R(x0+3+Math.floor(ah(tx,ty,163+i)*8),yy+1,2,1,AP.plankDk)})} // a knot or split in the rail
+  post(bx+7,by,13);
+  if(ah(tx,ty,165)<0.35)R(bx+3,by+13,3,1,AP.moss)}
 function drawStoneWall(R,g,bx,by,n,s,e,w,tx,ty){
   const hz=e||w||!(n||s),L=w?bx:bx+3,Rx=e?bx+16:bx+13,brick=(x0,y0,ww,hh)=>{R(x0,y0,ww,hh,AP.cst);for(let yy=0;yy<hh;yy+=4){R(x0,y0+yy+3,ww,1,AP.cstMor);const off=((ty*4+yy)/4)%2?4:0;for(let xx=x0+((x0+off)%8?8-((x0+off)%8):0);xx<x0+ww;xx+=8)R(xx,y0+yy,1,3,AP.cstMor)}};
   const top=(x0,y0,ww,hh)=>{R(x0-1,y0-1,ww+2,hh+1,AP.out);R(x0,y0,ww,hh,AP.cstHi);R(x0,y0,ww,1,'#9a9aa4');for(let xx=x0+5+Math.floor(ah(tx,ty,61)*3);xx<x0+ww-1;xx+=6+Math.floor(ah(xx,ty,62)*3))R(xx,y0+1,1,hh-1,AP.cstMor);
@@ -1505,6 +1520,56 @@ function drawTownProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,B=Y+H;
     [[6,'#e04060'],[11,'#40c060'],[16,'#4080e0'],[21,'#e0c040']].forEach(([x,c])=>{R(X+x,B-12,3,3,AP.out);R(X+x,B-12,2,2,c);R(X+x,B-12,1,1,'#ffffff')}); // gems
     R(X-1,B-30,W+2,4,AP.out);for(let x=0;x<W;x+=4)R(X+x,B-29,4,3,(x/4)%2?'#2a7a7a':'#d8d0b8');[X,X+W-2].forEach(px=>R(px,B-26,2,18,'#3e2c1e')); // striped awning on poles
     R(X+25,B-18,5,6,AP.out);R(X+26,B-17,3,4,'#ffb860');return true} // the lamp
+  if(k==='stable'){
+    // The wizard's stable (draft 2, owner Nov 27: "why does a wizard have horses? who cares"). References first (pixel
+    // stable, pixel barn, timber stables): what makes it read at game zoom is a long low plank barn under a straw thatch,
+    // a big X-braced double door in the middle, a stall either side with a half door and a horse looking out over it,
+    // a hay loft hatch in the gable stuffed with hay, and a hanging sign: a gold horseshoe under a purple star (the wizard's).
+    shadow(X-1,B-2,W+4,4);const wt=B-30;
+    R(X,wt,W,30,AP.out);for(let x=X+1;x<X+W-1;x+=4){R(x,wt+1,4,28,ah(x,1,96)<0.5?'#6a4a30':'#5e422a');R(x,wt+1,1,28,'#4a3220')} // vertical planks
+    R(X+1,B-5,W-2,4,AP.stoneDk);R(X+1,B-5,W-2,1,AP.stone); // stone footing
+    [1,25,51,W-4].forEach(x=>{R(X+x,wt+1,3,25,'#3a2a1c')});R(X+1,wt+1,W-2,2,'#3a2a1c'); // frame posts and the wall plate
+    R(X+23,wt+4,5,8,AP.out);R(X+24,wt+5,3,6,'#ffb860');R(X+24,wt+5,3,1,'#ffe0a0'); // lantern on the post by the door
+    const stall=(sx,horse)=>{R(sx-1,wt+5,20,22,AP.out);R(sx,wt+6,18,10,'#160f0a');R(sx,wt+16,18,10,AP.plank);R(sx,wt+16,18,1,AP.plankHi);
+      for(let i=0;i<18;i++){R(sx+i,wt+17+Math.round(i*8/17),1,1,AP.plankDk);R(sx+i,wt+25-Math.round(i*8/17),1,1,AP.plankDk)} // half door with its brace
+      if(horse){const c=horse,hx=sx+5; // a horse looking out over the half door: long face, ears, a pale blaze
+        R(hx-1,wt+6,9,11,AP.out);R(hx,wt+8,7,8,c[0]);R(hx+1,wt+6,1,2,c[0]);R(hx+5,wt+6,1,2,c[0]);R(hx+1,wt+12,5,4,c[1]);R(hx+3,wt+8,1,6,c[2]);
+        R(hx+1,wt+10,1,1,AP.out);R(hx+5,wt+10,1,1,AP.out);R(hx+2,wt+14,1,1,AP.out);R(hx+4,wt+14,1,1,AP.out)}}; // eyes, nostrils
+    stall(X+5,['#8a4a26','#663218','#e8e2d4']);stall(X+57,['#b8b4ac','#8e8a84','#d8d4cc']);
+    const dx=X+29;R(dx-1,wt+3,24,25,AP.out);[0,11].forEach(o2=>{R(dx+o2,wt+4,10,23,AP.plank);R(dx+o2,wt+4,10,1,AP.plankHi);
+      for(let i=0;i<10;i++){R(dx+o2+i,wt+5+Math.round(i*21/9),1,1,AP.plankDk);R(dx+o2+i,wt+26-Math.round(i*21/9),1,1,AP.plankDk)}; // X brace
+      R(dx+o2,wt+4,1,23,AP.plankDk);R(dx+o2+9,wt+4,1,23,AP.plankDk)});R(dx+9,wt+13,1,3,AP.ironHi);R(dx+12,wt+13,1,3,AP.ironHi); // handles
+    // straw thatch: rows of golden straw, ragged at the eave, a ridge on top
+    R(X-4,Y-14,W+8,wt-Y+16,AP.out);for(let y=Y-13;y<wt+1;y+=3)for(let x=X-3+(((y-Y)/3)%2?2:0);x<X+W+3;x+=3){const r2=ah(x,y,97);R(x,y,3,3,r2<0.4?'#8a7440':r2<0.8?'#a08848':'#6a5830');R(x,y,1,2,'#c0a860')}
+    for(let x=X-3;x<X+W+3;x+=2)R(x,wt+1+(ah(x,0,98)<0.5?1:0),1,2,'#6a5830'); // ragged straw at the eave
+    R(X-4,Y-16,W+8,3,AP.out);R(X-3,Y-15,W+6,1,'#c0a860');R(X,wt+2,W,1,'rgba(0,0,0,0.45)');
+    const lx=X+W/2-6;R(lx-1,Y-12,14,11,AP.out);R(lx,Y-11,12,9,'#1a120c');R(lx,Y-11,12,1,AP.plankDk); // hay loft hatch in the thatch
+    for(let i=0;i<12;i++){const t=Math.floor(ah(i,3,99)*3);R(lx+i,Y-6-t,1,6+t,i%2?'#c8a850':'#e0c870');if(ah(i,5,99)<0.45)R(lx+i,Y-2,1,2+Math.floor(ah(i,6,99)*3),'#c8a850')} // the loft's hay piled in the hatch, stalks hanging over the sill
+    // the sign on an iron bracket by the big door: a gold horseshoe under a little purple star
+    const sx2=X+53,sy=wt+5;R(sx2-2,sy-2,10,2,AP.out);R(sx2-1,sy-2,8,1,AP.ironHi);R(sx2,sy,1,3,AP.out);R(sx2+6,sy,1,3,AP.out);
+    R(sx2-2,sy+3,11,10,AP.out);R(sx2-1,sy+4,9,8,'#6a4c36');R(sx2-1,sy+4,9,1,'#8a6a4e');
+    R(sx2+1,sy+6,1,5,'#e8c850');R(sx2+5,sy+6,1,5,'#e8c850');R(sx2+2,sy+10,3,1,'#e8c850'); // horseshoe
+    R(sx2+3,sy+5,1,1,'#b070ff');R(sx2+2,sy+6,3,1,'#9050e0');R(sx2+3,sy+7,1,1,'#b070ff'); // star
+    for(let i=0;i<9;i++)R(X+30+Math.floor(ah(i,9,99)*22),B-2-Math.floor(ah(i,8,99)*2),2,1,'#c8a850'); // straw trodden out of the door
+    return true}
+  if(k==='hay_bale'){
+    // A square bale: golden straw, lighter top, two twine bands, stray stalks.
+    shadow(X+1,B-3,15,3);R(X+1,B-13,14,11,AP.out);R(X+2,B-12,12,9,'#b0943c');R(X+2,B-12,12,3,'#d8bc60');R(X+2,B-9,12,1,'#8a7030');
+    [5,10].forEach(x=>R(X+x,B-12,1,9,'#6a5020'));for(let i=0;i<6;i++)R(X+2+Math.floor(ah(o.x,i,100)*12),B-12+Math.floor(ah(o.y,i,100)*8),1,1,'#e8d080');
+    R(X,B-3,2,1,'#c8a850');R(X+14,B-4,2,1,'#c8a850');return true}
+  if(k==='trough'){
+    // A plank water trough on two legs, the water showing on top.
+    shadow(X+1,B-2,W-1,3);R(X+2,B-11,W-4,8,AP.out);R(X+3,B-10,W-6,6,AP.plank);R(X+3,B-10,W-6,1,AP.plankHi);R(X+3,B-7,W-6,1,AP.plankDk);
+    R(X+4,B-12,W-8,3,AP.out);R(X+5,B-11,W-10,1,AP.waterHi);R(X+9,B-11,3,1,AP.glint);[X+5,X+W-8].forEach(lx=>R(lx,B-4,3,4,AP.out));return true}
+  if(k==='barrels'){
+    // Two barrels and a crate by the smith's: staves, iron hoops, a lid.
+    const bar=(x,y)=>{R(x,y,9,12,AP.out);R(x+1,y+1,7,10,'#6a4a2a');R(x+1,y+1,2,10,'#8a6440');R(x+1,y+3,7,1,AP.iron);R(x+1,y+8,7,1,AP.iron);R(x+1,y,7,2,'#4a3220')};
+    shadow(X,B-2,16,3);R(X+8,B-9,8,8,AP.out);R(X+9,B-8,6,6,AP.plank);R(X+9,B-8,6,1,AP.plankHi);R(X+9,B-5,6,1,AP.plankDk); // crate behind
+    bar(X,B-13);bar(X+6,B-12);return true}
+  if(k==='bench'){
+    // A plank bench by the hearth, backless, two thick legs.
+    shadow(X+2,B-3,W-3,3);R(X+2,B-10,W-4,4,AP.out);R(X+3,B-9,W-6,2,AP.plank);R(X+3,B-9,W-6,1,AP.plankHi);
+    [X+5,X+W-8].forEach(lx=>{R(lx,B-7,4,6,AP.out);R(lx+1,B-7,2,5,AP.plankDk)});return true}
   return false}
 function drawChapelProp(g,R,o,X,Y,W,H,shadow){
   const k=o.kind,ell=(cx,cy,rx,ry,col)=>{g.fillStyle=col;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill()};

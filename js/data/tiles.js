@@ -52,6 +52,7 @@ V    steps        1   #4a4652 path floor ground
 K    ember_pit    0   #5a2414 pit
 L    palisade     0   #5a4030 border wall
 Z    drained      1   #2a2f36 floor ground
+j    rail_fence   0   #7a5a3a border
 `;
 // Objects with a footprint (w x h tiles, top-left at x y). blocks: 1 = solid. on: tag every footprint tile must have.
 // clear: tiles of open ground kept around it. door: side that must touch open ground (S = bottom middle, - = none).
@@ -152,6 +153,11 @@ townhouse    4 3 1      ground 1     -    1
 wizard_tower 3 3 1      ground 1     -    0
 orb_stand    1 1 1      ground 0     -    2
 gem_table    2 1 1      ground 0     -    2
+stable       5 3 1      ground 1     S    2
+hay_bale     1 1 1      ground 0     -    0
+trough       2 1 1      ground 0     -    0
+barrels      1 1 1      ground 0     -    0
+bench        2 1 1      ground 0     -    0
 `;
 // Objects that are only partly solid (v0.86, owner: "invisible walls behind the tree"). One row per footprint row, top to
 // bottom, '#' = solid. Objects not listed are solid on their whole footprint when blocks = 1. The giant tree's trunk and

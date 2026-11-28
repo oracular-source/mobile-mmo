@@ -678,6 +678,7 @@ function areaCritters(A){
   // Open water for ripples: water tiles with water all round them, so rings never cross the shore.
   A.waterSpots=[];for(let y=1;y<A.h-1;y++)for(let x=1;x<A.w-1;x++){const w=(a,b)=>A.rows[b][a]==='~';if(w(x,y)&&w(x-1,y)&&w(x+1,y)&&w(x,y-1)&&w(x,y+1))A.waterSpots.push({x:x*T+8,y:y*T+8})}
   A.chimneys=A.objs.filter(o=>o.kind==='shack').map(o=>({x:o.x*T+o.w*T-4,y:o.y*T-11}))
+    .concat(A.objs.filter(o=>o.kind==='townhouse').map(o=>({x:o.x*T+o.w*T-10,y:o.y*T-23})),A.objs.filter(o=>o.kind==='forge').map(o=>({x:o.x*T+15,y:o.y*T-23}))) // Town 1 (draft 2): the houses and the smith's chimney smoke
     .concat(A.objs.filter(o=>o.kind==='censer').map(o=>({x:o.x*T+13,y:o.y*T-9})),A.objs.filter(o=>o.kind==='book_pyre').map(o=>({x:o.x*T+8,y:o.y*T+4}))); // chapel censers and the smouldering books (v0.62)
   return A.crit;
 }
@@ -721,6 +722,16 @@ function updateAreaCritters(A,dt){
       else if(c.st==='run'){const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;c.jump=Math.abs(Math.sin(c.t*9))*4;
         if(blocked(nx,ny)||c.t>1.6){c.st='gone';c.t=0;c.jump=0}else{c.x=nx;c.y=ny}}
       else if(c.t>14&&home>170){c.st='sit';c.x=c.hx;c.y=c.hy;c.t=0}}
+    else if(c.kind==='horse'){
+      // (Town 1 draft 2) the wizard's horses in their paddock: graze, lift the head, swish the tail, now and then amble a
+      // few steps. They're tame: come close and they lift their heads and turn to look at you, they never bolt.
+      if(c.coat===undefined){c.coat=(A.crit.filter(q=>q.kind==='horse').indexOf(c))%3;c.pose='graze';c.hop=vr(1,4)}
+      c.hop-=dt;if(c.walk>0){c.walk-=dt;const nx=c.x+c.vx*dt,ny=c.y+c.vy*dt;if(blocked(nx+c.dir*10,ny)||blocked(nx,ny)||Math.hypot(nx-c.hx,ny-c.hy)>26)c.walk=0;else{c.x=nx;c.y=ny}}
+      const near=d<52&&player.dead<=0;
+      if(near){c.pose='stand';c.dir=player.x>c.x?1:-1;c.walk=0}
+      else if(c.hop<=0){c.hop=vr(2,6);const r=Math.random();
+        if(r<0.45)c.pose='graze';else if(r<0.75)c.pose='stand';else{const a=Math.random()*6.28;c.vx=Math.cos(a)*9;c.vy=Math.sin(a)*5;c.dir=c.vx>0?1:-1;c.walk=vr(1,2.2)}}
+      c.swish=Math.sin(time*1.7+c.ph*3)>0.92}
     else if(c.kind==='eyes'){
       // (v0.82, owner: v0.81's two dots didn't read) a wolf watching from the treeline: a low dark head-and-shoulders
       // shape you can just make out against the trunks, two eyes with real eyeshine. It blinks and tilts its head;
@@ -753,6 +764,7 @@ function drawAreaCritters(A,layer){
       if(c.kind==='rabbit')critGrid(c.jump>0.5?RABBIT_HOP:c.nib>0&&Math.floor(time*8)%2?RABBIT_NIB:RABBIT,c.x,c.y-c.jump,c.dir);
       if(c.kind==='cavefish'){const dx=Math.cos(c.a),dy=Math.sin(c.a)*0.5,dir=dx>=0?1:-1,wig=Math.floor(time*(c.dart>0?16:5)+c.ph)%2;lx.globalAlpha=0.42;
         f(c.x-dir*2,c.y,4,1,'#c8d8d4');f(c.x+dir*2,c.y,1,1,'#e8f0ec');f(c.x-dir*3,c.y+(wig?-1:1)*0.6,1,1,'#a8bcb8');lx.globalAlpha=1} // pale cave fish under the water
+      if(c.kind==='horse'){const step=c.walk>0&&Math.floor(time*6)%2;horseGrid(step?HORSE.walk:c.pose==='graze'?HORSE.graze:c.swish?HORSE.swish:HORSE.stand,c.x,c.y,c.dir,HORSE_COATS[c.coat||0])}
       if(c.kind==='deer')critGrid(c.st==='run'?(c.jump>2?DEER_RUN:DEER):c.alert||c.up>0?DEER:DEER_GRAZE,c.x,c.y-(c.jump||0),c.dir)});
     return}
   A.crit.forEach(c=>{
@@ -776,6 +788,12 @@ const DEER=['...........kk.','..........kLLk','..........kLkk','..k.......kLk.',
 const DEER_GRAZE=['..............','..............','..............','..k...........','.kwkkkkkkkkk..','.kLLLLLLLLLLk.','.kDDDDDDDDDLLk','..kDDDDDDDkLLk','..kk.k..k.kkk.','..k..k..k..k..'];
 const DEER_RUN=['...........kk.','..........kLLk','..........kLkk','..........kLk.','.kkkkkkkkkLLk.','kwLLLLLLLLLk..','.kDDDDDDDDDk..','..kDDDDDDDk...','.k...kk....k..','k.....kk....k.'];
 const CRIT_PAL={D:'#6e4e34',L:'#9a7452',k:'#0b0a0f',e:'#d8e070',g:'#4d7034',G:'#7aa04a',b:'#2a2733',h:'#4a4560',y:'#8d8692',r:'#6a5848',R:'#9a8670',w:'#e8e2d4'};
+// The wizard's horses (Town 1 draft 2): 24 x 18 side view (long face, mane, slim legs, tail), drawn pixel by pixel at size
+// (tools sketch in the map chat). Three coats: chestnut, bay, grey.
+const HORSE={"stand":["...............kCkCk....","..............kMkCCCk...",".............kMMCCkCkk..",".............kMCCCCCCCk.","............kMMCCCCCCCk.",".....kkkkkkkkMCCCCkkCCk.","..kkkCCCCCCCCMCCCCkkcck.",".kMMCLLLLLLLLLCCCCk.kk..",".kMCCCCCCCCCCCCCCk......",".kMCCCCCCCCCCCCCCk......","kMMCccccccccccccck......","kMMkccccccccccccck......","kMMkcccCCccccCCcck......","kMMkcckCCkkkkCCcck......",".kk.kckkCk..kCkck.......","....kckkCk..kCkck.......","....kHkkHk..kHkHk.......",".....k..k....k.k........"],"graze":["........................","........................","........................","........................","........................",".....kkkkkkkkkkkkk......","..kkkCCCCCCCCCCMMMk.....",".kMMCLLLLLLLLLCCCCk.....",".kMCCCCCCCCCCCCCCMMk....",".kMCCCCCCCCCCCCCCCCCk...","kMMCcccccccccccccCMCk...","kMMkccccccccccccckCCCk..","kMMkcccCCccccCCcckCCk...","kMMkcckCCkkkkCCcckkCCk..",".kk.kckkCk..kCkck.kCCk..","....kckkCk..kCkck.kcck..","....kHkkHk..kHkHk..kk...",".....k..k....k.k........"],"swish":["...............kCkCk....","..............kMkCCCk...",".............kMMCCkCkk..",".............kMCCCCCCCk.","............kMMCCCCCCCk.",".....kkkkkkkkMCCCCkkCCk.",".kk.kCCCCCCCCMCCCCkkcck.","kMMkCLLLLLLLLLCCCCk.kk..","MMkCCCCCCCCCCCCCCk......","MMkCCCCCCCCCCCCCCk......","MMkCccccccccccccck......","MMkkccccccccccccck......","MMkkcccCCccccCCcck......","kk.kcckCCkkkkCCcck......","....kckkCk..kCkck.......","....kckkCk..kCkck.......","....kHkkHk..kHkHk.......",".....k..k....k.k........"],"walk":["...............kCkCk....","..............kMkCCCk...",".............kMMCCkCkk..",".............kMCCCCCCCk.","............kMMCCCCCCCk.",".....kkkkkkkkMCCCCkkCCk.","..kkkCCCCCCCCMCCCCkkcck.",".kMMCLLLLLLLLLCCCCk.kk..",".kMCCCCCCCCCCCCCCk......",".kMCCCCCCCCCCCCCCk......","kMMCccccccccccccck......","kMMkccccccccccccck......","kMMccccCCcccCCcccck.....","kMMcckkCCkkkCCkkcck.....",".kkkck.kCk.kCk.kck......","...kck.kCk.kCk.kck......","...kHk.kHk.kHk.kHk......","....k...k...k...k......."]};
+const HORSE_COATS=[{C:'#8a4a26',c:'#663218',L:'#a8643a',M:'#3a1e10',H:'#2a2018',k:'#0b0a0f'},{C:'#6a4228',c:'#4a2c1a',L:'#86583a',M:'#141018',H:'#141018',k:'#0b0a0f'},{C:'#b8b4ac',c:'#8e8a84',L:'#d8d4cc',M:'#5a5650',H:'#3a3634',k:'#0b0a0f'}];
+function horseGrid(G,x,y,dir,P){const w=G[0].length,x0=Math.round(x)-(w>>1),y0=Math.round(y)-G.length;
+  G.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[dir<0?w-1-i:i];if(ch==='.')continue;lx.fillStyle=P[ch];lx.fillRect(x0+i,y0+j,1,1)}})}
 function critGrid(G,x,y,dir){const w=G[0].length,x0=Math.round(x)-(w>>1),y0=Math.round(y)-G.length;
   G.forEach((row,j)=>{for(let i=0;i<w;i++){const ch=row[dir<0?w-1-i:i];if(ch==='.')continue;lx.fillStyle=CRIT_PAL[ch];lx.fillRect(x0+i,y0+j,1,1)}})}
 function drawOwl(c){
