@@ -24,6 +24,7 @@ function animSwing(m,v){if(logMute)return;
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
 function animDeath(m){if(logMute)return;const img=IMG[m.def.img];if(!img||m.def.float)return;
   if(m.def.death==='bones'){boneCollapse(m,img);return}
+  if(m.def.death==='flip'&&MOB_DEATH_IMG[m.def.img]){const D=MOB_DEATH_IMG[m.def.img];fxo.push({k:'flip',D:D,x:m.x,y:m.y+1,dir:m.dir,t:0,life:D.t.reduce((a,b)=>a+b,0)});return} // rats: hop, belly-up, two kicks, gone
   fxo.push({k:'fall',img:img,x:m.x,y:m.y+1,dir:m.dir,t:0,life:0.55});fxBits(m.x,m.y-1,['#6e6458','#8a7f70','#5a5248'],8,16,4,0.9)}
 
 // ---------- Skeleton death: falls into a pile of bones, the skull drops on top (v0.105, first unique death) ----------
@@ -138,6 +139,8 @@ function fxDraw(){
     else if(f.k==='fall'){const p=f.t/f.life,im=f.img,h=Math.max(1,Math.round(im.h*(1-p*0.75))),w=im.w,dx=Math.round(f.x)-(w>>1),dy=Math.round(f.y)-h;
       lx.globalAlpha=1-p*p;lx.drawImage(f.dir<0?im.f:im.c,0,0,w,im.h,dx,dy,w,h);lx.globalAlpha=1}
     else if(f.k==='bones')bonesDraw(f)
+    else if(f.k==='flip'){let acc=0,i=0;const T=f.D.t;for(;i<T.length-1;i++){acc+=T[i];if(f.t<acc)break} // the frame for this moment; the last one fades out at once
+      const last=i===T.length-1;if(last)lx.globalAlpha=Math.max(0,1-(f.t-acc)/T[i]);drawPose(f.D.f[i],f.x,f.y,f.dir);lx.globalAlpha=1}
     else if(f.k==='parc'||f.k==='pthrust')playerFxDraw(f)
 })}
 // Every frame, after the lighting (so the dark doesn't swallow it): the bone in the King's hand, in the air and in pieces.

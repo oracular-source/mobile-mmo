@@ -4,22 +4,22 @@
 // death:'bones' = falls into a pile of bones, skull on top (js/anim.js); deathHead = [x, y, w, h, grid width] of the skull in its sprite.
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
-  rat:{name:'a grave rat',img:'rat',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:30,aggro:40,armor:0},
+  rat:{name:'a grave rat',img:'rat',death:'flip',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:30,aggro:40,armor:0},
   beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:24,aggro:30,armor:0.5},
   dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:51,hpl:21,dmg:4.4,dmgl:1.75,spd:25,aggro:48,undead:1,armor:0},
   // Old Gnawbone (rat tunnel, Nov 18): level 6 (the tunnel comes before the crypt), above every rat around him. adds: at each share of health he squeals and
   // that many rats burrow out of the nearest holes in the walls (beside him if there are none, e.g. the testing grounds).
   gnaw:{name:'Old Gnawbone',img:'gnaw',lv:[6,6],hp:125,hpl:31,dmg:4.6,dmgl:1.8,spd:31,aggro:56,armor:0.1,named:1,zone:'Rat tunnel',
     adds:[{at:0.66,type:'trat',n:2,lv:4},{at:0.33,type:'trat',n:2,lv:4}]},
-  trat:{name:'a tunnel rat',img:'trat',lv:[2,4],hp:48,hpl:18,dmg:2.4,dmgl:1.35,spd:31,aggro:44,armor:0},
-  brat:{name:'a big tunnel rat',img:'brat',lv:[4,5],hp:56,hpl:21,dmg:3,dmgl:1.55,spd:30,aggro:46,armor:0.05},
-  crat:{name:'a crypt rat',img:'crat',lv:[4,5],hp:50,hpl:20,dmg:2.8,dmgl:1.45,spd:31,aggro:44,armor:0},
+  trat:{name:'a tunnel rat',img:'trat',death:'flip',lv:[2,4],hp:48,hpl:18,dmg:2.4,dmgl:1.35,spd:31,aggro:44,armor:0},
+  brat:{name:'a big tunnel rat',img:'brat',death:'flip',lv:[4,5],hp:56,hpl:21,dmg:3,dmgl:1.55,spd:30,aggro:46,armor:0.05},
+  crat:{name:'a crypt rat',img:'crat',death:'flip',lv:[4,5],hp:50,hpl:20,dmg:2.8,dmgl:1.45,spd:31,aggro:44,armor:0},
   cskel:{name:'a crypt skeleton',img:'skel',death:'bones',deathHead:[3,0,9,7,16],lv:[4,6],hp:56,hpl:23,dmg:5.2,dmgl:2,spd:29,aggro:52,undead:1,armor:0.15},
   // Named rares (v0.32, map chat): about 1 in 100 spawns in an area brings out that area's rare at its own spot on the map.
   // rare:1 = 3x XP, a sure uncommon for your class (and a rare chance), a faint glow. shell = direct hits mostly glance off (DoTs work best).
   // callAt = at that share of health it runs to the nearest idle mob and brings it (and its neighbours) back. Adds from:'ground' = they rise beside it.
   ironshell:{name:'Ironshell',img:'ironshell',lv:[3,3],hp:80,hpl:24,dmg:3.8,dmgl:1.6,spd:22,aggro:34,armor:0.6,rare:1,shell:1,zone:'Crossroads'},
-  palerat:{name:'the Pale Rat',img:'palerat',lv:[5,5],hp:90,hpl:28,dmg:3.4,dmgl:1.6,spd:37,aggro:52,armor:0.05,rare:1,callAt:0.3,zone:'Rat tunnel'},
+  palerat:{name:'the Pale Rat',img:'palerat',death:'flip',lv:[5,5],hp:90,hpl:28,dmg:3.4,dmgl:1.6,spd:37,aggro:52,armor:0.05,rare:1,callAt:0.3,zone:'Rat tunnel'},
   bride:{name:'the Weeping Bride',img:'bride',lv:[8,8],hp:110,hpl:34,dmg:5.2,dmgl:2,spd:25,aggro:50,undead:1,armor:0,rare:1,zone:'Sunken Graveyard',
     adds:[{at:0.5,type:'dead',n:2,lv:6,from:'ground',shout:'WAIL!',say:'lets out a long wail, and the dead claw their way out of the ground!',col:'#3a3727'}]},
   // Wolfwood (v0.40, levels 8-11). pack = spawns of this type close together on the map fight as one pack.

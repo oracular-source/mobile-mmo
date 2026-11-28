@@ -221,7 +221,8 @@ function lightStamp(r,amb,kind){
 // smeared the edge pixels a little differently every frame while the body snapped to whole pixels).
 function shadow(x,y,r){x=Math.round(x);y=Math.round(y);lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2+1,2);lx.fillRect(x-r+1,y+1,r*2-1,1)}
 // Mob attack frames (MOB_POSES, from tools/mob_attack_draft.py) turned into pictures once: each with its ax and by.
-const MOB_POSE_IMG={};Object.keys(MOB_POSES).forEach(k=>{const P=MOB_POSES[k],o={t:P.t};['wind','smear','hit','rec'].forEach(s=>{o[s]={im:mk(P[s].rows,P.pal),ax:P[s].ax,by:P[s].by}});MOB_POSE_IMG[k]=o});
+const MOB_POSE_IMG={},MOB_DEATH_IMG={};Object.keys(MOB_POSES._deaths).forEach(k=>{const D=MOB_POSES._deaths[k];MOB_DEATH_IMG[k]={t:D.t,f:D.f.map(p=>({im:mk(p.rows,D.pal),ax:p.ax,by:p.by}))}}); // rat deaths (v0.118)
+Object.keys(MOB_POSES).forEach(k=>{if(k==='_deaths')return;const P=MOB_POSES[k],o={t:P.t};['wind','smear','hit','rec'].forEach(s=>{o[s]={im:mk(P[s].rows,P.pal),ax:P[s].ax,by:P[s].by}});MOB_POSE_IMG[k]=o});
 function drawSprite(img,x,y,dir,bob,sit){
   const im=dir<0?img.f:img.c,w=img.w,h=img.h;
   // Round the position first, then offset by whole pixels: with an odd width (15) Math.round(x-w/2) flipped a pixel out of step with the camera, so sprites shook while walking sideways (v0.27.4).

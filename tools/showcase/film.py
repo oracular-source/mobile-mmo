@@ -20,8 +20,12 @@ SETUP={
 'bite':'''const m=G.mobs.find(m=>m.type==='wolf'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.4;W.focus={x:m.x+5,y:m.y};W.n=84;W.god=1;''',
 'greyfangbite':'''const m=G.mobs.find(m=>m.type==='greyfang'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-4;m.state='chase';m.howled=true;m.threat={p:999,pet:0};m.atk=0.4;W.n=84;W.god=1;''',
 'scarbite':'''const m=G.mobs.find(m=>m.type==='wolf'&&!m.dead);m.type='oldscar';m.def=TYPES.oldscar;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-4;m.state='chase';m.threat={p:999,pet:0};m.atk=0.4;W.n=84;W.god=1;''',
+'ratbite':'''const m=G.mobs.find(m=>m.type==='rat'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+10;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.at=40;W.act=()=>killMob(m);W.n=80;W.god=1;''',
+'bratbite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.at=44;W.act=()=>killMob(m);W.n=84;W.god=1;''',
+'palebite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);m.type='palerat';m.def=TYPES.palerat;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+12;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.at=44;W.act=()=>killMob(m);W.n=84;W.god=1;''',
+'gnawbite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);m.type='gnaw';m.def=TYPES.gnaw;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+16;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.n=84;W.god=1;''',
 }
-AREA={'howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood'}  # scenes outside the crypt
+AREA={'howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood','ratbite':'graveyard','bratbite':'rat_tunnel','palebite':'rat_tunnel','gnawbite':'rat_tunnel'}  # scenes outside the crypt
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:

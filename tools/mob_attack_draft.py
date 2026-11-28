@@ -257,7 +257,7 @@ def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth):
     """The head thrown back, drawn from the sprite's own head so the face keeps its size and the eye stays where it is
     on the face (owner, Nov 27: the first try grew the faces). The upper head (rows above jaw_row) is lifted more the
     further forward it is: steps = [(from column, lift), ...]. The lower jaw stays. The gap between them is the open
-    mouth: pink from mouth_x forward, fur behind, a black lip at the front, and a lower tooth pointing up."""
+    mouth: black from mouth_x forward, fur behind, a black lip at the front, and a lower tooth pointing up."""
     px = grid_to_px(rows)
     up, low = {}, {}
     for (x, y), c in px.items():
@@ -273,9 +273,7 @@ def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth):
         ys_up = [y for (xx, y) in up if xx == x]; ys_lo = [y for (xx, y) in low if xx == x]
         if not ys_up or not ys_lo: continue
         for y in range(max(ys_up) + 1, min(ys_lo)):
-            head[(x, y)] = 'P' if x >= mouth_x else 'a'
-    for (x, y) in list(head):
-        if head[(x, y)] == 'P' and (x + 1, y) not in head: head[(x + 1, y)] = 'k'
+            head[(x, y)] = 'k' if x >= mouth_x else 'a'  # inside of the mouth: black (owner, Nov 27: brown looked bad on the Pale Rat; black for every mouth)
     for (x, y) in lower_tooth: head[(x, y)] = lower_tooth[(x, y)]
     return head
 
@@ -299,10 +297,13 @@ def big_rats(S):
     pr = B['palerat']
     ph = rear_head(pr, 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'})
     pale = rear_bite(pr, B['paleratstep'], S['REDO_PAL']['palerat'], 19, ph, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+    br = B['brat']  # the big tunnel rat: same body as the Pale Rat, same rear-back bite (owner, Nov 27)
+    bh = rear_head(br, 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'})
+    big = rear_bite(br, B['bratstep'], S['REDO_PAL']['brat'], 19, bh, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
     R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw']); g = R['gnaw']
     gh = rear_head(g, 30, 15, 36, [(33, 1), (36, 2)], {(38, 14): 'Y'})
     gnaw = rear_bite(g, R['gnawstep'], gpal, 30, gh, {14: "aaaaaadkYYYk"}, lunge=4)
-    return {'palerat_bite': pale, 'gnaw_bite': gnaw}
+    return {'palerat_bite': pale, 'brat_bite': big, 'gnaw_bite': gnaw}
 
 def player(S):
     r = S['RAG15']['warrior']; pal = dict(S['RAG15_COMMON']); pal.update(r['c'])
@@ -357,11 +358,22 @@ def write_game_data(data, S):
              'wolf': ('wolf', S['REDO_SPR']['wolf'], ['wind', 'smear', 'hit', 'rec']),
              'oldscar': ('oldscar', S['REDO_SPR']['oldscar'], ['wind', 'smear', 'hit', 'rec']),
              'greyfang': ('greyfang', S['WOLF_SPR']['greyfang'], ['wind', 'smear', 'hit', 'rec'])}
+    names.update({'rat_bite': ('rat', S['SPR']['rat'], None), 'crat_bite': ('crat', S['SPR']['rat'], None), 'trat_bite': ('trat', S['SPR']['rat'], None),
+                  'brat_bite': ('brat', S['REDO_SPR']['brat'], None), 'palerat_bite': ('palerat', S['REDO_SPR']['palerat'], None),
+                  'gnaw_bite': ('gnaw', S['SPR']['gnaw'], None)})
     out = {}
+    deaths = {}
     for key, (name, base, slots) in names.items():
+        slots = slots or ['wind', 'smear', 'hit', 'rec']
         frs = data[key][1:]  # frame 0 is the ready pose (the normal sprite)
         out[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal']}
         for slot, f in zip(slots, frs): out[name][slot] = to_pose(f, len(base[0]), len(base))
+    # Family deaths drawn as frames (rats: yelp hop, belly-up, two kicks, gone at once; owner Nov 27).
+    for name, base, key in (('rat', S['SPR']['rat'], 'rat_death'), ('crat', S['SPR']['rat'], 'crat_death'), ('trat', S['SPR']['rat'], 'trat_death'),
+                            ('brat', S['REDO_SPR']['brat'], 'brat_death'), ('palerat', S['REDO_SPR']['palerat'], 'palerat_death')):
+        frs = data[key][1:]
+        deaths[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, len(base[0]), len(base)) for f in frs]}
+    out['_deaths'] = deaths
     block = ('// MOB_POSES (from tools/mob_attack_draft.py, owner OK Nov 27): attack frames drawn from each sprite. t = seconds for\n'
              '// wind-up (held before the hit lands), smear, hit (held), recover. Physical attacks: the weapon or the jaws do the work.\n'
              'const MOB_POSES=' + json.dumps(out, separators=(',', ':')) + ';\n// /MOB_POSES\n')
@@ -396,4 +408,12 @@ if __name__ == '__main__' and '--rats' in sys.argv:
 
 if __name__ == '__main__' and '--game' in sys.argv:
     S = load_sprites()
-    write_game_data({'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'oldscar': oldscar(S), 'greyfang': greyfang(S)}, S)
+    d = {'skeleton': skeleton(S), 'king': king(S), 'wolf': wolf(S), 'oldscar': oldscar(S), 'greyfang': greyfang(S)}
+    d.update(rats(S))
+    cpal = dict(S['PAL']); cpal.update(S['RAT_PAL']['crat']); cpal['w'] = '#e8e2d4'
+    cb, cd = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], cpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."}, {4: "aaAwp"}, (13, 3))
+    d['crat_bite'] = cb; d['crat_death'] = cd
+    tpal = dict(S['PAL']); tpal.update(S['RAT_PAL']['trat']); tpal['w'] = '#e8e2d4'  # Old Gnawbone's tunnel-rat adds
+    tb, td = rat_frames(S['SPR']['rat'], S['SPR']['ratstep'], tpal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."}, {4: "aaAwp"}, (13, 3))
+    d['trat_bite'] = tb; d['trat_death'] = td
+    write_game_data(d, S)
