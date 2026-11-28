@@ -367,7 +367,7 @@ $('barr').addEventListener('click',()=>{$('menuUI').classList.remove('show');set
   ['buffbar','tfx'].forEach(id=>{$(id).addEventListener('pointerdown',show);$(id).addEventListener('click',e=>{if(e.target.closest('.fx'))e.stopPropagation()})})}
 $('pframe').addEventListener('click',()=>{charTab='char';charSel=null;openModal('charUI')});
 let charTab='char',charSel=null; // charSel: {bag:i} or {slot:'head'}
-const DOLL_L=['head','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];
+const DOLL_L=['head','neck','chest','legs','feet'],DOLL_R=['ring','hands','weapon','offhand'];
 const nearMerchant=()=>{const m=npcs.find(n=>n.kind==='peddler');return m&&dist(m,player)<52};
 // Bag cells only fit a word, so show the item's last word ("Brittle Bone" -> "Bone"), which is usually the noun.
 const shortName=n=>{const w=n.replace(/^the /i,'').split(' ');return w[w.length-1]};

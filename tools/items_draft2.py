@@ -2,7 +2,7 @@
 # Prints a markdown section for docs/research/gold-and-items.md and writes the owner's review page (out/items-draft2.html).
 # Budget points = STR + STA + WIS + INT + AC/2, scaled by slot (weapon and chest 1.0; head, legs, off-hand 0.8; hands, feet, ring 0.6).
 import html, os
-W={'weapon':1,'chest':1,'head':.8,'legs':.8,'offhand':.8,'hands':.6,'feet':.6,'ring':.6}
+W={'weapon':1,'chest':1,'head':.8,'legs':.8,'offhand':.8,'hands':.6,'feet':.6,'ring':.6,'neck':.8}
 TARGET={'common':2,'uncommon':4.5,'rare':8,'sk':9,'named':9,'mal':11}  # at slot weight 1
 def pts(it): return sum(it.get(k,0) for k in ('str','sta','wis','int'))+it.get('ac',0)/2
 def stats(it): return ' '.join(f"{k.upper()} {it[k]}" for k in ('ac','str','sta','wis','int') if it.get(k))

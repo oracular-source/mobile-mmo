@@ -8,9 +8,10 @@ const ABI={};AB.forEach(a=>ABI[a.id]=a);
 // Each spell's own cooldown shrinks as you level past the level you learned it, down to a floor.
 const at=(arr,a)=>arr[0]+arr[1]*Math.max(0,player.lvl-(a?a.lvl:0)); // value that grows each level
 const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl))*(1-trickCd(a.id)):0;
-const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
+const SLOTS=[['head','Head'],['neck','Neck'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
 // Personal loot: only gear your class can use drops for you. Weapons go by weapon type (WPN_OF: a Paladin finds maces), armour by gear group.
-const forMe=id=>{const it=ITEMS[id];if(it.slot==='weapon')return it.wt===WPN_OF[CLS];const c=it.cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)};
+const forMe=id=>{const it=ITEMS[id];if(it.slot==='weapon')return it.wt===WPN_OF[CLS];if(it.lean)return it.lean==='caster'?!!C.caster:!C.caster; // necklaces lean caster (INT/WIS) or melee (STR/STA)
+  const c=it.cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)};
 // Random pools leave out the items that belong to one mob (a named's ring, a rare mob's own item): those only come from that mob.
 const pool=rar=>Object.keys(ITEMS).filter(id=>ITEMS[id].rar===rar&&ITEMS[id].slot&&forMe(id)&&id!=='gnawring'&&!ITEMS[id].src&&id!=='fangruff');
 // No duplicates of a mob's own items (owner, Nov 27): a pink or a rare mob's own blue you already have (worn or in your bags) won't drop again.

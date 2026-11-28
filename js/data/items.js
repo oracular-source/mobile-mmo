@@ -155,6 +155,14 @@ const ITEMS={
   scarhands:{name:"Old Scar's Hide Grips",slot:'hands',rar:'named',ac:3,sta:3,str:2,value:110,src:'oldscar'},
   // Greyfang's second pink (owner, Nov 27), beside his ring.
   fangruff:{name:"Greyfang's Ruff",slot:'head',rar:'named',ac:3,sta:3,wis:2,str:1,value:110},
+  // Necklaces (v0.128, owner Nov 27): one ring and one necklace. The necklace is the power piece (counts like a head piece in the stat
+  // budget, leans into your main stat); the ring is the trick piece (fewer stats, where small tricks live on). Any class, by lean.
+  necktwine:{name:'Twine Pendant',slot:'neck',rar:'common',int:1,wis:1,value:8,lean:'caster'},
+  neckmoss:{name:'Grave-moss Locket',slot:'neck',rar:'uncommon',int:2,wis:1,sta:1,value:30,lean:'caster'},
+  neckmourn:{name:"Mourner's Locket",slot:'neck',rar:'rare',int:3,wis:2,sta:1,value:80,lean:'caster'},
+  neckbead:{name:'Bone-bead Necklace',slot:'neck',rar:'common',str:1,sta:1,value:8,lean:'melee'},
+  neckfang:{name:'Wolf-fang Necklace',slot:'neck',rar:'uncommon',str:2,sta:2,value:30,lean:'melee'},
+  necktorc:{name:"Gravewarden's Torc",slot:'neck',rar:'rare',str:3,sta:2,ac:2,value:80,lean:'melee'},
   // Dungeon 1 (v0.63). The Drowned Prior and the Bellringer each drop one item any class can wear; Brother Malrec's chest holds
   // one for your gear group (a step above the Skeleton King's). Placeholder names until the setting is decided.
   dcultjunk:{name:'Waterlogged Psalter',rar:'junk',value:11,stack:true},
