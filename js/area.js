@@ -148,7 +148,7 @@ function* buildAreaGen(id){
     if(o.kind==='campfire'){A.lights.push({x:cx,y:o.y*T+6,r:72,w:38});A.flames.push({x:cx,y:o.y*T+11,big:1,camp:1})}
     // Ruined Chapel (v0.62): the steeple's gold window, censer embers, the shrine's candle, the ash circle's coals, the smouldering books.
     if(o.kind==='chapel'){const wx=o.x*T+o.w*T/2;A.lights.push({x:wx,y:(o.y+o.h)*T-80,r:46,w:40},{x:wx,y:(o.y+o.h)*T-6,r:30,w:22})}
-    if(o.kind==='censer'){A.lights.push({x:o.x*T+13,y:o.y*T-4,r:26,w:22});A.flames.push({x:o.x*T+13,y:o.y*T-7,big:0,tiny:1})}
+    if(o.kind==='censer'||o.kind==='hung_censer'){A.lights.push({x:o.x*T+13,y:o.y*T-4,r:26,w:22});A.flames.push({x:o.x*T+13,y:o.y*T-7,big:0,tiny:1})}
     if(o.kind==='shrine'){A.lights.push({x:o.x*T+15,y:o.y*T-6,r:44,w:30});A.flames.push({x:o.x*T+15,y:o.y*T-10,big:0,tiny:1});(A.rests=A.rests||[]).push({x:o.x*T+16,y:o.y*T+8})}
     if(o.kind==='ash_circle'){A.lights.push({x:cx,y:o.y*T+26,r:30,w:30})}
     if(o.kind==='book_pyre'){A.lights.push({x:cx,y:o.y*T+8,r:28,w:26});A.flames.push({x:cx,y:o.y*T+8,big:0})}
@@ -1480,6 +1480,15 @@ function drawChapelProp(g,R,o,X,Y,W,H,shadow){
     shadow(X+4,Y+13,9,2);R(X+7,Y-14,3,28,AP.out);R(X+8,Y-13,1,26,AP.woodHi);R(X+7,Y-14,8,2,AP.out);R(X+8,Y-13,6,1,AP.ironHi);
     R(X+13,Y-12,1,5,'#8d8692');R(X+10,Y-7,7,6,AP.out);R(X+11,Y-6,5,4,'#8a6f1a');R(X+11,Y-6,2,1,'#c9a227');R(X+12,Y-7,3,1,'#ff8a3c');R(X+13,Y-8,1,1,'#ffd27a');
     R(X+5,Y+12,7,2,AP.out);return true}
+  if(k==='hung_censer'){
+    // v0.113 (love pass H3): a censer hung where someone would hang one: an iron arm nailed into the pillar or wall just
+    // above it, a short brace under the arm, the brass bowl swinging on its chain (same bowl as the standing censer, so
+    // the light and embers line up). No pole, nothing standing in the open yard.
+    R(X+4,Y-18,12,3,AP.out);R(X+5,Y-17,10,1,AP.ironHi); // the arm, out from the pillar's face
+    R(X+4,Y-15,3,6,AP.out);R(X+5,Y-14,1,4,AP.ironHi);for(let j=0;j<4;j++)R(X+6+j,Y-14+j>Y-11?Y-11:Y-14+j,1,1,AP.out); // brace
+    R(X+13,Y-15,1,8,'#8d8692');R(X+12,Y-16,3,2,AP.out); // hook and chain
+    R(X+10,Y-7,7,6,AP.out);R(X+11,Y-6,5,4,'#8a6f1a');R(X+11,Y-6,2,1,'#c9a227');R(X+12,Y-7,3,1,'#ff8a3c');R(X+13,Y-8,1,1,'#ffd27a');
+    shadow(X+9,Y+12,9,2);return true}
   if(k==='banner'){
     // A cult banner nailed over the wall: a pole across the top, dark cloth with a swallowtail cut and a red ring.
     const x=X+4,y=Y+1;R(x-2,y-1,12,2,AP.out);R(x-1,y-1,10,1,AP.woodHi);

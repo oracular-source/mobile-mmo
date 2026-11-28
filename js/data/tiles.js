@@ -101,6 +101,7 @@ fallen_bell  2 2 1      ground 1     -    0
 ash_circle   3 3 0      ground 0     -    1
 shrine       2 1 1      ground 1     S    3
 censer       1 1 1      ground 0     -    2
+hung_censer  1 1 0      ground 0     -    2
 banner       1 1 0      wall   0     -    0
 bedroll      1 1 0      ground 0     -    0
 cot          1 1 1      ground 0     -    0

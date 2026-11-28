@@ -11,38 +11,38 @@ MAPS.chapel = {
   tiles: [
     'FFvvvnnnnvnnnvnnnannFFvFFFFFFFFFFFFFFFFFFFFFFFFF',
     'FFFFnn::::::::::::nnannFFFFFFFFFFFFFFFFFFFFFFFFF',
-    'FFFvnn:nfannnnnf:annFfnFFFFFFFFFFFFFFFFFFFFFFFFF',
-    'FFFnnn:nnnWWWWWWqrWWWWWWWWWWWWWWWWWWWWWWWWWWWFFF',
-    'FFFvn::nnaWaqaqaaqaqaqqaaqaaaaaaqPsssssssssaWFFF',
-    'FFFnvv:avaWqeeeeeeeeaaaaaaaaaqaaqssssssssssaWFFF',
-    'FFFfnv:vnFWaaaaqaaaaaaaqaqqqaqaaaPs,,,,,,sPaWFFF',
-    'FFFfvv:nvnWqeeeeeeeeaaaaaaaqaaaaass,,,,,,ssqWFFF',
-    'FFFnn::navWqaqaaqaaaqaaaaqqaaaqqaPs,,,,,,sPqWFFF',
-    'FFFnna:vnaWaeeeeeeeeaaaaaqqaaaaaass,,,,,,ssaWFFF',
-    'FFFnna:vfnWaaqaaaa~~~aaaaaaaqqqaaPssssssssPaWFFF',
-    'nnnvvn:vanWaeeeea~~~~aqaaaaaaaaaaPsPsPsPsPPaWFFF',
-    'vfnnf::nfnWaaqaaaaaaaaaaaaaaaaaaaaaaaaqqaqaqWFFF',
-    'nnvvnn:nnnWaaaqaaqaaqaaaaaqaaaqaaqaaqaaaqaaaWFFF',
-    'fnnnnv:nnnWqaqaaqaaaaqaaaqqaaqaaaqaqaaaaaaqaWFFF',
-    'Fnnnnv:annWaqqqqaaaaaqaqaqaaqaaqaaaaaaaaaaaaWOOO',
-    'Fnvnf::nnvWaaqqqaaqqaaaaaaaqaaaaaaaaaqaaaqaqWOOF',
-    'nvFnnf:nnvWaqaqqaaaaaaaaaaaqaaqaaaaaqaaaaaaaWOOF',
-    'nnFnnn:nnFWaaaqqaqaaaaaaqaaaaaqaaqaaqaaaaaaaG::O',
-    'fnvnfa:nrFWaaqqaaaaqqaaaaaaaaqaqaaqaaaaaqaqaW::F',
-    'Fnnnn::vvFWqaaqaaaaaaaqqaaaqaaaqaaqaaaaaaaaaW::F',
-    'FFFnvnqqqqqaaqqaaaaaaqaaaaaaaaaqaaaaaqaqaaaaW::O',
-    'FFFvvnqqqqqaaaaaaqqqaaaaasssssqaaaaaaaaaaqaaW::F',
-    'FFFnnn:nnnWqa+o++o+aaaaqqsssssaaaaaaqqaaaaaaW::F',
-    'FFFnn::nvrWaaqaaaaaqaaaqqsssssqaaaaaaaaaaaqaW::O',
-    'FFFnna:avFWaTaaaaqaaaqaaaqsssaaaaaaqaaaaqaqaW:::',
-    'FFFnnn:naFWqq++o+++aaqaaqaqsqqqaaaqaqaaaaqaaWOOF',
-    'FFFnvn:anFWaqaaqaaaqqqaaaaaaaaaaaaqaaaaqaaaaWOOO',
-    'FFFnn::vnFWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWFFF',
-    'vFFFnn:naaaFnvvvnnFfvnnfvnnfvnnfvFnfvnFFFFFFFFFF',
-    'nFFvvn:anaaFvnnnnnnnfvnFfavnfvnnfvnnfFnFFFFFFFFF',
-    'nFnfnv:fnnFannnvvnvnvnnnnnnvvnnnnnfaavFFaaFFFFFF',
-    'nnnFn::ffnvnvnnvffvnnvnvnnnfnnvnnvnnnfnFnnFFFFFF',
-    'FnFFnn:fnn:fnnn:nvnn:vnfn:nnnf:nnnf::vnnnFFFFFFF',
+    'FFFvnn:nfannnnnf:annFfnFFFFFFFFFFFFFFFFFFFFFFbFF',
+    'FFFnnn:nnnWWWWWWqrWWWWWWWWWWWWWWWWWWWWWWWWWWWbFF',
+    'FFFvn::nnaWaaaaaqqaaaaaaaaaaaaaaaPsssssssssaWbFF',
+    'FFFnvv:avaWaeeeeeeeeaaaaaaaaaaaaassssssssssaWbFF',
+    'FFFfnv:vnFWaaaaaaaaaaaaaaaaaaaaaaPs,,,,,,sPaWbFF',
+    'FFFfvv:nvnWaeeeeeeeeaaaaaaaaaaaaass,,,,,,ssaWbFF',
+    'FFFnn::navWaaaaaaaaaaaaaaaaaaaaaaPs,,,,,,sPaWbFF',
+    'FFFnna:vnaWaeeeeeeeeaaaaaaaaaaaaass,,,,,,ssaWbFF',
+    'FFFnna:vfnWaaaaaaa~~~aaaaaaaaaaaaPssssssssPaWbFF',
+    'nnnvvn:vanWaeeeea~~~~aaaaaaaaaaaaPsPsPsPsPPaWbFF',
+    'vfnnf::nfnWaqqaaaaaaaaaaaaaaaaaaaaaaqqaaaaaaWbFF',
+    'nnvvnn:nnnWaaqaaaaaaaaaaaaaaaaaaaaaaqqaaaaaaWbFF',
+    'fnnnnv:nnnWaaqaaaaaaaaaaaaaaaaaaaaaqqaaaaaaaWbFF',
+    'Fnnnnv:annWaaqaaaaaaaaaaaaaaaaaaaaaqqaaaaaaaWOOO',
+    'Fnvnf::nnvWaaqqaaaaaaaaaaaaaaaaaaaaqqaaaaaaaWOOF',
+    'nvFnnf:nnvWaaaqaaaaaaaaaaaaaaaaaaaqqaaaaaaaaWOOF',
+    'nnFnnn:nnFWaaaqaaaaaaaaaaaaaaaaaaaqqaaaaaaaaG::O',
+    'fnvnfa:nrFWaaqqaaaaaaaaaaaaaaaaaaaqqaaaaaaaaW::F',
+    'Fnnnn::vvFWaaqqaaaaaaaaaaaaaaaaaaqqaaaaaaaaaW::F',
+    'FFFnvnqqqqqqqqqqqqqaaaaaaaaaaaaaaaaaaaaaaaaaW::O',
+    'FFFvvnqqqqqqqqqqqqqqqqqqqsssssaaqqqaaaaaaaaaW::F',
+    'FFFnnn:nnnWaa+o++o+qqqqqasssssqqqaaaaaaaaaaaW::F',
+    'FFFnn::nvrWaaaaaaaaaaaaaasssssaaaaaaaaaaaaaaW::O',
+    'FFFnna:avFWaTaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaW:::',
+    'FFFnnn:naFWaa++o+++aaaaaaaaaaaaaaaaaaaaaaaaaWOOF',
+    'FFFnvn:anFWaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaWOOO',
+    'FFFnn::vnFWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWbbF',
+    'vFFFnn:naaaFnvvvnnFfvnnfvnnfvnnfvFnnvnnnnnnbbbbF',
+    'nFFvvn:anaaFvnnnnnnnfvnFfavnfvnnfvnnfnnvnnvnnFFF',
+    'nFnfnv:fnnFannnvvnvnvnnnnnnvvnnnnnfaavFnaaFnvFFF',
+    'nnnFn::ffnvnvnnvffvnnvnvnnnnnnvnnvnnnfnFnnFFFFFF',
+    'FnFFnn:fnn:fnnn:nvnn:vnfn:nnnnnnnnf::vnnnFFFFFFF',
     'FnFnnn:::::::::::::::::::::::nnnnnnnnnfvnFFFFFFF',
     'nvFnvnnfffnnnnnnnnvffnvnfnn::nnnnnnnnnffFFFFFFFF',
     'FFFvnvnnnfvnnvfnnvfnnfnfnnn::nnnnnnnnfnvFFFFFFFF',
@@ -55,17 +55,16 @@ MAPS.chapel = {
 obj chapel 24 13
 obj fallen_bell 36 6
 obj ash_circle 35 20
-obj shrine 30 37
+obj shrine 27 33
 obj well 15 16
 obj book_pyre 22 23
 # small stories: the monks' banner torn down under the cult's, a pilgrim's pack dropped by the shrine,
 # the monks' graves dug up (o tiles in the plot) with the spade left behind, the monks' books burned before the door
 obj torn_banner 22 4
-obj pack 33 38
+obj pack 30 33
 obj shovel 16 25
-# light: candles at the shrine, the wall gap, the door and the ash circle; censers smoking
-obj candle 29 36
-obj candle 32 36
+# light: candles at the wall gap, the door and the ash circle (the shrine carries its own candle); censers hung from the
+# cloister's arches where the monks swung them, smoking
 obj candle 11 20
 obj candle 11 23
 obj candle 25 22
@@ -74,9 +73,8 @@ obj candle 34 19
 obj candle 38 19
 obj candle 34 23
 obj candle 38 23
-obj censer 21 18
-obj censer 32 17
-obj censer 40 25
+obj hung_censer 35 12
+obj hung_censer 39 12
 obj banner 14 3
 obj banner 22 3
 obj banner 32 3
@@ -87,6 +85,8 @@ obj bedroll 41 14
 obj bedroll 29 9
 obj fallen_log 22 31
 obj stump 12 36
+# a pilgrim's lantern on a post where the road leaves the woods (lights the way in)
+obj lantern 26 38
 # ways in and out
 exit south 28 39 to=wolfwood at=north
 exit dungeon 27 22 to=dungeon1 at=out lit
@@ -146,7 +146,7 @@ rare ashen_acolyte 13 10
 chest 38 7
 # something alive in every screen
 critter owl 34.5 35.2
-critter moth 30.9 36.4 3
+critter moth 28.4 32.4 3
 critter moth 11.5 21.5 2
 critter moth 27 22.4 2
 critter moth 36.5 21 2
@@ -169,7 +169,7 @@ label 16 4 Herb garden, fish pond
 label 16 22 Monks' plot (dug up)
 label 36 18 Ash circle
 label 15 15 Well
-label 31 35 Wayside shrine
+label 28 31 Wayside shrine
 label 44 16 East gate (barred)
 label 8 20 Wall gap
 `
