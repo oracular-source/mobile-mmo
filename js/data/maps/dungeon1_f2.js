@@ -76,8 +76,7 @@ obj shovel 12 37
 seal 16 29 17 30 bellringer
 # 5. WISP ROOM: the old ritual hall round its ember pit. Two packs, one each side, each a summoner with its big wisp
 # (already summoned, hovering with the pack). Killing the summoner does NOT kill its wisp.
-obj censer 13 21
-obj censer 20 21
+# v0.143 (D2): the pole censers by the ember pit are gone (they read as street lamps); the pit lights the room
 obj banner 10 16
 obj banner 23 16
 obj candle 6 17

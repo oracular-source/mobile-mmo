@@ -15,15 +15,15 @@ MAPS.dungeon1 = {
     'XXXXXXXXXXXXXXXXXXXXXVVVVXXXXXXXXXXXXXXXXXXXXX',
     'XXXXXXXXXXXXXX__________________XXXXXXXXXXXXXX',
     'XXXXXXXXXXXXX____________________XXXXXXXXXXXXX',
-    'XXXXXXXXXXXX____zzzzzzzzz_zzzz____XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzzzzzzzzzzzzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzPzzzzzzzzPzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzzzzzzzzzzzzzz___XXXXXXXXXXXX',
-    'XXXXXXXXXXXX___zzzzzzzzzzzzzzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzzzzzzzzzzzzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzPzzzzzzzzPzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX__zzzzzzzzzzzzzzzzzz__XXXXXXXXXXXX',
-    'XXXXXXXXXXXX____zzzz_zzzzzzzzz____XXXXXXXXXXXX',
+    'XXXXXXXXXXXX______zzzzzzzz________XXXXXXXXXXXX',
+    'XXXXXXXXXXXX_____zzzzzzzzz________XXXXXXXXXXXX',
+    'XXXXXXXXXXXX___zzzPzzzzzzzzP______XXXXXXXXXXXX',
+    'XXXXXXXXXXXX____zzzzzzzzzzzzzzz___XXXXXXXXXXXX',
+    'XXXXXXXXXXXX____zzzzzzzzzzzzzzzzz_XXXXXXXXXXXX',
+    'XXXXXXXXXXXX__zzzzzzzzzzzzzzzzzzz_XXXXXXXXXXXX',
+    'XXXXXXXXXXXX__zzzzPzzzzzzzzPzz____XXXXXXXXXXXX',
+    'XXXXXXXXXXXX__zzzzzzzzzzzzzzz_____XXXXXXXXXXXX',
+    'XXXXXXXXXXXX___zzz________________XXXXXXXXXXXX',
     'XXXXXXXXXXXXX____________________XXXXXXXXXXXXX',
     'XXXXXXXXXXXXXX__________________XXXXXXXXXXXXXX',
     'XXXXXXXXXXXXXXXXXXXXXX__XXXXXXXXXXXXXXXXXXXXXX',
@@ -93,12 +93,10 @@ obj table 23 26
 obj banner 21 17
 obj banner 24 17
 obj torn_banner 20 27
-# v0.96 lighting pass: wall torches either side of the banners and a censer pair either side of the middle table, all
-# mirrored on the doors (was one censer on the east wall)
+# v0.96 lighting pass: wall torches either side of the banners. v0.143 (D2): the two pole censers by the middle table
+# are gone (they read as street lamps); the book fire lights the middle now
 obj sconce 19 17
 obj sconce 26 17
-obj censer 17 24
-obj censer 28 24
 spawn cult_zealot 14 26 20
 spawn cult_ashcaller 14 28 19
 spawn cult_mender 14 27 21
@@ -115,6 +113,7 @@ obj candle 26 28
 # the floor's chest, in a little alcove off the west wall, one candle left burning by it
 chest 15 22
 obj candle 15 23
+# v0.143 love pass (D3): the pool is a rounded, uneven shape now, not a square sheet with notches (dry floor all round).
 # 3. FLOODED CHAMBER: the only water in the dungeon (slows a little all the time); a pool in the middle until you're locked in. MINI BOSS: the Drowned Prior with
 # two drowned dead. His grip: ripples under you (about 1.5 s), step off or hands rise and slow you hard (light damage).
 # When he dies the flood drains and the steps down at the north wall come up out of the water.

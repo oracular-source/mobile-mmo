@@ -25,6 +25,7 @@ function devAct(a){
   else if(a==='dun'){enterZone('dun')}
   else if(a==='crypt'){enterZone('crypt');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='gy'){enterZone('gy');if(pet){pet.x=player.x;pet.y=player.y}}
+  else if(a==='town'){enterZone('town');if(pet){pet.x=player.x;pet.y=player.y}} // v0.143: Town 1 draft (the crossroads gate stays shut until it's built)
   else if(a==='cross'){enterZone('cross');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='tunnel'){enterZone('tunnel');if(pet){pet.x=player.x;pet.y=player.y}}
   else if(a==='wolf'){enterZone('wolf');if(pet){pet.x=player.x;pet.y=player.y}}
@@ -61,7 +62,7 @@ function renderDev(){
   $('devbox').innerHTML=
     sec('char','Character',g(b('lvldn','Level −'),b('lvlup','Level +'),b('heal','Full heal'),b('cds','Reset cooldowns'),b('god','God mode'),b('kill','Kill target')))+
     sec('loot','Loot',g(b('white','White'),b('gear','Green'),b('rare','Blue'),b('pink','Pink'),b('boss','Skeleton King item'),b('wpns','All my weapons'),b('copper','+500 copper'),b('orbs','+5 orbs')))+
-    sec('tp','Teleport',g(b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
+    sec('tp','Teleport',g(b('town','Town 1 (draft)'),b('cross','Crossroads'),b('tunnel','Rat tunnel'),b('den','Gnawbone den'),b('gy','Graveyard'),b('crypt','Crypt'),b('wolf','Wolfwood'),b('chapel','Chapel'),b('d1','Dungeon 1'),b('prior','Drowned Prior'),b('bell','Bellringer'),b('malrec','Malrec')))+
     // Old Zone (owner, Nov 27): the first build (Gate Road, guards, the first crypt), kept only to compare then and now.
     // Frozen: not part of the game, nobody works on it.
     sec('old','Old Zone (first build, frozen)',g(b('gate','Old gate'),b('door','Old crypt door'),b('dun','Old crypt'),b('bossroom','Old boss room')))+

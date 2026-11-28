@@ -8,7 +8,7 @@ OBJECTS.trim().split('\n').slice(1).forEach(l=>{const p=l.trim().split(/\s+/);AR
 const AREA_MOBS={corpse:'dead',rat:'rat',beetle:'beetle',crypt_rat:'crat',skeleton:'cskel',skeleton_king:'boss1',tunnel_rat:'trat',big_rat:'brat',old_gnawbone:'gnaw',ironshell:'ironshell',pale_rat:'palerat',weeping_bride:'bride',blight_wolf:'wolf',thornback_boar:'boar',greyfang:'greyfang',old_scar:'oldscar',cult_zealot:'zealot',cult_ashcaller:'ashcaller',cult_chanter:'chanter',ash_wisp:'wisp',ashen_acolyte:'acolyte',cult_mender:'mender',cult_deacon:'deacon',drowned_prior:'prior',bellringer:'bellringer',malrec:'malrec',great_wisp:'gwisp',cult_summoner:'summoner'};
 const AREAS={}; // built once, the first time you enter
 // Zone ids that are built from map files (the old 'gy' id is kept so explored maps carry over).
-const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel',d1:'dungeon1',d2:'dungeon1_f2'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel',dungeon1:'d1',dungeon1_f2:'d2'};
+const AREA_OF={gy:'graveyard',crypt:'crypt',cross:'crossroads',tunnel:'rat_tunnel',wolf:'wolfwood',chapel:'chapel',d1:'dungeon1',d2:'dungeon1_f2',town:'town1'},ZONE_OF={graveyard:'gy',crypt:'crypt',crossroads:'cross',rat_tunnel:'tunnel',wolfwood:'wolf',chapel:'chapel',dungeon1:'d1',dungeon1_f2:'d2'};
 // Each map's light: how bright the dark is (amb) and the colour of the night over it. Indoors, spill (how strong) and reach
 // (times a light's radius) give every light a long faint tail that fills its room (v0.95, bakeLight); outdoors has none. Shared by render.js and the minimap.
 const AREA_TINT={moonlit:{amb:0.44,col:'3,12,14',text:'#9fd8c0'},crypt:{amb:0.22,col:'2,4,14',text:'#9fb4ee',spill:0.35,reach:2.6},dusk:{amb:0.5,col:'14,8,4',text:'#ffd8a0'},earth:{amb:0.34,col:'6,8,8',text:'#c8b89a',spill:0.35,reach:2.6},wood:{amb:0.42,col:'6,12,8',text:'#c8dca0'},
@@ -146,6 +146,12 @@ function* buildAreaGen(id){
     // v0.118: a faint cold breath of crypt air out of the tunnel mouth in the hillside, so the way down shows in the dark.
     if(o.kind==='hill_face'){A.lights.push({x:o.x*T+72,y:o.y*T+o.h*T-10,r:30,w:0,c:26})}
     if(o.kind==='foxfire'){A.lights.push({x:cx,y:o.y*T+10,r:22,w:0,c:26});(A.fox=A.fox||[]).push({x:o.x*T,y:o.y*T,ph:ah(o.x,o.y,64)*6.3})}
+    // Town 1 (v0.143, owner Nov 27: a small hub round one square): the forge's open hearth, lit windows, the gem cutter's lamp, the wizard's orb.
+    if(o.kind==='forge'){A.lights.push({x:o.x*T+14,y:o.y*T+20,r:48,w:40});A.flames.push({x:o.x*T+14,y:o.y*T+18,big:1})}
+    if(o.kind==='townhouse'||o.kind==='bank')A.lights.push({x:o.x*T+(o.kind==='bank'?24:20),y:(o.y+o.h)*T-8,r:28,w:22});
+    if(o.kind==='wizard_tower')A.lights.push({x:o.x*T+24,y:(o.y+o.h)*T-28,r:30,w:0,c:30});
+    if(o.kind==='gem_table'){A.lights.push({x:o.x*T+16,y:o.y*T,r:30,w:24});A.flames.push({x:o.x*T+27,y:o.y*T-6,big:0,lamp:1})}
+    if(o.kind==='orb_stand')A.lights.push({x:cx,y:o.y*T-6,r:36,w:0,c:46});
     if(o.kind==='shack')A.lights.push({x:o.x*T+15,y:o.y*T+30,r:30,w:24}); // the gravedigger is home: his window throws a little warm light (v0.82)
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
     if(o.kind==='candle'){A.lights.push({x:cx,y:o.y*T+8,r:26,w:20});A.flames.push({x:cx-3,y:o.y*T+9,big:0,tiny:1},{x:cx+2,y:o.y*T+11,big:0,tiny:1})}
@@ -1447,6 +1453,59 @@ function drawPillar(R,x,y){R(x,y,8,14,AP.out);R(x+1,y+2,6,11,AP.brick);R(x+1,y+2
 /* ---------- Ruined Chapel props (v0.62, Vesper embers; shapes from tools/chapel_takes.py take A, references first) ----------
    What makes each one read: the bell's flared mouth and crown loop; the shrine's little roof over a lit niche on a post; the
    censer's bowl on a chain with smoke; the banner's swallowtail and red ring; the well's round stone ring and crossbar. */
+/* ---------- Town 1 (v0.143, owner Nov 27: a small Diablo-style hub, everyone round one square) ---------- */
+// References first (pixel blacksmith, pixel wizard tower, timber-framed houses). What makes each read at game zoom:
+// forge = open shed on posts over a glowing stone hearth, chimney, anvil out front; bank = squat dressed stone, two
+// pillars, a heavy iron-bound door, a gold coin sign; townhouse = white plaster between dark timbers under a shingle roof,
+// chimney, lit window; wizard tower = round stone tower, tall pointed blue roof with a gold star, glowing slit windows;
+// gem table = a trestle under a striped awning with sparkling stones and a lamp; orb stand = a stone pedestal with a
+// cold blue orb. All 3/4 view: walls face south, roofs seen from above, a shadow at the foot.
+function townRoof(R,x0,x1,y0,y1,c,hi,dk){R(x0-1,y0-1,x1-x0+2,y1-y0+3,AP.out);for(let row=0,y=y0;y<y1;row++,y+=3){for(let x=x0+(row%2?2:0),i=0;x<x1;i++){const w=4+Math.floor(ah(i,row+y0,91)*3);R(x,y,Math.min(w-1,x1-x),3,i%3?c:dk);R(x,y,Math.min(w-1,x1-x),1,hi);x+=w}}R(x0-2,y0-2,x1-x0+4,3,AP.out);R(x0-1,y0-1,x1-x0+2,1,hi);R(x0,y1,x1-x0,2,'rgba(0,0,0,0.45)')}
+function drawTownProp(g,R,o,X,Y,W,H,shadow){const k=o.kind,B=Y+H;
+  if(k==='townhouse'){
+    shadow(X-1,B-2,W+4,4);const wt=B-26;
+    R(X,wt,W,26,AP.out);R(X+1,wt+1,W-2,24,'#c9bfa4');R(X+1,wt+1,W-2,2,'#ddd3b8');R(X+1,B-6,W-2,5,AP.stoneDk);R(X+1,B-6,W-2,1,AP.stone); // plaster over a stone footing
+    [1,W/2-1,W-4].forEach(x=>R(X+x,wt+1,3,20,'#3a2a1c'));R(X+1,wt+9,W-2,2,'#3a2a1c');treeLine(R,X+4,wt+19,X+W/2-2,wt+11,2,'#3a2a1c');treeLine(R,X+W-5,wt+19,X+W/2+2,wt+11,2,'#3a2a1c'); // timbers and braces
+    const wx=X+8+ah(o.x,o.y,92)*6|0;R(wx,wt+3,9,7,AP.out);R(wx+1,wt+4,7,5,'#ffb860');R(wx+4,wt+4,1,5,AP.out);R(wx+1,wt+4,7,1,'#ffe0a0'); // lit window
+    const dx=X+W-20;R(dx,B-20,10,16,AP.out);R(dx+1,B-19,8,15,'#5a3a22');R(dx+4,B-19,1,15,'#3a2414');R(dx+6,B-12,1,1,AP.bellHi); // door
+    townRoof(R,X-4,X+W+4,Y-12,wt,'#6a3a28','#8a5038','#4e2a1c');R(X+W-14,Y-22,7,12,AP.out);R(X+W-13,Y-21,5,10,AP.stoneDk);R(X+W-13,Y-21,5,1,AP.stone); // roof, chimney
+    R(X+2,wt-3,6,2,AP.moss);return true}
+  if(k==='forge'){
+    shadow(X-1,B-2,W+4,4);
+    [X+1,X+W-4].forEach(px=>{R(px,Y,4,H,AP.out);R(px+1,Y,2,H-1,'#4a3424');R(px+1,Y,1,H-1,'#6a4c36')}); // posts
+    const hx=X+5,hy=B-18;R(hx-1,hy-1,20,19,AP.out);for(let y=0;y<17;y+=3)for(let x=(y/3)%2?0:2;x<18;x+=5)R(hx+x,hy+y,4,2,ah(x,y,93)<0.5?AP.stone:AP.stoneDk);
+    R(hx+4,hy+6,10,7,'#1a0c06');R(hx+5,hy+8,8,5,'#e0602a');R(hx+6,hy+9,6,3,'#ffb840');R(hx+7,hy+10,4,1,'#fff0b0'); // the hearth's glowing mouth
+    R(hx+6,Y-22,8,26,AP.out);R(hx+7,Y-21,6,25,AP.stoneDk);for(let y=Y-20;y<Y+3;y+=4)R(hx+7,y,6,1,AP.stone); // chimney
+    townRoof(R,X-3,X+W+3,Y-8,Y+6,'#4a4a52','#6a6a74','#36363e');
+    const ax=X+W-18,ay=B-6;R(ax,ay-6,14,4,AP.out);R(ax+1,ay-5,12,2,'#5a5e68');R(ax+1,ay-5,12,1,'#9aa0aa');R(ax-2,ay-5,4,2,AP.out);R(ax+4,ay-2,6,6,AP.out);R(ax+5,ay-2,4,5,'#4a3424'); // anvil on its stump
+    R(ax+3,ay-8,6,1,AP.out);R(ax+7,ay-10,1,3,'#6a4c36'); // hammer on the anvil
+    R(X+W-6,B-12,7,11,AP.out);R(X+W-5,B-11,5,9,'#3e2c1e');R(X+W-5,B-11,5,2,'#2a4a5a');return true} // quench barrel
+  if(k==='bank'){
+    shadow(X-1,B-2,W+4,4);const wt=B-28;
+    R(X,wt,W,28,AP.out);for(let y=wt+1,r=0;y<B-1;y+=4,r++)for(let x=X+1+(r%2?0:3);x<X+W-1;x+=6)R(x,y,Math.min(5,X+W-1-x),3,ah(x,y,94)<0.5?'#8a8a96':'#7a7a86');
+    [X+6,X+W-11].forEach(px=>{R(px,wt-2,5,30,AP.out);R(px+1,wt-1,3,28,'#b8b8c4');R(px+1,wt-1,1,28,'#d8d8e4');R(px-1,wt-3,7,2,AP.out)}); // two pillars
+    const dx=X+W/2-6;R(dx,B-20,12,18,AP.out);R(dx+1,B-19,10,17,'#4a3424');[B-15,B-8].forEach(y=>{R(dx+1,y,10,2,AP.iron);R(dx+1,y,10,1,AP.ironHi)});R(dx+5,B-12,2,2,AP.bellHi);
+    R(X-2,wt-6,W+4,5,AP.out);R(X-1,wt-5,W+2,3,'#9a9aa6');R(X-1,wt-5,W+2,1,'#c8c8d4'); // cornice
+    townRoof(R,X-2,X+W+2,Y-10,wt-6,'#3e4a5e','#5a6a82','#2e3848');
+    R(X+W/2-5,wt-16,10,10,AP.out);R(X+W/2-4,wt-15,8,8,'#c9a227');R(X+W/2-3,wt-14,6,6,'#e8c850');R(X+W/2-1,wt-13,2,4,'#8a6a10');return true} // gold coin sign
+  if(k==='wizard_tower'){
+    shadow(X,B-2,W+2,4);const tx=X+6,tw=W-12,wt=B-44;
+    R(tx,wt,tw,44,AP.out);for(let y=wt+1,r=0;y<B-1;y+=4,r++)for(let x=tx+1+(r%2?0:3);x<tx+tw-1;x+=6)R(x,y,Math.min(5,tx+tw-1-x),3,ah(x,y,95)<0.5?'#6e6a7a':'#5e5a6a');
+    R(tx+1,wt+1,4,42,'rgba(255,255,255,0.08)');R(tx+tw-6,wt+1,5,42,'rgba(0,0,0,0.3)'); // round: lit left, shaded right
+    [[tw/2-2,wt+8],[tw/2-2,wt+22]].forEach(([wx,wy])=>{R(tx+wx-1,wy,6,9,AP.out);R(tx+wx,wy+1,4,7,'#7ad0ff');R(tx+wx,wy+1,4,2,'#c8f0ff')}); // glowing windows
+    const dx=tx+tw/2-6;R(dx,B-18,12,16,AP.out);for(let y=0;y<15;y++){const a=y<3?[4,2,1][y]:0;R(dx+1+a,B-17+y,10-2*a,1,'#3a2a5a')}R(dx+8,B-10,1,1,AP.bellHi);
+    for(let y=0;y<34;y++){const hw=Math.round((tw/2+4)*y/33);R(tx+tw/2-hw-1,wt-34+y,hw*2+2,1,AP.out);if(y>0)R(tx+tw/2-hw,wt-34+y,hw*2,1,y%4===0?'#2a2a6a':'#3a3a8a');if(y>2)R(tx+tw/2-hw,wt-34+y,Math.max(1,hw-3),1,'#5050b0')} // tall pointed roof
+    R(tx+tw/2-2,wt-41,4,5,AP.out);R(tx+tw/2-1,wt-40,2,3,'#e8c850');R(tx+tw/2-3,wt-39,6,1,'#e8c850'); // gold star
+    R(tx+tw/2+5,wt-14,3,3,'#e8c850');R(tx+tw/2-7,wt-8,2,2,'#e8c850');return true} // stars painted on the roof
+  if(k==='orb_stand'){
+    shadow(X+2,B-3,12,3);R(X+4,B-12,8,11,AP.out);R(X+5,B-11,6,10,AP.stone);R(X+5,B-11,2,10,AP.stoneHi);R(X+3,B-13,10,3,AP.out);R(X+4,B-13,8,2,AP.stoneHi);
+    R(X+4,B-21,8,8,AP.out);R(X+5,B-20,6,6,'#3a7ad0');R(X+5,B-20,4,3,'#7ad0ff');R(X+6,B-19,2,1,'#e8f8ff');return true}
+  if(k==='gem_table'){
+    shadow(X,B-2,W+2,3);R(X+1,B-10,W-2,4,AP.out);R(X+2,B-9,W-4,2,'#6a4c36');R(X+2,B-9,W-4,1,'#8a6a4e');[X+3,X+W-6].forEach(lx=>R(lx,B-6,3,6,'#3e2c1e'));
+    [[6,'#e04060'],[11,'#40c060'],[16,'#4080e0'],[21,'#e0c040']].forEach(([x,c])=>{R(X+x,B-12,3,3,AP.out);R(X+x,B-12,2,2,c);R(X+x,B-12,1,1,'#ffffff')}); // gems
+    R(X-1,B-30,W+2,4,AP.out);for(let x=0;x<W;x+=4)R(X+x,B-29,4,3,(x/4)%2?'#2a7a7a':'#d8d0b8');[X,X+W-2].forEach(px=>R(px,B-26,2,18,'#3e2c1e')); // striped awning on poles
+    R(X+25,B-18,5,6,AP.out);R(X+26,B-17,3,4,'#ffb860');return true} // the lamp
+  return false}
 function drawChapelProp(g,R,o,X,Y,W,H,shadow){
   const k=o.kind,ell=(cx,cy,rx,ry,col)=>{g.fillStyle=col;g.beginPath();g.ellipse(cx,cy,rx,ry,0,0,7);g.fill()};
   if(k==='fallen_bell'){
@@ -1575,6 +1634,7 @@ function drawObj(g,R,o){
   const X=o.x*T+(o.ox||0),Y=o.y*T,W=o.w*T,H=o.h*T,k=o.kind;
   const shadow=(x,y,w,h)=>{g.fillStyle='rgba(0,0,0,0.35)';g.fillRect(x,y,w,h)};
   const bricks=(x,y,w,h,base,hi)=>{R(x,y,w,h,base);for(let yy=0;yy<h;yy+=4){R(x,y+yy,w,1,AP.mortar);const off=(yy/4)%2?4:0;for(let xx=off;xx<w;xx+=8)R(x+xx,y+yy,1,4,AP.mortar);if(hi)for(let xx=off+1;xx<w;xx+=8)R(x+xx,y+yy+1,3,1,hi)}};
+  if(drawTownProp(g,R,o,X,Y,W,H,shadow))return;
   if(drawChapelProp(g,R,o,X,Y,W,H,shadow))return;
   if(drawDungeonProp(g,R,o,X,Y,W,H,shadow))return;
   if(drawCryptProp(g,R,o,X,Y,W,H,shadow))return;
