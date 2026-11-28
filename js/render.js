@@ -85,7 +85,7 @@ function mkRags(id,wid){
     // lunging) legs. Each pose frame also gets three leg versions taken from the walk cycle (standing, left foot, right
     // foot): the bottom 5 rows, columns 0-10 of the standing body (legs only; a staff foot at 11+ stays the pose's own).
     const wk=[pf.s,pf.a,pf.b],mid=pf.s[0].length>>1;
-    im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i],
+    im.poses={};Object.keys(pf.p).forEach(k=>{im.poses[k]=pf.p[k].map((r,i)=>({im:mk(r,pal),ax:pf.x[k][i],tip:pf.pg&&pf.pg[k]&&pf.pg[k][i]?[pf.pg[k][i][0],pf.pg[k][i][1]]:null, // tip: the hand, where the channel glow sits (no weapon)
       legs:wk.map(w=>mk(withLegs(r,pf.x[k][i]-mid,w),pal))}))});return wid?armed(im,pf,id,wid):im}
   const q=RAG15[id];if(q){const pal=Object.assign({},RAG15_COMMON,q.c),im=mk(q.r,pal);im.steps=[mk(q.a,pal),mk(q.b,pal)];return im}
   const c=RAGS[id];if(!c)return null;
@@ -143,7 +143,8 @@ function armed(im,pf,cls,wid){const type=ITEMS[wid].wt,look=ITEMS[wid].look,T=WE
   if(!L)return im;const pal=weaponPal(cls,wid),cache={},wp=deg=>cache[deg]||(cache[deg]=weaponAt(L[0],L[1],deg,pal));
   const gs=pf.g&&pf.g.s,o=withWeapon(im,gs,wp);o.fo=im.fo;o.steps=im.steps.map(st=>withWeapon(st,gs,wp));o.poses={};
   Object.keys(im.poses).forEach(k=>{o.poses[k]=im.poses[k].map((p,i)=>{const m=pf.pg&&pf.pg[k]&&pf.pg[k][i],a=withWeapon(p.im,m,wp);
-    return{im:a,ax:p.ax+(a.pad||0),legs:p.legs.map(l=>withWeapon(l,m,wp))}})});
+    // tip: the top of the weapon (grip spot moved up by the grip row; poses hold it upright), where the channel glow sits
+    return{im:a,ax:p.ax+(a.pad||0),tip:m?[m[0]+(a.pad||0),m[1]+(a.h-p.im.h-(a.by||0))-L[1]]:null,legs:p.legs.map(l=>withWeapon(l,m,wp))}})});
   return o}
 // Walk cycle for pictures that have step frames: stand, left foot up, stand, right foot up (body rises on steps).
 // Copy the walk frame's legs (bottom 5 rows, standing columns 0-10) into a pose frame; sh = pose column minus standing column.
@@ -365,7 +366,7 @@ function render(){
   const behind=(o,tr)=>o&&!o.dead&&o.y<tr.y&&o.x+6>tr.b[0]&&o.x-6<tr.b[2]&&o.y>tr.b[1]+4&&o.y-14<tr.b[3];
   const drawEnt=e=>{
     if(e===player){
-      if(player.dead>0)return;
+      player.castTip=null;if(player.dead>0)return;
       const moving=player.tx!==null||joy.active||(settings.move==='hold'&&joy.id!==null)||keys.w||keys.a||keys.s||keys.d;
       const pim=playerImg(),pp=player.sit||player.fd>0?null:playerPose(pim),wf=walkFrame(pim,player.walk,moving&&!player.sit);
       // Shadow under the feet: the feet column measured from the standing picture, mirrored when facing left.
@@ -374,11 +375,18 @@ function render(){
       if(pp)drawPose(moving&&pp.legs?{im:pp.legs[wf.leg||0],ax:pp.ax}:pp,player.x,player.y+1,player.dir); // attack or cast pose (js/anim.js); legs keep walking
       else drawSprite(wf.im,player.x,player.y+1,player.dir,wf.bob,player.sit||player.fd>0);
       lx.globalAlpha=1;
+      // Channel glow (character lane, owner Nov 27): a spell with a cast time charges at the staff tip (or the hand, or in
+      // front of the body for classes with no cast pose); js/anim.js castGlowDraw draws it and the light pool grows with it.
+      if(player.cast&&!player.cast.a.melee&&!player.sit){let tx,ty;
+        if(pp&&pp.tip){const im=moving&&pp.legs?pp.legs[wf.leg||0]:pp.im,dx=Math.round(player.x)-(player.dir<0?im.w-1-pp.ax:pp.ax),dy=Math.round(player.y+1)-im.h+(pp.by||0)+(im.by||0);
+          tx=player.dir<0?dx+im.w-1-pp.tip[0]:dx+pp.tip[0];ty=dy+pp.tip[1]}
+        else{tx=Math.round(player.x)+player.dir*6;ty=Math.round(player.y)-10}
+        player.castTip={x:tx,y:ty,p:Math.min(1,player.cast.time/player.cast.a.cast),col:player.cast.a.col}}
       if(player.buffs.stance>0&&Math.floor(time*4)%2===0){lx.fillStyle='#c9a227';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-12,1,1);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-12,1,1)}
       if(player.buffs.bark>0&&Math.floor(time*4)%4===0){lx.fillStyle='#a07850';lx.fillRect(Math.round(player.x)-6,Math.round(player.y)-10,1,1);lx.fillRect(Math.round(player.x)+6,Math.round(player.y)-6,1,1)}
       if(player.buffs.aura>0){lx.fillStyle='#ffd27a';for(let a=0;a<16;a++){if((a+Math.floor(time*8))%2)continue;const an=a/16*Math.PI*2;lx.fillRect(Math.round(player.x+Math.cos(an)*8),Math.round(player.y-7+Math.sin(an)*10),1,1)}}
       if(player.buffs.mshield>0&&Math.floor(time*4)%2===0){lx.fillStyle='#7dbbff';lx.fillRect(Math.round(player.x)-7,Math.round(player.y)-8,1,2);lx.fillRect(Math.round(player.x)+7,Math.round(player.y)-8,1,2)}
-      if(player.cast){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
+      if(player.cast&&player.cast.a.melee){lx.fillStyle=player.cast.a.col;const k=Math.floor(time*10)%4;lx.fillRect(Math.round(player.x)+5,Math.round(player.y)-15-k,1,1);lx.fillRect(Math.round(player.x)-5,Math.round(player.y)-13+k,1,1)}
       return;
     }
     if(e===decoy){lx.globalAlpha=0.45;drawSprite(playerImg(),e.x,e.y+1,e.dir,0,false);lx.globalAlpha=1;return}
@@ -457,7 +465,7 @@ function render(){
   const ox=Math.floor(camX),oy=Math.floor(camY),DW=VW+2,DH=VH+2;
   // v0.72 (owner, Nov 21): the player no longer carries a light; you see by the world's own lights and ambient.
   // PLAYER_LIGHT = 1 brings the old glow back (radius 95) if dark spots turn out unreadable on the phone.
-  const lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(zl)
+  const ct=player.castTip,lights=(PLAYER_LIGHT?[{x:player.x,y:player.y-8,r:95,w:18}]:[]).concat(ct?[{x:ct.x,y:ct.y,r:8+18*ct.p,w:0}]:[],zl) // channel glow lights the ground around the caster
     .map(l=>({x:Math.round(l.x),y:Math.round(l.y),r:Math.round(l.r*(l.c?1:fl)),w:l.w,c:l.c})).filter(l=>l.x>camX-l.r&&l.x<camX+VW+l.r&&l.y>camY-l.r&&l.y<camY+VH+l.r);
   if(dark.width!==DW||dark.height!==DH){dark.width=DW;dark.height=DH}
   dg.globalCompositeOperation='source-over';dg.clearRect(0,0,DW,DH);dg.fillStyle='rgba('+(AT?AT.col:'0,0,0')+','+(1-amb)+')';dg.fillRect(0,0,DW,DH);
@@ -475,7 +483,7 @@ function render(){
   lights.forEach(l=>{if(l.w>0){lx.globalAlpha=l.w/255;lx.drawImage(lightStamp(l.r,amb,'warm'),l.x-l.r-1,l.y-l.r-1)}if(l.c>0){lx.globalAlpha=l.c/255;lx.drawImage(lightStamp(l.r,amb,'cool'),l.x-l.r-1,l.y-l.r-1)}}); // c = cold daylight
   lx.restore();
   drawGlows();
-  lx.save();lx.translate(-camX,-camY);fxDrawLit();lx.restore(); // the Bone Throw, over the dark (js/anim.js)
+  lx.save();lx.translate(-camX,-camY);fxDrawLit();castGlowDraw();lx.restore(); // the Bone Throw, over the dark (js/anim.js)
   cx.setTransform(1,0,0,1,0,0); // back to screen pixels for the crisp text layer
   // Crisp text layer
   cx.textAlign='center';cx.textBaseline='middle';

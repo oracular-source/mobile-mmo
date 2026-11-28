@@ -154,6 +154,12 @@ Whenever the owner makes a call on how things should look or feel (in any chat),
 - Poses never stop the legs: while moving, a pose frame borrows the walk frame's legs (bottom 5 rows, standing columns 0-10; anything at column 11+, like a staff foot, stays the pose's). Standing still keeps the pose's own legs.
 - Shadows sit on whole pixels, the same width either side of the centre, and under the feet (the boots' middle column, mirrored when facing left), not under the picture's middle.
 
+## Channel glow (character lane, v0.130, Nov 27; owner asked for it)
+- **Only spells with a cast time** charge it; instant spells keep the quick staff lift, physical casts (Bandage) keep their small sparkle.
+- **Where:** the top of the held weapon in the cast pose (grip spot moved up by the weapon's grip row; the pose holds it upright); the open hand with no weapon; in front of the body (6 px out, 10 up) for classes with no cast pose.
+- **How it's drawn:** the spell's own colour. A soft round glow added on top of the dark (radius 3 → 9 px, strength 0.3 → 0.8 as the bar fills, a slight fast pulse); 2 → 6 one-pixel motes spiralling in toward the tip; a bright cream core pixel that grows a 3 × 3 cross past half; and a light pool cut out of the darkness, radius 8 → 26 px.
+- **Size rule:** small to start. Longer casts read as more energy just by filling longer; it can grow bigger and more dramatic later (owner's flavor rule).
+
 ## Animation and effects (animation lane, v0.102)
 - **Physical attacks (owner, Nov 27): small mobs attack with their bodies.** You see what physically happens: the wolf crouches, springs and bites with its **own jaws** (no fangs floating over you, not a Pokemon-style move); a skeleton **swings the sword in its hand**. Floating effects (slashes, fangs, glows) are only for spells and spell-like moves. Bigger hits and heavier attacks for bigger mobs are a later idea (backlog).
 - **Mouths are red inside (owner, Nov 27, v0.127):** any open mouth shows the wolves' mouth red (`#7a1a22`) inside, for every mob. Picked over black on a side-by-side page (black read flat; brown looked bad on the Pale Rat).
