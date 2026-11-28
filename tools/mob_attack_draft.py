@@ -391,6 +391,9 @@ def write_game_data(data, S):
                             ('brat', S['REDO_SPR']['brat'], 'brat_death'), ('palerat', S['REDO_SPR']['palerat'], 'palerat_death')):
         frs = data[key][1:]
         deaths[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, len(base[0]), len(base)) for f in frs]}
+    # Beetles, boar, ash wisp and cultists (tools/family_anims_draft.py, owner OK'd Nov 27).
+    from family_anims_draft import game_data
+    fp, fd = game_data(to_pose); out.update(fp); deaths.update(fd)
     out['_deaths'] = deaths
     block = ('// MOB_POSES (from tools/mob_attack_draft.py, owner OK Nov 27): attack frames drawn from each sprite. t = seconds for\n'
              '// wind-up (held before the hit lands), smear, hit (held), recover. Physical attacks: the weapon or the jaws do the work.\n'

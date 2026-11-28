@@ -401,7 +401,7 @@ function render(){
     const m=e;if(m.dead)return;
     const img=IMG[m.def.img];
     // Ash wisps (v0.62) hover: a small shadow, a slow bob, the flame flickering between two frames, a thread of smoke.
-    if(m.def.float){const bob=Math.round(Math.sin(time*3+m.hx)*1.5);shadow(m.x,m.y,3);drawSprite(Math.floor(time*8+m.hx)%2?(IMG[m.def.img+'2']||IMG.wisp2):img,m.x,m.y-5+bob,m.dir,0,false);
+    if(m.def.float){const bob=Math.round(Math.sin(time*3+m.hx)*1.5),fpf=poseFrame(m);shadow(m.x,m.y,3);if(fpf)drawPose(fpf,m.x,m.y-5+bob,m.dir);else drawSprite(Math.floor(time*8+m.hx)%2?(IMG[m.def.img+'2']||IMG.wisp2):img,m.x,m.y-5+bob,m.dir,0,false);
       if(Math.random()<0.2)parts.push({x:m.x+(Math.random()-0.5)*2,y:m.y-6+bob,vx:(Math.random()-0.5)*4,vy:-9,t:0,life:0.9,col:'#6a6670'});return}
     shadow(m.x,m.y,Math.max(4,Math.round(img.w/2.4)));
     if(m.def.rare){const pr=0.5+0.5*Math.sin(time*3),rw=Math.round(img.w/2)+2;lx.globalAlpha=0.09+0.08*pr;lx.fillStyle='#d8c8ff';lx.beginPath();lx.ellipse(Math.round(m.x),Math.round(m.y),rw,Math.max(2,Math.round(rw/3)),0,0,7);lx.fill();lx.globalAlpha=1;

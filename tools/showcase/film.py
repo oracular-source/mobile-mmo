@@ -26,6 +26,12 @@ SETUP={
 'gnawbite':'''const m=G.mobs.find(m=>m.type==='brat'&&!m.dead);m.type='gnaw';m.def=TYPES.gnaw;G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+16;P.y=m.y-3;m.state='chase';m.threat={p:999,pet:0};m.atk=0.5;W.n=84;W.god=1;''',
 }
 AREA={'howl':'wolfwood','bite':'wolfwood','greyfangbite':'wolfwood','scarbite':'wolfwood','ratbite':'graveyard','bratbite':'rat_tunnel','palebite':'rat_tunnel','gnawbite':'rat_tunnel'}  # scenes outside the crypt
+# Family animations (v0.134): one attack, then the death. type, how far you stand, which area.
+for _k,(_t,_g,_a) in {'beetlebite':('beetle',12,'crossroads'),'ironbite':('ironshell',20,'crossroads'),'boarbite':('boar',16,'wolfwood'),
+    'wispbite':('wisp',10,'chapel'),'zealotbite':('zealot',12,'chapel'),'ashbite':('ashcaller',12,'chapel'),'chantbite':('chanter',12,'chapel')}.items():
+  SETUP[_k]=("const m=G.mobs.find(m=>m.type==='%s'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+%d;P.y=m.y-3;m.state='chase';"
+    "m.threat={p:999,pet:0};m.atk=0.5;m.bolt=99;m.castT=99;m.chargeCd=99;W.focus={x:m.x+%d,y:m.y-4};W.at=42;W.act=()=>killMob(m);W.n=84;W.god=1;")%(_t,_g,_g//2)
+  AREA[_k]=_a
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:

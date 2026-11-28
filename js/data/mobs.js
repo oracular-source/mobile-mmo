@@ -5,7 +5,7 @@
 // HP is tuned so an even-level mob takes about 5-6 Thornlash hits (or DoTs plus a few hits).
 const TYPES={
   rat:{name:'a grave rat',img:'rat',death:'flip',lv:[1,2],hp:46,hpl:18,dmg:2.2,dmgl:1.3,spd:30,aggro:40,armor:0},
-  beetle:{name:'a mire beetle',img:'beetle',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:24,aggro:30,armor:0.5},
+  beetle:{name:'a mire beetle',img:'beetle',death:'flip',lv:[2,3],hp:41,hpl:17,dmg:3.3,dmgl:1.45,spd:24,aggro:30,armor:0.5},
   dead:{name:'a shambling corpse',img:'dead',lv:[3,5],hp:51,hpl:21,dmg:4.4,dmgl:1.75,spd:25,aggro:48,undead:1,armor:0},
   // Old Gnawbone (rat tunnel, Nov 18): level 6 (the tunnel comes before the crypt), above every rat around him. adds: at each share of health he squeals and
   // that many rats burrow out of the nearest holes in the walls (beside him if there are none, e.g. the testing grounds).
@@ -18,7 +18,7 @@ const TYPES={
   // Named rares (v0.32, map chat): about 1 in 100 spawns in an area brings out that area's rare at its own spot on the map.
   // rare:1 = 3x XP, a sure uncommon for your class (and a rare chance), a faint glow. shell = direct hits mostly glance off (DoTs work best).
   // callAt = at that share of health it runs to the nearest idle mob and brings it (and its neighbours) back. Adds from:'ground' = they rise beside it.
-  ironshell:{name:'Ironshell',img:'ironshell',lv:[3,3],hp:80,hpl:24,dmg:3.8,dmgl:1.6,spd:22,aggro:34,armor:0.6,named:1,shell:1,zone:'Crossroads'},
+  ironshell:{name:'Ironshell',img:'ironshell',death:'flip',lv:[3,3],hp:80,hpl:24,dmg:3.8,dmgl:1.6,spd:22,aggro:34,armor:0.6,named:1,shell:1,zone:'Crossroads'},
   palerat:{name:'the Pale Rat',img:'palerat',death:'flip',lv:[5,5],hp:90,hpl:28,dmg:3.4,dmgl:1.6,spd:37,aggro:52,armor:0.05,rare:1,callAt:0.3,zone:'Rat tunnel'},
   bride:{name:'the Weeping Bride',img:'bride',lv:[8,8],hp:110,hpl:34,dmg:5.2,dmgl:2,spd:25,aggro:50,undead:1,armor:0,rare:1,zone:'Sunken Graveyard',
     adds:[{at:0.5,type:'dead',n:2,lv:6,from:'ground',shout:'WAIL!',say:'lets out a long wail, and the dead claw their way out of the ground!',col:'#3a3727'}]},
@@ -26,7 +26,7 @@ const TYPES={
   // flee = at that share of health it turns tail for a few seconds (snare or root it to stop that); anything idle it runs past joins in.
   // charge = when you're a little way off it lowers its head (seen coming), then rushes you and hits at once.
   wolf:{name:'a blight wolf',img:'wolf',lv:[8,11],hp:47,hpl:19,dmg:3.3,dmgl:1.5,spd:34,bite:1,aggro:52,armor:0,pack:1,flee:0.2},
-  boar:{name:'a thornback boar',img:'boar',lv:[8,11],hp:56,hpl:23,dmg:3.5,dmgl:1.65,spd:27,aggro:44,armor:0.15,charge:1},
+  boar:{name:'a thornback boar',img:'boar',death:'flip',lv:[8,11],hp:56,hpl:23,dmg:3.5,dmgl:1.65,spd:27,aggro:44,armor:0.15,charge:1},
   // Greyfang (named, 11): walks a loop round the middle of the wood with two pack wolves (route on the map). howl = when it's pulled,
   // its whole pack comes from much farther off. Never flees. No summon key: it comes back on its own timer.
   greyfang:{name:'Greyfang',img:'greyfang',lv:[11,11],hp:138,hpl:34,dmg:4.9,dmgl:1.95,spd:34,bite:1,aggro:60,armor:0.1,named:1,howl:1,zone:'Wolfwood'},
@@ -37,11 +37,11 @@ const TYPES={
   // its head (stun, fear or step out of range to stop it): name, first/every seconds, cast time, range, x = damage vs one melee hit.
   // chant = every few seconds the chanter's song makes its camp hit harder (kill it first). drain = each hit also burns that much mana.
   // blink = every few seconds it vanishes in a puff and reappears beside you. float = drawn hovering, with its own light.
-  zealot:{name:'a fen zealot',img:'zealot',lv:[10,14],hp:55,hpl:22,dmg:3.6,dmgl:1.65,spd:28,aggro:50,armor:0.1,camp:1},
-  ashcaller:{name:'a fen ashcaller',img:'ashcaller',lv:[10,14],hp:42,hpl:17,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
+  zealot:{name:'a fen zealot',img:'zealot',death:'flip',lv:[10,14],hp:55,hpl:22,dmg:3.6,dmgl:1.65,spd:28,aggro:50,armor:0.1,camp:1},
+  ashcaller:{name:'a fen ashcaller',img:'ashcaller',death:'flip',lv:[10,14],hp:42,hpl:17,dmg:2.6,dmgl:1.2,spd:27,aggro:56,armor:0,camp:1,
     cast:{name:'Ash Bolt',first:1.5,every:4.5,dur:1,range:90,x:1.6,col:'#ff9a4a'}},
-  chanter:{name:'a fen chanter',img:'chanter',lv:[10,14],hp:46,hpl:18,dmg:2.8,dmgl:1.3,spd:27,aggro:50,armor:0,camp:1,chant:1},
-  wisp:{name:'an ash wisp',img:'wisp',lv:[10,14],hp:36,hpl:15,dmg:2.8,dmgl:1.3,spd:30,aggro:46,armor:0,drain:1,blink:1,float:1},
+  chanter:{name:'a fen chanter',img:'chanter',death:'flip',lv:[10,14],hp:46,hpl:18,dmg:2.8,dmgl:1.3,spd:27,aggro:50,armor:0,camp:1,chant:1},
+  wisp:{name:'an ash wisp',img:'wisp',death:'flip',lv:[10,14],hp:36,hpl:15,dmg:2.8,dmgl:1.3,spd:30,aggro:46,armor:0,drain:1,blink:1,float:1},
   // The Ashen Acolyte (rare, 14, herb garden): a telegraphed shadow bolt like the King's, and Ember Brand: a ring of embers
   // flares under you (1.5 s to step out, then a big burn). No flee-to-heal (owner, Nov 20: unfair to classes without a snare).
   acolyte:{name:'the Ashen Acolyte',img:'acolyte',lv:[14,14],hp:120,hpl:32,dmg:4.6,dmgl:1.9,spd:28,aggro:56,armor:0.05,rare:1,brand:1,zone:'Ruined Chapel',

@@ -320,3 +320,26 @@ if __name__ == '__main__':
     json.dump(d, open(out, 'w'), separators=(',', ':'))
     sheet(d, out.replace('.json', '.png'))
     print('wrote', out)
+
+# ---------- into the game (owner OK'd draft 1, Nov 27: "this all looks fantastic"; one shared cultist death is fine) ----------
+# mob_attack_draft.py --game calls this and merges it into MOB_POSES, so one command rewrites every mob's frames.
+GAME = {  # game image name: (draft key for the attack, draft key for the death, sprite rows the frames line up with)
+    'beetle': ('beetle_bite', 'beetle_death', lambda S: S['REDO_SPR']['beetle']),
+    'ironshell': ('ironshell_bite', 'ironshell_death', lambda S: S['REDO_SPR']['ironshell']),
+    'boar': ('boar_bite', 'boar_death', lambda S: S['REDO_SPR']['boar']),
+    'wisp': ('wisp_bite', 'wisp_death', lambda S: S['WISP_SPR'][0]),
+    'zealot': ('zealot_attack', 'zealot_death', lambda S: S['REDO_SPR']['zealot']),
+    'ashcaller': ('ashcaller_attack', 'ashcaller_death', lambda S: S['REDO_SPR']['ashcaller']),
+    'chanter': ('chanter_attack', 'chanter_death', lambda S: S['REDO_SPR']['chanter']),
+}
+
+def game_data(to_pose):
+    d, S = build(); poses, deaths = {}, {}
+    for name, (atk, die, base) in GAME.items():
+        rows = base(S); w, h = len(rows[0]), len(rows)
+        frs = d[atk][1:]  # frame 0 is the ready pose (the normal sprite)
+        poses[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal']}
+        for slot, f in zip(['wind', 'smear', 'hit', 'rec'], frs): poses[name][slot] = to_pose(f, w, h)
+        frs = d[die][1:]
+        deaths[name] = {'t': [round(f['ms'] / 1000, 3) for f in frs], 'pal': frs[0]['pal'], 'f': [to_pose(f, w, h) for f in frs]}
+    return poses, deaths

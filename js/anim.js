@@ -22,9 +22,10 @@ function animSwing(m,v){if(logMute)return;
   fxo.push({k:'slash',x:v.x,y:v.y-8,ax:-dx/d,ay:-dy/d,t:0,life:0.16,col:m.def.slash||'#f2eee0'})}
 // A mob dies. Its family's death if it has one (def.death in js/data/mobs.js), otherwise it sinks into the ground and
 // fades while dust puffs out at its feet. (No white flash: owner, Nov 27, it looked like a hit.)
-function animDeath(m){if(logMute)return;const img=IMG[m.def.img];if(!img||m.def.float)return;
+function animDeath(m){if(logMute)return;const img=IMG[m.def.img];if(!img)return;
   if(m.def.death==='bones'){boneCollapse(m,img);return}
-  if(m.def.death==='flip'&&MOB_DEATH_IMG[m.def.img]){const D=MOB_DEATH_IMG[m.def.img];fxo.push({k:'flip',D:D,x:m.x,y:m.y+1,dir:m.dir,t:0,life:D.t.reduce((a,b)=>a+b,0)});return} // rats: hop, belly-up, two kicks, gone
+  if(m.def.death==='flip'&&MOB_DEATH_IMG[m.def.img]){const D=MOB_DEATH_IMG[m.def.img];fxo.push({k:'flip',D:D,x:m.x,y:m.y+1-(m.def.float?6:0),dir:m.dir,t:0,life:D.t.reduce((a,b)=>a+b,0)});return} // a family death drawn as frames (rats, beetles, boar, wisp, cultists); a floating wisp dies where it hovers
+  if(m.def.float)return;
   fxo.push({k:'fall',img:img,x:m.x,y:m.y+1,dir:m.dir,t:0,life:0.55});fxBits(m.x,m.y-1,['#6e6458','#8a7f70','#5a5248'],8,16,4,0.9)}
 
 // ---------- Skeleton death: falls into a pile of bones, the skull drops on top (v0.105, first unique death) ----------
@@ -62,6 +63,7 @@ function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=
 // before the hit lands (m.atk counts down to it), then smear, hit (held) and recover after it.
 function poseFrame(m){const P=MOB_POSE_IMG[m.def.img];if(!P||m.casting)return null;const t=P.t;
   if(m.swT>0){const e=(m.swDur||0)-m.swT;return e<t[1]?P.smear:e<t[1]+t[2]?P.hit:P.rec}
+  if(m.def.charge&&m.wind>0)return P.wind; // the boar lowering its head before a charge shows its head-down frame
   if(m.near>0&&m.atk>0&&m.atk<t[0]&&m.aimX!==undefined)return P.wind;
   return null}
 function mobAnim(m){let dx=0,dy=0;if(MOB_POSES[m.def.img])return{dx:0,dy:0}; // drawn frames move the body themselves
