@@ -253,65 +253,55 @@ def rats(S):
     return out
 
 # ---------- the Pale Rat and Old Gnawbone: rear back, jaws wide on the big teeth, then bite down (owner, Nov 27) ----------
-def rear_bite(rows, step, pal, head_x, rear_head, rear_top, snap_edits, lunge=3):
-    """Ready -> rears back: head thrown up and back, mouth wide on the big incisors (held, the tell) -> lunges in, still
-    open -> bites down: head drops, teeth clamped (held) -> back. rear_head is drawn by hand from head_x, its first row
-    at rear_top (can be above the sprite). Drawn poses, never a turned sprite."""
+def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth):
+    """The head thrown back, drawn from the sprite's own head so the face keeps its size and the eye stays where it is
+    on the face (owner, Nov 27: the first try grew the faces). The upper head (rows above jaw_row) is lifted more the
+    further forward it is: steps = [(from column, lift), ...]. The lower jaw stays. The gap between them is the open
+    mouth: pink from mouth_x forward, fur behind, a black lip at the front, and a lower tooth pointing up."""
+    px = grid_to_px(rows)
+    up, low = {}, {}
+    for (x, y), c in px.items():
+        if x < head_x: continue
+        if y < jaw_row:
+            lift = max([l for fx, l in steps if x >= fx] or [0])
+            up[(x, y - lift)] = c
+        else: low[(x, y)] = c
+    head = over(low, up)
+    cols = sorted({x for x, _ in head})
+    front = max(x for x, _ in low) if low else cols[-1]
+    for x in cols:
+        ys_up = [y for (xx, y) in up if xx == x]; ys_lo = [y for (xx, y) in low if xx == x]
+        if not ys_up or not ys_lo: continue
+        for y in range(max(ys_up) + 1, min(ys_lo)):
+            head[(x, y)] = 'P' if x >= mouth_x else 'a'
+    for (x, y) in list(head):
+        if head[(x, y)] == 'P' and (x + 1, y) not in head: head[(x + 1, y)] = 'k'
+    for (x, y) in lower_tooth: head[(x, y)] = lower_tooth[(x, y)]
+    return head
+
+def rear_bite(rows, step, pal, head_x, head, snap_edits, lunge=3):
+    """Ready -> rears back: head thrown up, jaws wide on the big teeth (held, the tell) -> lunges in, still open ->
+    bites down: head drops, teeth clamped (held) -> back. Drawn poses, never a turned sprite."""
     ready = grid_to_px(rows)
     body_r = {p: c for p, c in ready.items() if p[0] < head_x}
     body_s = {p: c for p, c in grid_to_px(step).items() if p[0] < head_x}
-    head = grid_to_px(rear_head, head_x, rear_top)
     snap_rows = [r for r in rows]
     for i, t in snap_edits.items(): snap_rows[i] = snap_rows[i][:head_x] + t + snap_rows[i][head_x + len(t):]
     snap_head = {(x, y + 1): c for (x, y), c in grid_to_px(snap_rows).items() if x >= head_x}  # head dropped into the bite
     return [frame(ready, pal, 500, 'Ready (as today)'),
-            frame(shift(over(body_r, head), -1, 0), pal, 320, 'Rears back: head up, jaws wide on the big teeth (held, the tell)'),
+            frame(shift(over(body_r, head), -1, 0), pal, 320, 'Rears back: head tips up, jaws wide on the big teeth (held, the tell)'),
             frame(shift(over(body_s, head), lunge - 1, 0), pal, 60, 'Lunges in, still open'),
             frame(shift(over(body_s, snap_head), lunge, 0), pal, 150, 'Bites down: head drops, teeth clamped (held)'),
             frame(shift(ready, 1, 0), pal, 120, 'Back')]
 
-PALE_REAR = [  # columns 19 on, first row = row -4: snout thrown high, mouth wide
-    "........kk.",
-    ".......kApk",
-    "......kAaak",
-    "..kk.kAaak.",
-    "kkppkAaeak.",
-    "akppkaaaayk",
-    "aakkAaaakyk",
-    "AAAaaaakkPk",
-    "aaAAaakPPk.",
-    "aaaaaakPPk.",
-    "aaaaaaakyk.",
-    "aaaaaaaayk.",
-    "aaaaaaakk..",
-    "dddkkk.....",
-]
-GNAW_REAR = [  # columns 30 on, first row = row 1
-    "...........kk.....",
-    "..........kAAk....",
-    ".........kAaApk...",
-    "....k..k.kAaaApk..",
-    "...kpkkpkAaaaaak..",
-    "...kppkpkAaeaaYk..",
-    "k.kkpkkkAaaaaYYk..",
-    "AkAAAAAAaaaakkk...",
-    "aAAAAASAaakPPPk...",
-    "aaaaAAAaakPpPPk...",
-    "aaaaaAAaakPPPk....",
-    "aaaaaAAaaakYYk....",
-    "aaaaaadaaaakYk....",
-    "aaaaawdkaaakk.k...",
-    "aaaaawwwwwwwwk....",
-    "aaaaaWdkWkkkWk....",
-    "aaadddk.k...k.....",
-]
-
 def big_rats(S):
     B = S['REDO_SPR']
-    pale = rear_bite(B['palerat'], B['paleratstep'], S['REDO_PAL']['palerat'], 19, PALE_REAR, -4,
-                     {7: "aaaaaayyyk", 8: "aaaaaakyk."})
-    R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw'])
-    gnaw = rear_bite(R['gnaw'], R['gnawstep'], gpal, 30, GNAW_REAR, 1, {14: "aaaaawdkYYYkwk"}, lunge=4)
+    pr = B['palerat']
+    ph = rear_head(pr, 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'})
+    pale = rear_bite(pr, B['paleratstep'], S['REDO_PAL']['palerat'], 19, ph, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+    R = S['SPR']; gpal = dict(S['PAL']); gpal.update(S['RAT_PAL']['gnaw']); g = R['gnaw']
+    gh = rear_head(g, 30, 15, 36, [(33, 1), (36, 2)], {(38, 14): 'Y'})
+    gnaw = rear_bite(g, R['gnawstep'], gpal, 30, gh, {14: "aaaaaadkYYYk"}, lunge=4)
     return {'palerat_bite': pale, 'gnaw_bite': gnaw}
 
 def player(S):
