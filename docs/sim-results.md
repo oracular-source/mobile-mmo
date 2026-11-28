@@ -7,6 +7,37 @@ How to read it: **Kill** = seconds from the pull to the last mob dying (wins onl
 Run it yourself on the phone: open the game with `?dev`, DEV → Testing grounds → **Run sim** (runs the class you're playing; a few minutes now). The summary line above the table shows the first level that beats Boss 1.
 
 
+## Zone 1 climb with gear (v0.144, Nov 27, Items lane)
+
+`__game.runClimb()` / `python3 tools/climb.py` (all 14 classes, 5 runs each, gear on and off, ~5 min). Level 1 to Brother Malrec: laps of every built area in order, camps fought as one pull, Dungeon 1 from level 14, ends when Malrec falls. Every kill rolls the game's own loot (`lootIds`, real area), chests open when refilled, rares 1 spawn in 100, anything better goes on at once (`gearScore`), orbs enchant the best item. Review page: artifact page "Zone 1 climb with gear" (slug `8fea2d6f-d4ba-4ae9-a464-d5fc8090c1ed`).
+
+**Typical class** (median of the 9 healthy classes, gear on): **5.2 h** to Malrec (bot), **950 kills**, **level 14**. Real player guessed at x1.5 or more (~8 h): owner asked for his own time to calibrate.
+
+| Class | Hours with gear | Hours no gear | Deaths (gear) |
+| --- | ---: | ---: | ---: |
+| Monk | 4.4 | 7.3 | 6 |
+| Necro | 4.5 | 6.9 | 7 |
+| Shaman | 4.8 | 5.3 | 0 |
+| Warrior | 4.9 | 8.7 | 6 |
+| Rogue | 5.2 | 8.7 | 35 |
+| Shadow Knight | 5.3 | 7.6 | 13 |
+| Enchanter | 5.6 | 5.8 | 6 |
+| Ranger | 5.9 | 6.9 | 44 |
+| Magician | 7.1 | 7.7 | 138 |
+| Wizard | 7.1 | never (30 h, 100 dungeon runs) | 18 |
+| Druid | 8.5 | 9.0 | 109 |
+| Paladin | 10.7 | 12.0 | 257 |
+| Cleric | 15.8 | 16.5 | 470 |
+| Bard | 16.1 | 17.3 | 378 |
+
+**Where the time goes** (typical, minutes): Crossroads 11, Rat Tunnel 13, Graveyard 21, Crypt 27, **Wolfwood 111, Chapel 107**, Dungeon 1 11. Levels 1-8 take about an hour; 8-14 is ~3.5 h of looping Wolfwood and the Chapel 13-14 times each. Minutes per level (bot): 3, 4, 7, 6, 7, 9, 17, 18, 26, 31, 39, 41, 65 (for 2 through 14). Dense areas: ~3.3 kills a minute, walking and rest included. Walking is ~33% of the time.
+
+**Drops on one climb** (typical): white 36, green 48, **blue 20** (~4 an hour; target was ~1), pink 5, orbs 21. By source: normal mobs 24 white / 7 green / 2 blue / 6 orbs; **hidden chests** (~47 opened) 12 / 26 / 6 / 4 orbs; named 10 green / 11 blue / 4 pink / 7 orbs; rare mobs 5 / 1 / 1 pink / 4 orbs. End gear: ~3.5 blue, 3.2 pink, 2.2 green, 3-4 items at +5. First blue: Ironshell's first-kill guarantee in every run, ~11 min in, level 3. Copper ~15,000 earned, ~2,600 spent.
+
+**Gear's effect:** melee 30-45% faster; casters 3-10% (INT/WIS worth little). **Balance flags:** Cleric, Bard, Paladin die hundreds of times; Wizard can't beat Malrec naked.
+
+**Zone 2 math:** today's curve (+25% kills a level) makes 14 to 22 ~4,400 kills, ~22 bot hours. A 3 h real Zone 2 is ~400 kills, ~300 spawns at 1.3 kills each (Zone 1: 157 outdoor spawns killed ~6 times each), and buys ~2 levels on today's curve. Claude's lean: set Zone 2 by time (~3 h), levels 15-18 at ~100 kills a level, ~300 mobs on the road, walking ~40%; trim Zone 1 ~25% (fewer kills per level 9-14) for a mount at hour 9-10.
+
 ## Dungeon 1 boss pass: vanish at half, the finale (v0.79, Nov 24, map chat)
 `runDungeon({seeds:2, lvl:15})` for each class, on top of the v0.76 bots (they step off ripples and back out of the Toll; updated here for Grasp's three spots and the Toll's stun reach). New: the Prior and the Bellringer **vanish at half health**, the Toll stuns close (1–3 s) and slows further out, Grasp lands on three spots and up to two of the Prior's dead rise per fight, and **Malrec's fight goes on into the finale** (both come back at half their solo health, 75% damage, taking turns). Limit: the arena has no rising water or drag in the finale (a best case there).
 

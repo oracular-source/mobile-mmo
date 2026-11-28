@@ -554,7 +554,7 @@ function simFight(f,L,seed,mode){
   pet=null;pet2=null;enterZone('arena');finaleReset();resetPlayer(L);
   // wade: the whole arena is knee-deep flood (v0.71: the Drowned Prior locks you in and floods his room wall to wall), so
   // you, your pet and the mobs all walk slowed, as in the game.
-  if(f.wade)slowArea={w:ARENA.w,h:ARENA.h,slow:new Uint8Array(ARENA.w*ARENA.h).fill(1)};
+  if(f.wade)slowArea={w:ARENA.w,h:ARENA.h,slow:new Uint8Array(ARENA.w*ARENA.h).fill(1),rows:new Array(ARENA.h).fill('')}; // rows: wadeDepth reads them since v0.123 (no '~' = flood, full depth)
   const bot=BOTS[CLS],st={mode:mode,fight:f.id};
   // Before the pull: raise the pet, hide. Then top up, as if you'd rested.
   for(let t=0;t<15&&!bot.prep(st);t+=SIM_DT)update(SIM_DT);
@@ -759,6 +759,126 @@ function dungeonPace(L,seed,noWade){
   return{min:t/60,deaths:deaths,named:named,log:log}}
 function runDungeon(opts){opts=opts||{};if(simState.busy||!BOTS[CLS])return null;const keep=simBegin(),L=opts.lvl||15,runs=[];
   for(let i=0;i<(opts.seeds||2);i++)runs.push(dungeonPace(L,1+i,opts.noWade));simEnd(keep);return{cls:CLS,name:C.name,lvl:L,runs:runs}}
+
+/* ---------- Zone 1 climb with gear (v0.137, Items lane, owner Nov 27) ---------- */
+// The whole climb from level 1 to Brother Malrec, picking up and wearing gear as it drops, to time Zone 1 and size Zone 2.
+// Laps of every built area in the owner's order (crossroads, rat tunnel, graveyard, crypt, Wolfwood, chapel); from level
+// CLIMB_DUNGEON_LV each lap ends with a run of Dungeon 1, and the climb ends the first time Malrec falls.
+// Like the pace sim: fights a spawn (or a whole camp, all at once, as the map groups them) from 3 levels below up to 2 above,
+// a named at most 1 above; each fight runs in the arena at the spawn's real level; rest to 80% after a win; walking at
+// straight-line x1.4; a lost fight is tried once more after a 25 s run back. New since the pace sim:
+//  - drops: every kill rolls the game's own loot (lootIds, with the real area, so the cave bonus, keys and orbs count);
+//    hidden chests open when you pass and they've refilled (10 min); a rare mob shows up 1 spawn in 100 where an area has one.
+//  - gear: anything better for the slot goes on at once (gear:false never wears anything: the old naked numbers).
+//    "Better" = a simple stat score for your class (below). Enchant orbs go on the best item when you have the fee.
+//  - copper: coin per kill, junk sold, chest coin; minus enchant fees and repairs (each death wears gear 10%).
+//  - named: up the first time you reach them; after that the rat tunnel's and the crypt's need their summon key, which must
+//    drop from that area's mobs on that lap (the others are assumed up again by the next lap).
+const CLIMB_AREAS=['crossroads','rat_tunnel','graveyard','crypt','wolfwood','chapel'];
+const CLIMB_DUNGEON_LV=14;   // the monastery's mobs are 14-15
+const CLIMB_HOURS=30;        // give up here
+const CLIMB_KEY={rat_tunnel:'severed_paw',crypt:'crown_shard'};
+// What a sensible player would call an upgrade: the stats that matter to the class, a little extra for a pink's trick.
+function gearScore(id){const it=ITEMS[id];if(!it)return 0;const cas=!!C.caster;
+  return (it.ac||0)*0.5+(it.sta||0)+(it.str||0)*(cas?0.3:1.3)+(it.int||0)*(cas?1.3:0.3)+(it.wis||0)*(C.mana?(cas?1:0.5):0)+(it.rar==='named'?2:0)}
+// Everything in the bags that beats what's worn goes on (enchants move over when you can pay); the rest is sold or broken.
+function climbEquip(st){
+  inv.bags.forEach((b,i)=>{if(!b)return;const it=ITEMS[b.id];if(!it)return;
+    if(it.rar==='junk'){st.copper+=it.value*b.n;inv.bags[i]=null;return}
+    if(!it.slot)return; // orbs and keys stay
+    const sl=it.slot,cur=inv.equip[sl];
+    if(st.gear&&(!cur||gearScore(b.id)>gearScore(cur))){
+      const e=inv.ench[sl]||0;inv.equip[sl]=b.id;delete inv.wear[sl];
+      if(e&&st.copper>=LOOT.moveFee*e){st.copper-=LOOT.moveFee*e;st.spent+=LOOT.moveFee*e}else delete inv.ench[sl];
+      st.equips.push({min:Math.round(st.time/60),lvl:st.L,id:b.id,rar:it.rar})}
+    inv.bags[i]=null}); // not worn: broken into dust or sold, either way gone
+  // Orbs: raise the best worn item that isn't +5 yet, if the fee is there.
+  if(!st.gear)return;
+  for(;;){const oi=inv.bags.findIndex(b=>b&&b.id==='orb1');if(oi<0)break;
+    const sl=Object.keys(inv.equip).filter(k=>(inv.ench[k]||0)<LOOT.enchMax).sort((a,b)=>gearScore(inv.equip[b])-gearScore(inv.equip[a]))[0];
+    if(!sl)break;const fee=LOOT.enchFee[inv.ench[sl]||0];if(st.copper<fee)break;
+    st.copper-=fee;st.spent+=fee;inv.ench[sl]=(inv.ench[sl]||0)+1;st.enchants++;
+    if(--inv.bags[oi].n<=0)inv.bags[oi]=null}
+}
+function climbGive(id){const it=ITEMS[id];let i=it.stack?inv.bags.findIndex(b=>b&&b.id===id):-1;
+  if(i>=0)inv.bags[i].n++;else{i=inv.bags.indexOf(null);if(i<0){inv.bags.push({id:id,n:1});return}inv.bags[i]={id:id,n:1}}}
+// One fight in the climb: the arena fight, then XP, coin and loot for everything you killed (lost fights keep their kills).
+function climbFight(st,types,lvs,zone,wade){
+  st.fights++;simState.climb=[];
+  const r=simFight({mobs:types,lvs:lvs,wade:!!wade},st.L,st.seed*104729+st.fights,'');
+  const killed=simState.climb;simState.climb=null;st.time+=r.t+(r.rest||0);st.fightT+=r.t;st.restT+=(r.rest||0);
+  seedRng(st.seed*7919+st.fights*131+7); // loot gets its own rolls, so wearing gear can't shift the next fight's dice
+  killed.forEach(k=>{st.kills++;st.gain(xpFor(k.lv,k.def,st.L));st.copper+=Math.floor(rr(0,3)+k.lv);
+    if(k.noLoot||(k.type==='malrec'&&!r.win))return; // the finale's two pay nothing; Malrec's chest only opens once the finale is won
+    const m={type:k.type,lv:k.lv,def:k.def};lootIds(m,zone,true).forEach(id=>{climbGive(id);const it=ITEMS[id];
+      if(it.slot||it.rar==='orb'){st.drops[it.rar]=(st.drops[it.rar]||0)+1;const so=k.def.named||k.def.boss||k.def.end||NAMED_PINKS[k.type]?'named':k.def.rare?'rare':'mob';st.src[so+' '+it.rar]=(st.src[so+' '+it.rar]||0)+1;if(it.rar==='named'||it.rar==='rare')st.good.push({min:Math.round(st.time/60),lvl:st.L,id:id,from:TYPES[k.type].name})}
+      if(it.rar==='key')st.keys[id]=(st.keys[id]||0)+1})});
+  if(r.death){st.deaths++;st.time+=PACE_DEATH;
+    Object.keys(inv.equip).forEach(sl=>{const c=ITEMS[inv.equip[sl]].value*LOOT.wearDeath/100;st.copper-=c;st.spent+=c})} // mended at the next fire
+  climbEquip(st);
+  return r;
+}
+function climbChest(st,A){const o=CHEST_ODDS[A.id];if(!o||!A.chests.length)return;
+  A.chests.forEach((ch,ci)=>{const k=A.id+ci;if(st.chestAt[k]!=null&&st.time-st.chestAt[k]<CHEST_REFILL)return;st.chestAt[k]=st.time;
+    seedRng(st.seed*31+st.fights*7+ci+3);const r=rng();let pool=r<o.rare?RARES:r<o.rare+o.unc?UNCOMMONS:COMMONS;if(!pool.length)pool=UNCOMMONS.length?UNCOMMONS:COMMONS;
+    st.copper+=Math.floor(rr(o.cu,o.cu*2));const ids=[];if(pool.length)ids.push(pick(pool));if(rng()<LOOT.orbChest)ids.push('orb1');
+    ids.forEach(id=>{climbGive(id);const it=ITEMS[id];st.drops[it.rar]=(st.drops[it.rar]||0)+1;st.src['chest '+it.rar]=(st.src['chest '+it.rar]||0)+1;st.chests++;if(it.rar==='rare')st.good.push({min:Math.round(st.time/60),lvl:st.L,id:id,from:'hidden chest'})})});
+  climbEquip(st)}
+// Groups as the map makes them (a camp is one pull), in the map's order; named last.
+function climbGroups(A){const by={},order=[],named=A.named.map(n=>n.sp);
+  A.spawns.forEach((sp,i)=>{const k=sp.group?'g'+sp.group:'s'+i;if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
+  const gs=order.map(k=>by[k]);return gs.filter(g=>!g.some(sp=>named.indexOf(sp)>=0)).sort((a,b)=>a[0].lv[0]-b[0].lv[0]).concat(gs.filter(g=>g.some(sp=>named.indexOf(sp)>=0)))}
+function climbArea(st,id,lap){
+  const A=buildArea(id),zone=ZONE_OF[id],named=A.named.map(n=>n.sp),t0=st.time,L0=st.L,k0=st.kills;let px=null,py=null,visited=false;
+  const keyHad=CLIMB_KEY[id]?(st.keys[CLIMB_KEY[id]]||0):0;
+  climbGroups(A).forEach(g=>{
+    seedRng(st.seed*7919+st.fights*31+st.kills*17+1);
+    const lvs=g.map(sp=>sp.lv[0]+Math.floor(rng()*(sp.lv[1]-sp.lv[0]+1))),top=Math.max.apply(null,lvs),isN=g.some(sp=>named.indexOf(sp)>=0);
+    if(top>st.L+(isN?1:2)||top<st.L-3)return;
+    if(isN){const ty=g.find(sp=>named.indexOf(sp)>=0).type;
+      if(st.lost[ty]>=st.L)return;
+      if(st.namedSeen[ty]&&CLIMB_KEY[id]){if((st.keys[CLIMB_KEY[id]]||0)<1)return;st.keys[CLIMB_KEY[id]]--}}
+    if(!visited){visited=true;st.time+=PACE_HOP;climbChest(st,A)}
+    if(px!==null)st.time+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
+    for(let tries=0;tries<2;tries++){const r=climbFight(st,g.map(sp=>sp.type),lvs,zone,false);
+      if(r.win){if(isN){const ty=g.find(sp=>named.indexOf(sp)>=0).type;st.namedSeen[ty]=1;if(!st.namedAt[ty])st.namedAt[ty]={lvl:st.L,min:Math.round(st.time/60)}}
+        // a rare: 1 spawn in 100 in an area that has one
+        if(A.rare&&!isN){seedRng(st.seed*13+st.kills);if(rng()<RARE_CHANCE*g.length){st.rares++;climbFight(st,[A.rare.sp.type],[A.rare.sp.lv[1]],zone,false)}}
+        return}}
+    if(isN)st.lost[g.find(sp=>named.indexOf(sp)>=0).type]=st.L});
+  if(visited)st.areaLog.push({lap:lap,area:A.name,from:L0,to:st.L,min:(st.time-t0)/60,kills:st.kills-k0});
+}
+// One run of Dungeon 1 at your level, nearest camp next (as dungeonPace), with loot. True if Malrec fell.
+function climbDungeon(st){const t0=st.time,L0=st.L,k0=st.kills;let malrec=false;
+  ['dungeon1','dungeon1_f2'].forEach(id=>{const A=buildArea(id),by={},order=[];let px=A.start.x,py=A.start.y;
+    climbChest(st,A);
+    A.spawns.forEach(sp=>{const k=sp.group||('solo'+A.spawns.indexOf(sp));if(!by[k]){by[k]=[];order.push(k)}by[k].push(sp)});
+    while(order.length){order.sort((a,b)=>Math.hypot(by[a][0].x-px,by[a][0].y-py)-Math.hypot(by[b][0].x-px,by[b][0].y-py));const g=by[order.shift()];
+      g.sort((a,b)=>(TYPES[b.type].named?1:0)-(TYPES[a.type].named?1:0));const types=g.map(sp=>sp.type),lvs=g.map(sp=>sp.lv[1]);
+      st.time+=Math.hypot(g[0].x-px,g[0].y-py)*1.4/PSPEED;px=g[0].x;py=g[0].y;
+      for(let tries=0;tries<2;tries++){const r=climbFight(st,types,lvs,ZONE_OF[id],types.some(x=>TYPES[x].grasp));
+        if(r.win){if(types.indexOf('malrec')>=0)malrec=true;break}}}
+    const ex=A.exits.find(e=>e.name==='down');if(ex)st.time+=Math.hypot(ex.tx*T+8-px,ex.ty*T+8-py)*1.4/PSPEED});
+  st.dungeons.push({lvl:L0,min:(st.time-t0)/60,kills:st.kills-k0,malrec:malrec});return malrec}
+function climbRun(seed,gear){
+  inv.equip={};inv.wear={};inv.ench={};inv.bags=new Array(BAG_SIZE).fill(null);lootMem.first={};lootMem.dry={};
+  const st={seed:seed,gear:gear!==false,L:1,xp:0,time:0,fightT:0,restT:0,deaths:0,fights:0,kills:0,copper:0,spent:0,enchants:0,chests:0,rares:0,
+    drops:{},src:{},good:[],equips:[],keys:{},lost:{},namedSeen:{},namedAt:{},chestAt:{},areaLog:[],dungeons:[],levels:[{lvl:1,min:0}]};
+  st.gain=n=>{if(st.L>=LEVEL_CAP)return;st.xp+=n;while(st.L<LEVEL_CAP&&st.xp>=need(st.L)){st.xp-=need(st.L);st.L++;st.levels.push({lvl:st.L,min:Math.round(st.time/60),kills:st.kills})}if(st.L>=LEVEL_CAP)st.xp=0};
+  let done=false,lap=0;
+  while(!done&&st.time<CLIMB_HOURS*3600){lap++;
+    CLIMB_AREAS.forEach(id=>{if(!done)climbArea(st,id,lap)});
+    if(st.L>=CLIMB_DUNGEON_LV)done=climbDungeon(st)}
+  const worn={};Object.keys(inv.equip).forEach(sl=>worn[sl]={id:inv.equip[sl],name:ITEMS[inv.equip[sl]].name,rar:ITEMS[inv.equip[sl]].rar,ench:inv.ench[sl]||0});
+  const named={};Object.keys(st.namedAt).forEach(k=>named[TYPES[k].name]=st.namedAt[k]);
+  return{seed:seed,gear:st.gear,malrec:done,laps:lap,hours:st.time/3600,fightH:st.fightT/3600,restH:st.restT/3600,lvl:st.L,deaths:st.deaths,fights:st.fights,kills:st.kills,
+    copper:Math.round(st.copper),spent:Math.round(st.spent),enchants:st.enchants,chests:st.chests,rares:st.rares,drops:st.drops,src:st.src,good:st.good,equips:st.equips,worn:worn,named:named,
+    levels:st.levels,areas:st.areaLog,dungeons:st.dungeons,stats:{ac:stat('ac'),sta:stat('sta'),str:stat('str'),int:stat('int'),wis:stat('wis')}};
+}
+// Runs the climb for your class. Headless only (it takes minutes): __game.runClimb({seeds:1,gear:true}).
+function runClimb(opts){opts=opts||{};if(simState.busy||!BOTS[CLS])return null;const keep=simBegin(),runs=[];
+  try{for(let i=0;i<(opts.seeds||1);i++)runs.push(climbRun((opts.seed0||1)+i,opts.gear))}finally{simState.climb=null;simEnd(keep)}
+  return{cls:CLS,name:C.name,caster:!!C.caster,runs:runs}}
 
 // Pace results for the DEV panel: level after the first lap, time to level 8, deaths, and when each named first fell.
 function paceSummary(res){

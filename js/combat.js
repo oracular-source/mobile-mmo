@@ -122,7 +122,8 @@ function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the
   // The crypt boss (v0.37): one banner with how long the visit took. Once per visit; the clock starts at the stairs.
   if(m.def.boss&&zoneId==='crypt'&&run.cryptT0!=null){const s=Math.round(time-run.cryptT0),mm=Math.floor(s/60)+':'+String(s%60).padStart(2,'0');banner('Crypt cleared','in '+mm);log('Crypt cleared in '+mm+'.','#ffd27a');run.cryptT0=null}
   if(m.def.noxp){if(player.target===m)player.target=null;return}
-  if(credit&&!m.noLoot){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
+  if(credit&&simState.climb){simState.climb.push({type:m.type,lv:m.lv,def:m.def,noLoot:!!m.noLoot})} // the climb sim pays it out after the fight (noxp mobs returned above)
+  else if(credit&&!m.noLoot){const coin=Math.floor(rr(0,3)+m.lv);if(coin>0){inv.copper+=coin;log('You receive '+coin+' copper.','#c9a227','loot')}rollLoot(m);saveInv();}
   if(player.target===m)player.target=null;
   while(player.lvl<LEVEL_CAP&&player.xp>=need(player.lvl)){
     player.xp-=need(player.lvl);player.lvl++;player.hp=maxHP(player.lvl);player.mp=maxMP(player.lvl);
@@ -341,25 +342,32 @@ function malrecChest(){const left=MALREC.filter(id=>!owned(id)),out=[];if(left.l
 const NAMED_PINKS={gnaw:()=>['gnawring'],ironshell:()=>['ironbracers'],greyfang:()=>['fangring'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
 // A rare mob's own item (src in items.js): it's the blue a rare drops, unless you already have it (then any blue for your class).
 const OWN_ITEM={};Object.keys(ITEMS).forEach(id=>{if(ITEMS[id].src)OWN_ITEM[ITEMS[id].src]=id});
-function rollLoot(m){
+// lootIds (v0.137): the roll itself, for any zone, without handing anything out. rollLoot gives the result to you; the Zone 1
+// climb sim (sim.js) calls it with the real area so its drops follow exactly these rules. direct = boss chest items come
+// straight back instead of waiting in the chest. Same rng() calls in the same order as before, so the sim numbers don't move.
+function lootIds(m,zone,direct){
   const got=[];
   if(rng()<0.6)got.push(JUNK[m.type]);
   if(m.type==='dead'&&rng()<0.3)got.push('rag');
-  const cave=zoneId==='crypt'||zoneId==='tunnel'?LOOT.caveX:1,boss=m.def.named||m.type==='boss1'||NAMED_PINKS[m.type]||m.type==='malrec';
+  const cave=zone==='crypt'||zone==='tunnel'?LOOT.caveX:1,boss=m.def.named||m.type==='boss1'||NAMED_PINKS[m.type]||m.type==='malrec';
   if(!boss&&!m.def.rare){const r=rng(),pc=LOOT.mobCommon+LOOT.mobCommonLv*m.lv,pu=LOOT.mobUnc*cave;
     if(r<pc)got.push(pick(COMMONS));else if(r<pc+pu)got.push(pick(UNCOMMONS));
     if(m.lv>=LOOT.mobRareLv&&rng()<LOOT.mobRare*cave&&RARES.length)got.push(pick(RARES))}
   // Summon keys: only from that area's mobs, in that area (the zone check comes first, so the arena sim rolls nothing extra).
-  const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
+  const key=KEY_DROPS[zone]&&KEY_DROPS[zone][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
   if(m.def.rare){const own=OWN_ITEM[m.type];got.push(rng()<LOOT.rareMobBlue?(own&&!owned(own)?own:blueOrGreen()):pick(UNCOMMONS))} // a rare always pays one item: green, sometimes its own blue
   if(NAMED_PINKS[m.type])got.push(namedOffer(m.type,NAMED_PINKS[m.type](),1)[0]);
   // The Skeleton King's item waits in his chest; so does Brother Malrec's: one of his two pinks plus a blue (v0.131).
-  const toChest=items=>{if(run.chest){run.chest.items=items;return}got.push.apply(got,items)};
+  const toChest=items=>{if(run.chest&&!direct){run.chest.items=items;return}got.push.apply(got,items)};
   if(m.type==='boss1')toChest(namedOffer('boss1',BOSS1,1));
   if(m.type==='malrec')toChest(malrecChest());
   // Enchant orbs (v0.100): rare from normal mobs, likelier from rares, named and bosses, always from Brother Malrec.
   // Never rolled in the arena, so the sim's random rolls (and its numbers) stay exactly as they were.
-  if(zoneId!=='arena'){const orb=m.type==='malrec'||(boss?rng()<LOOT.orbNamed:m.def.rare?rng()<LOOT.orbRare:m.lv>=LOOT.orbMobLv&&rng()<LOOT.orbMob);if(orb)got.push('orb1')}
+  if(zone!=='arena'){const orb=m.type==='malrec'||(boss?rng()<LOOT.orbNamed:m.def.rare?rng()<LOOT.orbRare:m.lv>=LOOT.orbMobLv&&rng()<LOOT.orbMob);if(orb)got.push('orb1')}
+  return got;
+}
+function rollLoot(m){
+  const got=lootIds(m,zoneId,false);
   got.forEach((id,i)=>giveItem(id,1,i));
   lootPillar(m.x,m.y,got); // a column of light for a blue, a pink or an orb
 }
@@ -590,8 +598,9 @@ function applyAbilityCore(a,t,fromHide){
     // Recoil Shot (Ranger fork): a free shot at what you hopped away from, and it's snared.
     if(from&&!from.dead&&ABI.shoot){beams.push({x1:player.x,y1:player.y-8,x2:from.x,y2:from.y-6,t:0,col:'#9fd0d0'});hitMob(from,at(ABI.shoot.dmg)*rr(0.85,1.15)*(1-from.def.armor)*mult,'direct','Recoil Shot');if(!from.dead){from.snare=Math.max(from.snare||0,a.recoil*durMult(from));log(cap(from.def.name)+' is snared.','#9fd0d0')}}}
   else if(a.kind==='gate'){gateHome();}
-  else if(a.kind==='petheal'){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult),tp=pet2&&pet2.hp/pet2.maxhp<pet.hp/pet.maxhp?pet2:pet; // Bone Pair: mends the more hurt skeleton
-    tp.hp=Math.min(tp.maxhp,tp.hp+h);floatText(tp.x,tp.y-20,'+'+h,'#7dffa6');burst(tp.x,tp.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight');}
+  else if(a.kind==='petheal'){const tp=pet2&&(!pet||pet2.hp/pet2.maxhp<pet.hp/pet.maxhp)?pet2:pet; // Bone Pair: mends the more hurt skeleton
+    if(tp){const h=Math.round(at(a.heal)*rr(0.9,1.1)*mult); // the pet can die while the heal is still casting: then it fizzles
+    tp.hp=Math.min(tp.maxhp,tp.hp+h);floatText(tp.x,tp.y-20,'+'+h,'#7dffa6');burst(tp.x,tp.y-6,a.col,10,true);log(a.name+' heals your '+petName()+' for '+h+'.','#7dffa6','fight')}}
   else if(a.kind==='fear'){t.fear=at(a.dur,a)*durMult(t);t.fearT=0;t.fearTo=null;t.fearCower=false;burst(t.x,t.y-6,a.col,10,true);log(cap(t.def.name)+' flees in terror ('+Math.round(t.fear)+'s).','#c8a0ff');engage(t);}
   // Feign Death. The Monk's version ("split") sends every mob home except your target, which keeps coming:
   // a pack becomes a single. With only one mob on you, it drops that one too (an escape).
