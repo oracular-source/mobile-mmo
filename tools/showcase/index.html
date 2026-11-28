@@ -21,7 +21,7 @@ header p{margin:0 0 14px;color:var(--dim);max-width:62ch}
 .chips button:focus-visible{outline:2px solid var(--glow);outline-offset:2px}
 .reel{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,420px),1fr));gap:20px;padding:18px max(5vw,16px) 40px;max-width:1100px;margin:auto}
 .clip{background:var(--slab);border-radius:10px;overflow:hidden;box-shadow:0 10px 30px #0008}
-.clip img{display:block;width:100%;aspect-ratio:1;image-rendering:pixelated;background:#000}
+.clip img{display:block;width:100%;height:auto;image-rendering:pixelated;background:#000} /* each clip keeps its own shape (owner, Nov 27: wide clips were squashed into squares) */
 .clip video{display:block;width:100%;max-height:80vh;background:#000}
 .clip>div{padding:14px 16px 18px}
 .clip h2{font:600 20px/1.2 Cinzel,serif;margin:0 0 6px;color:var(--bone)}
