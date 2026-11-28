@@ -13,7 +13,7 @@ ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 def load_sprites():
     js = r"""
 const fs=require('fs');const src=fs.readFileSync(process.argv[1],'utf8');
-const o=new Function(src+';return {UNDEAD_SPR,UNDEAD_PAL,REDO_SPR,REDO_PAL,RAG15,RAG15_COMMON,WOLF_SPR,WOLF_PAL,PAL}')();
+const o=new Function(src+';return {UNDEAD_SPR,UNDEAD_PAL,REDO_SPR,REDO_PAL,RAG15,RAG15_COMMON,WOLF_SPR,WOLF_PAL,PAL,SPR,RAT_PAL}')();
 process.stdout.write(JSON.stringify(o));"""
     out = subprocess.run(['node', '-e', js, os.path.join(ROOT, 'js/data/sprites.js')], capture_output=True, text=True, check=True)
     return json.loads(out.stdout)
@@ -196,6 +196,60 @@ def greyfang(S):
     snap = {7: "AAAaaaaaawwwwwwkk", 8: "AAAAaadaaaaakk...", 9: "AAAAaaadddkk.....", 10: "AAAdddddkkk......"}
     return bite(rows, W['greyfangstep'], pal, 24, open_head, snap, 16, lunge=4)
 
+# ---------- rats: a quick lunging nip, and a death where they flip onto their backs ----------
+def rat_frames(rows, step, pal, head_x, open_rows, snap_rows, eye):
+    """Bite: squash down (the tell), dart in with the snout up and teeth showing, nip shut (held), back.
+    Death: a yelp hop, then belly-up with the legs in the air, two kicks, then it lies still (the game fades it).
+    open_rows / snap_rows = {row: new head part from head_x}; eye = (x, y) of the eye, shut when dead."""
+    ready = grid_to_px(rows)
+    h = len(rows)
+    squash = grid_to_px(['.' * len(rows[0])] + rows[:2] + rows[3:])  # one body row taken out: it crouches flat
+    def head_edit(rws, edits):
+        r = list(rws)
+        for i, t in edits.items():
+            r[i] = r[i][:head_x] + t + r[i][head_x + len(t):] if i >= 0 else r[i]
+        return r
+    lunge = grid_to_px(head_edit(step, open_rows))
+    snap = grid_to_px(head_edit(step, snap_rows))
+    bite = [frame(ready, pal, 500, 'Ready (as today)'),
+            frame(shift(squash, -1, 0), pal, 150, 'Squash: flattens, ready to dart (the tell)'),
+            frame(shift(lunge, 2, -1), pal, 60, 'Dart: snout up, teeth out'),
+            frame(shift(snap, 3, 0), pal, 120, 'Nip: jaws shut on you (held)'),
+            frame(shift(ready, 1, 0), pal, 100, 'Back')]
+    # Belly-up: the body drawn upside down on the ground (legs in the air), eye shut, tail lying flat.
+    def belly(rws):
+        r = [row for row in rws if row.strip('.')]
+        up = r[::-1]
+        # Light and dark swap: the pale belly is now on top, the dark back against the ground. The eye shuts.
+        sw = {'A': 'd', 'd': 'A', 'e': 'k'}
+        px = {p: sw.get(c, c) for p, c in grid_to_px(up).items()}
+        dy = h - len(up)
+        return shift(px, 0, dy)
+    dead = belly(rows); kick = belly(step)
+    death = [frame(ready, pal, 300, 'Hit (alive)'),
+             frame(shift(grid_to_px(step), 0, -2), pal, 90, 'Death: a yelp hop'),
+             frame(dead, pal, 260, 'Belly-up, legs in the air'),
+             frame(kick, pal, 90, 'Kick'),
+             frame(dead, pal, 90, ''),
+             frame(kick, pal, 90, 'Kick'),
+             frame(dead, pal, 1400, 'Lies still, then fades')]
+    return bite, death
+
+def rats(S):
+    R = S['SPR']; pal = dict(S['PAL']); pal.update(S['RAT_PAL']['rat']); pal['w'] = '#e8e2d4'
+    # Small rat (16x8): head from column 11. Open: snout lifted a pixel, a tooth under it. Snap: the tooth tucked in.
+    small = rat_frames(R['rat'], R['ratstep'], pal, 11,
+                       {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "dkwk."},
+                       {4: "aaAwp"}, (13, 3))
+    B = S['REDO_SPR']; bpal = S['REDO_PAL']['brat']; bpal = dict(bpal); bpal['w'] = '#efe6cc'
+    # Big tunnel rat (29x13): head from column 21. Open: top jaw up, the yellow incisors split top and bottom with the
+    # pink mouth between. Snap: incisors clamped together.
+    bopen = {5: "aaaaeak.", 6: "aaaaaapk", 7: "aaaayyk.", 8: "aaakPPk.", 9: "dkkkyk.."}
+    bsnap = {7: "aaaayyyk", 8: "aaaakyk."}
+    big = rat_frames(B['brat'], B['bratstep'], bpal, 21, bopen, bsnap, (26, 5))
+    pale = rat_frames(B['palerat'], B['paleratstep'], dict(S['REDO_PAL']['palerat'], w='#ffffff'), 21, bopen, bsnap, (26, 5))
+    return {'rat_bite': small[0], 'rat_death': small[1], 'brat_bite': big[0], 'brat_death': big[1], 'palerat_bite': pale[0], 'palerat_death': pale[1]}
+
 def player(S):
     r = S['RAG15']['warrior']; pal = dict(S['RAG15_COMMON']); pal.update(r['c'])
     return {'px': [[x, y, c] for (x, y), c in grid_to_px(r['r']).items()], 'pal': pal}
@@ -229,7 +283,7 @@ def main():
         print('PIL missing: no strip image', file=sys.stderr)
     print('wrote', out)
 
-if __name__ == '__main__':
+if __name__ == '__main__' and len(sys.argv) == 1:
     main()
 
 
@@ -262,6 +316,29 @@ def write_game_data(data, S):
     s = (s[:a] + block + s[b + len('// /MOB_POSES\n'):]) if a >= 0 and b > a else s.rstrip('\n') + '\n' + block
     open(p, 'w').write(s)
     print('wrote MOB_POSES into js/data/sprites.js')
+
+def rat_draft():
+    S = load_sprites(); data = rats(S); data['player'] = player(S)
+    out = os.path.join(ROOT, 'art/drafts/rat-anims-draft1.json'); json.dump(data, open(out, 'w'), separators=(',', ':'))
+    from PIL import Image
+    strips = []
+    for key in [k for k in data if k != 'player']:
+        frs = [f for f in data[key]]
+        allp = [(x, y) for f in frs for x, y, _ in f['px']]
+        x0, y0, x1, y1 = min(p[0] for p in allp) - 2, min(p[1] for p in allp) - 2, max(p[0] for p in allp) + 2, max(p[1] for p in allp) + 2
+        fw, fh = x1 - x0 + 1, y1 - y0 + 1
+        im = Image.new('RGB', (fw * len(frs), fh), (40, 38, 46))
+        for i, f in enumerate(frs):
+            for x, y, c in f['px']:
+                hx = f['pal'].get(c, '#ff00ff').lstrip('#'); im.putpixel((i * fw + x - x0, y - y0), tuple(int(hx[j:j+2], 16) for j in (0, 2, 4)))
+        strips.append(im.resize((im.width * 6, im.height * 6), Image.NEAREST))
+    W = max(s.width for s in strips); H = sum(s.height + 12 for s in strips)
+    sheet = Image.new('RGB', (W, H), (24, 22, 28)); y = 0
+    for st in strips: sheet.paste(st, (0, y)); y += st.height + 12
+    sheet.save(out.replace('.json', '.png')); print('wrote', out)
+
+if __name__ == '__main__' and '--rats' in sys.argv:
+    rat_draft()
 
 if __name__ == '__main__' and '--game' in sys.argv:
     S = load_sprites()
