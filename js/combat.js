@@ -98,7 +98,7 @@ function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
   {const tr=how!=='vanish'&&RAT_TYPES.indexOf(m.type)>=0&&wornTrick('rats');if(tr){const h=Math.max(1,Math.round(maxHP(player.lvl)*tr.rats));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2');trickNote(tr,'mends you for '+h+'.')}} // Gnawed Ring
   if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
-  burst(m.x,m.y-6,'#cfc8b2',10,false);if(how!=='vanish')animDeath(m);
+  if(how!=='vanish')animDeath(m); // each family has its own death now; the old white spark burst is gone (owner, Nov 27)
   if(how!=='vanish')log('You have slain '+m.def.name+'!','#ffd27a');
   forkOnDeath(m);
   let xp=xpFor(m.lv,m.def,player.lvl);

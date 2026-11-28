@@ -253,7 +253,7 @@ def rats(S):
     return out
 
 # ---------- the Pale Rat and Old Gnawbone: rear back, jaws wide on the big teeth, then bite down (owner, Nov 27) ----------
-def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth):
+def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth, mouth='k'):
     """The head thrown back, drawn from the sprite's own head so the face keeps its size and the eye stays where it is
     on the face (owner, Nov 27: the first try grew the faces). The upper head (rows above jaw_row) is lifted more the
     further forward it is: steps = [(from column, lift), ...]. The lower jaw stays. The gap between them is the open
@@ -273,7 +273,7 @@ def rear_head(rows, head_x, jaw_row, mouth_x, steps, lower_tooth):
         ys_up = [y for (xx, y) in up if xx == x]; ys_lo = [y for (xx, y) in low if xx == x]
         if not ys_up or not ys_lo: continue
         for y in range(max(ys_up) + 1, min(ys_lo)):
-            head[(x, y)] = 'k' if x >= mouth_x else 'a'  # inside of the mouth: black (owner, Nov 27: brown looked bad on the Pale Rat; black for every mouth)
+            head[(x, y)] = mouth if x >= mouth_x else 'a'  # inside of the mouth: black (owner, Nov 27: brown looked bad on the Pale Rat; black for every mouth)
     for (x, y) in lower_tooth: head[(x, y)] = lower_tooth[(x, y)]
     return head
 
@@ -304,6 +304,23 @@ def big_rats(S):
     gh = rear_head(g, 30, 15, 36, [(33, 1), (36, 2)], {(38, 14): 'Y'})
     gnaw = rear_bite(g, R['gnawstep'], gpal, 30, gh, {14: "aaaaaadkYYYk"}, lunge=4)
     return {'palerat_bite': pale, 'brat_bite': big, 'gnaw_bite': gnaw}
+
+def mouth_compare(S):
+    """Black vs red inside the mouth, side by side (owner, Nov 27: decide which reads better on the rats)."""
+    RED = '#7a1a22'  # the wolves' mouth red
+    out = {}
+    for col in ('k', 'r'):
+        R = S['SPR']; pal = dict(S['PAL']); pal.update(S['RAT_PAL']['rat']); pal['w'] = '#e8e2d4'; pal['r'] = RED
+        out['rat_' + col] = rat_frames(R['rat'], R['ratstep'], pal, 11, {2: "AAAk.", 3: "aAeAk", 4: "aaAAp", 5: "d" + col + "wk."}, {4: "aaAwp"}, (13, 3))[0]
+        B = S['REDO_SPR']
+        for name in ('brat', 'palerat'):
+            bp = dict(S['REDO_PAL'][name]); bp['r'] = RED
+            h = rear_head(B[name], 19, 8, 24, [(22, 1), (24, 2)], {(26, 9): 'y'}, col)
+            out[name + '_' + col] = rear_bite(B[name], B[name + 'step'], bp, 19, h, {7: "aaaaaayyyk", 8: "aaaaaakyk."})
+        gp = dict(S['PAL']); gp.update(S['RAT_PAL']['gnaw']); gp['r'] = RED
+        gh = rear_head(R['gnaw'], 30, 15, 36, [(33, 1), (36, 2)], {(38, 14): 'Y'}, col)
+        out['gnaw_' + col] = rear_bite(R['gnaw'], R['gnawstep'], gp, 30, gh, {14: "aaaaaadkYYYk"}, lunge=4)
+    return out
 
 def player(S):
     r = S['RAG15']['warrior']; pal = dict(S['RAG15_COMMON']); pal.update(r['c'])
@@ -402,6 +419,10 @@ def rat_draft():
     sheet = Image.new('RGB', (W, H), (24, 22, 28)); y = 0
     for st in strips: sheet.paste(st, (0, y)); y += st.height + 12
     sheet.save(out.replace('.json', '.png')); print('wrote', out)
+
+if __name__ == '__main__' and '--mouths' in sys.argv:
+    S = load_sprites(); d = mouth_compare(S); d['player'] = player(S)
+    json.dump(d, open(os.path.join(ROOT, 'art/drafts/rat-mouths.json'), 'w'), separators=(',', ':')); print('wrote mouths')
 
 if __name__ == '__main__' and '--rats' in sys.argv:
     rat_draft()
