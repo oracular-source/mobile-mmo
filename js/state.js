@@ -7,7 +7,7 @@ const AB=C.abilities;
 const ABI={};AB.forEach(a=>ABI[a.id]=a);
 // Each spell's own cooldown shrinks as you level past the level you learned it, down to a floor.
 const at=(arr,a)=>arr[0]+arr[1]*Math.max(0,player.lvl-(a?a.lvl:0)); // value that grows each level
-const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl)):0;
+const cdFor=a=>a.cd?Math.max(a.cd[1],a.cd[0]-a.cd[2]*Math.max(0,player.lvl-a.lvl))*(1-trickCd(a.id)):0;
 const SLOTS=[['head','Head'],['chest','Chest'],['legs','Legs'],['feet','Feet'],['hands','Hands'],['weapon','Weapon'],['offhand','Off-hand'],['ring','Ring']];
 // Personal loot: only gear your class can use drops for you. Weapons go by weapon type (WPN_OF: a Paladin finds maces), armour by gear group.
 const forMe=id=>{const it=ITEMS[id];if(it.slot==='weapon')return it.wt===WPN_OF[CLS];const c=it.cls;return !c||c===CLS||(c==='caster'&&C.caster)||!!(C.gear&&C.gear.indexOf(c)>=0)};
@@ -43,6 +43,13 @@ const repairCost=()=>{let c=0,any=false;Object.keys(inv.equip).forEach(sl=>{cons
 const lootMem=(function(){const d={first:{},dry:{}};try{const v=store.get(KEY('loot'),null);if(v){d.first=v.first||{};d.dry=v.dry||{}}}catch(e){}return d})();
 const saveLoot=()=>store.set(KEY('loot'),lootMem);
 const spellMult=()=>1+stat('int')*0.02;            // INT: +2% spell damage and healing per point
+// Pink tricks (v0.121): the trick an item does in your hands (weapons by class, named items for everyone), and the ones you're wearing.
+const trickOf=id=>{const t=TRICKS[id];return t?(t[CLS]||t.all||null):null};
+const myTricks=()=>{const out=[];for(const sl in inv.equip){const id=inv.equip[sl],tr=id&&!broken(sl)&&trickOf(id);if(tr)out.push(Object.assign({item:ITEMS[id].name},tr))}return out};
+const wornTrick=key=>myTricks().find(tr=>tr[key]); // e.g. wornTrick('wade') -> the Drowned Prior's Cowl's trick, if worn
+// The trick line on an item card, in pink (for your class; blank if it does nothing in your hands).
+const trickLine=it=>{const id=Object.keys(ITEMS).find(k=>ITEMS[k]===it),tr=id&&trickOf(id);return tr?'<br><span style="color:#ff9de2">'+tr.desc+'</span>':''};
+const trickCd=id=>{const tr=myTricks().find(x=>x.cd&&x.on===id);return tr?tr.cd:0};
 const itemStats=(it,e)=>STAT_KEYS.filter(s=>it[s[0]]).map(s=>(s[0]==='ac'?'AC ':s[1]+' +')+r1(it[s[0]]*enchMul(e))).join(' · ');
 // STA: +3 HP per point. WIS: +3 mana per point.
 // Spirit Ward (Shaman buff): +10% max health.

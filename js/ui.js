@@ -432,13 +432,13 @@ function detailStrip(near){
     const w=inv.wear[sl]||0,e=inv.ench[sl]||0;
     // Enchant button: one orb plus a copper fee that grows with each step; only at a campfire.
     const eb=e>=LOOT.enchMax?'<button disabled>+'+LOOT.enchMax+' (max)</button>':nearFire()?'<button data-act="enchant">Enchant to +'+(e+1)+' · 1 orb + '+LOOT.enchFee[e]+'c</button>':'';
-    return '<b class="'+enchCls(e)+'" style="color:'+RAR[it.rar]+'">'+enchName(it,e)+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span>'+(w?' · <span style="color:'+(w>=100?'#ff6b6b':'#e0b060')+'">'+(w>=100?'broken: no stats until repaired':'condition '+(100-w)+'%')+'</span>':'')+'<br>'+(itemStats(it,e)||'No stats')+
+    return '<b class="'+enchCls(e)+'" style="color:'+RAR[it.rar]+'">'+enchName(it,e)+'</b><br><span class="q">'+nm+' · '+it.rar+' · worn</span>'+(w?' · <span style="color:'+(w>=100?'#ff6b6b':'#e0b060')+'">'+(w>=100?'broken: no stats until repaired':'condition '+(100-w)+'%')+'</span>':'')+'<br>'+(itemStats(it,e)||'No stats')+trickLine(it)+
       (e?' <span class="q">(+'+r1(e*LOOT.enchStep*100)+'%)</span>':'')+(!nearFire()&&e<LOOT.enchMax&&bagCount('orb1')?'<br><span class="q">Enchant it at any campfire.</span>':'')+
       '<div class="acts"><button data-act="unequip">Take off</button>'+eb+'</div>'}
   const b=inv.bags[charSel.bag];if(!b)return '<span class="q">Tap a bag item or a worn slot to see it here.</span>';
   const it=ITEMS[b.id],be=b.e||0;let h='<b class="'+enchCls(be)+'" style="color:'+RAR[it.rar]+'">'+enchName(it,be)+'</b>'+(b.n>1?' ×'+b.n:'')+'<br><span class="q">'+(it.slot?SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar:(it.desc||'Junk'))+' · sells for '+it.value*b.n+'c</span>';
   let move='';
-  if(it.slot){h+='<br>'+(itemStats(it,be)||'No stats');const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]],ce=inv.ench[it.slot]||0;
+  if(it.slot){h+='<br>'+(itemStats(it,be)||'No stats')+trickLine(it);const cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]],ce=inv.ench[it.slot]||0;
     const diffs=STAT_KEYS.map(k=>{const d=r1((it[k[0]]||0)*enchMul(be)-(cur&&cur[k[0]]||0)*enchMul(ce));return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
     h+='<br><span class="q">vs '+(cur?enchName(cur,ce):'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>');
     // Moving an enchant (v0.100): so a new drop never feels like losing your +4. The worn item's steps go onto this one as you equip it.
@@ -529,7 +529,7 @@ $('logclose').addEventListener('pointerdown',e=>{e.preventDefault();toggleLogPan
 function renderChestPick(){const c=run.chest;if(!c||!c.offer)return;
   $('plist').innerHTML=c.offer.map((id,i)=>{const it=ITEMS[id],cur=inv.equip[it.slot]&&ITEMS[inv.equip[it.slot]];
     const diffs=STAT_KEYS.map(k=>{const d=(it[k[0]]||0)-(cur&&cur[k[0]]||0);return d?'<span class="'+(d>0?'up':'down')+'">'+k[1]+' '+(d>0?'+':'')+d+'</span>':''}).filter(Boolean);
-    return '<button data-i="'+i+'"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar+'</span> · '+(itemStats(it)||'No stats')+
+    return '<button data-i="'+i+'"><b style="color:'+RAR[it.rar]+'">'+it.name+'</b><br><span class="q">'+SLOTS.find(x=>x[0]===it.slot)[1]+' · '+it.rar+'</span> · '+(itemStats(it)||'No stats')+trickLine(it)+
       '<br><span class="q">vs '+(cur?cur.name:'nothing worn')+':</span> '+(diffs.join(' · ')||'<span class="q">same</span>')+'</button>'}).join('')}
 $('plist').addEventListener('click',e=>{const b=e.target.closest('button[data-i]'),c=run.chest;if(!b||!c||!c.offer||c.taken)return;
   const id=c.offer[+b.dataset.i];if(!giveItem(id,1,0))return;c.taken=true;lootPillar(c.x,c.y,[id]);saveInv();$('pickUI').style.display='none'});

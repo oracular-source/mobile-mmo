@@ -56,7 +56,7 @@ function wadeDepth(x,y){const SA=slowArea;if(!SA)return 0;const tx=Math.floor(x/
 function moveToward(e,tx,ty,spd,dt){
   const dx=tx-e.x,dy=ty-e.y,d=Math.hypot(dx,dy);if(d<0.5)return true;
   // Flood water (v0.63, Dungeon 1) slows anyone wading it, you, pets and mobs alike; floating things skim over it.
-  const SA=slowArea;if(SA&&!(e.def&&e.def.float)){const sx=Math.floor(e.x/T),sy=Math.floor(e.y/T);if(sx>=0&&sy>=0&&sx<SA.w&&sy<SA.h&&SA.slow[sy*SA.w+sx]&&wadeDepth(e.x,e.y)>0)spd*=WADE}
+  const SA=slowArea;if(SA&&!(e.def&&e.def.float)){const sx=Math.floor(e.x/T),sy=Math.floor(e.y/T);if(sx>=0&&sy>=0&&sx<SA.w&&sy<SA.h&&SA.slow[sy*SA.w+sx]&&wadeDepth(e.x,e.y)>0)spd*=WADE*(e===player?((wornTrick('wade')||{}).wade||1):1)} /* the Drowned Prior's Cowl wades faster */
   const step=Math.min(d,spd*dt),vx=dx/d*step,vy=dy/d*step;
   // Feet, not a point (v0.64, owner: "you can walk through the water a bit"): water you can't wade stops your whole feet,
   // a few pixels either side and in front, so half your body never hangs out over a pond. Only ever stops a move that

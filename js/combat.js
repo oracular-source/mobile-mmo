@@ -96,6 +96,7 @@ const need=L=>NEED[L]||NEED[NEED.length-1];
 function killMob(m,how){ // how 'vanish' = driven off at half health (v0.79: the Prior, the Bellringer)
   if(m.sp.rare)m.sp.up=false; // the rare is gone until a spawn rolls it again
   m.dead=true;m.hp=0;m.sp.timer=m.sp.noRespawn?Infinity:respawnTime(m);m.sp.mob=null;
+  {const tr=how!=='vanish'&&RAT_TYPES.indexOf(m.type)>=0&&wornTrick('rats');if(tr){const h=Math.max(1,Math.round(maxHP(player.lvl)*tr.rats));player.hp=Math.min(maxHP(player.lvl),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2');trickNote(tr,'mends you for '+h+'.')}} // Gnawed Ring
   if(curArea()&&curArea().instance){m.sp.gone=1;namedSeal(m)} // v0.66: stays dead for the rest of the run (back up a floor too); a named can open the way on
   burst(m.x,m.y-6,'#cfc8b2',10,false);if(how!=='vanish')animDeath(m);
   if(how!=='vanish')log('You have slain '+m.def.name+'!','#ffd27a');
@@ -153,6 +154,7 @@ function hurtPlayer(m){
   if(grounds.some(g=>g.sanct&&Math.hypot(player.x-g.x,player.y-g.y)<=g.r))dmg*=grounds.find(g=>g.sanct).sanct; // Sanctuary (Paladin fork)
   dmg*=100/(100+(stat('ac')+C.ac+(player.buffs.ward>0?8:0))*4); // AC from gear (and Warrior plate, and Spirit Ward) softens every hit
   if(player.sit){dmg*=1.25;player.sit=false;log('You stand up.','#9aa')}
+  dmg=scarHide(dmg); // Old Scar's Hide Grips (pink trick)
   dmg=Math.max(1,Math.round(dmg));if(dev.god)dmg=0;
   // Warding Renew (Cleric fork): the next big hit (a tenth of your health or more) is blocked.
   if(player.ward>0&&dmg>=maxHP(player.lvl)*0.1){player.ward=0;floatText(player.x,player.y-20,'WARDED','#fff3c4');log('Your ward blocks '+m.def.name+"'s hit.",'#fff3c4','fight');return}
@@ -284,7 +286,7 @@ function updatePetOne(dt,second){
     if(pt&&!pt.dead&&pt.state==='chase'&&!(pt.mez>0))pet.target=pt;
     else{const m=mobs.filter(m=>!m.dead&&m.state==='chase'&&!(m.mez>0)&&dist(m,player)<90).sort((a,b)=>dist(a,pet)-dist(b,pet))[0];if(m)pet.target=m;}}
   const t=pet.target;
-  if(t){if(dist(pet,t)>12)pathTo(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=(pet.rate||1.8)/(player.buffs.burnout>0?(player.petHaste||1.3):1);burst(t.x,t.y-6,pet.img==='fire'?'#ff9a4a':'#cfc8b2',3);const pd=pet.dmg*rr(0.8,1.2);hitMob(t,pd*(1-t.def.armor),'melee',petName(),'pet');
+  if(t){if(dist(pet,t)>12)pathTo(pet,t.x,t.y,38,dt);else{pet.dir=t.x>pet.x?1:-1;if(pet.atk<=0){pet.atk=(pet.rate||1.8)/(player.buffs.burnout>0?(player.petHaste||1.3):1);burst(t.x,t.y-6,pet.img==='fire'?'#ff9a4a':'#cfc8b2',3);const pd=pet.dmg*rr(0.8,1.2)*(pet.firstHit||1);pet.firstHit=0; /* first hit after a summon (pink trick) */hitMob(t,pd*(1-t.def.armor),'melee',petName(),'pet');
       // Wildfire (Magician fork): during Burnout the pet's hits splash onto mobs near its target.
       if(pet&&player.buffs.burnout>0&&player.petSplash)mobs.filter(o=>o!==t&&!o.dead&&dist(o,t)<=20).forEach(o=>hitMob(o,pd*player.petSplash*(1-o.def.armor),'melee',petName(),'pet'));
       // Wraith (Shadow Knight fork): its hits heal you.
@@ -311,6 +313,7 @@ function petAttack(){
 function petBackOff(){
   if(!pet||player.dead)return;pet.hold=true;pet.target=null;pet.follow=true;if(pet2){pet2.hold=true;pet2.target=null;pet2.follow=true}log('Your '+petName()+' backs off.','#cfc8b2');
 }
+const RAT_TYPES=['rat','crat','trat','brat','palerat','gnaw']; // Gnawed Ring's rats
 const LIFETAP_HEAL=0.85; // Lifetap returns this share of its damage as healing (v0.11.1: was 100%)
 
 /* ---------- Loot ---------- */
@@ -439,6 +442,11 @@ function resistChance(m){const d=m.lv-player.lvl;return Math.max(0.02,Math.min(0
 // Roots, snares and DoTs last longer on lower-level mobs and shorter on higher ones.
 const durMult=m=>Math.max(0.25,Math.min(1.5,1-0.15*(m.lv-player.lvl)));
 function applyAbility(a,t,fromHide){
+  const before={hp:player.hp,x:player.x,y:player.y,pet:pet&&!pet.charm?{x:pet.x,y:pet.y}:null};
+  if(applyAbilityCore(a,t,fromHide)==='miss')return;
+  pinkTricks(a,t,before);
+}
+function applyAbilityCore(a,t,fromHide){
   animPlayer(a,t); // looks only (js/anim.js): the body's attack or cast pose
   const L=player.lvl,mult=(a.melee?meleeMult():spellMult())*(a.melee&&player.buffs.stance>0&&player.stanceHit?player.stanceHit:1);
   if(a.hpCost){const c=Math.round(maxHP(L)*a.hpCost);player.hp=Math.max(1,player.hp-c);floatText(player.x,player.y-20,'-'+c,'#a3252f');log(a.name+' costs you '+c+' health.','#c87a80')}
@@ -447,7 +455,7 @@ function applyAbility(a,t,fromHide){
   if(a.kind==='backstab'&&t&&t.lost>0)fromHide=true;
   if(a.tgt&&a.kind!=='taunt'&&!a.sure&&!(a.kind==='backstab'&&fromHide)&&rng()<resistChance(t)){
     floatText(t.x,t.y-18,a.melee?'MISS':'RESIST',a.melee?'#cfd6e0':'#c8a0ff');
-    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff',a.melee?'fight':'main');engage(t);return;}
+    log(a.melee?'You miss '+t.def.name+' with '+a.name+'.':cap(t.def.name)+' resists your '+a.name+'!',a.melee?'#9aa':'#c8a0ff',a.melee?'fight':'main');engage(t);return 'miss';}
   if(a.kind==='nuke'||a.kind==='stun'){
     if(a.dash)dashTo(t); // Monk's Flying Kick: leap in first
     // Crane Kick (Monk fork): the landing stuns every mob around you. Tiger Leap: the kick comes back if this mob dies soon.
@@ -603,6 +611,47 @@ function applyAbility(a,t,fromHide){
     if(a.healPct)healed+=dealt*a.healPct; // Crusader Strike (Paladin fork)
     if(healed>0){const h=Math.round(healed);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x,player.y-22,'+'+h,'#b48cff')}}
 }
+
+// Pink tricks (v0.121, Items lane): small extras from worn pinks (TRICKS in items.js), after an ability lands. Nothing here runs
+// unless you're wearing the item, so the sim (which fights without gear) is untouched.
+const trickNote=(tr,msg)=>{if(!logMute)log('Your '+tr.item+' '+msg,'#ff9de2','fight')};
+const trickSpark=(x,y)=>burst(x,y-8,'#ff9de2',6,true);
+const trickDot=(m,spec,name)=>{if(!m||m.dead)return;m.dots=m.dots.filter(d=>d.id!=='trick');m.dots.push({id:'trick',name:name,t:spec[2],next:1,dmg:(spec[0]+spec[1]*player.lvl)*spellMult()})};
+function pinkTricks(a,t,before){
+  const L=player.lvl,all=myTricks();if(!all.length)return;
+  // Greyfang's Tooth: your first hit on each mob bites a little extra.
+  const tooth=all.find(x=>x.firstHit);if(tooth&&t&&!t.dead&&a.tgt&&!t.bitten&&t.kind!=='pet'){t.bitten=1;hitMob(t,tooth.firstHit,'direct',tooth.item);trickSpark(t.x,t.y)}
+  all.filter(tr=>tr.on&&(tr.on===a.id||(Array.isArray(tr.on)&&tr.on.indexOf(a.id)>=0))).forEach(tr=>{
+    if(tr.dur){ // a little longer: whatever timer this ability set
+      if(a.kind==='root'&&t&&t.root>0)t.root+=tr.dur;
+      else if(a.kind==='stun'&&t&&t.stun>0&&(!tr.undead||isUndead(t)))t.stun+=tr.dur;
+      else if(a.kind==='mez'&&t&&t.mez>0)t.mez+=tr.dur;
+      else if(a.kind==='snare'&&t&&t.snare>0){t.snare+=tr.dur;if(t.aslow>0)t.aslow+=tr.dur}
+      else if(a.kind==='slow'&&t&&t.aslow>0)t.aslow+=tr.dur;
+      else if(a.kind==='decoy'&&decoy)decoy.t+=tr.dur;
+      else if(a.kind==='ground'&&grounds.length)grounds[grounds.length-1].t+=tr.dur;
+      else return;
+      if(t)trickSpark(t.x,t.y);}
+    if(tr.heal){const h=Math.max(1,Math.round(maxHP(L)*tr.heal));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2');trickSpark(player.x,player.y);trickNote(tr,'mends you for '+h+'.')}
+    if(tr.mana){const g=Math.max(1,Math.round(maxMP(L)*tr.mana));player.mp=Math.min(maxMP(L),player.mp+g);floatText(player.x+6,player.y-30,'+'+g+' mana','#ff9de2');trickSpark(player.x,player.y)}
+    if(tr.taunt&&t&&!t.dead){t.threat.p=Math.max(t.threat.p,t.threat.pet+40);engage(t);floatText(t.x,t.y-26,'TAUNT','#ff9de2')}
+    if(tr.share&&pet&&!pet.charm){const h=Math.round(Math.max(0,player.hp-before.hp)*tr.share);if(h>0){pet.hp=Math.min(pet.maxhp,pet.hp+h);floatText(pet.x,pet.y-20,'+'+h,'#ff9de2')}}
+    if(tr.holy){const near=mobs.filter(m=>!m.dead&&isUndead(m)&&m.state==='chase'&&dist(m,player)<=40);near.forEach(m=>{hitMob(m,tr.holy,'holy',tr.item);trickSpark(m.x,m.y)})}
+    if(tr.petFirst&&pet)pet.firstHit=tr.petFirst;
+    if(tr.dot&&t)trickDot(t,tr.dot,tr.item);
+    if(tr.healPer){const n=mobs.filter(m=>dist(m,player)<=(a.radius||20)&&(m.dead?m.hp<=0:true)&&m.state==='chase').length;if(n){const h=Math.max(1,Math.round(maxHP(L)*tr.healPer*n));player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2');trickSpark(player.x,player.y)}}
+    if(tr.frost){mobs.filter(m=>!m.dead&&Math.hypot(m.x-before.x,m.y-before.y)<=20).forEach(m=>{m.snare=Math.max(m.snare||0,tr.frost*durMult(m));floatText(m.x,m.y-24,'chilled','#bfe6ff')});burst(before.x,before.y-6,'#bfe6ff',10,true)}
+    if(tr.embers&&before.pet){mobs.filter(m=>!m.dead&&Math.hypot(m.x-before.pet.x,m.y-before.pet.y)<=(a.radius||30)).forEach(m=>trickDot(m,tr.embers,tr.item))}
+    if(tr.trap2&&traps.length){const o=traps[traps.length-1];traps.push(Object.assign({},o,{dmg:o.dmg*tr.trap2,bleed:o.bleed*tr.trap2}))}
+    if(tr.knock&&t&&!t.dead&&!t.def.boss)knockBack(t,tr.knock);
+    if(tr.refund&&a.hpCost){const h=Math.round(maxHP(L)*a.hpCost*tr.refund);player.hp=Math.min(maxHP(L),player.hp+h);floatText(player.x+6,player.y-30,'+'+h,'#ff9de2')}
+  });
+}
+// Old Scar's Hide Grips: once a minute, a hit that drops you under a quarter health hardens your hide for 5 seconds (10% less damage).
+function scarHide(dmg){const tr=wornTrick('hide');if(!tr)return dmg;
+  if(player.hideT>0)return dmg*(1-tr.hide);
+  if((player.hideCd||0)<=time&&player.hp-dmg<maxHP(player.lvl)*0.25&&player.hp-dmg>0){player.hideT=5;player.hideCd=time+60;trickSpark(player.x,player.y);trickNote(tr,'hardens: you take less damage for a moment.');return dmg*(1-tr.hide)}
+  return dmg}
 
 // Cleric's twist: holy power from a heal burns every undead fighting near you.
 // Radiant Renew (fork): "all" is the share that also burns mobs that aren't undead.

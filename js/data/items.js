@@ -170,6 +170,46 @@ const ITEMS={
   malrapier:{name:"Malrec's Vesper Rapier",slot:'weapon',rar:'named',value:200,cls:'bard',wt:'rapier',look:4,str:7,sta:3,wis:1}
 };
 // Which mobs drop which summon key, by area (zone id -> mob type -> key). One in KEY_CHANCE kills drops one.
+// Pink tricks (v0.121, Items lane, owner Nov 27): each pink does one small thing on top of its stats. Tiny on purpose in Zone 1,
+// and one of a kind: later items never repeat a trick, and a trick never shrinks as stats fade, so an old pink can still earn a
+// slot in a build later (situational ones shine in zones built around them). Weapons: a trick per class holding it. Named: 'all'.
+// on = ability id it rides on; dur = seconds added to what it does; heal / mana = share of your max; cd = cooldown share off;
+// share = share of your heal that also goes to your pet; dot = [damage per tick at level 1, + per level, ticks]; more in combat.js.
+const TRICKS={
+  b1crook:{druid:{on:'root',heal:0.02,desc:'Rootgrip gives a little back: you heal 2% of your health.'}},
+  b1blade:{warrior:{on:'bash',taunt:1,desc:'Shield Bash also taunts: the mob turns to you.'},
+    shadowknight:{on:'siphon',share:0.25,desc:'Siphon also heals your minion for a quarter of what it heals you.'}},
+  b1dagger:{rogue:{on:'gouge',dur:0.5,desc:'Gouge lasts half a second longer.'}},
+  b1staff:{necro:{on:'raise',cd:0.1,desc:'Raise Bones comes back 10% sooner.'},wizard:{on:'freeze',dur:0.5,desc:'Freeze lasts half a second longer.'}},
+  b1mace:{cleric:{on:['mheal','gheal','renew'],holy:3,desc:'Your heals spark 3 holy damage onto undead near you.'},
+    paladin:{on:'hbash',dur:0.5,undead:1,desc:'Holy Bash stuns undead half a second longer.'}},
+  b1scepter:{enchanter:{on:'mez',dur:1,desc:'Mesmerize lasts 1 second longer.'},
+    magician:{on:['earth','fire'],petFirst:1.25,desc:"Your elemental's first hit after you summon it lands 25% harder."}},
+  b1bow:{ranger:{on:'ensnare',dur:1,desc:'Ensnaring Shot lasts 1 second longer.'}},
+  b1fists:{monk:{on:'mfeign',heal:0.03,desc:'Feign Death heals you 3% of your health.'}},
+  b1spear:{shaman:{on:'drowsy',dur:1,desc:'Drowsy lasts 1 second longer.'}},
+  b1rapier:{bard:{on:'lullaby',dur:1,desc:'Lullaby lasts 1 second longer.'}},
+  malcrook:{druid:{on:'snare',dot:[1.5,0.15,4],desc:'Tanglefoot also pricks: a tiny thorn tick each second for 4 seconds.'}},
+  malaxe:{warrior:{on:'cleave',healPer:0.01,desc:'Cleave heals you 1% of your health for each mob it hits.'},
+    shadowknight:{on:'harm',cd:0.1,desc:'Harm Touch comes back 10% sooner.'}},
+  malknife:{rogue:{on:'evade',heal:0.03,desc:'Evade heals you 3% of your health.'}},
+  malstaff:{necro:{on:'tap',share:0.25,desc:'Lifetap also heals your skeleton for a quarter of what it heals you.'},
+    wizard:{on:'blink',frost:1.5,desc:'Blink leaves a puff of frost where you stood: mobs in it are slowed for a moment.'}},
+  malmace:{cleric:{on:'turn',dot:[1.5,0.15,3],desc:'Undead fleeing your Turn Undead smoulder: a tiny burn for 3 seconds.'},
+    paladin:{on:'consec',dur:1,desc:'Consecrate burns 1 second longer.'}},
+  malscepter:{enchanter:{on:'phantasm',dur:1,desc:'Phantasm lasts 1 second longer.'},
+    magician:{on:'detonate',embers:[1.5,0.15,2],desc:'Detonate leaves embers that burn mobs it hit for 2 seconds.'}},
+  malbow:{ranger:{on:'trap',trap2:0.5,desc:'Spike Trap snaps twice: a second, smaller spike.'}},
+  malwraps:{monk:{on:'fkick',knock:8,desc:'Flying Kick knocks the mob back a step.'}},
+  malspear:{shaman:{on:'canni',refund:0.15,desc:'Cannibalize costs a little less health.'}},
+  malrapier:{bard:{on:'crescendo',mana:0.03,desc:'Crescendo gives back 3% of your mana.'}},
+  gnawring:{all:{rats:0.02,desc:'Killing a rat heals you 2% of your health.'}},
+  fangring:{all:{firstHit:3,desc:'Your first spell or strike on a mob bites for 3 extra damage.'}},
+  fangruff:{all:{noFlee:1,desc:"Hurt wolves can't run from you."}},
+  scarhands:{all:{hide:0.1,desc:'Thick hide: once a minute, a hit that drops you under a quarter health makes you take 10% less damage for 5 seconds.'}},
+  priorcowl:{all:{wade:1.1,desc:'You wade through water 10% faster.'}},
+  bellband:{all:{stun:0.8,desc:'Stuns on you wear off 20% sooner.'}}
+};
 // Which weapon type each class fights with (owner, Nov 27). Weapons drop for your weapon type, armour for your gear group.
 // The Monk's hand wraps never show on the character. The scythe is saved for a special drop later.
 const WPN_OF={wizard:'staff',necro:'staff',magician:'scepter',enchanter:'scepter',druid:'crook',shaman:'spear',warrior:'sword',

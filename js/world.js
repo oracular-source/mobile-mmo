@@ -314,6 +314,7 @@ function walkRoute(m,dt){const R=m.sp.route;if(m.ri===undefined){m.ri=0;m.stuck=
 // A snare slows the run; a root stops it.
 const FLEE_TIME=4;
 function wolfFlee(m,dt,spd){
+  if(!m.fled&&wornTrick('noFlee'))return false; // Greyfang's Ruff: hurt wolves can't run from you (pink trick)
   if(!m.fled&&m.hp<=m.maxhp*m.def.flee){m.fled=true;m.fleeT=FLEE_TIME;floatText(m.x,m.y-20,'flees!','#ffb37a');log(cap(m.def.name)+' turns tail and runs!','#ffb37a')}
   if(!(m.fleeT>0))return false;
   m.fleeT-=dt;
@@ -526,7 +527,7 @@ function tollRing(m){const d=dist(m,player);
   // The bell's ring knocks the hands back down (finale: the safe spot is mid range, slowed but not stunned).
   for(let i=hands.length-1;i>=0;i--)hands.splice(i,1);player.mireT=0;
   if(player.dead)return;
-  if(d<=TOLL.stunR){const s=TOLL.stunMax-(TOLL.stunMax-TOLL.stunMin)*(d/TOLL.stunR);player.stunT=s;player.cast=null;
+  if(d<=TOLL.stunR){const s=(TOLL.stunMax-(TOLL.stunMax-TOLL.stunMin)*(d/TOLL.stunR))*((wornTrick('stun')||{}).stun||1); /* Bellringer's Band */player.stunT=s;player.cast=null;
     floatText(player.x,player.y-28,'STUNNED','#ffd27a',true);log('The toll rings through your skull! You are stunned ('+s.toFixed(1)+' s).','#ffd27a');mobSpellHit(m,(m.def.dmg+m.def.dmgl*m.lv)*TOLL.x*finX(m),'Toll','#ffd27a')}
   else if(d<=TOLL.slowR){const f=1-(d-TOLL.stunR)/(TOLL.slowR-TOLL.stunR);player.tollX=1-TOLL.slowMax*f;player.tollT=TOLL.slow;
     floatText(player.x,player.y-28,'SLOWED','#e8dcc0',true);log('The toll booms through the room and your legs go heavy.','#e8dcc0')}

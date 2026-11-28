@@ -14,7 +14,8 @@ function update(dt){
     if(keys.w||keys.arrowup)my-=1;if(keys.s||keys.arrowdown)my+=1;if(keys.a||keys.arrowleft)mx-=1;if(keys.d||keys.arrowright)mx+=1;
     // Held by Grasp of the Deep or stunned by the Toll (v0.63): no walking until it wears off.
     if(player.mireT>0)player.mireT=Math.max(0,player.mireT-dt); // the Drowned Prior's grip (v0.66): slowed, not held
-    if(player.tollT>0)player.tollT=Math.max(0,player.tollT-dt); // the Toll's slow further out (v0.79)
+    if(player.tollT>0)player.tollT=Math.max(0,player.tollT-dt);
+    if(player.hideT>0)player.hideT=Math.max(0,player.hideT-dt); // Old Scar's Hide Grips (pink trick) // the Toll's slow further out (v0.79)
     if(player.held>0||player.stunT>0){player.held=Math.max(0,(player.held||0)-dt);player.stunT=Math.max(0,(player.stunT||0)-dt);mx=0;my=0;player.tx=null}
     const steering=mx!==0||my!==0;if(steering)player.lastMove={x:mx,y:my}; // which way you were heading when you took an exit
     if(player.fd>0){player.fd-=dt;if(steering||player.tx!==null){player.fd=0;log('You get back up.','#9aa')}
