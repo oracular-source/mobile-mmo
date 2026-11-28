@@ -115,7 +115,7 @@ def missing(cls,i):
     rows,p,_,_,_=B[cls][i];pal={**C,**p}
     return sorted({c for r in rows for c in r if c!='.' and c not in pal})
 
-if __name__=='__main__':
+if __name__=='__main__' and len(sys.argv)==1:
     os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
     for cls in B:
         for i in range(6):
@@ -141,3 +141,61 @@ if __name__=='__main__':
             g.alpha_composite(im,(10+i*26*S+(26*S-17*S)//2-L*S,5+row*30*S+30*S-6-feet*S))
     g.save('art/drafts/look-ladder-draft1-game.png')
     print('ok')
+
+# ---------- Draft 2 (owner, Nov 27): more small steps in between before anything gets grand (e.g. a bobble on the
+# Wizard's hat), so the ladder can stretch further. 10 steps: today, then 7 small steps, then the two grand ones last.
+# Run: python3 tools/look_ladder_draft.py 2 -> art/drafts/look-ladder-draft2.png (+ -game.png)
+def ed(rows,changes):
+    g=[list(r.ljust(17,'.')) for r in rows]
+    for y,x,c in changes:g[y][x]=c
+    return [''.join(r) for r in g]
+def drop(rows,letters):return [''.join('.' if c in letters else c for c in r) for r in rows]
+POM=[(2,9,'P'),(2,10,'P'),(3,9,'P'),(3,10,'p')]          # a cream bobble hanging off the hat's tip
+BELT=[(13,5,'L'),(13,6,'L'),(13,8,'b'),(13,9,'L'),(13,10,'L')]  # leather belt and buckle instead of the rope
+COLLAR=[(10,4,'D'),(10,11,'D')]
+LB={'P':'#d6d0be','p':'#a8a08a','L':'#5a3e26','b':'#b08a3a'}
+zs=[base,base,ed(base,POM+BELT),ed(z2,POM+BELT),ed(z2,POM+BELT+COLLAR),
+    ed(z3,[(1,9,'P'),(1,10,'P'),(2,9,'P'),(2,10,'p')]),
+    ed(z3,[(1,9,'P'),(1,10,'P'),(2,9,'P'),(2,10,'p'),(7,5,'F'),(6,5,'F'),(5,4,'f'),(4,4,'f'),(15,5,'D'),(16,6,'D')]),
+    drop(ed(z4,[(5,9,'D')]),'UV'),z4,z5]
+zp=[ZP[0],ZP[1],{**ZP[1],**LB},{**ZP[2],**LB},{**ZP[2],**LB},{**ZP[3],**LB},{**ZP[3],**LB,'F':'#c8b48a','f':'#e8dcc0'},
+    ZP[4],{**ZP[4],'D':'#d4ad3a'},ZP[5]]
+STUD=[(11,11,'C'),(12,11,'C'),(12,2,'z'),(12,3,'z'),(12,5,'z'),(10,7,'z'),(10,9,'z')]   # leather bracer, studs, iron band on the shield
+w2b=ed(w1,STUD)
+TABARD=[(10,7,'u'),(10,8,'U'),(11,7,'u'),(11,8,'U'),(12,7,'u'),(12,8,'U'),(10,11,'C'),(9,11,'C')]
+w4b=ed(w2,TABARD)
+w6=ed(w3,[(2,8,'F'),(3,8,'F'),(2,9,'f')])
+ws=[B['warrior'][0][0],w1,w2b,w2,w4b,w3,w6,drop(w4,'UV'),w4,w5]
+wp=[WP[0],WP[1],{**WP[1],'z':'#8d8692','C':'#563a22'},WP[2],{**WP[2],'C':'#563a22'},WP[3],{**WP[3],'F':'#c03030','f':'#7a1a1a'},
+    WP[4],WP[4],WP[5]]
+TIERS=[1,2,3,4,4,5,5,6,6,7]
+STEPS2=['Rags','Zone 1 · a','Zone 1 · b','Zone 1 · c','Zone 2 · a','Zone 2 · b','Zone 3','Later zones','End of launch','Expansions']
+NOTE2={'wizard':['Today','Blue dye','Hat bobble, leather belt','Cream trim, hat band','Small collar','Mantle, taller hat','Feather, star stitching',
+  'Hooded mantle, gold trim','Cape on the back','Tall glowing hat'],
+ 'warrior':['Today','Leather cap and jerkin','Studs, bracer, banded shield','Iron cap, mail','Red tabard, leather shoulder','Open helm, pauldrons, breastplate',
+  'Small red plume','Closed helm, crest, gold trim','Cape on the back','Winged helm, silver and gold']}
+def B2(cls):
+    rows,pals=(zs,zp) if cls=='wizard' else (ws,wp);g=ZG if cls=='wizard' else WG
+    return [(rows[i],pals[i],g,min(TIERS[i],5 if cls=='warrior' else 4),TIERS[i]) for i in range(10)]
+if __name__=='__main__' and len(sys.argv)>1 and sys.argv[1]=='2':
+    os.chdir(os.path.join(os.path.dirname(os.path.abspath(__file__)),'..'))
+    B['wizard']=B2('wizard');B['warrior']=B2('warrior')
+    for cls in B:
+        for i in range(10):
+            m=missing(cls,i)
+            if m:print('missing colours',cls,i,m)
+    S=6;BG=(52,62,40,255);cw=24*S;rh=30*S;top=40;n=10
+    f=ImageFont.truetype('/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf',15)
+    sh=Image.new('RGBA',(n*cw+20,top+2*rh+20),BG);d=ImageDraw.Draw(sh)
+    for i in range(n):d.text((10+i*cw+6,12),STEPS2[i],font=f,fill=(255,210,122))
+    for row,cls in enumerate(('wizard','warrior')):
+        for i in range(n):
+            im,L,feet=picture(cls,i);im=im.resize((im.width*S,im.height*S),Image.NEAREST)
+            sh.alpha_composite(im,(10+i*cw+(cw-17*S)//2-L*S+S,top+row*rh+rh-14-feet*S))
+    sh.save('art/drafts/look-ladder-draft2.png')
+    S=3;g=Image.new('RGBA',(n*24*S+20,2*30*S+10),BG)
+    for row,cls in enumerate(('wizard','warrior')):
+        for i in range(n):
+            im,L,feet=picture(cls,i);im=im.resize((im.width*S,im.height*S),Image.NEAREST)
+            g.alpha_composite(im,(10+i*24*S+(24*S-17*S)//2-L*S,5+row*30*S+30*S-6-feet*S))
+    g.save('art/drafts/look-ladder-draft2-game.png');print('ok2')
