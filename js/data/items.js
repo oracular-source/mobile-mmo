@@ -238,7 +238,7 @@ const KEY_CHANCE=0.1;
 // Hidden chests (v0.32): each opening rolls one piece of gear your class can use. Chance of uncommon and rare by area (the rest is common), plus copper.
 // Deeper areas pay better. An opened chest fills again after CHEST_REFILL seconds.
 const CHEST_ODDS={crossroads:{unc:0.3,rare:0,cu:5},rat_tunnel:{unc:0.5,rare:0.05,cu:10},graveyard:{unc:0.55,rare:0.08,cu:14},crypt:{unc:0.6,rare:0.12,cu:16},wolfwood:{unc:0.6,rare:0.12,cu:20},chapel:{unc:0.65,rare:0.15,cu:26},dungeon1:{unc:0.75,rare:0.25,cu:34}};
-const CHEST_REFILL=3600; // seconds; v0.146 (owner, Nov 27): an hour, was 10 min. The climb sim found chests out-dropping every mob combined
+const CHEST_REFILL=1200; // seconds; v0.154 (owner, Nov 28): 20 min. v0.146 made it an hour (was 10 min); owner wants players decked out and is fine with chest farming
 // Loot feel (v0.97, Items lane, owner Nov 27): fewer drops so each one counts. Normal mobs drop gear rarely (about 1 kill in 30),
 // blues are a highlight, pinks (named items) only come from named and bosses, about 1 in 10 kills, and creep up each kill without one.
 const LOOT={
