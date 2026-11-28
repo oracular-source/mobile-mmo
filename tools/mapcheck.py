@@ -266,7 +266,7 @@ OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030'
            'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'hill_face': '#5a5a55', 'lean_to': '#6a5034', 'firepit': '#3a3430',
            'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038',
            'chapel': '#6a6672', 'fallen_bell': '#a08a50', 'ash_circle': '#2a2624', 'shrine': '#7a7480', 'censer': '#ffb060', 'hung_censer': '#ffb060',
-           'banner': '#3a1418', 'bedroll': '#6a5a48', 'cot': '#8a6a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030',
+           'banner': '#3a1418', 'bedroll': '#6a5a48', 'cot': '#8a6a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030', 'forge': '#7a3a20', 'bank': '#6a6a80', 'townhouse': '#5a4a3a', 'wizard_tower': '#4a3a7a', 'orb_stand': '#9fd8ff', 'gem_table': '#3a8a8a',
            'well': '#6a6672', 'book_pyre': '#ff8a3c', 'torn_banner': '#c8c0b0', 'pack': '#7a5a3a', 'altar': '#8a8494',
            'window': '#ffcf6a', 'table': '#5a4230', 'cage': '#4a4652', 'bell_mold': '#6a5a40'}
 
