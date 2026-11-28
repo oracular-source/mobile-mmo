@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gear look ladder</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Pixelify+Sans:wght@600&family=Inter:wght@400;600&display=swap">
+<style>
+/* VOICE: a quiet design review, plain words, owner decides.
+   IDEA: a character sheet pinned on the studio wall, rags to legend left to right.
+   PICTURE: the ladder itself, big, pixel-crisp.
+   COLOUR and TYPE: the game's mossy dark green ground, parchment text, ember gold for steps; Pixelify Sans titles, Inter body.
+   LAYOUT: one column for a phone; ladder first, then step notes, then questions. */
+:root{color-scheme:dark;--bg:#2b3322;--card:#343e28;--ink:#ece4cf;--dim:#b8b29c;--gold:#ffd27a;--line:#4a5638}
+*{box-sizing:border-box;min-width:0}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 Inter,system-ui,sans-serif;overflow-x:clip}
+.band{padding:clamp(20px,4vw,48px) max(5vw,14px);max-width:1040px;margin:auto}
+h1{font:600 clamp(30px,6vw,44px)/1.05 'Pixelify Sans',Inter,sans-serif;margin:0 0 8px;color:var(--gold);text-wrap:balance}
+h2{font:600 24px/1.2 'Pixelify Sans',Inter,sans-serif;margin:28px 0 10px;color:var(--gold)}
+p{margin:0 0 12px;max-width:66ch}.dim{color:var(--dim);font-size:14px}
+.scroll{overflow-x:auto;scroll-snap-type:x mandatory;border:1px solid var(--line);border-radius:10px;background:#343e28}
+.scroll img{display:block;image-rendering:pixelated;height:auto}
+.big{width:956px;max-width:none}
+.game{width:488px;max-width:100%}
+table{border-collapse:collapse;width:100%;font-size:15px}
+th,td{text-align:left;vertical-align:top;padding:8px 10px;border-bottom:1px solid var(--line)}
+th{color:var(--gold);font-weight:600}
+td:first-child{white-space:nowrap;font-weight:600}
+ol li{margin-bottom:12px;max-width:66ch}
+b{color:var(--gold);font-weight:600}
+@media(max-width:600px){table{font-size:13px}.stack thead{display:none}.stack tr{display:grid;padding-block:10px}.stack td{display:flow-root;border:0;padding:3px 0;padding-inline-start:8em;text-align:start}.stack td::before{content:attr(data-l);float:inline-start;width:7.5em;margin-inline-start:-8em;white-space:normal;color:var(--dim)}.stack td:empty{display:none}}
+</style><script>new MutationObserver(()=>{for(const c of document.querySelectorAll('.stack td:not([data-l])')){let i=0,p=c;while(p=p.previousElementSibling)i+=p.colSpan;c.dataset.l=c.closest('table').rows[0].cells[i]?.textContent||''}}).observe(document,{childList:true,subtree:true})</script></head><body>
+<div class="band">
+<h1>Gear look ladder, draft 1</h1>
+<p>Wizard (robe) and Warrior (plate) with their weapons, from today's rags to the far future in 6 steps. Shown 6×; swipe sideways on a phone. The body stays 15 × 18 everywhere: gear grows the outline from Zone 2 on.</p>
+<div class="scroll"><img class="big" src="look-ladder-draft1.png" alt="Wizard and Warrior in 6 gear steps, rags to endgame"></div>
+<p class="dim" style="margin-top:8px">First column is the game today.</p>
+
+<h2>At game size</h2>
+<p>About how big they read on the phone (3×).</p>
+<div class="scroll"><img class="game" src="look-ladder-draft1-game.png" alt="The same 12 looks at near game size"></div>
+
+<h2>What changes at each step</h2>
+<table class="stack"><thead><tr><th>Step</th><th>Wizard</th><th>Warrior</th><th>Weapon</th></tr></thead><tbody>
+<tr><td>Rags (today)</td><td>Grey robe.</td><td>Red bandana, cloth tunic, plank shield.</td><td>Look 1, plain.</td></tr>
+<tr><td>Zone 1 early</td><td>Robe dyed the class blue. Same shape.</td><td>Leather cap, laced leather jerkin. Same shape.</td><td>Look 2.</td></tr>
+<tr><td>Zone 1 end (Malrec)</td><td>Cream trim down the front and hem, a band on the hat.</td><td>Iron cap with a nose guard, mail shirt over the red tunic.</td><td>Look 4: the biggest weapon shape already.</td></tr>
+<tr><td>Zone 2 (the Mire)</td><td>First shape change: short mantle over the shoulders, hat 1 pixel taller with a wider brim.</td><td>First shape change: open steel helm, pauldrons, breastplate, iron-rimmed shield.</td><td>Look 5: same size, new metal.</td></tr>
+<tr><td>End of launch</td><td>Hooded cape on the back, gold trim, a star on the hat.</td><td>Closed helm with a red crest, bigger pauldrons, gold trim, crimson shield, cape.</td><td>Look 6: same size, gold metal.</td></tr>
+<tr><td>Expansions</td><td>Tall hat with a glowing band and runes, high collar, long flared robe, gold-edged cape.</td><td>Winged helm, silver plate with gold, kite shield with a glowing crest, cape to the ground.</td><td>Look 7: pale steel and a faint glow (glow only here).</td></tr>
+</tbody></table>
+
+<h2>Questions for you</h2>
+<ol>
+<li><b>Overall range.</b> Is Zone 1 small enough, and is the far end grand enough? Anything you'd push further or pull back?</li>
+<li><b>Weapons get there faster than armour.</b> Today's weapon ladder reaches its biggest shape (look 4) by Malrec, while armour is still only colour and trim. A: keep it (weapons are the first thing you notice). B: Zone 1 tops out at look 3, and look 4's shape arrives in Zone 2 with the first armour shape change.</li>
+<li><b>Warrior in Zone 1:</b> leather, then mail, and real plate only from Zone 2. OK, or should a plate class show steel sooner?</li>
+<li><b>Shields.</b> I drew the shield changing too (iron rim in Zone 2, crimson in Zone 3, kite shield late). Should the shield follow the gear like this, or stay the same?</li>
+<li><b>Capes</b> arrive at the end of launch for both. Earlier, later, or fine?</li>
+</ol>
+<p class="dim">Next after your notes: draw Zone 1's small steps (chest and head) for all 14 classes on one review page, then build them into the game.</p>
+</div>
+</body></html>
