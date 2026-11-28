@@ -62,7 +62,17 @@ function bonesDraw(f){const im=f.img,dirIm=f.dir<0?im.f:im.c,H=f.H,sc=f.sc,fade=
 // animations, owner Nov 27.)
 // Which attack frame to draw (MOB_POSES in sprites.js), or null for the normal sprite: the wind-up in the moment
 // before the hit lands (m.atk counts down to it), then smear, hit (held) and recover after it.
-function poseFrame(m){const P=MOB_POSE_IMG[m.def.img];if(!P||m.casting)return null;const t=P.t;
+// Cast poses (v0.147, owner OK'd draft 1): while a cast bar fills the caster holds its pose and the glow builds a step at a
+// time; when the spell goes off (castPlay) the release frames play once. Instant moves (chant, flare, Ember Brand) play
+// their whole move through castPlay. Looks only.
+function castKind(c){return c.heal?'heal':c.grasp?'grasp':c.toll?'toll':c.bone?null:'bolt'}
+function castPlay(m,kind){if(logMute)return;const C=MOB_CAST_IMG[m.def.img];if(C&&C[kind]){m.cpK=kind;m.cpAt=time}}
+function castFrame(m){const C=MOB_CAST_IMG[m.def.img];if(!C)return null;
+  if(m.casting){const k=castKind(m.casting),A=k&&C[k];if(!A||!A.h.length)return null;m.cpK=null;
+    return A.h[Math.min(A.h.length-1,Math.floor(m.casting.t/m.casting.dur*A.h.length))]}
+  if(m.cpK){const A=C[m.cpK];let e=time-m.cpAt;for(let i=0;i<A.r.length;i++){if(e<A.rt[i])return A.r[i];e-=A.rt[i]}m.cpK=null}
+  return null}
+function poseFrame(m){const cf=castFrame(m);if(cf)return cf;const P=MOB_POSE_IMG[m.def.img];if(!P||m.casting)return null;const t=P.t;
   if(m.swT>0){const e=(m.swDur||0)-m.swT;return e<t[1]?P.smear:e<t[1]+t[2]?P.hit:P.rec}
   if(m.def.charge&&m.wind>0)return P.wind; // the boar lowering its head before a charge shows its head-down frame
   if(m.near>0&&m.atk>0&&m.atk<t[0]&&m.aimX!==undefined)return P.wind;

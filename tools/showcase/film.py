@@ -38,6 +38,13 @@ for _k,_r in {'cultdeath1':0.0,'cultdeath2':0.5,'cultdeath3':0.9}.items():
   SETUP[_k]=("const m=G.mobs.find(m=>m.type==='zealot'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+22;P.y=m.y-3;m.state='idle';"
     "W.at=8;W.act=()=>{const R=Math.random;Math.random=()=>%s;killMob(m);Math.random=R};W.n=80;W.god=1;")%_r
   AREA[_k]='chapel'
+# Cast poses (v0.147): the ashcaller's Ash Bolt from range, and the Bellringer heaving and slamming the clapper.
+SETUP['ashcast']=("const m=G.mobs.find(m=>m.type==='ashcaller'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+56;P.y=m.y-2;m.state='chase';"
+  "m.threat={p:999,pet:0};m.root=99;m.atk=99;m.bolt=0.1;W.focus={x:m.x+28,y:m.y-6};W.n=66;W.god=1;")
+AREA['ashcast']='chapel'
+SETUP['toll']=("const m=G.mobs.find(m=>m.type==='bellringer'&&!m.dead);G.mobs.forEach(o=>{if(o!==m)o.dead=true});P.x=m.x+34;P.y=m.y-2;m.state='chase';"
+  "m.threat={p:999,pet:0};m.root=99;m.atk=99;m.tollCd=0.1;W.focus={x:m.x+17,y:m.y-6};W.n=80;W.god=1;")
+AREA['toll']='dungeon1_f2'
 async def main(scene):
   os.makedirs('/tmp/film',exist_ok=True)
   async with async_playwright() as p:

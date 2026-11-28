@@ -233,6 +233,14 @@ Minimal EverQuest-style until the theme is decided; every screen part uses one l
 - **Light comes from the world, not the player (owner, Nov 21; v0.72):** your character carries no light. A spot too dark to read gets a light source that belongs there (candle, brazier, lit window, lantern, a crack of daylight), placed where someone would really put it or where light would really fall, never a glow on the player. **How it's drawn:** lights are entries in the area's `lights` (radius `r`, warm amount `w`, cold amount `c`) cut out of the area's ambient darkness (`AREA_TINT`); keep the ambient high enough that you and mobs still read between lights. `PLAYER_LIGHT` in `js/render.js` (radius 95) is the off switch, kept only for testing.
 - Effects (fog, rain, ash) never hide a mob or the target ring for long.
 
+### Mob cast poses (v0.147, owner OK'd draft 1, Nov 27)
+- **Every caster holds a pose for the whole cast** and the light builds as the bar fills, in **four steps** (a spark, a small cross, a 5-pixel glow, a 6-pixel glow with a white-hot core); motes drift in from step 1. Then **one release frame** when it goes off, then back to normal. Interrupted casts just stop (no release).
+- **Spell colours** are digits 1–4 in the frame palette (dark rim, the spell's own colour from `mobs.js`, bright, white core), so they never clash with a sprite's letters: Ash Bolt orange, Shadow Bolt purple, Cinder Lash amber, Mend green, Rite of Mending gold, Grasp of the Deep sea-green, the chant lilac.
+- **Bolts are lifted, then thrown:** the hand (or staff, or censer) goes up over the head where the glow gathers; the release is the arm thrust at you with a short star of light. **Heals** gather between raised hands (mender) or light up the caster's own trim (Malrec), and release as a ring or a flash along the floor.
+- **Instant moves get a short drawn move instead of a hold:** the chanter sways his censer twice with motes rising, the great ash wisp swells and pulses while its ring burns, the Acolyte tips his censer and embers spill for Ember Brand.
+- **Physical moves stay physical:** the Bellringer's Toll is a man heaving an iron clapper (it rises a step each beat and shakes with the strain: the tell), then slamming it down. **Iron stays straight (owner, Nov 27):** the clapper hits the floor as one rigid bar from his fist to its head, never bent at the hands, even if it looks a little stiff.
+- How it's drawn: `tools/cast_poses_draft.py` (draft page with `tools/cast_review_page.py`), `--game` writes `MOB_CASTS` into `js/data/sprites.js`; `castFrame` / `castPlay` in `js/anim.js` pick the frame, the cast code in `js/world.js` calls `castPlay` when a spell goes off.
+
 ## Area look sheets
 Each area gets a short look sheet here once its style is picked.
 

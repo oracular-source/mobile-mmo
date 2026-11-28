@@ -286,18 +286,31 @@ def bellringer(S):
     def strain(st, i):
         dy = 2 + st; dx = -1 if i % 2 else 0  # lifts higher each beat and shakes side to side: the strain is the tell
         return heave(dy, dx)
-    head = {(x - 18, y): c for (x, y), c in ready.items() if 18 <= x <= 25 and y <= 7}  # the clapper's iron head
+    # The clapper stays one straight, rigid bar from his fist to the floor (owner, Nov 27: it must never bend):
+    # a 2-pixel iron handle and, on the same line, the fat iron head resting on the ground.
+    import math
     bare = {p: c for p, c in body.items() if not (p[0] >= 15 and p[1] <= 12 and c in 'knmN')}  # no stub of the handle left over his head
-    hit = over(bare, stamp(head, (23, h - 9)))
-    hit = over(hit, {p: 'n' for p in line((20, 14), (25, h - 9)) + line((21, 14), (26, h - 9))})
+    A, B = (20, 13), (31, h - 3)
+    L = math.hypot(B[0] - A[0], B[1] - A[1]); ux, uy = (B[0] - A[0]) / L, (B[1] - A[1]) / L; px_, py_ = -uy, ux
+    bar = {}
+    steps = int(L * 2)
+    for j in range(steps + 1):
+        t = j / 2; cx_, cy_ = A[0] + ux * t, A[1] + uy * t
+        head = t > L - 6.5
+        half = 2.3 if head else 0.6
+        k = -half
+        while k <= half:
+            q = (round(cx_ + px_ * k), round(cy_ + py_ * k))
+            bar[q] = ('N' if k < -0.5 else 'n' if k < 1.2 else 'm') if head else ('N' if k < 0 else 'n')
+            k += 0.5
+    hit = reoutline(over(bare, outlined(bar)))
     hit = over(hit, {(19, 13): 's', (20, 13): 'S', (19, 14): 's', (20, 14): 's'})
-    hit = reoutline(hit)
-    dust = {(22, h - 1): 'u', (31, h - 2): 'U', (20, h - 2): 'U', (32, h - 1): 'u', (24, h - 3): 'u', (29, h - 3): 'U'}
+    dust = {(27, h - 1): 'u', (36, h - 2): 'U', (26, h - 2): 'U', (37, h - 1): 'u', (35, h - 3): 'u', (28, h - 3): 'U'}
     rings = {}
     import math
     for r, col in ((7, '3'), (10, '2')):
         for j in range(-6, 7):
-            a = math.radians(j * 12); rings[(round(27 + math.cos(a) * r), round(h - 5 + math.sin(a) * r * 0.5))] = col
+            a = math.radians(j * 12); rings[(round(31 + math.cos(a) * r), round(h - 4 + math.sin(a) * r * 0.5))] = col
     return [frame(ready, pal, 400, 'Ready (as today)')] + \
         hold(strain, pal, 1.5, ['Toll starts: heaves the clapper up', 'Higher, straining (it shakes)', 'Higher still', 'Up over his shoulder (step back now!)']) + \
         [frame(over(over(hit, dust), rings), pal, 120, 'Release: slams it into the floor: dust, the toll rings out (stuns anyone close)'),
@@ -320,10 +333,51 @@ def build():
     d['bellringer_toll'] = bellringer(S)
     return d, S
 
-if __name__ == '__main__':
+if __name__ == '__main__' and '--game' not in sys.argv:
     from family_anims_draft import sheet
     d, S = build(); d['player'] = player(S)
     out = os.path.join(ROOT, 'art/drafts/cast-poses-draft1.json')
     json.dump(d, open(out, 'w'), separators=(',', ':'))
     sheet(d, out.replace('.json', '.png'))
     print('wrote', out)
+
+# ---------- into the game (owner OK'd draft 1, Nov 27: "everything else looks absolutely fantastic"; the clapper
+# stays straight when it hits the floor) ----------
+# python3 tools/cast_poses_draft.py --game  writes MOB_CASTS into js/data/sprites.js. Per mob image, per kind of cast:
+#   h  = the hold frames, stepped through as the cast bar fills (glow stage 0..3)
+#   r  = the release frames played once when the spell goes off (rt = their seconds); for instant moves (chant, flare,
+#        brand) r is the whole move. The first (ready) and last (back) draft frames are the normal sprite, so they're dropped.
+CAST_GAME = {  # image: {kind: (draft key, base rows)}
+    'ashcaller': {'bolt': ('ashcaller_cast', lambda S: S['REDO_SPR']['ashcaller'])},
+    'summoner': {'bolt': ('summoner_cast', lambda S: S['REDO_SPR']['summoner'])},
+    'acolyte': {'bolt': ('acolyte_cast', lambda S: S['REDO_SPR']['acolyte']), 'brand': ('acolyte_brand', lambda S: S['REDO_SPR']['acolyte'])},
+    'mender': {'heal': ('mender_cast', lambda S: S['REDO_SPR']['mender'])},
+    'chanter': {'chant': ('chanter_chant', lambda S: S['REDO_SPR']['chanter'])},
+    'gwisp': {'flare': ('gwisp_flare', lambda S: S['GWISP_SPR'][0])},
+    'malrec': {'bolt': ('malrec_cast', lambda S: S['UNDEAD_SPR']['malrec']), 'heal': ('malrec_heal', lambda S: S['UNDEAD_SPR']['malrec'])},
+    'prior': {'grasp': ('prior_grasp', lambda S: S['MONASTERY_SPR']['prior'])},
+    'bellringer': {'toll': ('bellringer_toll', lambda S: S['MONASTERY_SPR']['bellringer'])},
+}
+INSTANT = ('chant', 'flare', 'brand')
+
+def write_game():
+    from mob_attack_draft import to_pose
+    d, S = build(); out = {}
+    for img, kinds in CAST_GAME.items():
+        out[img] = {}
+        for kind, (key, base) in kinds.items():
+            rows = base(S); w, h = len(rows[0]), len(rows); frs = d[key][1:-1]
+            hold = [] if kind in INSTANT else [f for f in frs if f.get('cast')]
+            rel = frs if kind in INSTANT else [f for f in frs if not f.get('cast')]
+            out[img][kind] = {'pal': frs[0]['pal'], 'h': [to_pose(f, w, h) for f in hold], 'r': [to_pose(f, w, h) for f in rel],
+                              'rt': [round(f['ms'] / 1000, 3) for f in rel]}
+    block = ('// MOB_CASTS (from tools/cast_poses_draft.py --game, owner OK Nov 27): cast poses. h = frames held while the cast bar\n'
+             '// fills (the glow builds), r = frames played once when it goes off (rt seconds each); instant moves are all r.\n'
+             'const MOB_CASTS=' + json.dumps(out, separators=(',', ':')) + ';\n// /MOB_CASTS\n')
+    p = os.path.join(ROOT, 'js/data/sprites.js'); s = open(p).read()
+    a = s.find('// MOB_CASTS'); b = s.find('// /MOB_CASTS\n')
+    s = (s[:a] + block + s[b + len('// /MOB_CASTS\n'):]) if a >= 0 and b > a else s.rstrip('\n') + '\n' + block
+    open(p, 'w').write(s); print('wrote MOB_CASTS into js/data/sprites.js', len(block) // 1024, 'KB')
+
+if __name__ == '__main__' and '--game' in sys.argv:
+    write_game()

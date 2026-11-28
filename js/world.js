@@ -364,13 +364,13 @@ function wallBetween(a,b){const A=curArea();if(!A)return false;const n=Math.ceil
 const CHANT={every:7,dur:6,x:1.25,first:2};
 function chantThink(m,dt){m.chantCd=(m.chantCd===undefined?CHANT.first:m.chantCd)-dt;if(m.chantCd>0)return;m.chantCd=CHANT.every;
   const mates=mobs.filter(o=>!o.dead&&(o===m||(m.sp.group&&o.sp.group===m.sp.group))&&dist(o,m)<90);
-  mates.forEach(o=>{o.chantT=CHANT.dur});floatText(m.x,m.y-24,'chants','#e0c3ff');burst(m.x,m.y-10,'#c8a0ff',6);
+  mates.forEach(o=>{o.chantT=CHANT.dur});castPlay(m,'chant');floatText(m.x,m.y-24,'chants','#e0c3ff');burst(m.x,m.y-10,'#c8a0ff',6);
   log(cap(m.def.name)+' chants, and '+(mates.length>1?'its camp fights harder':'it fights harder')+'!','#e0c3ff')}
 // Casters (ashcallers, the Ashen Acolyte): a spell with a cast bar over its head. Stands still while casting. A stun, fear,
 // sleep, Evade or Feign Death breaks it off (interruptCast); out of range when it lands = it misses.
 function mobCast(m,dt){const c=m.def.cast;
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
-  if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.bolt=c.every;
+  if(m.casting){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.bolt=c.every;castPlay(m,'bolt');
     if(dist(m,player)>c.range){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' falls short. You were out of range.','#9fb8e0');return false}
     if(!sightClear(m,player)){floatText(player.x,player.y-20,'MISS',c.col);log('The '+c.name.toLowerCase()+' breaks on the wall.','#9fb8e0');return false} // v0.126
     beams.push({x1:m.x,y1:m.y-12,x2:player.x,y2:player.y-8,t:0,col:c.col});burst(player.x,player.y-8,c.col,8);
@@ -394,7 +394,7 @@ function wispBlink(m,dt){m.blinkCd=(m.blinkCd===undefined?rr(3,5):m.blinkCd)-dt;
 // Ember Brand (the Ashen Acolyte): a ring of embers flares under you; 1.5 s to step out of it, then a big burn inside.
 const BRAND={first:5,every:9,dur:1.5,r:20,x:1.5},hazards=[];
 function brandThink(m,dt){if(m.casting)return;m.brandCd=(m.brandCd===undefined?BRAND.first:m.brandCd)-dt;if(m.brandCd>0||dist(m,player)>120)return;m.brandCd=BRAND.every;
-  hazards.push({x:player.x,y:player.y,r:BRAND.r,t:0,dur:BRAND.dur,m:m});floatText(m.x,m.y-26,'Ember Brand!','#ff8a3c');log(cap(m.def.name)+' brands the ground under you with embers! Move!','#ff8a3c')}
+  hazards.push({x:player.x,y:player.y,r:BRAND.r,t:0,dur:BRAND.dur,m:m});castPlay(m,'brand');floatText(m.x,m.y-26,'Ember Brand!','#ff8a3c');log(cap(m.def.name)+' brands the ground under you with embers! Move!','#ff8a3c')}
 function updateHazards(dt){for(let i=hazards.length-1;i>=0;i--){const h=hazards[i];h.t+=dt;if(h.t<h.dur)continue;hazards.splice(i,1);
   for(let k=0;k<14;k++)parts.push({x:h.x+rr(-h.r,h.r),y:h.y+rr(-h.r*0.6,h.r*0.6),vx:rr(-6,6),vy:-rr(14,30),t:0,life:0.7,col:k%2?'#ff8a3c':'#ffd27a'});
   if(player.dead||!h.m||h.m.dead)continue;
@@ -413,7 +413,7 @@ function checkSeals(A){A.seals.forEach(sl=>{if(sl.open||!sl.obj||sl.named)return
 // sleep or Evade breaks it off. It never heals itself. Returns true while casting (it stands still).
 function healThink(m,dt){const h=m.def.heal;
   if(m.aslow>0&&m.slowCast)dt/=(m.aslowX||1.6);
-  if(m.casting&&m.casting.heal){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;const t=m.casting.who;m.casting=null;m.healCd=h.every;
+  if(m.casting&&m.casting.heal){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;const t=m.casting.who;m.casting=null;m.healCd=h.every;castPlay(m,'heal');
     if(!t||t.dead)return false;const n=Math.round(t.maxhp*h.x);t.hp=Math.min(t.maxhp,t.hp+n);floatText(t.x,t.y-24,'+'+n,h.col);burst(t.x,t.y-8,h.col,8);
     log(cap(m.def.name)+(t===m?' heals itself':' heals '+t.def.name)+' for '+n+'.',h.col);return false}
   if(m.casting)return false;
@@ -440,7 +440,7 @@ const finX=m=>m.finale?FINALE.dmg:1; // the finale's returning bosses hit softer
 const onSpot=(s)=>Math.hypot((player.x-s.x)/GRASP.r,(player.y-s.y)/(GRASP.r*0.6))<=1;
 function graspThink(m,dt){
   if(m.def.grasp&&m.state==='chase')riseDead(m,dt);
-  if(m.casting&&m.casting.grasp){const c=m.casting;c.t+=dt;if(c.t<c.dur)return true;m.casting=null;m.graspCd=GRASP.every;if(m.finale)finaleNext('grasp');
+  if(m.casting&&m.casting.grasp){const c=m.casting;c.t+=dt;if(c.t<c.dur)return true;m.casting=null;m.graspCd=GRASP.every;castPlay(m,'grasp');if(m.finale)finaleNext('grasp');
     let caught=false;
     c.spots.forEach(s=>{for(let k=0;k<5;k++){const an=k*1.257+rr(-0.3,0.3);hands.push({x:s.x+Math.cos(an)*GRASP.r*0.7,y:s.y+Math.sin(an)*GRASP.r*0.42,t:0,life:1.4})}
       if(!caught&&onSpot(s))caught=true});
@@ -513,12 +513,12 @@ function resetLocks(){const A=curArea();if(!A||!A.locks)return;A.locks.forEach(L
 // (or drag the fight away from it). Uses the same ground hazards as Ember Brand.
 const GBURN={first:4,every:8,dur:1.6,r:34,x:1.1};
 function burnThink(m,dt){if(m.casting)return;m.burnCd=(m.burnCd===undefined?GBURN.first:m.burnCd)-dt;if(m.burnCd>0||dist(m,player)>GBURN.r+30)return;m.burnCd=GBURN.every;
-  hazards.push({x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'});floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
+  hazards.push({x:m.x,y:m.y,r:GBURN.r,t:0,dur:GBURN.dur,m:m,mult:GBURN.x,label:'Fire Ring'});castPlay(m,'flare');floatText(m.x,m.y-28,'flares!','#ff8a3c');burst(m.x,m.y-10,'#ffd27a',10);
   log(cap(m.def.name)+' flares up! Get out of the ring of fire.','#ff8a3c')}
 // Toll: he heaves the bell's clapper up for 1.5 s (a bar over his head), then slams it down. Counter: step back to mid range
 // (slowed, not stunned), or stun him first. In the finale the ring also knocks Grasp's hands back down.
 function tollThink(m,dt){
-  if(m.casting&&m.casting.toll){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.tollCd=TOLL.every;if(m.finale)finaleNext('toll');
+  if(m.casting&&m.casting.toll){m.casting.t+=dt;if(m.casting.t<m.casting.dur)return true;m.casting=null;m.tollCd=TOLL.every;castPlay(m,'toll');if(m.finale)finaleNext('toll');
     tollRing(m);return false}
   if(m.casting)return false;
   if(m.finale){if(!finaleTurn('toll')||dist(m,player)>TOLL.slowR)return false}

@@ -238,6 +238,8 @@ function lightStamp(r,amb,kind){
 function shadow(x,y,r){x=Math.round(x);y=Math.round(y);lx.fillStyle='rgba(0,0,0,0.5)';lx.fillRect(x-r,y-1,r*2+1,2);lx.fillRect(x-r+1,y+1,r*2-1,1)}
 // Mob attack frames (MOB_POSES, from tools/mob_attack_draft.py) turned into pictures once: each with its ax and by.
 const MOB_POSE_IMG={},MOB_DEATH_IMG={};Object.keys(MOB_POSES._deaths).forEach(k=>{const D=MOB_POSES._deaths[k];MOB_DEATH_IMG[k]={t:D.t,f:D.f.map(p=>({im:mk(p.rows,D.pal),ax:p.ax,by:p.by}))}}); // rat deaths (v0.118)
+// Cast poses (v0.147): MOB_CASTS[img][kind] = {h: frames held while the bar fills, r: frames played once when it goes off}.
+const MOB_CAST_IMG={};Object.keys(MOB_CASTS).forEach(k=>{MOB_CAST_IMG[k]={};Object.keys(MOB_CASTS[k]).forEach(n=>{const C=MOB_CASTS[k][n],f=p=>({im:mk(p.rows,C.pal),ax:p.ax,by:p.by});MOB_CAST_IMG[k][n]={h:C.h.map(f),r:C.r.map(f),rt:C.rt}})});
 Object.keys(MOB_POSES).forEach(k=>{if(k==='_deaths')return;const P=MOB_POSES[k],o={t:P.t};['wind','smear','hit','rec'].forEach(s=>{o[s]={im:mk(P[s].rows,P.pal),ax:P[s].ax,by:P[s].by}});MOB_POSE_IMG[k]=o});
 function drawSprite(img,x,y,dir,bob,sit){
   const im=dir<0?img.f:img.c,w=img.w,h=img.h;
