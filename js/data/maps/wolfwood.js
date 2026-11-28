@@ -16,11 +16,11 @@ MAPS.wolfwood = {
     'FFnnFnnnnnnvnvnFFvvvFnnnnnnnnnnBnFnnnnn::nnnnnnFFFFFvvnvvvfnnnFF',
     'FFFnnfFnnFnvvnvfvFFFnFvnnBnnnnnnnnnnnnn:::nnnnFFFFFvvFnFvnnFnnFF',
     'FFnnFFFfFFFFnnFFvvnvvFvnnnnnnnnnkknnnnnn::nnnnFFFFFvnvvFvvvFFFFF',
-    'FFnnnnnFFFFnnnnnFFnnnFFFnFnvFktvFnnnnnnn::nnFFnFFFfvFvnvvFnnnFFF',
-    'FFFnFnOOOOOOOnnnnnnFfnnnFnFknvkkkFtFFnnn:::FFnnnnFFFvvnFnvFnnFFF',
-    'FFFnFOnnnnnnnOnnnnnFnFnFknkvkkkkkkknFknnn::FnnnnnnnnvvFvvFFFnnFF',
-    'FFFfFOnnnnnnnnOnnFFnFFFtnkkkkkkkkktkkkkFF::nnnnnnnnnnFnFFFnnnnFF',
-    'FFFFnnOnnnnnnOnnFFnnnnknkkkkkkkkkkkkkkktk::nnnnnnnnnnnnFFFnnFnFF',
+    'FFnnnnnFFFFnnnnnFFnnnFFFnFnvnktvFnnnnnnn::nnFFnFFFfvFvnvvFnnnFFF',
+    'FFFnFnnnnnnnnnnnnnnFfnnnFnFknvkkkFtFFnnn:::FFnnnnFFFvvnFnvFnnFFF',
+    'FFFnFnnnnnnnnnnnnnnFnFnFknkvkkkkkkknFknnn::FnnnnnnnnvvFvvFFFnnFF',
+    'FFFfFnnnnnnnnnnnnFFnFFFtnkkkkkkkkktkkkkFF::nnnnnnnnnnFnFFFnnnnFF',
+    'FFFFnnnnnnnnnnnnFFnnnnknkkkkkkkkkkkkkkktk::nnnnnnnnnnnnFFFnnFnFF',
     'FFFFFnnnnnnnnnnnnnnFkknkkkkkkkkkkkkkkkkkn::nnnnnnnnnnnnnFFFFFFFF',
     'FFFFFnnnnnnnnnnnnFnFkknkktkkkkkkkkkkkkktk::nnnnnvnvnnvnnFFnFFFFF',
     'FFFFnnnnn:nnnnnnnnnnFkkkkkkkkkkkkkkkkkkkk::nknnvnnvnnnFnnnnFFFFF',
@@ -59,7 +59,8 @@ MAPS.wolfwood = {
   things: `
 # landmarks and props
 obj giant_tree 29 15
-obj tunnel_mouth 8 14
+# the crypt tunnel comes up through a rock face in the hillside (v0.118, owner's pick D)
+obj hill_face 5 10
 obj wolf_den 26 4
 obj cot 53 26
 obj campfire 53 29 pot
@@ -106,10 +107,8 @@ critter firefly 60 24.5 3
 critter firefly 15.5 24.5 2
 critter deer 58.5 22.8
 critter deer 60.2 26.6
-critter eyes 18.5 8.5
 critter eyes 7.5 6.5
 critter eyes 54.5 2.6
-critter eyes 60.5 9.5
 critter eyes 21.5 13.5
 # ways in and out
 exit south 56 47 to=crossroads at=north

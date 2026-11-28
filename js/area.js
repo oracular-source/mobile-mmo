@@ -139,6 +139,8 @@ function* buildAreaGen(id){
     // Wolfwood heart pass (v0.81): low gold dusk light through gaps in the canopy (more near the crossroads, fewer deeper in),
     // and foxfire's cold glow round the blight. Both drawn live too (world.js drawGlows).
     if(o.kind==='sunbeam'){A.lights.push({x:cx,y:o.y*T+8,r:46,w:20});(A.beams=A.beams||[]).push({x:cx,y:o.y*T+12,ph:ah(o.x,o.y,63)*6.3})}
+    // v0.118: a faint cold breath of crypt air out of the tunnel mouth in the hillside, so the way down shows in the dark.
+    if(o.kind==='hill_face'){A.lights.push({x:o.x*T+72,y:o.y*T+o.h*T-10,r:30,w:0,c:26})}
     if(o.kind==='foxfire'){A.lights.push({x:cx,y:o.y*T+10,r:22,w:0,c:26});(A.fox=A.fox||[]).push({x:o.x*T,y:o.y*T,ph:ah(o.x,o.y,64)*6.3})}
     if(o.kind==='shack')A.lights.push({x:o.x*T+15,y:o.y*T+30,r:30,w:24}); // the gravedigger is home: his window throws a little warm light (v0.82)
     if(o.kind==='flowers'){A.lights.push({x:o.x*T+12,y:o.y*T+2,r:20,w:18});A.flames.push({x:o.x*T+12,y:o.y*T+2,big:0,tiny:1})} // a mourner's candle (v0.49)
@@ -1864,6 +1866,53 @@ function drawObj(g,R,o){
     R(X+8,Y,4,H,AP.out);R(X+9,Y+1,2,H-1,AP.woodDk);R(X+W-12,Y,4,H,AP.out);R(X+W-11,Y+1,2,H-1,AP.woodDk);R(X+7,Y-2,W-14,4,AP.out);R(X+8,Y-1,W-16,2,AP.wood);R(X+8,Y-1,W-16,1,AP.woodHi);
     [[14,6],[22,9],[31,5]].forEach(([x,l])=>{for(let k=0;k<l;k++)R(X+x+(k>3?1:0),Y+2+k,1,1,k<l-1?AP.root:AP.rootHi)});
     R(X+4,top+6,4,2,AP.mossHi);R(X+W-10,top+4,5,2,AP.mossHi);return}
+  if(k==='hill_face'){
+    // v0.118 (love pass W1, owner picked D): the hillside the crypt tunnel comes up through, drawn as ONE shape, not a row of
+    // round boulders. 3/4 view: you see the hill's turf from above, sloping down to the ground at its sides, and in the
+    // middle of its south side an outcrop of bare rock seen side-on (a half-oval, tallest over the mouth): uneven slabs,
+    // a lit lip along the top, cracks, moss in the joints. The turf overhangs the rock as a dark earth lip with roots
+    // hanging over the face and into the tunnel's black mouth. Pieces broken off the face lie at its foot.
+    const cx=X+72,hw=70,fw=48;
+    const base=x=>{const d=Math.abs(x-cx);return Y+H-2-(d>46?Math.round((1-Math.sqrt(Math.max(0,1-Math.pow(Math.min(1,(d-46)/25),2))))*46):0)+Math.round((ah(Math.floor(x/5),8,104)-0.5)*2)};
+    const top=x=>Y-6+Math.round(30*Math.pow((x-cx)/hw,2))+Math.round((ah(Math.floor(x/6),2,91)-0.5)*5);
+    const rockH=x=>{const d=Math.abs(x-cx)+(ah(Math.floor(x/4),4,92)-0.5)*6;return d>=fw?0:Math.round(50*Math.sqrt(1-Math.pow(d/fw,2)))};
+    const mh=28,mw=15,mb=Y+H-2; // the mouth: 28 tall, 30 wide at its foot
+    const inMouth=(x,y)=>{const t=(mb-y)/mh;if(t<0||t>1)return false;return Math.abs(x-cx)<Math.round(mw*Math.sqrt(1-t*t))+(ah(y,7,93)<0.3?1:0)};
+    const slab=(x,y)=>{ // which slab a rock pixel is in: rows of uneven height, joints offset per row
+      let yy=0,row=0;while(true){const h=4+Math.floor(ah(row,x>>6,105)*5);if(y-yy<h)break;yy+=h;row++;if(row>20)break}
+      const off=Math.floor(ah(row,1,106)*12),col=Math.floor((x+off)/(10+Math.floor(ah(row,2,107)*9)));return [row,col,y-yy]};
+    shadow(X+14,Y+H-3,W-28,4);
+    for(let x=X-2;x<X+W+2;x++){const t=top(x),b=base(x);if(b<=t+2)continue;const rh=rockH(x),f=b-rh;
+      for(let y=t;y<b;y++){
+        if(y===t||y===b-1){R(x,y,1,1,AP.out);continue}
+        const edge=top(x-1)>=base(x-1)-2||top(x+1)>=base(x+1)-2||y<top(x-1)||y<top(x+1)||y>=base(x-1)||y>=base(x+1);if(edge){R(x,y,1,1,AP.out);continue}
+        if(rh<2||y<f-2){ // turf, seen from above; the south slope darkens toward its foot
+          const r=ah(x,y,94),sl=(y-t)/(b-t);if(y-t<3&&x<cx+20&&r<0.7){R(x,y,1,1,AP.mossHi);continue} // the lit brow of the hill, top left
+          R(x,y,1,1,r<0.06&&sl<0.6?AP.mossHi:sl>0.75&&rh<2?(r<0.5?AP.mossDk:AP.needleDk):r<0.55?AP.mossG[Math.floor(ah(x>>2,y>>2,95)*4)]:AP.needles[Math.floor(r*4)]);continue}
+        if(y<f){R(x,y,1,1,y===f-2?'#2a2016':AP.out);continue} // the earth lip where the turf overhangs the rock
+        if(inMouth(x,y)){const dy=y-(mb-mh);R(x,y,1,1,dy<4?'#120e0c':dy<8?'#0a0807':'#030202');continue}
+        const [row,col,iy]=slab(x,y-f),lit=x<cx-20;
+        const joint=iy===0||(ah(row,col,108)<0.5&&Math.floor((x+Math.floor(ah(row,1,106)*12))%(10+Math.floor(ah(row,2,107)*9)))===0);
+        R(x,y,1,1,y===f?AP.bouldHi:joint?AP.bouldDk:iy===1&&lit?AP.bouldHi:ah(row,col,109)<0.35?AP.bouldDk:ah(row,col,110)<0.5?AP.bould:'#4c4c47')}}
+    // the mouth's rim: a dark outline, a lit edge on its left, the earth lip dipping over it
+    for(let y=mb-mh;y<mb;y++){const t=(mb-y)/mh,w=Math.round(mw*Math.sqrt(Math.max(0,1-t*t)));R(cx-w-2,y,2,1,AP.out);R(cx+w,y,2,1,AP.out);R(cx-w-3,y,1,1,AP.bouldHi)}
+    // cracks down the face (never through the mouth), moss in the joints
+    for(let i=0;i<6;i++){const x=cx-fw+8+Math.floor(ah(i,11,97)*(2*fw-16));if(Math.abs(x-cx)<mw+5)continue;const f=base(x)-rockH(x),y=f+3+Math.floor(ah(i,12,98)*6);
+      treeLine(R,x,y,x+(i%2?2:-1),Math.min(base(x)-3,y+8+(i%3)*3),1,AP.out)}
+    for(let i=0;i<10;i++){const x=cx-fw+6+Math.floor(ah(i,13,99)*(2*fw-12)),f=base(x)-rockH(x),y=f+1+Math.floor(ah(i,14,100)*Math.max(1,rockH(x)-6));if(rockH(x)<6||inMouth(x,y)||inMouth(x+3,y))continue;
+      R(x,y,3+(i%3),1,'#3e5232');R(x+1,y+1,2,1,AP.mossDk)}
+    // roots hanging off the turf over the face, longest over the mouth
+    for(let x=cx-fw+6;x<cx+fw-6;x+=4+Math.floor(ah(x,15,101)*5)){if(rockH(x)<8)continue;const over=Math.abs(x-cx)<mw+2,l=over?8+Math.floor(ah(x,16,102)*8):2+Math.floor(ah(x,16,102)*5),f=base(x)-rockH(x);
+      for(let j=0;j<l;j++)R(x+(j>4&&ah(x,j,103)<0.5?1:0),f+j,1,1,j<l-1?AP.root:AP.rootHi)}
+    // ferns and tufts on the turf so it reads as a grassy hilltop
+    [[cx-46,10],[cx+40,12],[cx-14,4],[cx+16,8],[cx-58,22]].forEach(([x,yo])=>{const y=top(x)+yo+6;for(let j=0;j<4;j++){R(x-j,y-j,1,1,'#3e5a32');R(x+j,y-j,1,1,'#3e5a32')}R(x,y-4,1,4,'#4e6a3a');R(x-1,y,3,1,AP.out)});
+    // pieces broken off the face, lying at its foot: angular, lit top-left facets, dark undersides, chips round them
+    const rock=(x,y,pts)=>{const P=pts.map(([a,b])=>[x+a,y+b]);g.fillStyle=AP.out;g.beginPath();P.forEach(([a,b],n)=>n?g.lineTo(a,b):g.moveTo(a,b));g.closePath();g.fill();
+      g.fillStyle=AP.bould;g.beginPath();P.forEach(([a,b],n)=>{const qx=a+(a<x+6?1:-1),qy=b+(b<y+4?1:-1);n?g.lineTo(qx,qy):g.moveTo(qx,qy)});g.closePath();g.fill()};
+    const ry=Y+H-2;
+    rock(cx-38,ry-9,[[0,6],[3,1],[9,0],[13,4],[12,9],[2,10]]);R(cx-34,ry-7,5,1,AP.bouldHi);R(cx-35,ry-6,1,3,AP.bouldHi);R(cx-35,ry,9,1,AP.bouldDk);
+    rock(cx+26,ry-7,[[0,5],[2,1],[8,0],[10,5],[7,8],[1,8]]);R(cx+29,ry-5,4,1,AP.bouldHi);R(cx+28,ry-4,1,2,AP.bouldHi);R(cx+27,ry,7,1,AP.bouldDk);
+    [[cx-24,ry-2],[cx-44,ry-1],[cx+38,ry-1],[cx+20,ry-3]].forEach(([x,y])=>{R(x,y,3,2,AP.out);R(x,y,2,1,AP.bould)});return}
   if(k==='wolf_den'){
     // Greyfang's den as a cave (v0.84; owner: "change it to a cave style, that will read better"). A low outcrop of grey
     // stone in layered ledges, lit from the upper left, moss on the ledge tops, with a big black arched mouth in its face;

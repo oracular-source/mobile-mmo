@@ -79,6 +79,7 @@ light_shaft  1 1 0      floor  0     -    4
 gnaw_pile    2 2 1      floor  1     -    0
 giant_tree   4 4 1      ground 1     S    0
 tunnel_mouth 3 2 1      ground 1     S    2
+hill_face    9 6 1      ground 0     -    2
 lean_to      3 2 1      ground 1     S    0
 firepit      1 1 1      ground 1     -    0
 drying_rack  2 1 1      ground 0     -    0
@@ -152,5 +153,7 @@ stalagmite   1 1 1      floor  0     -    0
 // (the tree fades while you're behind it).
 const OBJECT_SOLID = {
   giant_tree: ['....', '....', '.##.', '####'],
+  // the crypt tunnel's hillside in Wolfwood (v0.118, owner's pick D): a rounded rock face, the mouth in its south face
+  hill_face: ['..#####..', '.#######.', '#########', '#########', '#########', '.#######.'],
 };
 

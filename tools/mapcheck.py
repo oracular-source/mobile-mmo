@@ -226,7 +226,7 @@ def check(m, tiles, objs):
         lights = [o for o in placed if o['light']]
         for mk in markers:
             if mk['k'] == 'exit' and (mk['type'] == m['start'] or 'lit' in mk.get('extra', [])):
-                if not any(abs(o['x'] - mk['x']) + abs(o['y'] - mk['y']) <= o['light'] + 3 for o in lights):
+                if not any(max(o['x'] - mk['x'], 0, mk['x'] - o['x'] - o['w'] + 1) + max(o['y'] - mk['y'], 0, mk['y'] - o['y'] - o['h'] + 1) <= o['light'] + 3 for o in lights):  # from the nearest footprint tile (big objects)
                     W.append(f"exit {mk['type']} has no light near it (torches mark the way in)")
     # one light per spot (lighting pass v0.96, owner Nov 27): two light sources within 2 tiles of each other usually means
     # a spare candle beside a shrine. A pair flanking something sits on one row (gate torches, door braziers), so same-row
@@ -263,7 +263,7 @@ OBJ_COL = {'bell_tower': '#5d5668', 'crypt_mouth': '#4a4560', 'shack': '#5a4030'
            'statue': '#9a94a2', 'torch': '#ff9a3c', 'lantern': '#ffb860', 'candle': '#ffd890', 'cart': '#6a5034',
            'throne': '#3a3446', 'brazier': '#ff9a3c', 'campfire': '#ff9a3c', 'signpost': '#8a6a4a', 'sinkhole': '#120d0a',
            'burrow': '#1a120c', 'light_shaft': '#cfd8dc', 'gnaw_pile': '#b9b0a0',
-           'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'lean_to': '#6a5034', 'firepit': '#3a3430',
+           'giant_tree': '#b8b2a6', 'tunnel_mouth': '#4a4a48', 'hill_face': '#5a5a55', 'lean_to': '#6a5034', 'firepit': '#3a3430',
            'drying_rack': '#7a5a3a', 'trap': '#8a8a90', 'wolf_den': '#3e3c3a', 'fallen_log': '#5a4430', 'stump': '#6a5038',
            'chapel': '#6a6672', 'fallen_bell': '#a08a50', 'ash_circle': '#2a2624', 'shrine': '#7a7480', 'censer': '#ffb060', 'hung_censer': '#ffb060',
            'banner': '#3a1418', 'bedroll': '#6a5a48', 'cot': '#8a6a48', 'wagon': '#8a7254', 'fishing_rod': '#7a5a42', 'town_gate': '#5a4030',
@@ -540,7 +540,7 @@ def draw_objects(d, m, s, ox=0, oy=0, x0=0, y0=0):
         if k == 'crypt_mouth':
             d.rectangle([px + 1.6 * s, py + 1.2 * s, px + 3.4 * s, py + h - 1], fill=hexc('#07060a'))
             d.rectangle([px + 1.8 * s, py + 1.5 * s, px + 3.2 * s, py + h - 1], fill=hexc('#2a3a6a'))
-        if k in ('tunnel_mouth', 'wolf_den'):
+        if k in ('tunnel_mouth', 'wolf_den', 'hill_face'):
             d.rectangle([px + w * 0.3, py + h * 0.45, px + w * 0.7, py + h - 1], fill=hexc('#07060a'))
         if k == 'lean_to':
             d.polygon([(px, py + h - 1), (px + w / 2, py), (px + w - 1, py + h - 1)], fill=hexc('#7a5a38'), outline=hexc('#1c1712'))
