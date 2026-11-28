@@ -332,7 +332,12 @@ function namedOffer(type,pinks,n){
       else id=(first&&i===0)||rng()<LOOT.namedBlue?blueOrGreen():pick(UNCOMMONS.length?UNCOMMONS:COMMONS)}
     if(ITEMS[id].rar==='named')pink=true;out.push(id)}
   lootMem.first[type]=1;lootMem.dry[type]=pink?0:(lootMem.dry[type]||0)+1;saveLoot();return out}
-const NAMED_PINKS={gnaw:()=>['gnawring'],ironshell:()=>['ironbracers'],greyfang:()=>['fangring','fangruff'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
+// Brother Malrec's chest (v0.131, owner Nov 27): no choosing. It holds one of his two pinks for your class (weapon or chest piece,
+// at random, never one you already have) plus a blue. Run him again for the other pink. With both owned: two blues (or greens).
+function malrecChest(){const left=MALREC.filter(id=>!owned(id)),out=[];if(left.length)out.push(pick(left));
+  for(let tries=0;out.length<2&&tries<12;tries++){const id=blueOrGreen();if(out.indexOf(id)<0)out.push(id)}
+  lootMem.first.malrec=1;saveLoot();return out}
+const NAMED_PINKS={gnaw:()=>['gnawring'],ironshell:()=>['ironbracers'],greyfang:()=>['fangring'],prior:()=>['priorcowl'],bellringer:()=>['bellband']};
 // A rare mob's own item (src in items.js): it's the blue a rare drops, unless you already have it (then any blue for your class).
 const OWN_ITEM={};Object.keys(ITEMS).forEach(id=>{if(ITEMS[id].src)OWN_ITEM[ITEMS[id].src]=id});
 function rollLoot(m){
@@ -347,10 +352,10 @@ function rollLoot(m){
   const key=KEY_DROPS[zoneId]&&KEY_DROPS[zoneId][m.type];if(key&&rng()<KEY_CHANCE)got.push(key);
   if(m.def.rare){const own=OWN_ITEM[m.type];got.push(rng()<LOOT.rareMobBlue?(own&&!owned(own)?own:blueOrGreen()):pick(UNCOMMONS))} // a rare always pays one item: green, sometimes its own blue
   if(NAMED_PINKS[m.type])got.push(namedOffer(m.type,NAMED_PINKS[m.type](),1)[0]);
-  // The Skeleton King's item waits in his chest; Brother Malrec's chest offers three and you pick one (owner, Nov 27).
+  // The Skeleton King's item waits in his chest; so does Brother Malrec's: one of his two pinks plus a blue (v0.131).
   const toChest=items=>{if(run.chest){run.chest.items=items;return}got.push.apply(got,items)};
   if(m.type==='boss1')toChest(namedOffer('boss1',BOSS1,1));
-  if(m.type==='malrec'){const o=namedOffer('malrec',MALREC.length?MALREC:BOSS1,3);if(run.chest){run.chest.offer=o;run.chest.items=[]}else got.push(o[0])}
+  if(m.type==='malrec')toChest(malrecChest());
   // Enchant orbs (v0.100): rare from normal mobs, likelier from rares, named and bosses, always from Brother Malrec.
   // Never rolled in the arena, so the sim's random rolls (and its numbers) stay exactly as they were.
   if(zoneId!=='arena'){const orb=m.type==='malrec'||(boss?rng()<LOOT.orbNamed:m.def.rare?rng()<LOOT.orbRare:m.lv>=LOOT.orbMobLv&&rng()<LOOT.orbMob);if(orb)got.push('orb1')}

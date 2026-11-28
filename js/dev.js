@@ -13,7 +13,7 @@ function devAct(a){
   // Loot by rarity (owner, Nov 27): pick the colour you want to test. Every pink for your class, including named and Malrec ones.
   else if(a==='white'){giveItem(pick(COMMONS));saveInv()}
   else if(a==='gear'){giveItem(pick(UNCOMMONS));saveInv()}
-  else if(a==='pink'){giveItem(pick(Object.keys(ITEMS).filter(id=>ITEMS[id].rar==='named'&&ITEMS[id].slot&&forMe(id))));saveInv()}
+  else if(a==='pink'){giveItem(pick(Object.keys(ITEMS).filter(id=>ITEMS[id].rar==='named'&&ITEMS[id].slot&&forMe(id)&&!ITEMS[id].retired)));saveInv()}
   // Your weapon type's whole Zone 1 ladder (white to Malrec), for testing weapon looks as they get built.
   else if(a==='wpns'){Object.keys(ITEMS).filter(id=>ITEMS[id].slot==='weapon'&&forMe(id)).sort((x,y)=>(ITEMS[x].look||0)-(ITEMS[y].look||0)).forEach((id,i)=>giveItem(id,1,i));saveInv()}
   else if(a==='rare'){giveItem(pick(RARES));saveInv()}
